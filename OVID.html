@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OVID — Ovid Therapeutics · Deep-Dive Investment Dossier</title>
+<style>
+  :root{
+    --ink:#1c2430; --ink2:#3d4756; --mut:#6b7686; --line:#e3e8ef;
+    --bg:#ffffff; --panel:#f6f8fb; --panel2:#eef2f7;
+    --acc:#14508c; --acc2:#0e3d6e;
+    --hard:#0f7a3d; --guid:#8a6d00; --inf:#5b6b80;
+    --fact:#0f7a3d; --interp:#7a5b00; --gap:#9a3d1a; --unv:#5b6b80;
+    --red:#a8232a; --amber:#8a6d00; --green:#0f7a3d;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.62;font-size:15.5px}
+  .wrap{max-width:1180px;margin:0 auto;display:flex}
+  /* ---------- sidebar ---------- */
+  nav.side{position:sticky;top:0;height:100vh;overflow:auto;width:250px;flex:0 0 250px;
+    border-right:1px solid var(--line);background:var(--panel);padding:22px 16px;font-size:13.5px}
+  nav.side .brand{font-weight:700;font-size:15px;color:var(--acc2);margin-bottom:2px}
+  nav.side .sub{color:var(--mut);font-size:12px;margin-bottom:16px}
+  nav.side a{display:block;color:var(--ink2);text-decoration:none;padding:5px 8px;border-radius:6px}
+  nav.side a:hover{background:var(--panel2);color:var(--acc2)}
+  nav.side .sec{margin-top:12px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding:0 8px}
+  /* ---------- main ---------- */
+  main{flex:1;min-width:0;padding:34px 44px 90px}
+  h1{font-size:32px;line-height:1.25;margin:0 0 6px;color:var(--acc2);letter-spacing:-.01em}
+  h2{font-size:22px;color:var(--acc2);margin:44px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:17px;color:var(--ink);margin:26px 0 8px}
+  h4{font-size:15px;margin:18px 0 6px;color:var(--ink)}
+  p{margin:10px 0}
+  .kicker{color:var(--mut);font-size:14px;margin-bottom:18px}
+  .callout{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);
+    border-radius:8px;padding:14px 18px;margin:18px 0}
+  .callout.warn{border-left-color:var(--amber)}
+  .callout.risk{border-left-color:var(--red)}
+  .callout.good{border-left-color:var(--green)}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);font-weight:600;color:var(--acc2)}
+  tr:nth-child(even) td{background:#fafbfd}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:20px;padding:2px 10px;margin:1px 2px;white-space:nowrap}
+  .hard{background:#e3f3e9;color:var(--hard)} .guid{background:#f7efcf;color:var(--guid)} .inf{background:#e8edf3;color:var(--inf)}
+  .ev{display:inline-block;font-size:10.5px;font-weight:800;border-radius:4px;padding:1px 7px;margin-right:6px;
+    letter-spacing:.05em;vertical-align:1px}
+  .FACT{background:#e3f3e9;color:var(--fact)} .INTERPRETATION{background:#f7efcf;color:var(--interp)}
+  .GAP{background:#fbe7dc;color:var(--gap)} .UNVERIFIED{background:#e8edf3;color:var(--unv)}
+  ul.tight li{margin:6px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}
+  .card h4{margin-top:0}
+  .num{font-variant-numeric:tabular-nums}
+  .src{font-size:12.5px;color:var(--mut)}
+  .tl{position:relative;margin:22px 0 10px;padding-left:26px}
+  .tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl .ev-item{position:relative;margin:0 0 18px}
+  .tl .ev-item:before{content:"";position:absolute;left:-23px;top:7px;width:10px;height:10px;border-radius:50%;
+    background:#fff;border:2.5px solid var(--acc)}
+  .ev-item .dt{font-weight:700;color:var(--acc2)}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+  .legend{font-size:12.5px;color:var(--mut);background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:10px 14px;margin:14px 0}
+  /* ---------- audit-pass additions: theme, collapse, back-to-top, mobile ---------- */
+  [data-theme="dark"]{
+    --ink:#e8edf4; --ink2:#c3cede; --mut:#93a1b8; --line:#2b3547;
+    --bg:#0f141c; --panel:#151c28; --panel2:#1c2536;
+    --acc:#7fb0ec; --acc2:#a5c9f5;
+    --hard:#55c98d; --guid:#e3bd55; --inf:#9db1cc;
+    --fact:#55c98d; --interp:#e3bd55; --gap:#e08a5f; --unv:#9db1cc;
+    --red:#e07078; --amber:#e3bd55; --green:#55c98d;
+  }
+  [data-theme="dark"] tr:nth-child(even) td{background:#131a26}
+  [data-theme="dark"] .card{background:#131a26}
+  .theme-btn{position:fixed;top:12px;right:12px;z-index:70;min-width:44px;min-height:44px;
+    border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);
+    font-size:18px;cursor:pointer;line-height:1;padding:8px 12px}
+  #toTop{position:fixed;bottom:18px;right:18px;z-index:70;width:48px;height:48px;border-radius:50%;
+    border:1px solid var(--line);background:var(--acc);color:#fff;font-size:20px;cursor:pointer;
+    display:none;box-shadow:0 2px 10px rgba(0,0,0,.28)}
+  #toTop.show{display:block}
+  section.collapsed > *:not(h2){display:none}
+  main section > h2.ct{cursor:pointer}
+  main section > h2.ct .mark{color:var(--mut);font-size:15px;margin-right:8px}
+  main section > h2.ct .mark:before{content:"\25BE"}
+  section.collapsed > h2.ct .mark:before{content:"\25B8"}
+  .ctl-row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+  .ctl-row button{min-height:44px;padding:10px 18px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);color:var(--ink2);cursor:pointer;font-size:14px;font-weight:600}
+  .ctl-row button:hover{color:var(--acc2)}
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+  .tscroll table{min-width:660px;margin:0}
+  @media(max-width:900px){
+    .wrap{flex-direction:column}
+    nav.side{position:sticky;top:0;z-index:60;height:auto;max-height:44vh;overflow:auto;width:100%;
+      flex:none;border-right:none;border-bottom:1px solid var(--line)}
+    nav.side a{padding:13px 10px;font-size:14px}
+    main{padding:24px 16px 90px}
+    .grid2,.grid3{grid-template-columns:1fr}
+    h1{font-size:25px}
+    h2{font-size:19px}
+    .theme-btn{top:auto;bottom:76px}
+    #toTop{bottom:16px}
+  }
+  @media print{nav.side,.theme-btn,#toTop,.ctl-row{display:none}main{padding:0}
+    section.collapsed > *:not(h2){display:block !important}}
+</style>
+</head>
+<body>
+<button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">&#127769;</button>
+<button id="toTop" aria-label="Back to top">&#8593;</button>
+<div class="wrap">
+<nav class="side">
+  <div class="brand">OVID · Deep-Dive Dossier</div>
+  <div class="sub">Ovid Therapeutics Inc. · Nasdaq</div>
+  <a href="#snapshot">1 · Identity &amp; Thesis Snapshot</a>
+  <a href="#science">2 · Science: MoA &amp; Why It Could Fail</a>
+  <a href="#pipeline">3 · Pipeline Overview</a>
+  <a href="#trials">4 · Trial Design Deep Dive</a>
+  <a href="#reg">5 · Clinical / Regulatory Status</a>
+  <a href="#comp">6 · Competition</a>
+  <a href="#fin">7 · Financials</a>
+  <a href="#fdmc">8 · FDMC / EV</a>
+  <a href="#catalysts">9 · Catalyst &amp; Event Map</a>
+  <a href="#redflags">10 · Ranked Red Flags</a>
+  <a href="#scenarios">11 · Bear / Base / Bull &amp; Scenarios</a>
+  <a href="#mgmt">12 · Management &amp; Insider Signals</a>
+  <div class="sec">Reference</div>
+  <a href="#refs">13 · References, As-Of, Filings Used</a>
+</nav>
+<main>
+
+<h1>Ovid Therapeutics Inc. (Nasdaq: OVID)</h1>
+<div class="kicker">Comprehensive deep-dive investment dossier · As of <strong>October 7, 2026</strong> · audited and enhanced <strong>October 10, 2026</strong> · OV329 (GABA-AT inhibitor): Phase 2a in refractory focal onset seizures + year-end 2026 photosensitivity proof-of-mechanism; OV4071 (first oral direct KCC2 activator): Phase 1 ongoing, schizophrenia PoC targeted 2027; OV888/ROCK2 program paused; soticlestat revived in a Perceptive Advisors NewCo (option value only).</div>
+
+<div class="legend"><strong>Evidence labels used throughout:</strong>
+<span class="ev FACT">FACT</span> directly stated in a cited source ·
+<span class="ev INTERPRETATION">INTERPRETATION</span> analyst inference from facts ·
+<span class="ev GAP">GAP</span> material unknown ·
+<span class="ev UNVERIFIED">UNVERIFIED</span> single-source or trade-press claim ·
+<strong>Date quality:</strong> <span class="pill hard">hard</span> confirmed date · <span class="pill guid">guidance</span> company-guided window · <span class="pill inf">inferred</span> analyst inference.
+Every number carries units, population/timepoint, and source. No DCF and no buy/sell recommendation. §11 carries soft, scenario-based price anchors (not a price target) with explicit assumptions. No cross-trial head-to-head efficacy claims.
+</div>
+<div class="ctl-row">
+<button id="expandAll" type="button">Expand all sections</button>
+<button id="collapseAll" type="button">Collapse all sections</button>
+</div>
+<div class="callout"><strong>Audit pass — October 10, 2026.</strong> This dossier was re-verified and enhanced: pipeline re-ranked by value with reasoning (new, §3), soft bear/base/bull price anchors with explicit assumptions (new, §11), catalyst map rebuilt as a table with “what good looks like / what to watch” per event (new, §9), plus a dark-mode toggle, collapsible sections, a back-to-top button, and mobile tap-target fixes. <strong>Stale-data check:</strong> no catalyst dated before 2026-10-10 has already happened — all guidances remain intact; Cantor Fitzgerald initiated coverage Oct 9, 2026 (Overweight); third-party close Oct 9: $2.46 (<span class="ev UNVERIFIED">UNVERIFIED</span>). Zero personal data.</div>
+
+<section id="snapshot">
+<h2>1 · Identity &amp; Thesis Snapshot</h2>
+<div class="tscroll">
+<table>
+<tr><th style="width:220px">Item</th><th>Detail</th></tr>
+<tr><td>Company</td><td><span class="ev FACT">FACT</span> Ovid Therapeutics Inc., New York–based biopharmaceutical company developing small-molecule medicines for epilepsies and brain conditions with seizure symptoms; Nasdaq: OVID. <span class="src">Source: Q2 2026 10-Q (filed Aug 13, 2026); Aug 13, 2026 business-update PR.</span></td></tr>
+<tr><td>What it is today</td><td><span class="ev FACT">FACT</span> A clinical-stage CNS company with two active programs: <strong>OV329</strong> (next-generation GABA-aminotransferase inhibitor) in Phase 2 for treatment-resistant focal onset seizures (FOS) plus proof-of-concept studies in tuberous sclerosis complex (TSC)-associated seizures and infantile spasms (IS); and the <strong>KCC2 direct-activator portfolio</strong> led by oral <strong>OV4071</strong> (Phase 1, first-in-class claim) targeting psychosis/schizophrenia. The ROCK2/CCM program (OV888) is <strong>paused</strong>; soticlestat was revived in a Perceptive Advisors–backed private NewCo in May 2026 (milestone/royalty option value only). <span class="src">Source: Aug 13, 2026 PR; Q2 2026 10-Q Notes 11.</span></td></tr>
+<tr><td>Key swing factor</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> The dossier's key swing factor is the <strong>OV329 Phase 2a readout in treatment-resistant FOS (completion guided H2 2027)</strong>, preceded by the <strong>year-end 2026 photosensitivity proof-of-mechanism study</strong> — the first human anti-convulsant signal for a next-generation GABA-AT inhibitor whose entire differentiation thesis rests on avoiding vigabatrin's irreversible retinal toxicity.</td></tr>
+<tr><td>Price context</td><td><span class="ev FACT">FACT</span> ~$2.36–2.37/share (Oct 6, 2026); 52-week range $1.18–$3.11; 195,297,857 shares outstanding as of Aug 11, 2026 → ~$463M basic market cap. <span class="ev UNVERIFIED">UNVERIFIED</span> MarketBeat consensus (Oct 5–6, 2026): "Moderate Buy," average price target $6.12; street high $9.00 (Oppenheimer, Aug 3, 2026). <span class="src">Source: Finnhub/WallStreetZen market data; MarketBeat via trade-press summaries Oct 5, 2026.</span> <span class="ev UNVERIFIED">UNVERIFIED</span> <strong>Audit update (Oct 10, 2026):</strong> third-party snapshot shows $2.46 close on Oct 9, 2026 (~+4% vs Oct 6); Cantor Fitzgerald initiated at Overweight on Oct 9, 2026. <span class="src">Sharemaestro weekly report, Oct 9, 2026 (third-party; unverified); MarketBeat summaries, Oct 9, 2026.</span></td></tr>
+<tr><td>Cash</td><td><span class="ev FACT">FACT</span> $169.8M cash, cash equivalents + marketable securities at Jun 30, 2026; company guidance: runway <strong>into 2029</strong>; $8.3M gross raised via ATM on Jul 23, 2026 ($64.3M ATM capacity remaining). <span class="src">Source: Q2 2026 10-Q; Aug 13, 2026 PR.</span></td></tr>
+<tr><td>Leadership</td><td><span class="ev FACT">FACT</span> Meg Alexander, President &amp; CEO since Jan 1, 2026 (joined Ovid 2020; corporate-affairs/comms background via Syneos Health); founder Jeremy Levin transitioned to Executive Chairman and chairs the soticlestat NewCo board. <span class="src">Source: Nov 12, 2025 8-K/succession PR; company bio.</span></td></tr>
+</table>
+</div>
+<div class="callout"><strong>Thesis in one paragraph.</strong> Ovid is a two-shot clinical binary story funded into 2029: (1) <strong>OV329</strong>, a mechanism-validated (GABA-AT inhibition = vigabatrin's mechanism) but safety-differentiated epilepsy candidate whose Phase 2a FOS readout in H2 2027 is the defining event, with a de-risking photosensitivity read near year-end 2026; and (2) <strong>OV4071</strong>, a first-in-human oral direct KCC2 activator — a genuinely novel CNS mechanism with no approved-drug validation — moving from Phase 1 into a 2027 schizophrenia proof-of-concept. The balance sheet is strong but was built through ~2.7× share-count expansion in about a year (Oct 2025 PIPE → Mar 2026 placement → warrant exercises → ATM), leaving a 28.9M-share Series B warrant overhang and $64M+ of ATM capacity. The science is interesting and the pipeline is differentiated; the open questions are whether GABA-AT inhibition can be dosed chronically without vigabatrin-like ocular findings, and whether KCC2 activation translates from EEG biomarkers to real clinical efficacy.</div>
+</section>
+
+<section id="science">
+<h2>2 · Science: Mechanism of Action &amp; Why It Could Fail</h2>
+
+<div class="grid3">
+<div class="card">
+<h4>OV329 — next-gen GABA-AT inhibitor (epilepsy)</h4>
+<p><span class="ev FACT">FACT</span> GABA is the brain's major inhibitory neurotransmitter; GABA-aminotransferase (GABA-AT) is the key enzyme that degrades it. OV329 substantially reduces GABA-AT activity, raising synaptic and extrasynaptic GABA and boosting phasic + tonic inhibitory neurotransmission, which curbs excessive neuronal firing. <span class="src">Source: Ovid corporate decks (2024–2025); Silverman RB, <em>Chem Rev</em> 2018;118:4037–4070 (GABA-AT inactivation review, PMID 29569907).</span></p>
+<p><span class="ev FACT">FACT</span> OV329 was designed in the Richard Silverman laboratory (Northwestern University); Ovid holds license agreements with Northwestern University. Preclinical anticonvulsant activity was published: Feja et al., <em>Epilepsia</em> 2021;62:3091–3104 (pentylenetetrazole seizure-threshold test and amygdala-kindled rats). The mechanism-based inactivator chemistry was described in Juncosa et al., <em>J Am Chem Soc</em> 2018;140:2151–2164. <span class="src">Source: company decks; Northwestern seminar flyer; AES 2023 poster.</span></p>
+<p><span class="ev FACT">FACT</span> Company claim: OV329 is ~1,000-fold more potent than vigabatrin at GABA-AT (IC50 ~0.1–0.3 µM vs ~60–100 mM range) with a different enzyme-modification chemistry (described as electrostatic/irreversible vs vigabatrin's covalent enamine pathway), enabling low mg-range daily dosing and, critically, no retinal accumulation: preclinical head-to-head showed OV329 tissue exposure below quantification in retina while vigabatrin showed ~4× accumulation. <span class="src">Source: Aug 2025 corporate deck (company data on file).</span></p>
+</div>
+<div class="card">
+<h4>OV4071 / OV350 — direct KCC2 activators (psychosis, epilepsy)</h4>
+<p><span class="ev FACT">FACT</span> KCC2 (potassium-chloride cotransporter 2) is a neuron-specific chloride extruder that sets the chloride gradient enabling GABA to be inhibitory; reduced KCC2 activity produces excitatory/inhibitory imbalance implicated in epilepsy, schizophrenia, and other hyperexcitability disorders. Ovid's compounds bind and directly activate KCC2. The portfolio was in-licensed from AstraZeneca. <span class="src">Source: 2023 corporate deck; Aug 13, 2026 PR; Duy, He, He &amp; Kahle, <em>Expert Opin Ther Targets</em> 2020;24:629–637 (KCC2 therapeutic-targeting review).</span></p>
+<p><span class="ev FACT">FACT</span> The discovery/preclinical characterization of the IV compound OV350 was published: Jarvis et al., <em>Cell Reports Medicine</em> 2023;4:100957 — rapid brain accumulation after IV/IP dosing, a translatable EEG high-gamma pharmacodynamic biomarker, and restoration of diazepam efficacy in a refractory status-epilepticus model. In psychosis models, OV350/OV4071 suppressed MK-801-induced hyperlocomotion (company poster, APA 2026; authors Toshiya Nishi et al., Ovid) with activity described as comparable to or greater than clozapine, without sedation up to 75 mg/kg. <span class="src">Source: 2023 deck citing Jarvis 2023; APA 2026 poster P08-012.</span></p>
+<p><span class="ev FACT">FACT</span> First-in-human data for IV OV350 (reported Dec 2025): no treatment-related serious adverse events; PK as predicted; exploratory electrophysiology suggested GABAergic CNS activity consistent with the mechanism — described by the company as the first-ever clinical validation of direct KCC2 activation in humans. OV4071 is the first <em>oral</em> direct KCC2 activator, now in Phase 1 in healthy volunteers (Australia, HREC + TGA clinical-trial notification). <span class="src">Source: Mar 18, 2026 PR; Aug 13, 2026 PR (company claims).</span></p>
+</div>
+<div class="card">
+<h4>OV888 (GV101) — selective ROCK2 inhibitor (CCM) — PAUSED</h4>
+<p><span class="ev FACT">FACT</span> OV888/GV101 is a potent, highly selective ROCK2 inhibitor (company-claimed ~1,071-fold ROCK1/ROCK2 selectivity) licensed from Graviton Bioscience (Apr 2023 agreement; $10M Graviton preferred-stock purchase; tiered mid- to high-teens royalties if commercialized; territory excludes ALS and China/HK/Macau/Taiwan). ROCK2 regulates actin-cytoskeletal signaling relevant to endothelial dysfunction in cerebral cavernous malformations (CCM). A Phase 1 MAD study (100–600 mg QD × 7 days, healthy volunteers) showed dose-dependent IL-17/IL-21 suppression as a PD marker of ROCK2 inhibition, with headache the most common AE (23%, transient). <span class="src">Source: Q2 2026 10-Q Note 11; Jul 1, 2024 topline PR; 2024 corporate deck.</span></p>
+<p><span class="ev FACT">FACT</span> <strong>The program is currently paused</strong> (Q2 2026 10-Q: "The program related to this collaboration agreement is currently paused"); program expense for OV888 was $0 in H1 2026 and negative in 2025 (settlement/contra-expense with the collaboration partner). It contributes no near-term catalyst. <span class="src">Source: Q2 2026 10-Q Notes 11 &amp; 14.</span></p>
+</div>
+</div>
+
+<h3>Why each program could fail</h3>
+<h4>OV329 (GABA-AT) — the vigabatrin shadow</h4>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Vigabatrin, the only approved GABA-AT inhibitor, causes irreversible bilateral concentric visual-field constriction in ~40–50% of adult patients (15–31% in infants), typically asymptomatic until severe, slowly progressive and irreversible; retinal vigabatrin concentrations run 5–18× brain levels, raising retinal GABA ~5× and triggering excitotoxicity. Risk factors: cumulative dose and treatment duration. <span class="src">Source: IOVS (Wild et al.) retinal nerve-fiber imaging study; Karger <em>Cell Physiol Biochem</em> 40:831 (vigabatrin retinal toxicity/photopic/taurine study); Springer pediatric VFD review (prevalence 15–50%).</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> OV329's whole differentiation thesis is "vigabatrin's efficacy without vigabatrin's retina." The supporting evidence is preclinical (no retinal accumulation in animals; therapeutic-index proxy in Sprague-Dawley rats) plus short-duration Phase 1 ophthalmic testing (BCVA, fundus photography, OCT, automated perimetry through Day 30, 21–23 days post–last dose — no changes). That is reassuring but not dispositive: vigabatrin's toxicity is cumulative over months–years, and an 8-week Phase 2a + open-label extension is the first real test. Any ocular signal in Phase 2 would be thesis-breaking.</li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> Raising brain GABA broadly is not free: sedation, cognitive dulling, and behavioral effects are the classic GABAergic tax (vigabatrin itself carries behavioral/psychiatric AEs). The Phase 2a must show that low-mg dosing threads the needle between seizure reduction and tolerability in patients already on 0–3 concomitant anti-seizure meds.</li>
+<li><span class="ev GAP">GAP</span> No published head-to-head clinical data of OV329 vs vigabatrin; the "best-in-category safety" claim rests on company preclinical work and short Phase 1 follow-up.</li>
+</ul>
+<h4>OV4071/OV350 (KCC2) — novel human biology, no approved-drug validation</h4>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> No drug acting via direct KCC2 activation has ever been approved; the human pharmacology is first-in-class. Ovid states its molecules are the "only known direct KCC2 activators." <span class="ev UNVERIFIED">UNVERIFIED</span> Independent verification: this dossier's searches surfaced no other clinical-stage direct KCC2 activator; the claim remains a company assertion. <span class="src">Source: 2023 corporate deck; independent web/literature search Oct 2026.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> First-in-class CNS mechanisms have a long failure record when EEG/biomarker signals fail to convert into clinical efficacy. OV350's human data are exploratory electrophysiology in healthy volunteers; OV4071's 2027 schizophrenia PoC will be the first patient efficacy test of the mechanism. The ketamine-challenge study (H2 2026) is a translational proxy, not a substitute.</li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> The lead indication has already pivoted once: March 2026 PRs framed OV4071 around psychosis in Parkinson's disease and Lewy body dementia; by August 2026 the Phase 2 PoC is targeted at <em>acute schizophrenia</em>. Acute schizophrenia enrolls faster and reads out sooner, but it is a far more competitive indication (see §6) and a larger efficacy bar than PDP, where only one drug is approved.</li>
+<li><span class="ev GAP">GAP</span> Phase 1 design details (sample size, SAD/MAD dose levels, PD endpoints beyond safety/PK) have not been disclosed; the magnitude of any KCC2-engagement signal in humans is unknown.</li>
+</ul>
+<h4>Cross-cutting scientific risk</h4>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> The company's own 10-K/10-Q risk factors state the canonical warning: preclinical and early-clinical success is not predictive of later-trial outcomes, citing soticlestat — which succeeded in Phase 1b/2a and Phase 2 (ELEKTRA) yet failed both Phase 3 trials (SKYLINE in Dravet, SKYWAY in LGS) in June 2024 and was discontinued by Takeda in January 2025. <span class="src">Source: Q2 2026 10-Q Risk Factors; 2025 10-K.</span></li>
+</ul>
+</section>
+
+<section id="pipeline">
+<h2>3 · Pipeline Overview — Ranked by Value (Most → Least)</h2>
+<p><span class="ev INTERPRETATION">INTERPRETATION</span> The photosensitivity proof-of-mechanism study (results near YE 2026) is folded into the OV329 FOS rank as a supporting readout, not a standalone asset. Ranking weights: probability-adjusted value, time to the value event, and mechanistic validation.</p>
+<div class="tscroll">
+<table>
+<tr><th style="width:52px">Rank</th><th>Program</th><th>Indication / stage</th><th>Why this rank</th></tr>
+<tr><td class="num"><strong>1</strong></td><td><strong>OV329</strong> — focal onset seizures (oral; next-gen GABA-AT inhibitor)</td><td>Treatment-resistant adult FOS; Phase 2a randomized, placebo-controlled, dose-confirmatory (7 mg), completion guided H2 2027</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Most valuable.</strong> Largest addressable population of any program, the nearest large binary (H2 2027), mechanism de-risked by vigabatrin's established efficacy in FOS, and a trial designed with registrational-level rigor. Carries the highest probability-weighted value despite the chronic-ocular-safety overhang. <span class="src">Aug 13, 2026 PR.</span></td></tr>
+<tr><td class="num"><strong>2</strong></td><td><strong>OV329</strong> — TSC / infantile spasms (weight-based pediatric formulation; next-gen GABA-AT inhibitor)</td><td>TSC-associated seizures PoC to initiate Q4 2026; infantile-spasms study anticipated 2027</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> Same molecule as #1, so ocular-safety data read across. GABA-AT inhibition is already validated in exactly these populations — vigabatrin is approved/used for infantile spasms and TSC-associated spasms — giving high mechanistic confidence. Earlier-stage, smaller populations, and no disclosed PoC design keep it below the FOS program. <span class="src">Aug 13, 2026 PR.</span></td></tr>
+<tr><td class="num"><strong>3</strong></td><td><strong>OV4071</strong> — oral direct KCC2 activator (first-in-class claim)</td><td>Phase 1 in healthy volunteers ongoing; ketamine-challenge PoM to initiate H2 2026; Phase 2 PoC in acute schizophrenia targeted 2027</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> First-in-class platform option: the oral route unlocks chronic indications and the schizophrenia PoC is a free call option on a novel mechanism. Ranked below the OV329 franchise because KCC2 has zero approved-drug or patient-efficacy validation, and the lead indication has pivoted into a far more competitive space (see §6). <span class="src">Mar 18, 2026 PR; Aug 13, 2026 PR.</span></td></tr>
+<tr><td class="num"><strong>4</strong></td><td><strong>OV350</strong> — IV direct KCC2 activator</td><td>Phase 1 complete (Dec 2025): no treatment-related SAEs, PK as predicted, exploratory EEG suggested GABAergic CNS activity; acute indications (e.g., status epilepticus) preclinical</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> De-risked human pharmacology — the company's claimed first-ever clinical validation of direct KCC2 activation — but IV administration limits it to acute settings and no further development is disclosed. A platform backup/development option, not a standalone value driver. <span class="src">Mar 18, 2026 PR (company claim).</span></td></tr>
+<tr><td class="num"><strong>5</strong></td><td><strong>OV4041</strong> — oral direct KCC2 activator (IND-enabling)</td><td>Generalized anxiety disorder; Rett syndrome (per 2025 deck); IND submission guided late H2 2026 "subject to capital runway"</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> Pre-IND, earliest stage, and explicitly capital-contingent — adds breadth to the KCC2 platform but no near-term value; a slip here signals capital prioritization, not a science problem. <span class="src">Oct 2025 corporate deck (company guidance).</span></td></tr>
+<tr><td class="num"><strong>6</strong></td><td><strong>Soticlestat</strong> economics (CH24H inhibitor; out-licensed)</td><td>All IP assigned to Perceptive Advisors–backed NewCo (May 2026); Ovid holds 740,000 NewCo Series Seed preferred shares (~≥5% w/ antidilution), up to $7.5M development + $287.0M sales milestones, mid-single-digit tiered royalties; Ligand retains 13% of milestones and 31.4–37.7% of royalty receipts</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> Failed two Phase 3 trials (Jun 2024) and discontinued by Takeda (Jan 2025); the NewCo revival is private and timeline-free. Pure option value — ascribe ~zero in disciplined models. <span class="src">Q2 2026 10-Q Note 11.</span></td></tr>
+<tr><td class="num"><strong>7</strong></td><td><strong>OV888 / GV101</strong> — selective ROCK2 inhibitor</td><td>Cerebral cavernous malformations; collaboration program <strong>paused</strong>, $0 spend H1 2026</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Least valuable.</strong> Paused collaboration with demonstrated partner-execution risk, while competitor Recursion (REC-994) holds the only Phase 2 CCM dataset. Effectively zero near-term value. <span class="src">Q2 2026 10-Q Note 11.</span></td></tr>
+</table>
+</div>
+<div class="callout warn"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Pipeline concentration:</strong> the investable thesis is OV329 + the KCC2 platform. OV888 is paused, OV4041 is pre-IND, and soticlestat is a passive, private, timeline-free option. Practically all R&amp;D spend goes to OV329 ($8.9M direct program spend H1 2026) and OV4071/KCC2 ($6.3M combined H1 2026). <span class="src">Q2 2026 10-Q Note 14.</span></div>
+</section>
+
+<section id="trials">
+<h2>4 · Trial Design Deep Dive</h2>
+
+<h3>OV329 Phase 2a in treatment-resistant focal onset seizures — the defining binary</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Design (per Oct 2025 company deck): multicenter, randomized, placebo-controlled, 2:1 randomization to OV329 vs placebo; population 18–55 years, diagnosed treatment-refractory focal aware or focal impaired-awareness motor-onset seizures, on 0–3 concomitant anti-seizure medications stable ≥1 month. Schedule: ~1-week screening, ~1-week baseline, 8-week treatment, follow-up/taper. Dose: 7 mg. Planned enrollment N = 240–360, with an open-label extension. <span class="src">Source: Ovid Oct 2025 Phase 1 topline deck (Quartr).</span></li>
+<li><span class="ev FACT">FACT</span> Endpoints: safety (including ophthalmic, neurological, neurophysiology exams), pharmacokinetics; efficacy: percent change from baseline in monthly seizure frequency, responder rate (≥50% reduction), time to return to pre-randomization baseline seizure frequency, seizure-free days, Clinical Global Impression of Improvement (CGI-I). The company describes the study as designed with "registrational-level rigor to potentially support multiple future seizure indications." <span class="src">Source: Oct 2025 deck; Aug 13, 2026 PR.</span></li>
+<li><span class="ev GAP">GAP</span> No NCT number located in this dossier's research; statistical plan, powering assumptions, interim-analysis provisions, and the exact primary-endpoint hierarchy have not been publicly disclosed. The deck's N=240–360 range (vs. the n=30/15 figures on the same slide, which appear to describe a sub-cohort) leaves the actual powered sample size unclear — a material unknown for judging the readout's informativeness.</li>
+<li><span class="ev FACT">FACT</span> Context on the patient population: treatment-resistant focal epilepsy trials typically enroll patients with high baseline seizure burden (for reference, Xenon's X-TOLE2 Phase 3 enrolled n=380, median 5 prior ASMs, baseline 12.75 seizures/month). Ovid has not disclosed baseline-seizure entry criteria. <span class="src">Source: Xenon X-TOLE2 PR via trade press, Mar 2026 — comparator context only, not a head-to-head.</span></li>
+</ul>
+
+<h3>OV329 photosensitivity proof-of-mechanism study — the year-end 2026 read</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Open-label photostimulation (photosensitivity/PPR) study in patients with photosensitive epilepsy; testing three doses (5, 7, 9 mg) for anti-convulsant effect on the photoparoxysmal response; regulatory clearances received; study initiated (Netherlands specialized site); results guided near year-end 2026. <span class="src">Source: Aug 13, 2026 PR; q4-2026-dossier dataset (guidance quality).</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> The photosensitivity model is a well-established early human signal for anti-seizure activity — intermittent photic stimulation provokes a measurable EEG response that known anti-seizure drugs suppress — making it a legitimate, low-cost proof-of-mechanism gate before the Phase 2a reads out. But it is an acute challenge model: a positive PPR read supports pharmacology, it does not predict the magnitude of chronic seizure-frequency reduction in refractory FOS, and false reads in either direction are possible.</li>
+</ul>
+
+<h3>OV329 TSC-associated seizures PoC (Q4 2026 initiation) &amp; infantile spasms (2027)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Proof-of-concept safety and signal-finding study in TSC-associated seizures to initiate Q4 2026 using a weight-based pediatric formulation (independent from the adult fixed-dose tablet); to inform dosing for a subsequent infantile-spasms study anticipated in 2027. Company notes GABA-AT inhibition is an established-effective mechanism in these developmental epileptic encephalopathies (i.e., vigabatrin's approved/used indications). <span class="src">Source: Aug 13, 2026 PR.</span></li>
+<li><span class="ev FACT">FACT</span> Preclinical support: an AES abstract (Ovid-funded; NIH NINDS grants NS108378/NS111064/NS111338) showed OV329 reduced NMDA-induced flexion-seizure severity and count in a mouse infantile-spasm model, increased tonic (not phasic) inhibitory current in hippocampal neurons, and outperformed ACTH on motor-coordination measures. <span class="src">Source: AES abstracts listing (cms.aesnet.org).</span></li>
+<li><span class="ev GAP">GAP</span> No disclosed design, sample size, endpoints, or readout timing for the TSC PoC or the IS study.</li>
+</ul>
+
+<h3>OV329 Phase 1 readouts to date (healthy volunteers)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Oct 2025 topline (SAD/MAD): strong GABA-AT inhibitory activity ("53% GABA inhibition" per trade-press headline of the PR), no treatment-related ocular findings across extensive ophthalmic testing (BCVA, fundus photography, dilated ophthalmoscopy, OCT, automated perimetry) through Day 30 (21–23 days post–last dose); potentially treatment-related AEs were mild (headache, drowsiness at 2 mg; metallic taste at 5 mg). A 7 mg cohort was subsequently completed with "favorable safety and tolerability" (Mar 2026 PR). <span class="src">Source: Oct 3, 2025 PR; Mar 18, 2026 PR; AES 2025 late-breaking poster (Tsai, Rotenberg, Rogasch et al., abstract 2.451).</span></li>
+<li><span class="ev FACT">FACT</span> Target-engagement biomarkers (AES 2025 poster): cortical silent period prolonged vs placebo (FDI +12.9 ms, p=0.00012; APB +7.88 ms, p=0.026); medial parietal GABA +7.13% vs +0.24% placebo at 5 mg after 7 days (not statistically significant given baseline variability); exploratory EEG shifts consistent with increased inhibition. <span class="src">Source: NeurologyLive summary of AES 2025 poster; Ovid AES2025 poster PDF.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> Phase 1 established tolerability and target engagement in healthy volunteers — the necessary but not sufficient conditions. None of these endpoints measure seizures in patients.</li>
+</ul>
+
+<h3>OV4071 Phase 1 + ketamine-challenge proof-of-mechanism</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Phase 1 in healthy volunteers ongoing (Australia; HREC approval + TGA clinical-trial notification received Q1 2026); objectives: safety, tolerability, PK/PD of the first oral direct KCC2 activator. Data intended to support a Phase 2 proof-of-concept in <strong>acute schizophrenia</strong> in 2027. <span class="src">Source: Mar 18, 2026 PR; Aug 13, 2026 PR.</span></li>
+<li><span class="ev FACT">FACT</span> Ketamine-challenge study to initiate H2 2026: in healthy volunteers, designed to reproduce glutamate/dopamine surges and assess electrophysiology/biomarkers relevant to schizophrenia — a pharmacodynamic proof-of-mechanism step. <span class="src">Source: Aug 13, 2026 PR.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> The ketamine model is a standard translational psychiatry tool, but it models acute glutamatergic dysregulation, not the clinical syndrome of schizophrenia; a clean biomarker read de-risks pharmacology, not patient efficacy. The pivot from PDP/LBD (Mar 2026) to acute schizophrenia (Aug 2026) as the first PoC indication trades a thinly-treated niche for a faster-enrolling but far more competitive one.</li>
+<li><span class="ev GAP">GAP</span> Phase 2 PoC design (population, endpoints — e.g., PANSS vs SAPS-PD — sample size, duration) undisclosed; initiation timing within 2027 unspecified.</li>
+</ul>
+</section>
+
+<section id="reg">
+<h2>5 · Clinical / Regulatory Status &amp; Outlook</h2>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> <strong>OV329:</strong> Phase 1 complete (healthy volunteers); Phase 2a FOS study initiated with regulatory clearance "across multiple regions" (global study); photosensitivity PoM initiated; TSC PoC initiation guided Q4 2026. Completion of the FOS study guided H2 2027. <span class="src">Aug 13, 2026 PR.</span></li>
+<li><span class="ev FACT">FACT</span> <strong>OV4071:</strong> Phase 1 ongoing in Australia under HREC approval + TGA CTN (Q1 2026); no FDA IND referenced for OV4071 in the company's disclosures. Phase 2 PoC in acute schizophrenia targeted for 2027 — which would presumably require a US IND or ex-US equivalent. <span class="src">Mar 18, 2026 PR; Aug 13, 2026 PR.</span></li>
+<li><span class="ev FACT">FACT</span> <strong>OV350:</strong> Phase 1 complete with company-reported positive results (Dec 2025); no further clinical development disclosed. <span class="src">Mar 18, 2026 PR.</span></li>
+<li><span class="ev FACT">FACT</span> <strong>Designations:</strong> Soticlestat holds FDA Orphan Drug and Rare Pediatric Disease designations — now held via the NewCo, with economics to Ovid as described in §3. No disclosed FDA designations (orphan, fast track, breakthrough) for OV329, OV4071, or OV350. <span class="src">Aug 13, 2026 PR.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> Regulatory outlook: OV329's FOS Phase 2a is explicitly designed with "registrational-level rigor," suggesting the company hopes a single strong Phase 2a could anchor a registrational program — but there is no disclosed SPA, no FDA alignment disclosed, and focal-epilepsy registrational precedent (e.g., X-TOLE2) required two adequate, well-controlled trials' worth of evidence for NDA. Treat "registrational-level rigor" as design aspiration, not regulatory agreement.</li>
+<li><span class="ev GAP">GAP</span> No disclosed FDA interactions (pre-IND, EOP1, SPA), no disclosed primary-endpoint agreement, and no disclosed pediatric-study-plan obligations for the DEE programs.</li>
+</ul>
+</section>
+
+<section id="comp">
+<h2>6 · Competition — Clinical Differentiation Only</h2>
+
+<h3>Refractory focal onset seizures (OV329)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Same-mechanism incumbent: <strong>vigabatrin</strong> (Sabril, Lundbeck) — irreversible GABA-AT inhibitor, FDA-approved as adjunctive therapy for refractory complex partial seizures in adults and as monotherapy for infantile spasms; use is constrained by the boxed warning for irreversible bilateral visual-field loss and a REMS program. OV329's clinical differentiation thesis vs vigabatrin is entirely safety/PK-based (no retinal accumulation, lower mg dosing, rapid brain clearance) — <em>not</em> a claimed efficacy advantage. <span class="src">Sabril US label (boxed warning/REMS); Ovid decks.</span></li>
+<li><span class="ev FACT">FACT</span> New-mechanism near-term entrant: <strong>azetukalner</strong> (XEN1101, Xenon Pharmaceuticals) — Kv7.2/7.3 potassium-channel opener; Phase 3 X-TOLE2 positive (25 mg: −53.2% median monthly seizure reduction vs −10.4% placebo, p≈6×10⁻¹²; RR50 54.8% vs 20.8%; n=380, median 5 prior ASMs); NDA submission planned Q3 2026. If approved, it would reach the refractory FOS market well before OV329. <span class="src">Xenon X-TOLE2 PR, Mar 2026 (trade-press summaries); touchNEUROLOGY AAN 2026 review. Comparator context only — no cross-trial efficacy claim vs OV329 is made.</span></li>
+<li><span class="ev FACT">FACT</span> Approved refractory-FOS armamentarium includes cenobamate (Xcopri, SK Life Science — high responder rates in refractory patients), brivaracetam, lacosamide, perampanel, and others — a crowded adjunctive market where new entrants differentiate on efficacy magnitude, tolerability, and dosing convenience. <span class="src">Established labels; no head-to-head claim made.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> OV329's commercial/clinical bar is therefore twofold: (a) prove it is meaningfully safer than vigabatrin on chronic dosing, and (b) show seizure-reduction efficacy competitive with modern adjunctive agents in a population that will increasingly have azetukalner available. The Phase 2a placebo-controlled design answers (b) vs placebo, not vs active comparators.</li>
+</ul>
+
+<h3>TSC-associated seizures &amp; infantile spasms (OV329 DEE expansion)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> TSC-associated seizures: approved/used options include everolimus (Afinitor — EXIST-3 Phase 3 in TSC partial-onset seizures), cannabidiol (Epidiolex — approved for TSC seizures 2020, GWPCARE6), and vigabatrin (particularly for TSC-associated infantile spasms, where it is first-line). IS standard of care: ACTH, high-dose prednisolone, vigabatrin. <span class="src">Drug labels; EXIST-3 (Franz et al., <em>Lancet</em> 2016); GWPCARE6 (Thiele et al.).</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> The DEE expansion is strategically coherent — GABA-AT inhibition is already validated in exactly these populations by vigabatrin — but it also means OV329 would launch into indications where vigabatrin's risk/benefit is already accepted by prescribers for short-course IS therapy, narrowing the differentiation to chronic-use settings (TSC maintenance) and prescriber comfort.</li>
+</ul>
+
+<h3>Psychosis / schizophrenia (OV4071)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> PDP psychosis: <strong>pimavanserin</strong> (Nuplazid, Acadia) is the only FDA-approved drug for hallucinations/delusions associated with Parkinson's disease psychosis (approved Apr 2016) — a selective 5-HT2A inverse agonist with no D2 blockade (hence no motor worsening); pivotal trial: SAPS-PD −5.79 vs −2.73 placebo (n=199, 6 weeks); carries QT prolongation and the class boxed warning on mortality in elderly dementia-related psychosis. Low-dose quetiapine/clozapine are used off-label. <span class="src">Nuplazid label; pivotal trial summary (Cummings et al., <em>Lancet</em> 2014).</span></li>
+<li><span class="ev FACT">FACT</span> Acute schizophrenia: <strong>Cobenfy</strong> (KarXT, xanomeline-trospium, BMS) — muscarinic agonist — was FDA-approved Sept 2024, the first new schizophrenia mechanism in decades; by contrast, AbbVie's emraclidine (M4 PAM) failed Phase 2 (EMPOWER-1/2, late 2024) and Sumitomo's ulotaront (TAAR1) failed Phase 3 (2023). <span class="src">FDA approvals; company PRs 2023–2024.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> The lesson for OV4071: novel mechanisms can win (Cobenfy) but the schizophrenia graveyard is deep, and regulators/payers now have a non-D2 option to benchmark against. OV4071's differentiation would be a non-dopaminergic, non-muscarinic, non-sedating mechanism — but clinical differentiation must be earned on psychosis scales in patients, where KCC2 has zero precedent.</li>
+</ul>
+
+<h3>KCC2 mechanism — competitive whitespace</h3>
+<ul class="tight">
+<li><span class="ev UNVERIFIED">UNVERIFIED</span> Ovid describes its molecules as the "only known direct KCC2 activators," and independent searches for this dossier found no other clinical-stage direct KCC2 activator. If true, OV4071/OV350 face no direct-mechanism competition — but equally, no competitor will have de-risked the target. Indirect approaches (e.g., NKCC1 inhibition with bumetanide, WNK-SPAK pathway modulators) remain preclinical/academic. <span class="src">Company deck; literature search Oct 2026.</span></li>
+</ul>
+
+<h3>CCM (for completeness — program paused)</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> Recursion's REC-994 (superoxide scavenger) completed the first industry-sponsored Phase 2 in CCM (SYCAMORE, n=62, 12-month randomized DBPC): met the safety primary; 400 mg showed signals on MRI lesion-volume reduction and mRS vs placebo; no PRO improvement at 12 months; FDA discussions pending. No approved pharmacologic therapy for CCM exists; standard of care is surgical resection/radiosurgery. <span class="src">Recursion PRs Sept 2024 / Feb 2025 (ISC late-breaker).</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> With OV888 paused and a competitor holding the only Phase 2 CCM dataset, Ovid has effectively ceded near-term optionality in CCM.</li>
+</ul>
+</section>
+
+<section id="fin">
+<h2>7 · Financials</h2>
+<p><span class="src">All figures from the Q2 2026 10-Q (quarter ended Jun 30, 2026; filed Aug 13, 2026) and the Aug 13, 2026 business-update PR, unless noted. Units: USD millions.</span></p>
+<div class="tscroll">
+<table>
+<tr><th style="width:280px">Item</th><th>Q2 2026</th><th>Q2 2025</th><th>Note</th></tr>
+<tr><td>Cash, cash equivalents + marketable securities</td><td class="num">$169.8 (Jun 30)</td><td class="num">$90.4 (Dec 31, 2025)</td><td><span class="ev FACT">FACT</span> Breakdown Jun 30: cash $11.3M + current marketable $105.9M + noncurrent marketable $52.6M. <span class="src">10-Q balance sheet.</span></td></tr>
+<tr><td>Revenue (license &amp; other)</td><td class="num">$0.73</td><td class="num">$6.27</td><td><span class="ev FACT">FACT</span> Q2 2025 included $7.0M one-time Marinus/Immedica payment (ganaxolone royalty buyout: $6.3M royalties/licenses + $0.7M option), recognized in 2025. <span class="src">10-Q Notes 11, 14.</span></td></tr>
+<tr><td>R&amp;D expense</td><td class="num">$10.0</td><td class="num">$6.5</td><td><span class="ev FACT">FACT</span> Increase driven by OV329 + OV4071 clinical activity. Direct program spend H1 2026: OV329 $8.9M, OV4071 $3.5M, KCC2 library $2.7M, OV888 $0. <span class="src">10-Q Note 14.</span></td></tr>
+<tr><td>G&amp;A expense</td><td class="num">$6.5</td><td class="num">$4.9</td><td><span class="ev FACT">FACT</span> Higher accounting/audit, legal, BD and professional fees, partly offset by lower payroll (reduced headcount). <span class="src">Aug 13, 2026 PR.</span></td></tr>
+<tr><td>Net loss</td><td class="num">$(15.0) ($0.08/share)</td><td class="num">$(4.7) ($0.06/share)</td><td><span class="ev FACT">FACT</span> H1 2026 net loss $(32.0)M ($0.19/share). Accumulated deficit $(353.7)M at Jun 30, 2026. <span class="src">10-Q.</span></td></tr>
+<tr><td>Working capital</td><td class="num">$113.6</td><td>—</td><td><span class="ev FACT">FACT</span> Current assets $123.6M vs current liabilities $10.0M. <span class="src">10-Q balance sheet.</span></td></tr>
+<tr><td>Runway guidance</td><td colspan="2"><strong>Into 2029</strong></td><td><span class="ev FACT">FACT</span> Company expectation at Jun 30, 2026 cash; ATM proceeds ($8.3M gross, Jul 23, 2026) extend further. <span class="ev GAP">GAP</span> Guidance assumes current operating plan; Phase 2a + three PoC programs will lift R&amp;D spend (already +54% YoY in Q2). <span class="src">Aug 13, 2026 PR; 10-Q.</span></td></tr>
+</table>
+</div>
+
+<h3>Dilution history — the share count nearly tripled in ~12 months</h3>
+<div class="tscroll">
+<table>
+<tr><th style="width:170px">Date</th><th>Event</th><th>Shares / economics</th></tr>
+<tr><td>Oct 2025</td><td>PIPE (2025 Private Placement)</td><td><span class="ev FACT">FACT</span> 57,722 Series B preferred ($1,400/unit) + 38.48M Series A warrants + 28.86M Series B warrants @ $1.40; initial gross ~$80.8M (net $75.1M); investors incl. Janus Henderson, RA Capital, Eventide; CEO participated. Series B preferred auto-converted 1,000:1 at Dec 2025 special meeting (authorized shares raised to 315M). <span class="src">10-Q Note 7; Oct 2025 8-K; Dec 2025 PRE 14A.</span></td></tr>
+<tr><td>Mar 2026</td><td>Private placement (2026)</td><td><span class="ev FACT">FACT</span> 19,154,321 common @ $2.01 + 10,701,710 pre-funded warrants @ $2.009; gross $60.0M (net $56.2M); funded OV329 expansion into TSC + IS. <span class="src">10-Q Note 7; Mar 18, 2026 PR.</span></td></tr>
+<tr><td>Apr 2026</td><td>Series A warrant exercise/expiry</td><td><span class="ev FACT">FACT</span> All 38.48M Series A warrants exercised before expiry: 33,597,860 common @ $1.40 + 4,883,465 pre-funded @ $1.399; gross ~$53.9M (net $51.8M). Triggered by OV4071 TGA/HREC clearance milestone. <span class="src">10-Q Note 7; Mar 18, 2026 PR.</span></td></tr>
+<tr><td>H1 2026</td><td>ATM sales</td><td><span class="ev FACT">FACT</span> 1.5M shares, net ~$2.4M. <span class="src">10-Q Note 7.</span></td></tr>
+<tr><td>Jul 23, 2026</td><td>ATM sale</td><td><span class="ev FACT">FACT</span> 3.5M shares @ $2.38, gross ~$8.3M; $64.3M ATM capacity remaining. <span class="src">10-Q Note 7.</span></td></tr>
+<tr><td colspan="2"><strong>Share-count trajectory</strong></td><td><span class="ev FACT">FACT</span> Common outstanding: ~71.1M (Q2 2025 weighted avg) → 130.2M (Dec 31, 2025) → 184.8M (Jun 30, 2026) → <strong>195.3M (Aug 11, 2026)</strong>. <span class="src">10-Q cover + Note 13.</span></td></tr>
+</table>
+</div>
+<div class="callout warn"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Financing pattern:</strong> Ovid has funded itself through large structured PIPEs with warrant "kickers" tied to clinical milestones — a structure that delivered ~$190M gross in nine months but mechanically converts clinical progress into share issuance. The remaining Series B warrants (28.86M @ $1.40, expiring Oct 6, 2030, with mandatory-exercise triggers) and $64.3M of ATM capacity constitute the forward dilution overhang.</div>
+</section>
+
+<section id="fdmc">
+<h2>8 · FDMC / EV — Dilution-Honest Share Count</h2>
+<p><span class="src">Share counts from the Q2 2026 10-Q (Jun 30, 2026) and cover page (Aug 11, 2026). Price: $2.37 (Oct 6, 2026 close, per market data). No convertibles outstanding; no debt of note (debt-to-equity ~0.05).</span></p>
+<div class="tscroll">
+<table>
+<tr><th>Component</th><th class="num">Shares (M)</th><th>Terms</th></tr>
+<tr><td>Common outstanding (Aug 11, 2026)</td><td class="num">195.30</td><td><span class="ev FACT">FACT</span> 10-Q cover page. <span class="src">Q2 2026 10-Q.</span></td></tr>
+<tr><td>Pre-funded warrants</td><td class="num">15.59</td><td><span class="ev FACT">FACT</span> $0.001 exercise, immediately exercisable, no expiry; economically equivalent to common. Included in weighted-average share count for EPS. <span class="src">10-Q Note 7.</span></td></tr>
+<tr><td>Series B warrants</td><td class="num">28.86</td><td><span class="ev FACT">FACT</span> $1.40 exercise, expire Oct 6, 2030; in-the-money at $2.37. Mandatory-exercise provisions exist. <span class="src">10-Q Note 7.</span></td></tr>
+<tr><td>Stock options</td><td class="num">21.21</td><td><span class="ev FACT">FACT</span> WAEP $2.42, 7.13-yr avg remaining life; 12.58M vested. 7.01M shares remain available under the 2017 Plan (5%/yr evergreen added 6.51M on Jan 1, 2026). <span class="src">10-Q Note 8.</span></td></tr>
+<tr><td>Unvested RSUs</td><td class="num">0.70</td><td><span class="ev FACT">FACT</span> Vest over 3 years. <span class="src">10-Q Note 8.</span></td></tr>
+<tr><td><strong>Fully-diluted shares</strong></td><td class="num"><strong>261.65</strong></td><td>Sum of the above.</td></tr>
+</table>
+</div>
+<div class="tscroll">
+<table>
+<tr><th style="width:280px">Valuation line</th><th>Value</th></tr>
+<tr><td>Basic market cap (195.30M × $2.37)</td><td class="num"><strong>~$462.9M</strong></td></tr>
+<tr><td>Fully-diluted market cap (261.65M × $2.37)</td><td class="num"><strong>~$620.1M</strong></td></tr>
+<tr><td>Net cash (pro forma)</td><td class="num">~$161M <span class="ev UNVERIFIED">UNVERIFIED</span></td></tr>
+<tr><td colspan="2"><span class="ev INTERPRETATION">INTERPRETATION</span> Net-cash bridge: $169.8M (Jun 30) + $8.3M (Jul 23 ATM gross) − estimated Q3 2026 operating burn (~$16–17M/quarter run-rate). Q3 financials not yet reported; treat as an estimate, not a fact.</td></tr>
+<tr><td>Enterprise value (FDMC − net cash)</td><td class="num"><strong>~$450–460M</strong> <span class="ev UNVERIFIED">UNVERIFIED</span></td></tr>
+<tr><td colspan="2"><span class="ev INTERPRETATION">INTERPRETATION</span> On a dilution-honest basis the market is valuing Ovid's pipeline at roughly $450M+ net of cash — i.e., the market already prices in meaningful probability of OV329/KCC2 success. The Series B warrants alone represent ~11% potential dilution at a $1.40 strike (in-the-money), and the 2017 Plan evergreen adds ~5%/year of structural option dilution.</td></tr>
+</table>
+</div>
+<div class="callout"><strong>Street context (no price target endorsed).</strong> <span class="ev UNVERIFIED">UNVERIFIED</span> Per MarketBeat summaries (Oct 5–6, 2026): consensus "Moderate Buy," average PT $6.12; individual: Oppenheimer Outperform $9.00 (Aug 3, 2026 — street high), Roth Buy $8.00, Guggenheim Buy $7.00 (initiated Oct 5, 2026), Wedbush Outperform $7.00, HC Wainwright Buy $5.00, BTIG Buy $4.00, Lifesci Outperform $4.00; Leerink and William Blair at Strong Buy; Weiss at Sell. <span class="ev UNVERIFIED">UNVERIFIED</span> <strong>Audit update (Oct 9, 2026):</strong> Cantor Fitzgerald initiated at Overweight (target not stated in trade-press summaries). <span class="src">MarketBeat summaries, Oct 9, 2026.</span> <strong>Per the dossier's hard rule, any takeout/max-value scenario in §11 is capped at the street high of $9.00/share.</strong></div>
+</section>
+
+<section id="catalysts">
+<h2>9 · Catalyst &amp; Event Map</h2>
+<p><span class="src">Cross-checked against local datasets: ~/workspace/research_notes/catalyst-calendar-2027/data.json (2 OVID rows) and ~/workspace/research_notes/q4-2026-dossier/dossier-v4.json (1 OVID row), plus company PRs. Nothing on OVID is a <span class="pill hard">hard</span> date — the map is guidance-driven.</span></p>
+<div class="tscroll">
+<table>
+<tr><th style="width:150px">Timing</th><th>Event</th><th>What “good” looks like</th><th>What to watch</th></tr>
+<tr><td>Near year-end 2026 <span class="pill guid">guidance</span></td><td><strong>OV329 photosensitivity proof-of-mechanism results</strong> — open-label photostimulation study, 5/7/9 mg doses; first human anti-convulsant signal. <span class="src">Aug 13, 2026 PR; q4-2026-dossier.</span></td><td>Photoparoxysmal-response suppression at ≥1 dose</td><td>Dose–response shape across 5/7/9 mg; whether mg-range dosing engages the target in patients; small open-label n — do not over-read effect magnitude.</td></tr>
+<tr><td>Q4 2026 <span class="pill guid">guidance</span></td><td><strong>OV329 TSC-associated seizures PoC — initiation</strong> (initiation, not readout). Safety/signal-finding, weight-based pediatric formulation. <span class="src">Aug 13, 2026 PR.</span></td><td>On-time start; clean early safety</td><td>Enrollment pace; ocular-monitoring design; disclosed sample size/endpoints (currently a GAP).</td></tr>
+<tr><td>H2 2026 init <span class="pill guid">guidance</span> → readout <span class="pill inf">inferred</span> early 2027</td><td><strong>OV4071 ketamine-challenge proof-of-mechanism — initiation/readout.</strong> Healthy-volunteer PD/biomarker study. <span class="src">Aug 13, 2026 PR.</span></td><td>Electrophysiology/biomarker signal vs ketamine challenge, supporting the 2027 schizophrenia PoC</td><td>Whether initiation is confirmed inside H2 2026; magnitude of any PD effect — a null read impairs platform value.</td></tr>
+<tr><td>Late H2 2026 <span class="pill guid">guidance</span></td><td><strong>OV4041 IND submission</strong> (oral KCC2; anxiety/Rett) — “subject to capital runway.” <span class="src">Oct 2025 corporate deck.</span></td><td>IND filed on schedule</td><td>A slip signals capital prioritization toward OV329/OV4071 rather than a science problem.</td></tr>
+<tr><td>Early Nov 2026 <span class="pill inf">inferred</span></td><td><strong>Q3 2026 earnings + business update.</strong> <span class="src">Timing inferred from the Q2 reporting cadence (Aug 13, 2026); third-party calendar points ~Nov 10, 2026 <span class="ev UNVERIFIED">UNVERIFIED</span>.</span></td><td>Cash/burn in line; ATM used opportunistically, not defensively</td><td>Any ATM drawdown beyond the $8.3M July sale; R&amp;D step-up vs the $10.0M Q2 run-rate; pipeline guidance changes.</td></tr>
+<tr><td>2027 <span class="pill guid">guidance</span></td><td><strong>OV4071 Phase 2 proof-of-concept in acute schizophrenia — initiation.</strong> Phase 1 data package to support it. <span class="src">Aug 13, 2026 PR; catalyst-calendar-2027 (v16-0737).</span></td><td>Regulatory clearance; clean Phase 1 package</td><td>PoC design when disclosed (population, PANSS vs other endpoints, n, duration) — currently a GAP.</td></tr>
+<tr><td>2027 <span class="pill guid">guidance</span></td><td><strong>OV329 infantile-spasms study — initiation</strong> (follows TSC PoC dosing read). <span class="src">Aug 13, 2026 PR.</span></td><td>Dose selected from TSC PoC; timely start</td><td>Chained catalyst: the TSC PoC must read first.</td></tr>
+<tr><td>Mid-2027 / H2 2027 <span class="pill guid">guidance</span></td><td><strong>OV329 Phase 2a FOS topline — THE defining binary.</strong> Randomized, placebo-controlled, dose-confirmatory (7 mg), N=240–360 planned. <span class="src">Aug 13, 2026 PR; catalyst-calendar-2027 (v16-0548).</span></td><td>Statistically significant % seizure-frequency reduction + clean ophthalmic monitoring + acceptable tolerability</td><td>Effect size vs placebo; responder rates; any ocular finding (thesis-breaking); dropout/tolerability profile; disclosed powering.</td></tr>
+<tr><td>Ongoing <span class="pill inf">inferred</span></td><td><strong>NewCo (Perceptive Advisors) soticlestat development</strong> — private company; no disclosed timelines; milestone/royalty option value only. <span class="src">Q2 2026 10-Q Note 11.</span></td><td>Any disclosed development progress</td><td>Private company — expect no regular updates; treat as a free lottery ticket.</td></tr>
+</table>
+</div>
+<div class="callout"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Stale-data check (October 10, 2026):</strong> no catalyst dated before today has already happened — the photosensitivity POM is still guided for near year-end 2026 (not landed), the ketamine-challenge initiation window (H2 2026) is still open, and Q3 2026 results have not been reported. <span class="ev UNVERIFIED">UNVERIFIED</span> An independent October 2026 note (Encode LP) places the ketamine-challenge and OV4071 Phase 1 readouts in <em>early 2027</em> — consistent with this dossier's inferred H1 2027 timing. Sell-side update: Cantor Fitzgerald initiated at Overweight on Oct 9, 2026. <span class="src">Encode LP, Oct 2026; MarketBeat summaries, Oct 9, 2026.</span></div>
+<div class="callout"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Read of the map:</strong> the next 15 months are a drumbeat of small, noisy proof-of-mechanism reads (photosensitivity, ketamine challenge, TSC PoC) culminating in the one large binary — the FOS Phase 2a in H2 2027. The POM studies can build or erode confidence, but none is registrational; position sizing should respect that the true binary is ~20 months out, with interim reads tradable only on sentiment.</div>
+</section>
+
+<section id="redflags">
+<h2>10 · Ranked Red Flags</h2>
+<div class="tscroll">
+<table>
+<tr><th style="width:40px">#</th><th>Red flag</th><th>Why it matters</th></tr>
+<tr><td class="num">1</td><td><strong>Chronic ocular safety is unproven — the core of the OV329 thesis.</strong></td><td><span class="ev INTERPRETATION">INTERPRETATION</span> Vigabatrin's visual-field loss is cumulative over months–years; OV329's clean ophthalmic data cover ~30 days of dosing in healthy volunteers. The 8-week Phase 2a + OLE is the first meaningful test. A single ocular signal would likely end the program.</td></tr>
+<tr><td class="num">2</td><td><strong>KCC2 is first-in-class human biology with no approved-drug validation.</strong></td><td><span class="ev INTERPRETATION">INTERPRETATION</span> EEG/biomarker signals (OV350) and animal psychosis models frequently fail to translate. OV4071 will consume growing R&amp;D dollars (already $6.3M H1 2026) ahead of any patient efficacy data in 2027.</td></tr>
+<tr><td class="num">3</td><td><strong>Relentless dilution mechanics.</strong></td><td><span class="ev FACT">FACT</span> Shares 71M → 195M in ~12 months; 28.86M Series B warrants @ $1.40 (in-the-money, exp. Oct 2030) + $64.3M ATM capacity + 5%/yr option-plan evergreen remain. Every clinical milestone to date has been monetized into share issuance. <span class="src">Q2 2026 10-Q Notes 7–8.</span></td></tr>
+<tr><td class="num">4</td><td><strong>CEO is a corporate-affairs executive, not a drug developer.</strong></td><td><span class="ev FACT">FACT</span> Meg Alexander's 20-year background is communications/corporate strategy (Syneos Health Reputation &amp; Risk Management founder; 25+ medicine launches in a comms capacity); she joined Ovid in 2020 and became CEO Jan 2026. Scientific continuity rests on Executive Chair Levin — who also chairs the NewCo and Gensaic boards. <span class="src">Company bio; Nov 2025 succession PR; 10-Q Notes 11–12.</span></td></tr>
+<tr><td class="num">5</td><td><strong>OV888/Graviton program paused after $10M equity + Phase 1.</strong></td><td><span class="ev FACT">FACT</span> The ROCK2/CCM collaboration is "currently paused" with $0 spend; 2025 program expense was negative on partner settlement. Partnered-program execution risk is now demonstrated, not theoretical. <span class="src">Q2 2026 10-Q Notes 11, 14.</span></td></tr>
+<tr><td class="num">6</td><td><strong>Runway "into 2029" will be tested by rising burn.</strong></td><td><span class="ev INTERPRETATION">INTERPRETATION</span> R&amp;D was $10.0M in Q2 2026 (+54% YoY) with the FOS Phase 2a just starting and three PoC programs ramping. Guidance assumes the current operating plan; a larger Phase 2b/registrational FOS program or a full schizophrenia PoC would likely require fresh capital well before 2029.</td></tr>
+<tr><td class="num">7</td><td><strong>Azetukalner will likely reach refractory FOS first.</strong></td><td><span class="ev FACT">FACT</span> Xenon's Kv7 opener posted strong Phase 3 data and plans a Q3 2026 NDA — a potential 2027 approval in OV329's lead indication, raising the efficacy/tolerability bar and competing for trial enrollment. <span class="src">Xenon X-TOLE2 PR, Mar 2026.</span></td></tr>
+<tr><td class="num">8</td><td><strong>Indication pivot on OV4071 (PDP/LBD → acute schizophrenia).</strong></td><td><span class="ev INTERPRETATION">INTERPRETATION</span> Between Mar and Aug 2026 the lead PoC indication shifted from psychosis in PD/LBD (one approved drug, thin competition) to acute schizophrenia (Cobenfy approved 2024; deep novel-mechanism graveyard). Faster enrollment, higher bar — the rationale for the switch is undisclosed.</td></tr>
+<tr><td class="num">9</td><td><strong>Soticlestat economics are option value only.</strong></td><td><span class="ev FACT">FACT</span> The drug failed two Phase 3s (Jun 2024) and was discontinued by Takeda (Jan 2025); the NewCo revival is private, timeline-free, and Ovid's take is net of Ligand's 13% of milestones and 31.4–37.7% of royalties. Ascribe ~zero in disciplined models. <span class="src">Q2 2026 10-Q Note 11.</span></td></tr>
+<tr><td class="num">10</td><td><strong>PIPE-investor overhang; low insider ownership.</strong></td><td><span class="ev FACT">FACT</span> ~72% institutional ownership (largely 2025–2026 PIPE participants); insider ownership ~7% (trade-press summary). PIPE investors who exercised $1.40 warrants into a ~$2.37 stock hold low-cost paper. <span class="src">MarketBeat/institutional summaries; 13G filings (Affinity 7.9%, BlackRock 5.8%, Balyasny 4.99%).</span></td></tr>
+</table>
+</div>
+</section>
+
+<section id="scenarios">
+<h2>11 · Bear / Base / Bull Cases &amp; Scenario Analyses</h2>
+<p><span class="src">No DCF, no price target, no recommendation. Scenarios are qualitative outcome maps for the clinical binaries. Any takeout/max-value math is capped at the street high of $9.00/share (Oppenheimer, Aug 2026) on the fully-diluted share count, per the dossier's hard rule.</span></p>
+<div class="grid3">
+<div class="card">
+<h4>Bear case</h4>
+<ul class="tight">
+<li>Photosensitivity POM (YE 2026) is flat or uninterpretable → confidence in GABA-AT pharmacology erodes ahead of the Phase 2a.</li>
+<li>FOS Phase 2a (H2 2027) misses: underpowered (N=240–360, undisclosed powering), high placebo response, or tolerability limits dosing.</li>
+<li>Any ocular signal on chronic dosing → program termination; thesis breaks.</li>
+<li>OV4071 ketamine POM fails to show PD effect → KCC2 questioned as a human target; spend continues with no path.</li>
+<li>Cash burns into 2028; a raise into weak data prices at distressed levels, compounding the dilution cycle.</li>
+</ul>
+</div>
+<div class="card">
+<h4>Base case</h4>
+<ul class="tight">
+<li>Photosensitivity POM positive (PPR suppression at 5–9 mg) → clean pharmacology signal; stock re-rates on de-risking without proving chronic efficacy.</li>
+<li>FOS Phase 2a shows a dose-response seizure-reduction signal with clean ophthalmic monitoring → supports a registrational program; partnership or non-dilutive funding becomes plausible.</li>
+<li>TSC PoC (2027) shows safety + seizure signal in a vigabatrin-validated population → second indication leg.</li>
+<li>OV4071 ketamine POM positive → Phase 2 schizophrenia PoC initiates 2027 as a free call option on a novel mechanism.</li>
+<li>Runway into 2029 holds; ATM used opportunistically rather than defensively.</li>
+</ul>
+</div>
+<div class="card">
+<h4>Bull case</h4>
+<ul class="tight">
+<li>FOS Phase 2a delivers registrational-grade signal (statistically robust seizure-frequency reduction, clean eyes) → the "vigabatrin without the blindness" thesis is validated; registrational path clarified with FDA.</li>
+<li>TSC + IS PoCs positive → a DEE franchise in indications where GABA-AT inhibition is already the standard mechanism.</li>
+<li>OV4071 schizophrenia PoC (2027) shows antipsychotic signal without sedation/D2 liability → first-in-class platform value; strategic interest.</li>
+<li>NewCo advances soticlestat with Perceptive capital → milestone optionality re-prices from zero.</li>
+</ul>
+</div>
+</div>
+<h3>Scenario analysis — what moves the stock</h3>
+<div class="tscroll">
+<table>
+<tr><th style="width:200px">Event (date quality)</th><th>Positive read</th><th>Negative read</th></tr>
+<tr><td>OV329 photosensitivity POM <span class="pill guid">guidance</span> YE 2026</td><td>PPR suppression at ≥1 dose → pharmacology confirmed in humans; de-risks Phase 2a design</td><td>No PPR effect → questions whether mg-range dosing engages the target sufficiently in patients</td></tr>
+<tr><td>OV4071 ketamine POM <span class="pill guid">guidance</span> H2 2026 init → <span class="pill inf">inferred</span> H1 2027 read</td><td>Biomarker/EEG signal vs ketamine → supports 2027 schizophrenia PoC</td><td>Null → KCC2 human pharmacology in doubt; platform value impaired</td></tr>
+<tr><td>OV329 FOS Phase 2a <span class="pill guid">guidance</span> H2 2027</td><td>Significant seizure reduction + clean ophthalmic data → registrational path; the central bull trigger</td><td>Miss on efficacy or any ocular finding → thesis-breaking; likely dilutive rescue financing</td></tr>
+<tr><td>TSC PoC / IS study <span class="pill guid">guidance</span> 2027</td><td>Signal in a vigabatrin-validated population → franchise expansion</td><td>Null → DEE expansion closed; FOS-only story</td></tr>
+</table>
+</div>
+<h3 id="soft-targets">Soft Scenario Price Anchors — Explicit Numbers, Labeled Assumptions</h3>
+<div class="callout warn"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>These are SOFT, scenario-based anchors — not a price target and not a recommendation.</strong> They translate the bear/base/bull outcome maps above into per-share numbers using only this dossier's own inputs (EV, share counts, cash). No DCF was used. Method: scenario equity value ÷ the share count appropriate to that scenario (basic if dilutive securities would expire worthless; fully-diluted if the scenario implies value above their strikes).</div>
+<div class="tscroll">
+<table>
+<tr><th style="width:190px">Shared input</th><th>Value</th></tr>
+<tr><td>Reference price</td><td class="num">$2.37 (Oct 6, 2026 close); $2.46 (Oct 9, 2026 close, third-party snapshot <span class="ev UNVERIFIED">UNVERIFIED</span>)</td></tr>
+<tr><td>Net cash (pro forma est.)</td><td class="num">~$161M <span class="ev UNVERIFIED">UNVERIFIED</span> — $169.8M at Jun 30, 2026 + $8.3M Jul ATM − ~$16–17M est. Q3 burn; Q3 not yet reported</td></tr>
+<tr><td>Basic shares</td><td class="num">195.30M (Aug 11, 2026)</td></tr>
+<tr><td>Fully-diluted shares</td><td class="num">261.65M (pre-funded + Series B warrants + options + RSUs)</td></tr>
+<tr><td>Ceiling rule</td><td class="num">No soft anchor may exceed the street high of $9.00/share (Oppenheimer, Aug 2026)</td></tr>
+</table>
+</div>
+<div class="tscroll">
+<table>
+<tr><th>Scenario</th><th>Soft anchor</th><th>Equity-value bridge (explicit)</th><th>Key assumptions</th></tr>
+<tr><td><strong>Bear</strong></td><td class="num"><strong>~$0.75</strong></td><td class="num">Net cash ~$161M − ~$50M est. curtail burn (~3 quarters) + ~$30M residual early-stage KCC2 value ≈ $141M ÷ 195.3M basic shares ≈ $0.72</td><td>FOS Phase 2a misses on efficacy or any ocular signal → programs wound down; Series B warrants/options expire worthless (basic count used); residual value is early KCC2 chemistry only.</td></tr>
+<tr><td><strong>Base</strong></td><td class="num"><strong>~$4.00</strong></td><td class="num">Pipeline EV ~$885M (≈2× today's ~$450M FD-basis EV) + net cash ~$161M ≈ $1,046M ÷ 261.65M FD ≈ $4.00</td><td>Photosensitivity POM positive; FOS Phase 2a shows statistically significant seizure reduction with clean ophthalmic monitoring — strong but not registrational-grade; market re-rates pipeline to ~2× current EV; dilutive securities in-the-money (FD count used).</td></tr>
+<tr><td><strong>Bull</strong></td><td class="num"><strong>~$8.00</strong></td><td class="num">$8.00 × 261.65M FD ≈ $2,093M equity − ~$161M net cash ≈ $1,932M implied pipeline EV</td><td>Registrational-grade FOS Phase 2a + clean eyes + TSC/IS signals + OV4071 schizophrenia PoC signal → approaches takeout/max-value territory; capped below the $9.00 street-high ceiling per the dossier's hard rule.</td></tr>
+</table>
+</div>
+<div class="callout"><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Reading the anchors:</strong> at the $2.46 Oct 9 close the stock prices pipeline EV at ~$480M on a fully-diluted basis — i.e., the market assigns only modest probability to FOS Phase 2a success, near the low end of the base path. The POM reads (YE 2026, early 2027) can move sentiment, but only the H2 2027 Phase 2a can resolve the binary.</div>
+<div class="callout"><strong>Takeout / max-value boundary.</strong> <span class="ev INTERPRETATION">INTERPRETATION</span> The highest published sell-side target is $9.00/share (Oppenheimer, Aug 3, 2026). On the fully-diluted 261.65M share count, that bounds any acquisition/max-value scenario at ~$2.35B fully-diluted equity value — a ceiling, not a forecast. No scenario in this dossier exceeds it.</div>
+</section>
+
+<section id="mgmt">
+<h2>12 · Management Track Record &amp; Insider Signals</h2>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span> <strong>Meg Alexander, President &amp; CEO</strong> (effective Jan 1, 2026): joined Ovid in 2020 as Chief Strategy Officer/Chief Corporate Affairs Officer; President &amp; COO from 2024. 20-year background in biopharma corporate affairs/communications; founded and scaled the Reputation &amp; Risk Management practice at Syneos Health; credited with 25+ medicine launches in a commercial/comms capacity. Not a drug developer by training. <span class="src">Nov 12, 2025 succession PR; company bio (investors.ovidrx.com).</span></li>
+<li><span class="ev FACT">FACT</span> <strong>Dr. Jeremy Levin, Executive Chairman</strong> (CEO 2015–2025; co-founder): led the Takeda soticlestat deal ($196M upfront, 2021), the Ligand royalty monetization ($30M, 2023), and the pipeline rebuild. Now also chairs the soticlestat NewCo board and the Gensaic board — divided attention across three entities. Participated personally in the Oct 2025 PIPE (~$99k) and exercised warrants Mar 2026. <span class="src">Succession PR; Q2 2026 10-Q Notes 11–12.</span></li>
+<li><span class="ev FACT">FACT</span> <strong>Recent leadership changes (Jul 2026):</strong> Kevin Norrett, MS, MBA appointed Chief Business Officer; Eliseo Salinas, MD, MSc joined as Executive R&amp;D Advisor; Victoria Fort promoted to Chief Strategy Officer; Charles Carter, MS, MBA promoted to CFO succeeding Jeffrey Rona (advisor through end-2027). Anna Greka, MD, PhD (physician-scientist) joined the board Jun 2026, chairing the Science &amp; Technology Committee. <span class="src">Aug 13, 2026 PR.</span></li>
+<li><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Track-record read:</strong> management's demonstrated strength is deal-making and financing (Takeda $196M, Ligand $30M, ~$190M raised across Oct 2025–Jul 2026 PIPEs/warrants/ATM) and pipeline re-assembly (OV329, KCC2 from AstraZeneca, Graviton). Its clinical-execution record is unproven at the current programs — no Ovid-led program has yet produced patient efficacy data — and the soticlestat Phase 3 failure occurred on Takeda's watch, not Ovid's. The key-person risk is concentration: scientific leadership (Levin, Salinas, Nishi) around a CEO whose expertise is corporate strategy, not development.</li>
+<li><span class="ev FACT">FACT</span> <strong>Insider/institutional signals:</strong> institutional ownership ~72% (largely PIPE participants: Janus Henderson, RA Capital, Eventide, ADAR1, Affinity, Braidwell, BlackRock, Jupiter Topco per 13G/13D filings); insider ownership ~7% (trade-press summary). Guggenheim initiated at Buy/$7.00 on Oct 5, 2026, and Cantor Fitzgerald initiated at Overweight on Oct 9, 2026 — the two most recent sell-side actions. <span class="src">MarketBeat summaries, Oct 2026 <span class="ev UNVERIFIED">UNVERIFIED</span>.</span></li>
+<li><span class="ev GAP">GAP</span> No Form 4 open-market buying by officers/directors surfaced in this dossier's research beyond Levin's PIPE participation; a dedicated insider-transaction pull was not performed.</li>
+</ul>
+</section>
+
+<section id="refs">
+<h2>13 · References, As-Of, Filings Used</h2>
+<p><strong>As-of date:</strong> October 7, 2026. <strong>Audited + enhanced:</strong> October 10, 2026 (pipeline value-ranked; soft scenario price anchors added; catalyst map rebuilt; stale-data check run). <strong>Price/market data:</strong> Oct 6, 2026 close (~$2.37); audit update: Oct 9, 2026 close $2.46 per third-party snapshot (<span class="ev UNVERIFIED">UNVERIFIED</span>). Share counts: Q2 2026 10-Q (period ended Jun 30, 2026; filed Aug 13, 2026; cover page as of Aug 11, 2026).</p>
+<p><strong>Filings used:</strong></p>
+<ul class="tight">
+<li>Ovid Therapeutics Inc. Form 10-Q for the quarterly period ended June 30, 2026 (filed Aug 13, 2026) — financials, share counts, warrants/options, NewCo/Ligand/Graviton/Marinus agreements, risk factors.</li>
+<li>Ovid 2025 10-K (filed Mar 18, 2026) — soticlestat Phase 3 failure/discontinuation history.</li>
+<li>Form 8-K (Nov 12, 2025) — CEO succession (Alexander/Levin).</li>
+<li>Form 8-K (Oct 2–3, 2025) — 2025 Private Placement terms; PRE 14A (Dec 2025) — special-meeting approvals, warrant terms.</li>
+<li>Schedule 13G filings (Affinity, BlackRock, Balyasny — 2026) — institutional ownership.</li>
+</ul>
+<p><strong>Company materials (PRs/decks — company claims unless corroborated):</strong></p>
+<ul class="tight">
+<li>Business-update PRs: Oct 3, 2025 (OV329 Phase 1 topline); Nov 12, 2025 (Q3 2025 + succession); Mar 18, 2026 (Q4/FY2025 + OV329 7 mg + OV4071 clearance + $60M placement); Aug 13, 2026 (Q2 2026 results + pipeline).</li>
+<li>Corporate decks: Nov 2024, Aug 2025, Oct 2025 (Phase 2a design); R&amp;D Day Apr 14, 2026 (KCC2).</li>
+<li>Conference posters: AES 2025 (Tsai, Rotenberg, Rogasch et al., abstract 2.451 — OV329 Phase 1 biomarkers); AES abstracts (OV329 infantile-spasm mouse model); APA 2026 P08-012 (Nishi et al. — OV350/OV4071 psychosis models).</li>
+</ul>
+<p><strong>Academic literature (mandatory):</strong></p>
+<ul class="tight">
+<li>Feja M. et al. OV329, a novel highly potent GABA-AT inactivator, induces pronounced anticonvulsant effects in the pentylenetetrazole seizure threshold test and in amygdala-kindled rats. <em>Epilepsia.</em> 2021;62(12):3091–3104.</li>
+<li>Juncosa J.I. et al. Mechanism-based inactivator design (OV329 chemistry). <em>J Am Chem Soc.</em> 2018;140(6):2151–2164.</li>
+<li>Silverman R.B. Design of mechanism-based inactivators of GABA-AT. <em>Chem Rev.</em> 2018;118(7):4037–4070.</li>
+<li>Jarvis R. et al. KCC2 activator OV350 preclinical characterization. <em>Cell Reports Medicine.</em> 2023;4:100957.</li>
+<li>Duy P.Q., He M., He Z., Kahle K.T. Preclinical insights into therapeutic targeting of KCC2 for disorders of neuronal hyperexcitability. <em>Expert Opin Ther Targets.</em> 2020;24:629–637.</li>
+<li>Vigabatrin retinal toxicity: Wild J.M. et al., <em>IOVS</em> (RNFL imaging); vigabatrin retinal toxicity/photopic/taurine mechanism, <em>Cell Physiol Biochem.</em> 40:831; pediatric VFD review, <em>SpringerMedizin</em> (prevalence 15–50%).</li>
+<li>TSC/IS standards: Franz D.N. et al. EXIST-3 (everolimus), <em>Lancet.</em> 2016; Thiele E.A. et al. GWPCARE6 (cannabidiol in TSC), <em>JAMA Neurol.</em></li>
+<li>PDP psychosis: Cummings J. et al. Pimavanserin pivotal trial, <em>Lancet.</em> 2014 (SAPS-PD −5.79 vs −2.73).</li>
+</ul>
+<p><strong>Trade press / data (single-source; labeled UNVERIFIED where used):</strong></p>
+<ul class="tight">
+<li>MarketBeat via Markets Daily/Stock Observer (Oct 5, 2026) — Guggenheim initiation (Buy, $7.00); consensus "Moderate Buy," avg PT $6.12; Oppenheimer $9.00 (Aug 3, 2026), Roth $8.00, Wedbush $7.00, HC Wainwright $5.00, BTIG $4.00, Lifesci $4.00.</li>
+<li>MarketBeat via Transcript Daily/The Lincolnian (Oct 9, 2026) — Cantor Fitzgerald initiated coverage (Overweight; target not stated in summaries). <span class="ev UNVERIFIED">UNVERIFIED</span> single-source trade-press summaries.</li>
+<li>Sharemaestro weekly equity report (week ended Oct 9, 2026) — OVID close $2.46, +3.4% on the week, "earnings due in 32d" (~Nov 10, 2026). <span class="ev UNVERIFIED">UNVERIFIED</span> third-party data.</li>
+<li>Encode LP (Oct 2026 note) — OV329 photoparoxysmal-response study remains a year-end 2026 event; ketamine challenge and OV4071 Phase 1 readouts expected early 2027. <span class="ev UNVERIFIED">UNVERIFIED</span> single independent note; consistent with this dossier's inferred H1 2027 timing.</li>
+<li>Xenon X-TOLE2 summaries (Mar 2026; touchNEUROLOGY AAN 2026) — azetukalner Phase 3 data, Q3 2026 NDA plan.</li>
+<li>Recursion PRs (Sept 2024; Feb 2025 ISC) — REC-994 SYCAMORE Phase 2 in CCM.</li>
+<li>NeurologyLive (Dec 2025) — OV329 AES 2025 poster summary. Finnhub/WallStreetZen — price, 52-week range, shares outstanding cross-check.</li>
+<li>Local datasets cross-checked: <span class="num">~/workspace/research_notes/catalyst-calendar-2027/data.json</span> (OVID: FOS Ph2a 2027; OV4071 2027) and <span class="num">~/workspace/research_notes/q4-2026-dossier/dossier-v4.json</span> (OVID: photosensitivity POM near YE 2026).</li>
+</ul>
+<div class="callout">
+<strong>Disclosures &amp; limits.</strong> This dossier is a neutral third-party research document prepared for general distribution. It contains no personal information, no holdings or position data, and no attributions. It offers no DCF, no price target, and no buy/sell recommendation. No cross-trial head-to-head efficacy claims are made. Commercial discussion is intentionally lean; the analysis weights the clinical binary catalysts. All forward-looking statements are the company's or the author's inferences and are labeled accordingly.
+</div>
+</section>
+
+<footer>
+OVID deep-dive dossier · as of October 7, 2026 · audited and enhanced October 10, 2026 · single-file HTML · Evidence labels: FACT / INTERPRETATION / GAP / UNVERIFIED throughout · Soft scenario price anchors in §11 are assumptions-labeled, not a recommendation.
+</footer>
+
+</main>
+</div>
+<script>
+(function(){
+  "use strict";
+  /* ---- dark / light theme ---- */
+  var btn=document.getElementById('themeBtn');
+  function setTheme(t){
+    document.documentElement.setAttribute('data-theme',t);
+    try{localStorage.setItem('ovid-dossier-theme',t);}catch(e){}
+    btn.textContent=(t==='dark')?'\u2600\uFE0F':'\uD83C\uDF19';
+    btn.setAttribute('aria-label',(t==='dark')?'Switch to light mode':'Switch to dark mode');
+  }
+  var saved=null;
+  try{saved=localStorage.getItem('ovid-dossier-theme');}catch(e){}
+  if(!saved){saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}
+  setTheme(saved);
+  btn.addEventListener('click',function(){
+    setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+  });
+  /* ---- collapsible sections ---- */
+  var secs=Array.prototype.slice.call(document.querySelectorAll('main section'));
+  secs.forEach(function(s){
+    var h=s.getElementsByTagName('h2')[0];
+    if(!h)return;
+    var m=document.createElement('span');m.className='mark';m.setAttribute('aria-hidden','true');
+    h.insertBefore(m,h.firstChild);
+    h.classList.add('ct');
+    h.setAttribute('tabindex','0');h.setAttribute('role','button');
+    function tog(){s.classList.toggle('collapsed');}
+    h.addEventListener('click',tog);
+    h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
+  });
+  function setAll(c){secs.forEach(function(s){s.classList.toggle('collapsed',c);});}
+  var ex=document.getElementById('expandAll'),co=document.getElementById('collapseAll');
+  if(ex)ex.addEventListener('click',function(){setAll(false);});
+  if(co)co.addEventListener('click',function(){setAll(true);});
+  /* ---- TOC links auto-expand their target section ---- */
+  Array.prototype.forEach.call(document.querySelectorAll('nav.side a[href^="#"]'),function(a){
+    a.addEventListener('click',function(){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(t&&t.classList&&t.classList.contains('collapsed'))t.classList.remove('collapsed');
+    });
+  });
+  /* ---- back to top ---- */
+  var toTop=document.getElementById('toTop');
+  window.addEventListener('scroll',function(){toTop.classList.toggle('show',window.scrollY>600);},{passive:true});
+  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>
