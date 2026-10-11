@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHVS — Pharvaris N.V. · Deep-Dive Dossier · 2026-10-10</title>
+<style>
+  :root{
+    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
+    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
+    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
+    --hard:#166534; --guid:#b45309; --inf:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
+  header.top .wrap{max-width:1080px;margin:0 auto}
+  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
+  header.top h1 .tick{color:#7fd4d1}
+  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
+  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
+  .pricebar .pill b{color:#fff;font-size:14px}
+  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
+  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
+  nav.toc a:hover{background:var(--wash);color:var(--ink)}
+  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
+  section{padding:30px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
+  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
+  h3{font-size:16.5px;margin:26px 0 8px}
+  h4{font-size:14.5px;margin:20px 0 6px}
+  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  p,li{font-size:14.5px}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
+  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
+  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
+  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
+  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fbfcfd}
+  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
+  .callout.warn{border-left-color:var(--unver)}
+  .callout p{margin:6px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
+  .card h4{margin:0 0 8px;font-size:15px}
+  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
+  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl-item{position:relative;margin:0 0 18px}
+  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+  .tl-item .dt{font-weight:700;font-size:13.5px}
+  .tl-item .ev{font-size:14px;margin:2px 0}
+  .tl-item .note{font-size:12.5px;color:var(--muted)}
+  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .flag .rank{display:inline-block;background:var(--ink);color:#fff;font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
+  .refs{font-size:13px;color:var(--muted)}
+  .refs li{margin-bottom:8px}
+  .refs a{color:var(--accent-ink)}
+  .fine{font-size:12.5px;color:var(--muted)}
+  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px;font-size:12px;color:var(--muted)}
+  .verdict{background:var(--ink);color:#fff;border-radius:10px;padding:18px 22px;margin:22px 0}
+  .verdict h3{color:#7fd4d1;margin:0 0 8px}
+  .verdict p{margin:6px 0;font-size:14.5px;color:#e6ecf2}
+  a.src{color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted var(--accent-ink);font-size:12.5px}
+
+  /* ---- QOL additions: audit 2026-10-10 ---- */
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .theme-btn{font-size:12.5px;color:var(--muted);background:var(--wash);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer;min-height:36px;white-space:nowrap}
+  .theme-btn:hover{color:var(--ink)}
+  .sec-toggle{display:inline-block;margin-right:10px;border:1px solid var(--line);background:var(--wash);border-radius:6px;width:44px;height:44px;min-width:44px;min-height:44px;font-size:16px;font-weight:700;color:var(--accent-ink);cursor:pointer;vertical-align:middle}
+  section.collapsed>*:not(h2){display:none}
+  #toTop{position:fixed;right:18px;bottom:18px;z-index:100;display:none;border:1px solid var(--line);background:var(--ink);color:#fff;border-radius:50%;width:52px;height:52px;font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  #toTop.show{display:block}
+  body.dark{--ink:#e9eef4;--muted:#9fb0c2;--paper:#12171d;--wash:#1b232c;--line:#2c3742;--accent:#7fd4d1;--accent-ink:#a9e3e0;--fact:#8fb3ff;--interp:#c4a7f5;--gap:#f0b35e;--unver:#f08a8a}
+  body.dark .card{background:#161c23}
+  body.dark tr:nth-child(even) td{background:#151b22}
+  body.dark nav.toc{background:#12171d}
+  body.dark .theme-btn{background:#1b232c}
+  body.dark header.top{background:#0d1116}
+  body.dark .verdict{background:#0d1116}
+  @media(max-width:480px){
+    nav.toc .wrap{padding:6px 10px}
+    nav.toc a{min-height:44px;display:inline-flex;align-items:center;padding:8px 14px;font-size:13px}
+    table{font-size:12px;min-width:620px}
+    th,td{padding:7px 8px}
+    header.top{padding:26px 18px 22px}
+    header.top h1{font-size:24px}
+    main{padding:8px 16px 80px}
+    .pricebar .pill{font-size:12.5px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1><span class="tick">PHVS</span> · Pharvaris N.V.</h1>
+    <p class="sub">Comprehensive deep-dive investment dossier — oral bradykinin B2 receptor antagonists for hereditary angioedema · As of October 10, 2026</p>
+    <div class="pricebar">
+      <div class="pill">Price <b>$31.10</b> <span style="color:#9fb0c2">(Nasdaq close, 10/09/2026 · Finnhub)</span></div>
+      <div class="pill">Basic mcap <b>~$2.18B</b></div>
+      <div class="pill">FD mcap <b>~$2.41B</b></div>
+      <div class="pill">Cash <b>€318M</b> <span style="color:#9fb0c2">(Jun 30, 2026)</span></div>
+      <div class="pill">Next binary <b>PDUFA Apr 23, 2027</b></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <button id="themeToggle" class="theme-btn" aria-label="Toggle dark mode">&#9789; Dark mode</button>
+  <a href="#s1">1 · Identity &amp; Thesis</a><a href="#s2">2 · Science</a><a href="#s3">3 · Pipeline</a>
+  <a href="#s4">4 · Trial Design</a><a href="#s5">5 · Clinical/Regulatory</a><a href="#s6">6 · Competition</a>
+  <a href="#s7">7 · Financials</a><a href="#s8">8 · FDMC/EV</a><a href="#s9">9 · Catalyst Map</a>
+  <a href="#s10">10 · Red Flags</a><a href="#s11">11 · Bear/Base/Bull</a><a href="#s12">12 · Management</a>
+  <a href="#s13">13 · References</a>
+</div></nav>
+
+<main>
+
+<div class="legend">
+  <span><b>Evidence labels:</b></span>
+  <span><span class="tag fact">FACT</span> = from a primary/verified source</span>
+  <span><span class="tag interp">INTERPRETATION</span> = analyst inference from facts</span>
+  <span><span class="tag gap">GAP</span> = missing data, not yet disclosed</span>
+  <span><span class="tag unver">UNVERIFIED</span> = single/weak source, not corroborated</span>
+</div>
+
+<section id="s1">
+<h2><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
+<p class="kicker">Who they are, what the binary is, and what the dossier will prove or disprove.</p>
+
+<table>
+<tr><th style="width:32%">Item</th><th>Detail</th></tr>
+<tr><td>Company</td><td>Pharvaris N.V., a Dutch public limited company (N.V. = naamloze vennootschap), foreign private issuer; corporate HQ in Zug, Switzerland <span class="tag fact">FACT</span> <a class="src" href="#r20f">20-F FY2025</a> <a class="src" href="#rq2pr">Q2 2026 6-K</a></td></tr>
+<tr><td>Ticker / listing</td><td>PHVS · Nasdaq Global Select Market · CIK 1830487 <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></td></tr>
+<tr><td>Stage</td><td>Late-stage, pre-revenue; ~148 employees (2026) <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></td></tr>
+<tr><td>Lead asset</td><td><b>Deucrictibant</b> (formerly PHA121 / PHA-022121) — oral small-molecule bradykinin B2 receptor antagonist, in two formulations: immediate-release (IR) capsule for on-demand attack treatment, extended-release (XR) tablet for prophylaxis <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></td></tr>
+<tr><td>De-risking state</td><td>Both formulations have positive pivotal Phase 3 topline: RAPIDe-3 (IR, on-demand; Dec 3, 2025) and CHAPTER-3 (XR, prophylaxis; Sep 8, 2026). IR NDA accepted by FDA, PDUFA Apr 23, 2027. RAPIDe-3 full results published in <i>The Lancet</i> (Oct 8, 2026). <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a> <a class="src" href="#rchap3">CHAPTER-3 PR</a> <a class="src" href="#rlancet">Oct 8 PR</a></td></tr>
+<tr><td>Thesis in one line</td><td>Clinical efficacy risk is largely retired (two positive Phase 3s); the remaining binary is regulatory — the Apr 23, 2027 PDUFA on the IR NDA — plus the CREAATE readout (Q1 2027) and the XR NDA filing (H1 2027). <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Naming correction</td><td>The commissioning brief listed "Phase 3 RAPIDe-3 and CHAPTER-1." CHAPTER-1 was the Phase 2 prophylaxis study (topline Dec 2023); the pivotal Phase 3 prophylaxis study is <b>CHAPTER-3</b>. This dossier uses the corrected names. <span class="tag fact">FACT</span> <a class="src" href="#rchap1">BioSpace</a></td></tr>
+</table>
+
+<div class="verdict">
+<h3>Verdict — the swing factor</h3>
+<p>The key swing factor is the <b>FDA's PDUFA decision on deucrictibant IR on April 23, 2027</b> — with efficacy already demonstrated in two pivotal Phase 3s, value now turns on approval risk, label scope (adolescents, HAE with normal C1INH), and whether an oral on-demand drug can take share from an already-approved oral competitor (KalVista's Ekterly) while the XR prophylaxis NDA is still pending.</p>
+<p>Soft, scenario-based price targets are modeled in &#167;11 with stated assumptions &#8212; illustrative only. No buy/sell recommendation is given.</p>
+</div>
+</section>
+
+<section id="s2">
+<h2><span class="num">2</span>Science: Bradykinin B2 Antagonism in HAE</h2>
+<p class="kicker">Plain-language mechanism, the academic literature behind it, and why it could still fail.</p>
+
+<h3>Plain-language mechanism</h3>
+<p>In HAE types 1 and 2, mutations leave patients with too little (or dysfunctional) C1 esterase inhibitor (C1-INH), the protein that normally puts the brakes on the kallikrein–kinin cascade. Without that brake, plasma kallikrein runs unchecked and cleaves high-molecular-weight kininogen, flooding the blood with <b>bradykinin</b> — a short-lived peptide that binds the <b>bradykinin B2 receptor</b> on blood-vessel walls, forcing vessels to leak fluid into tissue. That leak is the swelling attack (skin, gut, airway). A B2 receptor antagonist sits in the receptor's binding pocket and physically blocks bradykinin from docking — shutting off the leak signal at its final step. <span class="tag fact">FACT</span> <a class="src" href="#rchdr">CHDR / Br J Clin Pharmacol 2010</a> <a class="src" href="#rwao">World Allergy Organ J 2010</a></p>
+<p>Deucrictibant applies this same receptor-level blockade with a small molecule instead of a peptide, which is what makes it orally bioavailable — and what allows two formulations: an immediate-release capsule for fast attack treatment and an extended-release tablet for round-the-clock prophylactic coverage. <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></p>
+
+<h3>Technical depth — what the molecule actually does</h3>
+<p>Deucrictibant is a <b>competitive</b> B2 antagonist: it occupies the receptor's orthosteric binding pocket without activating it, so blockade is surmountable in principle — a large enough bradykinin surge can displace it (the basis of failure mode #5 below). Icatibant, the peptide predecessor, is likewise competitive, but as a synthetic decapeptide it cannot survive the gut — hence subcutaneous injection, a ~1–2 h half-life, and an on-demand-only existence. The small-molecule chemistry is what makes both rapid IR absorption (attack treatment) and sustained XR exposure (once-daily prophylaxis) possible from one active ingredient — and it is also what introduces the off-target toxicology risk that a peptide never carried. <span class="tag fact">FACT</span> <a class="src" href="#rchdr">CHDR 2010</a> <span class="tag interp">INTERPRETATION</span></p>
+<p>Published potency metrics (Ki / IC<sub>50</sub> vs the human B2 receptor) for deucrictibant were not among the sources cited in this dossier — treat any such figures encountered elsewhere as company-reported, not independently verified here. <span class="tag gap">GAP</span></p>
+
+<h3>Why the target is considered validated</h3>
+<ul>
+<li><b>Icatibant (Firazyr, now generic)</b> — a synthetic decapeptide B2 antagonist — proved the mechanism in humans: selective, competitive B2 blockade, approved for acute HAE attacks (subcutaneous injection; FAST-1/FAST-2 Phase 3 trials). Icatibant is the clinical proof that blocking B2 stops an attack in progress. <span class="tag fact">FACT</span> <a class="src" href="#rchdr">CHDR 2010</a> <a class="src" href="#rwao">World Allergy Organ J 2010</a></li>
+<li>A 2026 review in <i>Clinical Reviews in Allergy &amp; Immunology</i> summarizing the evidence for the bradykinin B2 receptor as a therapeutic target in bradykinin-mediated angioedema (HAE and AAE-C1INH) was cited by Pharvaris in its Q2 2026 business update. <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></li>
+<li>Complementary validation comes from upstream: plasma kallikrein inhibitors (ecallantide, lanadelumab, berotralstat, sebetralstat) and C1-INH replacement all work by reducing the same bradykinin signal, confirming the cascade is the causal pathway. <span class="tag interp">INTERPRETATION</span></li>
+</ul>
+
+<h3>Why it could fail — ranked</h3>
+<ol>
+<li><b>Chronic B2 blockade is clinically unproven.</b> Icatibant was only ever tested as an acute, on-demand therapy (it is injected, with a 1–2 h half-life); no B2 antagonist has been used for long-term prophylaxis in humans before deucrictibant XR. Whether continuous receptor antagonism stays effective and tolerable over years — without tachyphylaxis, receptor upregulation, or off-target small-molecule toxicity — is the central scientific unknown. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>Prophylaxis demands 24/7 coverage.</b> An on-demand drug only needs to beat an attack to the receptor; a once-daily prophylactic must maintain sufficient receptor occupancy around the clock. PK dips, missed doses, or GI variability could leave windows of vulnerability that a trial's controlled setting masks. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>Small-molecule off-target risk already bit once.</b> The FDA put deucrictibant studies on clinical hold in Aug 2022 (reason undisclosed; resolved with a 26-week rodent toxicology study, holds lifted Jun 2023 for on-demand and Jan 2024 for prophylaxis). A chronic-use small molecule carries a different tox profile than an injected peptide, and regulators will scrutinize long-term exposure data. <span class="tag fact">FACT</span> <a class="src" href="#rhold">BioSpace / Rare Disease Advisor</a></li>
+<li><b>HAE with normal C1INH is mechanistically heterogeneous.</b> CHAPTER-3 enrolled HAE types 1, 2, and normal-C1INH patients, but normal-C1INH HAE has multiple genetic subtypes (FXII, plasminogen, kininogen, etc.) whose attacks may not all be purely bradykinin-driven. A B2 antagonist could underperform in that subgroup and narrow the label. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>Downstream blockade leaves upstream activity intact.</b> Unlike kallikrein or FXIIa inhibitors, B2 antagonism does not reduce bradykinin production itself; massive bradykinin surges could theoretically outcompete a competitive antagonist during severe attacks (e.g., laryngeal). <span class="tag interp">INTERPRETATION</span></li>
+</ol>
+
+<div class="callout warn">
+<p><b>What the science does NOT yet prove:</b> full CHAPTER-3 and RAPIDe-3 datasets are topline only — subgroup breakouts (normal-C1INH patients, adolescents, laryngeal attacks), exposure–response, and long-term safety data have not been published as of Oct 7, 2026. <span class="tag gap">GAP</span></p>
+</div>
+</section>
+
+<section id="s3">
+<h2><span class="num">3</span>Pipeline Overview</h2>
+<p class="kicker">Single-asset company: one molecule, two formulations, three disease settings — ranked by value, most to least.</p>
+
+<table>
+<tr><th>Value rank</th><th>Program</th><th>Formulation</th><th>Indication</th><th>Stage</th><th>Value rationale</th></tr>
+<tr><td><b>#1</b></td><td><b>Deucrictibant IR</b></td><td>Immediate-release capsule 20 mg</td><td>On-demand HAE (ages 12+)</td><td>Phase 3 complete; NDA + EMA MAA under review; PDUFA Apr 23, 2027 <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td><td>Largest value leg: nearest to revenue, largest addressable on-demand population, validated acute mechanism. Multiple tempered by launching ~21 months behind Ekterly. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>#2</b></td><td><b>Deucrictibant XR</b></td><td>Extended-release tablet 40 mg once daily</td><td>Prophylaxis of HAE attacks</td><td>Phase 3 complete; NDA/MAA filings planned starting H1 2027 <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td><td>Second leg: chronic therapy commands higher per-patient revenue; risk discount for unproven chronic B2 blockade and small n=85 pivotal. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>#3</b></td><td><b>Deucrictibant (IR + XR) — AAE-C1INH</b></td><td>Both formulations</td><td>Acquired angioedema due to C1INH deficiency</td><td>Pivotal Phase 3 (CREAATE); Part 1 topline Q1 2027 <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></td><td>Pure option value: first-ever Phase 3 in AAE-C1INH, but a small, hard-to-diagnose population — zero in conservative models. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>#4</b></td><td>CHAPTER-4</td><td>XR</td><td>Long-term extension (HAE prophylaxis)</td><td>Ongoing open-label <span class="tag fact">FACT</span> <a class="src" href="#rtipranks">TipRanks</a></td><td>No standalone value — supports the XR filing and answers the chronic-safety question for regulators and payers. <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+<p class="fine">All four legs are the same molecule — this is a single-asset company ranked by value leg, not a multi-asset pipeline. A CRL on the IR NDA would reprice every row. <span class="tag interp">INTERPRETATION</span></p>
+<p class="fine">Earlier programs: RAPIDe-1 and RAPIDe-2 (Phase 2 on-demand, supportive for the IR NDA) and CHAPTER-1 (Phase 2 prophylaxis, positive topline Dec 2023) are complete. <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a> <a class="src" href="#rchap1">BioSpace</a></p>
+</section>
+
+<section id="s4">
+<h2><span class="num">4</span>Trial Design Deep Dive</h2>
+<p class="kicker">Endpoints, statistical plan, powering, and readouts to date — the binary the holder is underwriting.</p>
+
+<h3>RAPIDe-3 — on-demand IR (NCT06343779)</h3>
+<table>
+<tr><th style="width:30%">Element</th><th>Detail</th></tr>
+<tr><td>Design</td><td>Global, randomized, double-blind, placebo-controlled <b>crossover</b> Phase 3 — each participant treated attacks with both deucrictibant IR and placebo <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a> <a class="src" href="#rlancet">Oct 8 PR</a></td></tr>
+<tr><td>Population</td><td>134 participants enrolled from 24 countries, ages 12+; HAE type 1, type 2, and HAE with normal C1INH; on and off long-term prophylaxis; attacks of varying severities and all body locations <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td></tr>
+<tr><td>Dose</td><td>Deucrictibant IR capsule 20 mg vs placebo, single on-demand dose <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td></tr>
+<tr><td>Primary endpoint</td><td>Median time to onset of symptom relief, measured by Patient Global Impression of Change (PGI-C) rating of at least "a little better" <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td></tr>
+<tr><td>Secondary endpoints</td><td>11 secondaries tested sequentially under a multiplicity-control procedure: time to End of Progression (EoP), substantial symptom relief, complete symptom resolution, proportion resolving with one dose (PGI-S / PGI-C / AMRA scales), and TEAE incidence <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td></tr>
+<tr><td>Statistical handling</td><td>Sequential testing under multiplicity control — all 11 secondaries achieved nominal statistical significance only because the gatekeeping chain held <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a></td></tr>
+<tr><td>Result (Dec 3, 2025)</td><td>Primary met: median 1.28 h to symptom relief vs placebo (p&lt;0.0001). All secondary endpoints met (p&lt;0.0001): End of Progression median 17.47 min; complete symptom resolution median 11.95 h. Efficacy consistent across HAE subtypes, severities, and locations. Well tolerated. Full results peer-reviewed and published in <i>The Lancet</i> (Oct 8, 2026). <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a> <a class="src" href="#rlancet">Oct 8 PR</a></td></tr>
+<tr><td>Design note</td><td>Company states RAPIDe-3 is the first-ever on-demand HAE study fully compliant with the AURORA consensus Core Outcome Set (company claim) <span class="tag unver">UNVERIFIED</span></td></tr>
+<tr><td>Powering detail</td><td>Formal sample-size / power assumptions for RAPIDe-3 were not disclosed in the topline release <span class="tag gap">GAP</span></td></tr>
+</table>
+
+<h3>CHAPTER-3 — prophylaxis XR (NCT06669754)</h3>
+<table>
+<tr><th style="width:30%">Element</th><th>Detail</th></tr>
+<tr><td>Design</td><td>Global, randomized, double-blind, placebo-controlled Phase 3 <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td></tr>
+<tr><td>Population</td><td>85 participants randomized 2:1 (55 deucrictibant / 30 placebo) from 21 countries; adolescents and adults with HAE type 1, type 2, or normal C1INH — described as the first and only prophylaxis Phase 3 in all three HAE types (company claim) <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td></tr>
+<tr><td>Dose / duration</td><td>Deucrictibant XR tablet 40 mg once daily, 24 weeks <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td></tr>
+<tr><td>Primary endpoint</td><td>Reduction in mean monthly attack rate vs placebo <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td></tr>
+<tr><td>Result (Sep 8, 2026)</td><td>Primary met: <b>83% attack-rate reduction vs placebo (p&lt;0.0001)</b>; 87% in HAE type 1/2 subgroup. All secondary efficacy endpoints met with statistical significance (attack-rate reduction from baseline, proportion attack-free). Benefit evident from the first week and sustained through 24 weeks. Most AEs mild/moderate; no treatment-related serious AEs. <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a> <a class="src" href="#rangio">Angioedema News</a></td></tr>
+<tr><td>Powering detail</td><td>Formal powering assumptions not disclosed in topline; n=85 is small for a prophylaxis pivotal (label-expansion subgroup estimates will be wide) <span class="tag gap">GAP</span></td></tr>
+<tr><td>Subgroup detail</td><td>Normal-C1INH-specific attack reduction, adolescent-specific results, and laryngeal-attack data not yet disclosed <span class="tag gap">GAP</span></td></tr>
+</table>
+
+<h3>CREAATE — AAE-C1INH (NCT07266805)</h3>
+<p>Pivotal Phase 3 of deucrictibant for prophylactic and on-demand treatment of acquired angioedema due to C1INH deficiency; described by the company as the first Phase 3 trial specifically studying AAE-C1INH. Part 1 topline expected Q1 2027. Design and endpoint details not yet published. <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a> <span class="tag gap">GAP</span></p>
+
+<h3>CHAPTER-1 — Phase 2 prophylaxis (completed)</h3>
+<p>Phase 2 proof-of-concept of XR for prophylaxis; positive topline announced Dec 2023; 12-week treatment period; both doses well tolerated with no SAEs, no severe TEAEs, no discontinuations (per secondary reporting). Served as the basis for CHAPTER-3 dose selection and the end-of-Phase-2 FDA meeting. <span class="tag fact">FACT</span> <a class="src" href="#rchap1">BioSpace</a> <a class="src" href="#rhold">Rare Disease Advisor</a></p>
+
+<div class="callout">
+<p><b>What to watch in the full datasets:</b> (1) normal-C1INH subgroup efficacy — the label-expansion wedge; (2) adolescent data — the IR NDA covers ages 12+; (3) TEAE profile on chronic XR exposure; (4) whether FDA asks for a second confirmatory prophylaxis study before the XR NDA. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+</section>
+
+<section id="s5">
+<h2><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
+<p class="kicker">Where each filing stands and what the agency calendar looks like.</p>
+
+<table>
+<tr><th>Milestone</th><th>Status</th><th>Date / timing</th></tr>
+<tr><td>Deucrictibant IR NDA (on-demand, ages 12+)</td><td>Accepted by FDA; under review</td><td>Accepted Jul 2026; <b>PDUFA Apr 23, 2027</b> <span class="pill-dq hard">hard</span> <span class="tag fact">FACT</span> <a class="src" href="#rstockt">StockTitan</a></td></tr>
+<tr><td>Deucrictibant IR EMA MAA</td><td>Under review (company: "runs in parallel to EMA MAA review")</td><td>CHMP opinion inferred H1 2027 from centralized-procedure clock <span class="pill-dq inferred">inferred</span> <span class="tag fact">FACT</span> <a class="src" href="#rstockt">StockTitan</a></td></tr>
+<tr><td>Deucrictibant XR NDA/MAA (prophylaxis)</td><td>Not yet filed</td><td>Filings planned starting H1 2027 <span class="pill-dq guidance">guidance</span> <span class="tag fact">FACT</span> <a class="src" href="#rchap3">CHAPTER-3 PR</a></td></tr>
+<tr><td>CREAATE Part 1 (AAE-C1INH)</td><td>Enrolling / ongoing</td><td>Topline Q1 2027 <span class="pill-dq guidance">guidance</span> <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></td></tr>
+<tr><td>CHAPTER-4 long-term extension</td><td>Ongoing</td><td>Data timing undisclosed <span class="tag gap">GAP</span></td></tr>
+</table>
+
+<h3>Regulatory history worth knowing</h3>
+<ul>
+<li><b>Aug 2022:</b> FDA placed deucrictibant studies on clinical hold (reason not publicly disclosed by the company). <span class="tag fact">FACT</span> <a class="src" href="#rhold">BioSpace</a></li>
+<li><b>Jun 2023:</b> hold lifted for the on-demand program after FDA reviewed a preplanned interim analysis of a 26-week rodent toxicology study. <span class="tag fact">FACT</span> <a class="src" href="#rhold">BioSpace</a></li>
+<li><b>Jan 2024:</b> hold lifted for the prophylaxis program after full 26-week rodent tox data; CHAPTER-1 open-label portion resumed in the US; company requested end-of-Phase-2 meeting to align on CHAPTER-3. <span class="tag fact">FACT</span> <a class="src" href="#rhold">Rare Disease Advisor</a></li>
+<li><b>Agency capacity caveat:</b> KalVista's Ekterly missed its original Jun 17, 2025 PDUFA date (approved Jul 2025) amid FDA staffing strain — a reminder that PDUFA dates can slip for agency-side reasons. <span class="tag fact">FACT</span> <a class="src" href="#rkalv">DelveInsight</a></li>
+</ul>
+<p>Orphan drug designation for bradykinin-mediated angioedema has been granted by the FDA, the European Commission, and Swissmedic. <span class="tag fact">FACT</span> <a class="src" href="#rstockt">StockTitan</a></p>
+</section>
+
+<section id="s6">
+<h2><span class="num">6</span>Competition — Clinical Differentiation Only</h2>
+<p class="kicker">Each agent's own approved/trial profile. No cross-trial efficacy comparisons are made.</p>
+
+<table>
+<tr><th>Drug / sponsor</th><th>Mechanism</th><th>Setting</th><th>Route</th><th>Status / own data</th></tr>
+<tr><td><b>Takhzyro</b> (lanadelumab) — Takeda</td><td>Plasma kallikrein inhibitor mAb</td><td>Prophylaxis</td><td>SC injection q2w</td><td>Approved 2018 (HELP study). Incumbent prophylaxis standard in the US. <span class="tag fact">FACT</span> <a class="src" href="#rhold">Pharma Manufacturing</a></td></tr>
+<tr><td><b>Orladeyo</b> (berotralstat) — BioCryst</td><td>Oral plasma kallikrein inhibitor</td><td>Prophylaxis</td><td>Oral once daily</td><td>Approved oral prophylaxis (APeX-2). Direct oral-prophylaxis incumbent deucrictibant XR must displace. <span class="tag fact">FACT</span> <a class="src" href="#rcal">2027 calendar</a></td></tr>
+<tr><td><b>Andembry</b> (garadacimab) — CSL Behring</td><td>Anti-FXIIa mAb</td><td>Prophylaxis</td><td>SC injection monthly</td><td>FDA approved Jun 2025. Newest prophylaxis entrant; monthly dosing. <span class="tag fact">FACT</span> <a class="src" href="#rgarad">industry reporting</a></td></tr>
+<tr><td><b>Ekterly</b> (sebetralstat) — KalVista</td><td>Oral plasma kallikrein inhibitor</td><td>On-demand</td><td>Oral tablet</td><td>FDA approved Jul 2025 (ages 12+); first and only oral on-demand HAE therapy until a deucrictibant IR approval. KONFIDENT: median time to beginning of symptom relief 1.61 h (300 mg) / 1.79 h (600 mg) vs 6.72 h placebo. <span class="tag fact">FACT</span> <a class="src" href="#rdrugs">Drugs.com</a></td></tr>
+<tr><td><b>Firazyr</b> (icatibant; generic) — Shire/Takeda originator</td><td>Injectable B2 receptor antagonist</td><td>On-demand</td><td>SC injection</td><td>Approved 2011; most widely used injectable on-demand therapy; now generic — the price floor for the on-demand segment. <span class="tag fact">FACT</span> <a class="src" href="#rhold">Pharma Manufacturing</a></td></tr>
+</table>
+
+<h3>Where deucrictibant is clinically differentiated</h3>
+<ul>
+<li><b>Mechanism:</b> the only oral B2 receptor antagonist in late-stage development — same validated receptor as icatibant, but oral and therefore usable both on-demand (IR) and for chronic prophylaxis (XR), which the peptide formulation of icatibant could never do. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>Single molecule, two settings:</b> if both formulations are approved, one molecule could cover a patient's on-demand and prophylaxis needs — no approved agent currently spans both settings. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>All-HAE-type data:</b> RAPIDe-3 and CHAPTER-3 enrolled HAE type 1, type 2, and normal-C1INH patients — broader enrollment than the historical prophylaxis pivotal trials. <span class="tag fact">FACT</span> <a class="src" href="#rrapide3">RAPIDe-3 PR</a> <a class="src" href="#rchap3">CHAPTER-3 PR</a></li>
+</ul>
+<h3>Where it is not</h3>
+<ul>
+<li><b>Oral on-demand is no longer white space:</b> Ekterly (sebetralstat) has been the first and only oral on-demand therapy since Jul 2025 — deucrictibant IR, if approved Apr 2027, launches into an established oral competitor. <span class="tag fact">FACT</span> <a class="src" href="#rkalv">DelveInsight</a></li>
+<li><b>Oral prophylaxis is not white space either:</b> Orladeyo holds the oral-prophylaxis position; Takhzyro and garadacimab hold the injectable-prophylaxis positions. Deucrictibant XR must displace, not create. <span class="tag interp">INTERPRETATION</span></li>
+<li><b>AAE-C1INH:</b> CREAATE is described as the first Phase 3 specifically in AAE-C1INH — genuine white space, but a small, hard-to-diagnose population. <span class="tag interp">INTERPRETATION</span></li>
+</ul>
+</section>
+
+<section id="s7">
+<h2><span class="num">7</span>Financials</h2>
+<p class="kicker">Cash, burn, runway, and dilution history — from filings.</p>
+
+<table>
+<tr><th>Metric</th><th>Value</th><th>Source</th></tr>
+<tr><td>Cash &amp; equivalents, Jun 30, 2026</td><td><b>€318 million</b></td><td>Q2 2026 6-K <span class="tag fact">FACT</span> <a class="src" href="#rq2">StockTitan Q2</a></td></tr>
+<tr><td>Cash &amp; equivalents, Mar 31, 2026</td><td>€247.0 million</td><td>May 2026 424B5 <span class="tag fact">FACT</span> <a class="src" href="#r424b5">424B5</a></td></tr>
+<tr><td>Cash &amp; equivalents, Dec 31, 2025</td><td>€292 million</td><td>FY2025 results <span class="tag fact">FACT</span> <a class="src" href="#rfy25">StockTitan FY25</a></td></tr>
+<tr><td>Q2 2026 net loss</td><td>€47.8 million (€0.70/share)</td><td>Q2 2026 6-K <span class="tag fact">FACT</span> <a class="src" href="#rq2">StockTitan Q2</a></td></tr>
+<tr><td>Q2 2026 R&amp;D / G&amp;A</td><td>€35.0M / €15.8M</td><td>Q2 2026 6-K <span class="tag fact">FACT</span> <a class="src" href="#rq2">StockTitan Q2</a></td></tr>
+<tr><td>FY2025 net loss</td><td>€176 million (€2.97/share), vs €134M in FY2024</td><td>FY2025 results <span class="tag fact">FACT</span> <a class="src" href="#rfy25">StockTitan FY25</a></td></tr>
+<tr><td>FY2025 R&amp;D / G&amp;A</td><td>€124M / €45.3M</td><td>FY2025 results <span class="tag fact">FACT</span> <a class="src" href="#rfy25">StockTitan FY25</a></td></tr>
+<tr><td>Runway guidance</td><td>Into 2028 (per company, post-May-2026 offering); into 1H 2028 per May 424B5</td><td>Company <span class="tag fact">FACT</span> <a class="src" href="#rq2">StockTitan Q2</a> <a class="src" href="#r424b5">424B5</a></td></tr>
+<tr><td>Debt</td><td>~nil (debt/equity 0% per third-party data)</td><td>Simply Wall St <span class="tag unver">UNVERIFIED</span></td></tr>
+</table>
+<p>Implied quarterly burn ≈ €45–48M (Q2 2026 loss €47.8M on €318M cash → ~6.6 quarters of coverage, consistent with the into-2028 guidance). <span class="tag interp">INTERPRETATION</span> Commercial build (US sales/marketing team expansion, per offering use-of-proceeds) will push burn higher through 2027. <span class="tag interp">INTERPRETATION</span></p>
+<p class="fine"><b>Vintage note (Oct 10):</b> cash figures are Jun 30, 2026 (Q2 2026 6-K) — unchanged since the Oct 7 build. Q3 2026 results are expected ~Nov 11, 2026 (inferred estimate, not company-guided). <span class="tag fact">FACT</span></p>
+
+<h3>Dilution history</h3>
+<table>
+<tr><th>Event</th><th>Shares / warrants</th><th>Price</th><th>Proceeds</th></tr>
+<tr><td>IPO — Feb 2021</td><td>9,511,075 ordinary shares (incl. full greenshoe)</td><td>$20.00</td><td>~$190.2M gross <span class="tag fact">FACT</span> <a class="src" href="#ripo">GlobeNewswire</a></td></tr>
+<tr><td>Follow-on — Dec 2023</td><td>11,125,000 shares + 1,375,000 pre-funded warrants</td><td>$24.00 / $23.99</td><td>~$300M gross <span class="tag fact">FACT</span> <a class="src" href="#rdec23">BioSpace</a></td></tr>
+<tr><td>Follow-on — Jul 2025</td><td>9,562,500 shares (incl. full option) + 500,000 pre-funded warrants</td><td>$20.00 / $19.99</td><td>~$201M net <span class="tag fact">FACT</span> <a class="src" href="#rjul25">6-K filing</a></td></tr>
+<tr><td>Follow-on — May 2026</td><td>4,455,863 shares (incl. full option)</td><td>$29.68</td><td>$132.3M gross / ~$124M net <span class="tag fact">FACT</span> <a class="src" href="#rmay26">6-K filing</a></td></tr>
+</table>
+<p>Pattern: four equity raises in ~5 years, all to fund late-stage deucrictibant development and now US commercial build-out. Offerings have historically traded down on announcement (average −5.6% next-day per StockTitan event data, a secondary-source statistic). <span class="tag fact">FACT</span> <a class="src" href="#rmay26news">StockTitan</a></p>
+</section>
+
+<section id="s8">
+<h2><span class="num">8</span>Fully-Diluted Market Cap &amp; Enterprise Value</h2>
+<p class="kicker">Dilution-honest share counts from filings, at $31.10 (Nasdaq close Oct 9, 2026).</p>
+
+<table>
+<tr><th>Component</th><th>Shares</th><th>Source / date</th></tr>
+<tr><td>Ordinary shares outstanding</td><td>70,204,506</td><td>Q2 2026 6-K (as of Jun 30, 2026) <span class="tag fact">FACT</span> <a class="src" href="#rq2">StockTitan Q2</a></td></tr>
+<tr><td>Stock options outstanding</td><td>3,951,032 (wtd-avg exercise $15.29)</td><td>May 2026 424B5 (as of Dec 31, 2025) <span class="tag fact">FACT</span> <a class="src" href="#r424b5">424B5</a></td></tr>
+<tr><td>Restricted stock units</td><td>1,417,632</td><td>May 2026 424B5 (as of Dec 31, 2025) <span class="tag fact">FACT</span> <a class="src" href="#r424b5">424B5</a></td></tr>
+<tr><td>Pre-funded warrants</td><td>1,875,000 (500,000 Jul-2025 + 1,375,000 Dec-2023 tranches)</td><td>6-K filings <span class="tag fact">FACT</span>; subsequent exercise status <span class="tag gap">GAP</span></td></tr>
+<tr><td><b>Fully-diluted shares</b></td><td><b>~77.45 million</b></td><td>Sum of above <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+
+<div class="grid2">
+<div class="card">
+<h4>Market cap</h4>
+<p>Basic: 70.20M × $31.10 = <b>~$2.18B</b><br>
+Fully-diluted: 77.45M × $31.10 = <b>~$2.41B</b> <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<div class="card">
+<h4>Enterprise value</h4>
+<p>Cash €318M ≈ $372M at an assumed EUR/USD of 1.17 (assumption — flag if stale).<br>
+Basic EV ≈ $2.18B − $0.37B = <b>~$1.81B</b><br>
+FD EV ≈ $2.41B − $0.37B = <b>~$2.04B</b><br>
+(€-terms: FD EV ≈ €1.74B) <span class="tag interp">INTERPRETATION</span></p>
+</div>
+</div>
+<p class="fine">52-week range $20.65–$43.25 (Finnhub). MarketBeat reports 65.41M outstanding shares and a $2.08B mcap — stale vs the 70.20M in the Q2 2026 6-K; the filing number is used above. <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a> <a class="src" href="#rfinnhub">Finnhub</a></p>
+</section>
+
+<section id="s9">
+<h2><span class="num">9</span>Catalyst / Event Map</h2>
+<p class="kicker">Every known upcoming event in chronological order, each tagged by date quality, with what "good" looks like and what to watch. Hold-through-the-binary frame: the PDUFA is the event that matters.</p>
+
+<div class="timeline">
+<div class="tl-item"><div class="dt">~Nov 11, 2026 <span class="pill-dq inferred">inferred</span></div><div class="ev"><b>Q3 2026 earnings</b> — cash update, CREAATE enrollment, commercial-build progress</div><div class="note"><b>What good looks like:</b> cash &#8805;&#8364;260M at Sep 30, CREAATE enrollment on pace for the Q1 2027 readout, commercial leadership named. <b>What to watch:</b> burn acceleration from US commercial hiring; any pre-PDUFA financing language. Estimated date per MarketBeat; not company-guided. <span class="tag unver">UNVERIFIED</span></div></div>
+<div class="tl-item"><div class="dt">Q1 2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>CREAATE Part 1 topline</b> — pivotal Phase 3 in AAE-C1INH (NCT07266805)</div><div class="note"><b>What good looks like:</b> statistically significant attack-rate reduction vs placebo, directionally consistent with the HAE signal — validates B2 blockade outside HAE. <b>What to watch:</b> endpoint definition in a heterogeneous, hard-to-diagnose population; population is small so direct value is modest — the narrative signal (B2 works beyond HAE) is the prize. Company guidance. <span class="tag fact">FACT</span></div></div>
+<div class="tl-item"><div class="dt">H1 2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>Deucrictibant XR NDA/MAA filings</b> — prophylaxis, on positive CHAPTER-3</div><div class="note"><b>What good looks like:</b> both filings submitted on schedule and accepted without refuse-to-file. <b>What to watch:</b> whether FDA flags the n=85 CHAPTER-3 size or asks for a second confirmatory study; whether CHAPTER-4 interim safety data are included. Company guidance. <span class="tag fact">FACT</span></div></div>
+<div class="tl-item"><div class="dt">H1 2027 <span class="pill-dq inferred">inferred</span></div><div class="ev"><b>CHMP opinion — deucrictibant IR (EU)</b></div><div class="note"><b>What good looks like:</b> positive opinion on the centralized-procedure clock. <b>What to watch:</b> label scope vs FDA (adolescents, normal-C1INH). No sponsor/agency timing guidance — derived from the procedure clock. <span class="tag gap">GAP</span></div></div>
+<div class="tl-item"><div class="dt">April 23, 2027 <span class="pill-dq hard">hard</span></div><div class="ev"><b>PDUFA — deucrictibant IR NDA, on-demand HAE (ages 12+)</b></div><div class="note"><b>What good looks like:</b> approval on the action date with the full 12+ and all-HAE-type label; no REMS, no major post-marketing requirements. <b>What to watch:</b> agency-side slippage (cf. Ekterly missing its original Jun 17, 2025 PDUFA by ~3 weeks); label restrictions on normal-C1INH or adolescents; launch-pricing signals. THE binary — FDA target action date per company announcement following Jul 2026 NDA acceptance. <span class="tag fact">FACT</span></div></div>
+<div class="tl-item"><div class="dt">2027 (timing undisclosed) <span class="pill-dq inferred">inferred</span></div><div class="ev"><b>CHAPTER-4 long-term extension data</b> — chronic XR safety/efficacy</div><div class="note"><b>What good looks like:</b> attack control sustained with no new chronic-safety signal — answers the central scientific unknown in &#167;2. <b>What to watch:</b> discontinuation rate, hepatic/lab signals, any tachyphylaxis. No disclosed timing. <span class="tag gap">GAP</span></div></div>
+</div>
+
+<div class="callout">
+<p><b>Already landed (context):</b> RAPIDe-3 topline Dec 3, 2025 (positive); IR NDA accepted Jul 2026; CHAPTER-3 topline Sep 8, 2026 (positive); <b>Oct 5, 2026 — real-world HAE disease-experience analysis published in <i>Advances in Therapy</i></b> (company PR via newswire) <a class="src" href="#rtherapy">wire</a>; <b>Oct 8, 2026 — RAPIDe-3 full results published in <i>The Lancet</i></b> (peer-reviewed publication of known topline data — validation signal for the NDA review, not new efficacy information). <span class="tag fact">FACT</span> <a class="src" href="#rlancet">Oct 8 PR</a></p>
+<p class="fine">No remaining PHVS company catalysts in Q4 2026 beyond the (inferred, non-company-guided) Q3 earnings estimate. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+</section>
+
+<section id="s10">
+<h2><span class="num">10</span>Ranked Red Flags</h2>
+<p class="kicker">Ordered by expected impact on the hold-through-the-binary thesis.</p>
+
+<div class="flag"><span class="rank">#1</span><b>Oral on-demand is no longer white space.</b> KalVista's Ekterly (sebetralstat) has been the first and only oral on-demand HAE therapy since Jul 2025. If deucrictibant IR is approved in Apr 2027, it launches ~21 months behind an entrenched oral competitor — the "oral convenience" wedge is now a share battle, not a category creation. <span class="tag fact">FACT</span> <a class="src" href="#rkalv">DelveInsight</a></div>
+<div class="flag"><span class="rank">#2</span><b>Single-asset dependence.</b> 100% of enterprise value rests on deucrictibant. A CRL on the IR NDA would hit both formulations' regulatory read-across and the financing plan. <span class="tag interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#3</span><b>Regulatory risk is now the whole binary.</b> Two positive Phase 3s retire most efficacy risk, but FDA review risk remains: label scope (adolescents 12+, normal-C1INH inclusion), REMS/PMR requirements, and agency-side timing slippage (cf. Ekterly missing its original Jun 17, 2025 PDUFA). <span class="tag interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#4</span><b>Repeat dilution machine.</b> Four equity raises since the Feb 2021 IPO; the May 2026 raise funds only into 2028 while the company is simultaneously building a US commercial organization — a launch-phase financing overhang is likely before profitability. <span class="tag interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#5</span><b>Prior FDA clinical hold (2022–2024).</b> Non-disclosed reason; resolved via 26-week rodent tox. Any long-term safety signal in CHAPTER-4 or the XR review could reopen the question, especially for chronic use. <span class="tag fact">FACT</span> <a class="src" href="#rhold">BioSpace</a></div>
+<div class="flag"><span class="rank">#6</span><b>Insider selling cluster.</b> MarketBeat aggregation reports 513,102 shares (~$18.6M) sold by insiders in the last 3 months, including Anne Lesage (30,000 sh @ $38.30, Sep 10) and director Elisabeth Bjork (52,500 sh @ $37.89, Sep 17). CEO Modig's sales are small 10b5-1 tax-related tranches. Aggregated figure is single-source. <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rmb">MarketBeat</a></div>
+<div class="flag"><span class="rank">#7</span><b>CHAPTER-3 was small (n=85).</b> Subgroup estimates — especially normal-C1INH — will have wide confidence intervals; FDA could restrict label or request more data. Full subgroup data not yet published. <span class="tag interp">INTERPRETATION</span> <span class="tag gap">GAP</span></div>
+<div class="flag"><span class="rank">#8</span><b>First-time commercial launcher.</b> No approved products; US sales/marketing team is being built now with offering proceeds. Launch execution in a rare-disease market against Takeda/CSL incumbents is unproven. <span class="tag interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#9</span><b>XR NDA needs a second filing and review cycle.</b> Prophylaxis approval is a 2028+ event at earliest; any FDA demand for a second confirmatory prophylaxis study pushes it further. <span class="tag interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#10</span><b>Dutch N.V. / foreign private issuer plumbing.</b> Shareholder rights under Dutch law differ from US norms; enforcement of US securities judgments is harder — standard FPI friction, low probability of mattering. <span class="tag interp">INTERPRETATION</span></div>
+</section>
+
+<section id="s11">
+<h2><span class="num">11</span>Bear / Base / Bull + Scenarios</h2>
+<p class="kicker">Framed for a holder who holds through the clinical/regulatory binary. Price targets below are <b>soft, scenario-based illustrations</b> built from this dossier's own numbers — not recommendations.</p>
+
+<div class="grid2">
+<div class="card">
+<h4>Bear — regulatory or competitive stumble</h4>
+<p>CRL or major label restriction on the IR NDA (e.g., adults-only, or exclusion of normal-C1INH); CREAATE Part 1 misses in Q1 2027; XR NDA requires a second confirmatory study; Ekterly entrenches the oral on-demand position while deucrictibant IR is still unapproved. Financing overhang compounds the drawdown. The clinical data stay positive but unmonetized on schedule. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<div class="card">
+<h4>Base — approval on time, grind to share</h4>
+<p>PDUFA approval Apr 23, 2027 on the IR NDA with a 12+ label; XR NDA filed H1 2027 and accepted; CREAATE Part 1 supports the AAE-C1INH expansion; launch begins into a market where Ekterly owns oral on-demand mindshare and Orladeyo/Takhzyro own prophylaxis — share accrues gradually on the dual-formulation story rather than in a step change. One more financing round before cash-flow breakeven. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+</div>
+<div class="card" style="margin-top:16px">
+<h4>Bull — clean sweep into a two-formulation franchise</h4>
+<p>IR approved on PDUFA with full 12+ and all-HAE-type label; XR NDA filed H1 2027 and approved on a single pivotal (CHAPTER-3); CREAATE Part 1 positive, opening the first approved AAE-C1INH indication; full datasets show durable efficacy and clean chronic safety, making deucrictibant the only molecule spanning on-demand and prophylaxis. A takeout bid is the plausible max-value exit — capped at ~$79, the top of the published sell-side target range ($41.02–$79.04; 14 analysts, average $57.56, S&amp;P Global poll via StockAnalysis, Oct 9, 2026). Any max-value scenario in this dossier is held at or below that ceiling. <span class="tag interp">INTERPRETATION</span> <a class="src" href="#rsa">StockAnalysis</a></p>
+</div>
+
+
+<h3>Soft scenario price targets (illustrative — not recommendations)</h3>
+<table>
+<tr><th>Scenario</th><th>Soft target</th><th>Implied FD EV</th><th>Key assumptions</th></tr>
+<tr><td><b>Bear</b> — CRL on IR NDA</td><td><b>$10</b></td><td>~$0.40B</td><td>Regulatory failure on the lead filing; residual option value on XR + AAE-C1INH only; FD share count rises on a distressed raise. ($0.40B + $0.372B cash) &#247; 77.45M &#8776; $10. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Base</b> — IR approved Apr 2027, XR filed H1 2027</td><td><b>$50</b></td><td>~$3.50B</td><td>Approval on PDUFA with 12+ label; XR NDA accepted; gradual share gains vs Ekterly/Orladeyo/Takhzyro; one pre-breakeven financing. ($3.50B + $0.372B cash) &#247; 77.45M = $50. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bull</b> — clean sweep into takeout</td><td><b>$75</b></td><td>~$5.44B</td><td>Full labels, XR approved on CHAPTER-3 alone, CREAATE positive, strategic takeout. Capped below the published sell-side high ($79.04) per dossier rules. ($5.44B + $0.372B cash) &#247; 77.45M &#8776; $75. <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+<p class="fine"><b>Method:</b> FD share count 77.45M (Q2 2026 6-K + 424B5 components, &#167;8); net cash &#8364;318M &#8776; $372M at assumed EUR/USD 1.17 (flag if stale); debt ~nil. Targets are rounded arithmetic on the EV cases — not DCF outputs, not recommendations. <span class="tag interp">INTERPRETATION</span></p>
+
+<h3>Scenario analyses</h3>
+<table>
+<tr><th>Scenario</th><th>Trigger</th><th>Mechanism of value change</th></tr>
+<tr><td><b>PDUFA delay (3–6 mo)</b></td><td>FDA resource constraints or minor review issue, no CRL</td><td>Timing slip only; cash covers into 2028 but commercial hiring burn continues. History: Ekterly missed its original PDUFA by ~3 weeks in 2025. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>CRL on IR NDA</b></td><td>CMC, safety, or subgroup-data deficiency</td><td>Single-asset binary resolves negatively; XR program's regulatory read-across turns adverse; financing at distressed levels. This is the position-killer. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>CREAATE miss (Q1 2027)</b></td><td>AAE-C1INH pathophysiology less B2-driven than assumed</td><td>Franchise-expansion leg removed, but HAE core intact; AAE-C1INH is a small population so direct value impact is modest — the signal damage is to the "B2 works everywhere" narrative. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Takeout</b></td><td>Post-PDUFA, by a rare-disease incumbent (Takeda, CSL)</td><td>Strategic fit: an oral franchise plugs portfolio gaps against Ekterly/Orladeyo. Capped at ~$76–$79 (top of published sell-side range) per dossier rules. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Pre-PDUFA financing</b></td><td>Cash into 2028 but launch costs rising</td><td>Typical 5–8% announcement drawdown pattern (secondary-source statistic); would reset the FD share count above 77.45M. <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+</section>
+
+<section id="s12">
+<h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
+<p class="kicker">Who is running the binary, and what their trading says.</p>
+
+<table>
+<tr><th>Person</th><th>Role</th><th>Track record</th></tr>
+<tr><td><b>Berndt Modig</b></td><td>Co-founder, CEO, director</td><td>CFO of Jerini AG (2003–2008) through its Frankfurt IPO (2005) and sale to Shire (2008) — <b>Jerini developed icatibant</b>, the B2 antagonist that is deucrictibant's mechanistic predecessor; Modig worked alongside icatibant inventor Jochen Knolle. CFO of Prosensa (2010–2015) through its Nasdaq IPO (2013) and acquisition by BioMarin (2015). Rare-disease financing and M&amp;A operator, not a drug developer by training (CPA, INSEAD MBA). <span class="tag fact">FACT</span> <a class="src" href="#rmodig">The Org</a> <a class="src" href="#rms">Morgan Stanley transcript</a></td></tr>
+<tr><td><b>Peng Lu, MD, PhD</b></td><td>President (promoted Jun 2026; formerly CMO)</td><td>Led the clinical program through both pivotal wins; promotion consolidated R&amp;D and commercial under one leader ahead of launch. <span class="tag fact">FACT</span> <a class="src" href="#rq2pr">Q2 2026 PR</a></td></tr>
+</table>
+
+<h3>Insider &amp; holder signals</h3>
+<ul>
+<li>CEO Modig: sells only small 10b5-1 tranches (~2,292 shares/quarter, tied to RSU vesting/tax); holds 130,625 shares directly plus 950,000 indirectly via Schoodic Management BV. <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></li>
+<li>Anne Lesage (insider): sold 30,000 shares @ $38.30 on Sep 10, 2026 (~$1.15M), cutting her direct position ~35%. <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></li>
+<li>Director Elisabeth Bjork: sold 52,500 shares @ $37.89 on Sep 17, 2026 (~$1.99M), cutting ownership ~78%. <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></li>
+<li>Aggregated insider sales of 513,102 shares (~$18.6M) over 3 months are a single-source (MarketBeat) figure — treat as <span class="tag unver">UNVERIFIED</span> until confirmed against Form 4 filings.</li>
+<li>General Atlantic entities: 7.6% holder (5,359,727 shares, Aug 2026 13G/A). Viking Global: 5.6% (3,653,310 shares, Mar 2026). Institutional-quality holders remain in size. <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a></li>
+<li>Sell-side (updated Oct 9, 2026): S&amp;P Global poll of 14 analysts via StockAnalysis — consensus "Strong Buy," average target $57.56 (range $41.02–$79.04); MarketBeat (15 analysts, Oct 7): average $58.60 (range $30–$79), one sell rating. HC Wainwright trimmed estimates Oct 7, 2026. <span class="tag fact">FACT</span> <a class="src" href="#rsa">StockAnalysis</a> <a class="src" href="#rmb">MarketBeat</a></li>
+</ul>
+<div class="callout warn">
+<p><b>Read on insider selling:</b> sales cluster after the CHAPTER-3 pop (Sep 8, 2026) into strength — consistent with diversification/liquidity after a de-risking event, not with pre-binary flight. But the Bjork ~78% position cut is large enough to note. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+</section>
+
+<section id="s13">
+<h2><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
+<p class="kicker">As of <b>October 10, 2026</b>. Filings used (unchanged since Oct 7 build): 2025 Form 20-F (filed Apr 2026); Q2 2026 6-K (Aug 12, 2026); May 2026 424B5 prospectus; Jul 2025 and May 2026 offering 6-Ks; GlobeNewswire company releases (Dec 2025 RAPIDe-3, Sep 2026 CHAPTER-3, Aug 2026 Q2 results, Oct 5 Advances in Therapy note, Oct 8 Lancet publication). Price/cap figures updated to the Oct 9, 2026 close ($31.10). New since Oct 7: RAPIDe-3 full results published in <i>The Lancet</i> (Oct 8); real-world HAE analysis in <i>Advances in Therapy</i> (Oct 5).</p>
+
+<ol class="refs">
+<li id="rchap3">Pharvaris press release via GlobeNewswire, Sep 8, 2026 — "Pharvaris Announces Positive Topline Data from CHAPTER-3 Pivotal Study of Deucrictibant XR for Prophylaxis of HAE Attacks." <a href="https://www.globenewswire.com/news-release/2026/09/08/3357455/0/en/pharvaris-announces-positive-topline-data-from-chapter-3-pivotal-study-of-deucrictibant-xr-for-prophylaxis-of-hae-attacks.html">link</a></li>
+<li id="rrapide3">Pharvaris press release via GlobeNewswire, Dec 3, 2025 — "Pharvaris Announces Positive Topline Data from RAPIDe-3 Pivotal Study … for On-Demand Treatment of HAE Attacks." <a href="https://pr.wvcjournal.com/article/Pharvaris-Announces-Positive-Topline-Data-from-RAPIDe-3-Pivotal-Study-Confirming-Potential-of-Deucrictibant-for-On-Demand-Treatment-of-HAE-Attacks?storyId=693024c1476361ebf71e4d56">link</a></li>
+<li id="rq2pr">Pharvaris press release via GlobeNewswire, Aug 12, 2026 — "Pharvaris Reports Second Quarter 2026 Financial Results and Provides Business Update." <a href="https://www.globenewswire.com/news-release/2026/08/12/3343484/0/en/pharvaris-reports-second-quarter-2026-financial-results-and-provides-business-update.html">link</a></li>
+<li id="r20f">Pharvaris N.V. Form 20-F, FY2025 (via StockTitan filing archive). <a href="https://www.stocktitan.net/sec-filings/PHVS/page-8.html">link</a></li>
+<li id="rq2">StockTitan summary of Pharvaris Q2 2026 6-K. <a href="https://www.stocktitan.net/news/PHVS/pharvaris-reports-second-quarter-2026-financial-results-and-provides-27knecf75ihz.html">link</a></li>
+<li id="r424b5">Pharvaris 424B5 prospectus supplement, May 2026 offering. <a href="https://www.stocktitan.net/sec-filings/PHVS/424b5-pharvaris-n-v-prospectus-supplement-debt-securities-e9400e8686e8.html">link</a></li>
+<li id="ripo">Pharvaris press release via GlobeNewswire, Feb 4, 2021 — IPO pricing. <a href="https://www.globenewswire.com/news-release/2021/02/05/2170403/0/en/Pharvaris-Announces-Pricing-of-Upsized-Initial-Public-Offering.html">link</a></li>
+<li id="rdec23">BioSpace, Dec 6, 2023 — $300M offering pricing. <a href="https://www.biospace.com/pharvaris-announces-pricing-of-300-million-underwritten-offering-of-ordinary-shares-and-pre-funded-warrants">link</a></li>
+<li id="rjul25">StockTitan 6-K record, Jul 2025 offering close. <a href="https://www.stocktitan.net/sec-filings/PHVS/6-k-pharvaris-n-v-current-report-foreign-issuer-0a31b9642963.html">link</a></li>
+<li id="rmay26">StockTitan 6-K record, May 2026 offering (4,455,863 shares @ $29.68). <a href="https://www.stocktitan.net/sec-filings/PHVS/6-k-pharvaris-n-v-current-report-foreign-issuer-03888e59f499.html">link</a></li>
+<li id="rmay26news">StockTitan, May 2026 — closing of $132.3M offering. <a href="https://www.stocktitan.net/news/PHVS/pharvaris-announces-closing-of-132-3-million-underwritten-offering-c5g23oi5xyj6.html">link</a></li>
+<li id="rfy25">StockTitan, Apr 2026 — FY2025 results (€292M cash, €176M net loss). <a href="https://www.stocktitan.net/news/PHVS/pharvaris-reports-fourth-quarter-and-full-year-2025-financial-bjsy5f1q5wpw.html">link</a></li>
+<li id="rhold">BioSpace / Rare Disease Advisor, Jan 2024 — FDA lifting of deucrictibant clinical hold. <a href="https://www.biospace.com/pharvaris-announces-fda-lifting-of-the-clinical-hold-of-deucrictibant-for-the-prophylactic-treatment-of-hae-attacks">link</a> <a href="https://www.rarediseaseadvisor.com/news/deucrictibant-clinical-hold-lifted-hae-prophylactic-treatment/">link</a></li>
+<li id="rchap1">BioSpace, Dec 2023 — CHAPTER-1 Phase 2 topline (via Global Genes summary). <a href="https://globalgenes.org/raredaily/pharvaris-reports-positive-top-line-phase-2-study-data-of-deucrictibant-for-treatment-of-hae-attacks/">link</a></li>
+<li id="rstockt">StockTitan company overview — PDUFA Apr 23, 2027; orphan designations. <a href="https://www.stocktitan.net/overview/PHVS/">link</a></li>
+<li id="rkalv">DelveInsight, Jul 2025 — Ekterly (sebetralstat) FDA approval. <a href="https://www.delveinsight.com/blog/ekterly-for-hereditary-angioedema-treatment">link</a></li>
+<li id="rdrugs">Drugs.com — Ekterly FDA approval history (KONFIDENT data). <a href="https://www.drugs.com/history/ekterly.html">link</a></li>
+<li id="rchdr">CHDR Library — "Icatibant Mechanism of Action in Hereditary Angioedema" (Br J Clin Pharmacol 2010; doi:10.1111/j.1365-2125.2010.03642.x). <a href="https://chdr.nl/library/icatibant">link</a></li>
+<li id="rwao">Zuraw et al., World Allergy Organization Journal 2010 — "Hereditary Angioedema Therapy: Kallikrein Inhibition and Bradykinin Receptor Antagonism." <a href="https://link.springer.com/article/10.1186/1939-4551-3-S3-S34">link</a></li>
+<li id="rangio">Angioedema News, Sep 2026 — CHAPTER-3 topline summary. <a href="https://angioedemanews.com/news/extended-release-tablets-cut-hae-attacks-over-80-percent-trial/">link</a></li>
+<li id="rtipranks">TipRanks, Sep 2026 — CHAPTER-3 / pipeline summary (CHAPTER-4, CREAATE). <a href="https://www.tipranks.com/news/company-announcements/pharvaris-posts-strong-phase-3-hae-prophylaxis-data-for-oral-deucrictibant-xr">link</a></li>
+<li id="rmodig">The Org — Berndt Modig biography (Jerini, Prosensa). <a href="https://theorg.com/org/pharvaris/org-chart/berndt-modig">link</a></li>
+<li id="rms">Seeking Alpha transcript, Sep 15, 2026 — Pharvaris at Morgan Stanley Healthcare Conference (Modig on Jerini/icatibant history). <a href="https://seekingalpha.com/article/4946552-pharvaris-n-v-phvs-presents-at-morgan-stanley-24th-annual-global-healthcare-conference">link</a></li>
+<li id="rmb">MarketBeat — PHVS price targets, insider transactions, ownership (updated Oct 7, 2026). <a href="https://www.marketbeat.com/stocks/NASDAQ/PHVS/">link</a></li>
+<li id="rsa">StockAnalysis — PHVS analyst forecast (S&amp;P Global poll). <a href="https://stockanalysis.com/stocks/phvs/forecast/">link</a></li>
+<li id="rfinnhub">Finnhub — PHVS market data (price $31.68, 52-wk range, mcap $2.18B). <a href="https://finnhub.io/?q=%22PHVS%22">link</a></li>
+<li id="rcal">Internal 2027 catalyst calendar dataset (~/workspace/research_notes/catalyst-calendar-2027/data.json) — PHVS rows v16-0188/0189/0190, v20-0003.</li>
+<li id="rgarad">Industry reporting — garadacimab (Andembry) FDA approval Jun 2025 (CSL Behring); date aligned to &#167;6 (previously misstated Jun 2026 in this reference entry).</li>
+<li id="rlancet">Pharvaris press release via GlobeNewswire, Oct 8, 2026 — "Phase 3 Study Results Highlighting Deucrictibant's Rapid and Sustained Efficacy in Treating HAE Attacks Published in The Lancet." <a href="https://www.tradingview.com/news/globenewswire:8b2836c02094b:0-phase-3-study-results-highlighting-deucrictibant-s-rapid-and-sustained-efficacy-in-treating-hae-attacks-published-in-the-lancet/">link</a> <a href="https://wkow.marketminute.com/article/gnwcq-2026-10-8-phase-3-study-results-highlighting-deucrictibants-rapid-and-sustained-efficacy-in-treating-hae-attacks-published-in-the-lancet">mirror</a></li>
+<li id="rtherapy">Stockwatch PHVS news wire — company press release Oct 5, 2026, "Real-World Analysis Highlighting HAE Disease Experience and Gaps in Treatment Satisfaction Published in Advances in Therapy." <a href="https://www.stockwatch.com/News/Search?U:PHVS&amp;wire=0&amp;symbolchanges=Y">wire listing</a></li>
+</ol>
+
+<p class="fine"><b>Method note:</b> source order followed — SEC filings → FDA/labels → CT.gov (NCT IDs cited from company PRs; CT.gov pages not independently opened) → academic papers → company PRs/decks → trade press. No dates, cash figures, enrollment, endpoints, or p-values were invented; every number carries units, population/timepoint, and source. No DCF or recommendation is included; soft scenario price targets are illustrative (&#167;11). Takeout/max-value framing is capped at the top of the published sell-side target range (~$79).</p>
+<p class="fine"><b>Distribution note:</b> this document contains no personal information about any individual investor — no holdings, positions, share counts, costs, or account details. It is written as a neutral third-party research document.</p>
+</section>
+
+</main>
+
+<footer>
+PHVS deep-dive dossier · As of October 10, 2026 · Single-file interactive HTML · Evidence labels: FACT / INTERPRETATION / GAP / UNVERIFIED on every material claim.
+</footer>
+
+
+<button id="toTop" aria-label="Back to top">&uarr;</button>
+<script>
+(function(){
+  /* theme */
+  var t=document.getElementById('themeToggle');
+  try{if(localStorage.getItem('phvs-theme')==='dark'){document.body.classList.add('dark');t.innerHTML='&#9728; Light mode';}}catch(e){}
+  t.addEventListener('click',function(){
+    var dark=document.body.classList.toggle('dark');
+    t.innerHTML=dark?'&#9728; Light mode':'&#9789; Dark mode';
+    try{localStorage.setItem('phvs-theme',dark?'dark':'light');}catch(e){}
+  });
+  /* collapsible sections */
+  document.querySelectorAll('main section').forEach(function(sec){
+    var h2=sec.querySelector('h2');if(!h2)return;
+    var b=document.createElement('button');
+    b.className='sec-toggle';b.setAttribute('aria-expanded','true');
+    b.setAttribute('aria-label','Collapse section');b.textContent='\u2013';
+    b.addEventListener('click',function(){
+      var c=sec.classList.toggle('collapsed');
+      b.textContent=c?'+':'\u2013';
+      b.setAttribute('aria-expanded',String(!c));
+      b.setAttribute('aria-label',c?'Expand section':'Collapse section');
+    });
+    h2.insertBefore(b,h2.firstChild);
+  });
+  /* tables: horizontal scroll wrap for small screens */
+  document.querySelectorAll('main table').forEach(function(tb){
+    var w=document.createElement('div');w.className='tablewrap';
+    tb.parentNode.insertBefore(w,tb);w.appendChild(tb);
+  });
+  /* back to top */
+  var top=document.getElementById('toTop');
+  window.addEventListener('scroll',function(){top.classList.toggle('show',window.scrollY>600);},{passive:true});
+  top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>
