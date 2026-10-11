@@ -1,214 +1,349 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XENE — Xenon Pharmaceuticals · Deep-Dive Investment Dossier</title>
-<style>
-  :root{
-    --ink:#1c2430; --ink2:#3d4756; --mut:#6b7686; --line:#e3e8ef;
-    --bg:#ffffff; --panel:#f6f8fb; --panel2:#eef2f7;
-    --acc:#14508c; --acc2:#0e3d6e;
-    --hard:#0f7a3d; --guid:#8a6d00; --inf:#5b6b80;
-    --fact:#0f7a3d; --interp:#7a5b00; --gap:#9a3d1a; --unv:#5b6b80;
-    --red:#a8232a; --amber:#8a6d00; --green:#0f7a3d;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-    line-height:1.62;font-size:15.5px}
-  .wrap{max-width:1180px;margin:0 auto;display:flex}
-  /* ---------- sidebar ---------- */
-  nav.side{position:sticky;top:0;height:100vh;overflow:auto;width:250px;flex:0 0 250px;
-    border-right:1px solid var(--line);background:var(--panel);padding:22px 16px;font-size:13.5px}
-  nav.side .brand{font-weight:700;font-size:15px;color:var(--acc2);margin-bottom:2px}
-  nav.side .sub{color:var(--mut);font-size:12px;margin-bottom:16px}
-  nav.side a{display:block;color:var(--ink2);text-decoration:none;padding:5px 8px;border-radius:6px}
-  nav.side a:hover{background:var(--panel2);color:var(--acc2)}
-  nav.side .sec{margin-top:12px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding:0 8px}
-  /* ---------- main ---------- */
-  main{flex:1;min-width:0;padding:34px 44px 90px}
-  h1{font-size:32px;line-height:1.25;margin:0 0 6px;color:var(--acc2);letter-spacing:-.01em}
-  h2{font-size:22px;color:var(--acc2);margin:44px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line);letter-spacing:-.01em}
-  h3{font-size:17px;color:var(--ink);margin:26px 0 8px}
-  h4{font-size:15px;margin:18px 0 6px;color:var(--ink)}
-  p{margin:10px 0}
-  .kicker{color:var(--mut);font-size:14px;margin-bottom:18px}
-  .callout{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--acc);
-    border-radius:8px;padding:14px 18px;margin:18px 0}
-  .callout.warn{border-left-color:var(--amber)}
-  .callout.risk{border-left-color:var(--red)}
-  .callout.good{border-left-color:var(--green)}
-  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
-  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-  th{background:var(--panel2);font-weight:600;color:var(--acc2)}
-  tr:nth-child(even) td{background:#fafbfd}
-  .pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:20px;padding:2px 10px;margin:1px 2px;white-space:nowrap}
-  .hard{background:#e3f3e9;color:var(--hard)} .guid{background:#f7efcf;color:var(--guid)} .inf{background:#e8edf3;color:var(--inf)}
-  .ev{display:inline-block;font-size:10.5px;font-weight:800;border-radius:4px;padding:1px 7px;margin-right:6px;
-    letter-spacing:.05em;vertical-align:1px}
-  .FACT{background:#e3f3e9;color:var(--fact)} .INTERPRETATION{background:#f7efcf;color:var(--interp)}
-  .GAP{background:#fbe7dc;color:var(--gap)} .UNVERIFIED{background:#e8edf3;color:var(--unv)}
-  ul.tight li{margin:6px 0}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}
-  .card h4{margin-top:0}
-  .num{font-variant-numeric:tabular-nums}
-  .src{font-size:12.5px;color:var(--mut)}
-  .tl{position:relative;margin:22px 0 10px;padding-left:26px}
-  .tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
-  .tl .ev-item{position:relative;margin:0 0 18px}
-  .tl .ev-item:before{content:"";position:absolute;left:-23px;top:7px;width:10px;height:10px;border-radius:50%;
-    background:#fff;border:2.5px solid var(--acc)}
-  .ev-item .dt{font-weight:700;color:var(--acc2)}
-  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
-  .legend{font-size:12.5px;color:var(--mut);background:var(--panel);border:1px solid var(--line);
-    border-radius:8px;padding:10px 14px;margin:14px 0}
-  @media(max-width:900px){.wrap{flex-direction:column}nav.side{position:static;height:auto;width:100%;flex:none}
-    main{padding:24px 18px}.grid2,.grid3{grid-template-columns:1fr}}
-  @media print{nav.side{display:none}main{padding:0}#topnav,#themeToggle,#backTop{display:none}}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>XENE — Xenon Pharmaceuticals · Deep-Dive Investment Dossier</title>
+  <style>
+:root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
 
-  /* ---------- enhancements: theme, nav, QOL ---------- */
-  [data-theme="dark"]{--ink:#e9edf3;--ink2:#c8d0dc;--mut:#98a2b1;--line:#2b3442;
-    --bg:#11151b;--panel:#181e27;--panel2:#202836;
-    --acc:#8fbae9;--acc2:#a9cbf2;
-    --hard:#7fd6a4;--guid:#e3c76a;--inf:#9aa8bd;
-    --fact:#7fd6a4;--interp:#e3c76a;--gap:#f0a080;--unv:#9aa8bd;
-    --red:#f08080;--amber:#e3c76a;--green:#7fd6a4}
-  [data-theme="dark"] .hard,[data-theme="dark"] .FACT{background:#16332a}
-  [data-theme="dark"] .guid,[data-theme="dark"] .INTERPRETATION{background:#3a2f14}
-  [data-theme="dark"] .inf,[data-theme="dark"] .UNVERIFIED{background:#232b38}
-  [data-theme="dark"] .GAP{background:#3d241a}
-  [data-theme="dark"] tr:nth-child(even) td{background:#151b24}
-  [data-theme="dark"] .card{background:#181e27}
-  #themeToggle{position:fixed;left:16px;bottom:16px;z-index:100;min-width:48px;min-height:48px;
-    border-radius:24px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);
-    font-size:14px;font-weight:600;padding:10px 16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-  #backTop{position:fixed;right:16px;bottom:16px;z-index:100;width:48px;height:48px;border-radius:24px;
-    border:1px solid var(--line);background:var(--acc);color:#fff;font-size:20px;cursor:pointer;
-    display:none;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-  #backTop.show{display:block}
-  #topnav{display:none}
-  .sec-toggle{background:none;border:1px solid var(--line);border-radius:6px;min-width:44px;min-height:44px;
-    cursor:pointer;color:var(--acc2);font-size:17px;margin-right:10px;vertical-align:middle;padding:6px 10px}
-  section.collapsed > :not(h2){display:none}
-  nav.side a{min-height:44px;display:flex;align-items:center}
-  @media(max-width:900px){
-    #topnav{display:flex;overflow-x:auto;position:sticky;top:0;z-index:60;background:var(--panel);
-      border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
-    #topnav a{flex:0 0 auto;padding:12px 14px;min-height:44px;display:flex;align-items:center;
-      color:var(--ink2);text-decoration:none;font-size:13.5px;white-space:nowrap}
-    #topnav a:hover{background:var(--panel2);color:var(--acc2)}
-  }
-  @media(max-width:640px){
-    body{font-size:15px}
-    main{padding:20px 14px}
-    main table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
-    h1{font-size:26px}
-  }
-</style>
+    /* ---- compat: retained component styles mapped to PEPG tokens ---- */
+    .tblwrap,.tbl-wrap,.tablewrap{overflow-x:auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+    table{border-collapse:collapse;width:100%;font-size:13.5px}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font:700 10.5px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    h4{font-size:16px;margin:0 0 8px}
+    ul.tight li,ol.tight li{margin:4px 0}
+
+
+    .callout{background:var(--raised);border:1px solid var(--line);border-left:4px solid var(--teal);padding:14px 18px;margin:18px 0}
+    .callout.warn{border-left-color:var(--orange)}
+    .card{background:var(--raised);border:1px solid var(--line);padding:14px 16px;box-shadow:var(--shadow)}
+    .ev-item{position:relative;margin:0 0 18px}
+    .dt{font-weight:700}
+    .src{font-size:12.5px;color:var(--muted)}
+    .kicker{color:var(--muted);font-size:14px;margin-bottom:18px}
+    .tl{position:relative;margin:22px 0 10px;padding-left:26px}
+    .tl:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    @media(max-width:900px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.grid3{grid-template-columns:1fr}}
+    .num{font-variant-numeric:tabular-nums}
+    .tight{font-size:13.5px}
+    .legend{font-size:12.5px;color:var(--muted);margin:14px 0}
+
+  </style>
 </head>
 <body>
-<div id="topnav" aria-label="Dossier sections">
-<a href="#snapshot">Snapshot</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Trials</a><a href="#reg">Regulatory</a><a href="#comp">Competition</a><a href="#fin">Financials</a><a href="#fdmc">FDMC/EV</a><a href="#catalysts">Catalysts</a><a href="#redflags">Red flags</a><a href="#scenarios">Scenarios</a><a href="#mgmt">Management</a><a href="#refs">References</a>
-</div>
-<button id="themeToggle" aria-label="Toggle dark mode">☾ Dark</button>
-<button id="backTop" aria-label="Back to top">↑</button>
-<div class="wrap">
-<nav class="side">
-  <div class="brand">XENE · Deep-Dive Dossier</div>
-  <div class="sub">Xenon Pharmaceuticals Inc. · Nasdaq</div>
-  <a href="#snapshot">1 · Identity &amp; Thesis Snapshot</a>
-  <a href="#science">2 · Science: MoA &amp; Why It Could Fail</a>
-  <a href="#pipeline">3 · Pipeline Overview</a>
-  <a href="#trials">4 · Trial Design Deep Dive</a>
-  <a href="#reg">5 · Clinical / Regulatory Status</a>
-  <a href="#comp">6 · Competition</a>
-  <a href="#fin">7 · Financials</a>
-  <a href="#fdmc">8 · FDMC / EV</a>
-  <a href="#catalysts">9 · Catalyst &amp; Event Map</a>
-  <a href="#redflags">10 · Ranked Red Flags</a>
-  <a href="#scenarios">11 · Bear / Base / Bull &amp; Scenarios</a>
-  <a href="#mgmt">12 · Management &amp; Insider Signals</a>
-  <div class="sec">Reference</div>
-  <a href="#refs">13 · References, As-Of, Filings Used</a>
-</nav>
+<div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · XENE</span><span class="stamp">Deep-dive dossier · October 10, 2026</span></div>
+        <h1>Xenon Pharmaceuticals Inc.</h1>
+        <p class="hero-dek">Azetukalner (Kv7 opener): Phase 3-positive in focal epilepsy, NDA filed September 2026 (FDA acceptance pending); Phase 3 MDD program under voluntary enrollment pause; X-NOVA2 topline Q1 2027.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$36.44</div>
+        <div class="quote-label">Fixed market snapshot · Oct 9, 2026 close</div>
+        <div class="quote-meta"><strong>~$3.53B</strong> basic mcap · <strong>$1,245.1M</strong> cash (Jun 30, 2026); runway into 2029<br>Next catalyst: <strong>X-NOVA2 topline, Q1 2027</strong> (guidance)</div>
+      </div>
+    </div>
+  </header>
+
+<div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#snapshot">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Clinical</a><a href="#reg">Regulatory</a><a href="#comp">Landscape</a><a href="#fin">Financials</a><a href="#fdmc">Valuation</a><a href="#catalysts">Catalysts</a><a href="#redflags">Risks</a><a href="#scenarios">Scenarios</a><a href="#mgmt">People</a><a href="#refs">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+    </nav>
+  </div>
+
 <main>
-
-<h1>Xenon Pharmaceuticals Inc. (Nasdaq: XENE)</h1>
-<div class="kicker">Comprehensive deep-dive investment dossier · As of <strong>October 10, 2026</strong> · Azetukalner (Kv7 opener): Phase 3-positive in focal epilepsy, NDA filed Sept 2026 (FDA acceptance pending); Phase 3 MDD program under voluntary enrollment pause; X-NOVA2 topline Q1 2027.</div>
-
-<div class="legend"><strong>Evidence labels used throughout:</strong>
-<span class="ev FACT">FACT</span> directly stated in a cited source ·
-<span class="ev INTERPRETATION">INTERPRETATION</span> analyst inference from facts ·
-<span class="ev GAP">GAP</span> material unknown ·
-<span class="ev UNVERIFIED">UNVERIFIED</span> single-source or trade-press claim ·
-Every number carries units, population/timepoint, and source. No DCF, no recommendation; §11 carries explicitly soft, scenario-based per-share targets with stated assumptions (not a formal price target).
-</div>
-
 <section id="snapshot">
-<h2>1 · Identity &amp; Thesis Snapshot</h2>
-<table>
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>An NDA in epilepsy — and a psychiatry program on pause</h2></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <table>
 <tr><th style="width:220px">Item</th><th>Detail</th></tr>
-<tr><td>Company</td><td><span class="ev FACT">FACT</span> Xenon Pharmaceuticals Inc., neuroscience-focused biopharma, headquartered Burnaby, British Columbia, Canada; Nasdaq: XENE. Founded 1996. <span class="src">Source: Q2 2026 10-Q (filed Aug 6, 2026); company PRs.</span></td></tr>
-<tr><td>Lead asset</td><td><span class="ev FACT">FACT</span> Azetukalner (XEN1101) — novel, potent Kv7 (KCNQ2/3) potassium channel opener in development for epilepsy (focal onset seizures, PGTCS) and depression (MDD, bipolar depression). <span class="src">Source: Sept 17, 2026 company PR (NDA submission).</span></td></tr>
-<tr><td>Regulatory state</td><td><span class="ev FACT">FACT</span> NDA for azetukalner in focal onset seizures (FOS) submitted to FDA Sept 17, 2026. <span class="ev UNVERIFIED">UNVERIFIED</span> FDA acceptance not yet confirmed as of Oct 7, 2026. Company modeling a standard ~12-month review (~Sept 2027 decision) + ~3 months DEA scheduling. <span class="src">Source: Sept 17, 2026 PR; company commentary via market reports Sept 30, 2026.</span></td></tr>
-<tr><td>Cash</td><td><span class="ev FACT">FACT</span> $1,245.1 million cash, cash equivalents + marketable securities as of June 30, 2026; company guidance: runway into 2029. <span class="src">Source: Q2 2026 10-Q.</span></td></tr>
-<tr><td>Price context</td><td><span class="ev FACT">FACT</span> $36.44 (Oct 9, 2026 close, +0.77%); 52-week range $35.06–$72.66 — low reset Oct 8, 2026. Week ended Oct 9: −4.2%; 12-week return −46.6%; price sits at 3.7% of its 52-week range. <span class="src">Source: stockanalysis.com; Finnhub; Sharemaestro weekly report, Oct 9, 2026.</span></td></tr>
-<tr><td>Valuation shell</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> At $36.44, FDMC ≈ $4.09B on ~112.4M fully-diluted shares; EV ≈ $2.85B after $1.245B cash. Stock currently prices epilepsy-only optionality with psychiatry value largely removed (see §11).</td></tr>
+<tr><td>Company</td><td><span class="ev fact">FACT</span> Xenon Pharmaceuticals Inc., neuroscience-focused biopharma, headquartered Burnaby, British Columbia, Canada; Nasdaq: XENE. Founded 1996. <span class="src">Source: Q2 2026 10-Q (filed Aug 6, 2026); company PRs.</span></td></tr>
+<tr><td>Lead asset</td><td><span class="ev fact">FACT</span> Azetukalner (XEN1101) — novel, potent Kv7 (KCNQ2/3) potassium channel opener in development for epilepsy (focal onset seizures, PGTCS) and depression (MDD, bipolar depression). <span class="src">Source: Sept 17, 2026 company PR (NDA submission).</span></td></tr>
+<tr><td>Regulatory state</td><td><span class="ev fact">FACT</span> NDA for azetukalner in focal onset seizures (FOS) submitted to FDA Sept 17, 2026. <span class="ev unverified">UNVERIFIED</span> FDA acceptance not yet confirmed as of Oct 7, 2026. Company modeling a standard ~12-month review (~Sept 2027 decision) + ~3 months DEA scheduling. <span class="src">Source: Sept 17, 2026 PR; company commentary via market reports Sept 30, 2026.</span></td></tr>
+<tr><td>Cash</td><td><span class="ev fact">FACT</span> $1,245.1 million cash, cash equivalents + marketable securities as of June 30, 2026; company guidance: runway into 2029. <span class="src">Source: Q2 2026 10-Q.</span></td></tr>
+<tr><td>Price context</td><td><span class="ev fact">FACT</span> $36.44 (Oct 9, 2026 close, +0.77%); 52-week range $35.06–$72.66 — low reset Oct 8, 2026. Week ended Oct 9: −4.2%; 12-week return −46.6%; price sits at 3.7% of its 52-week range. <span class="src">Source: stockanalysis.com; Finnhub; Sharemaestro weekly report, Oct 9, 2026.</span></td></tr>
+<tr><td>Valuation shell</td><td><span class="ev interp">INTERPRETATION</span> At $36.44, FDMC ≈ $4.09B on ~112.4M fully-diluted shares; EV ≈ $2.85B after $1.245B cash. Stock currently prices epilepsy-only optionality with psychiatry value largely removed (see §11).</td></tr>
 </table>
 
 <div class="callout">
 <strong>Thesis in one paragraph (neutral framing).</strong>
 Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase 2b + Phase 3 X-TOLE2 both met primary endpoints in highly refractory focal epilepsy, with an NDA now under FDA review and a potential approval in ~Sept 2027. The mechanism is genetically validated and chemically distinct from the withdrawn ezogabine. Offsetting that, Xenon voluntarily paused enrollment in its Phase 3 MDD/bipolar depression program in Sept 2026 after neuropsychiatric adverse events (confusion, speech/coordination issues, psychotic episodes) emerged at the 20 mg psychiatry dose — the same events had not appeared in the Phase 2 X-NOVA study — and the Street removed most psychiatry value. The stock at 52-week lows therefore trades primarily on the epilepsy binary, with the Q1 2027 X-NOVA2 readout as the next major swing factor: a hit rehabilitates the psychiatry franchise; a miss or tolerability-driven failure leaves an epilepsy-only story with ~$2.9B EV against sell-side PTs topping at $90.
 </div>
-</section>
-
+    </section>
 <section id="science">
-<h2>2 · Science: Mechanism of Action &amp; Why It Could Fail</h2>
-
-<h3>2a · Plain-language mechanism</h3>
-<p><span class="ev FACT">FACT</span> Kv7.2 and Kv7.3 (encoded by KCNQ2/KCNQ3) are voltage-gated potassium channels concentrated on neurons. They generate the "M-current," a steady outward flow of potassium ions that keeps a neuron's resting voltage stable and prevents it from firing in runaway bursts. <span class="src">Source: Gunthorpe, Large &amp; Sankar, <em>Epilepsia</em> 2012 (MoA review of retigabine).</span></p>
+      <div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>The M-current brake — and why it could fail</h2></div></div>
+      <h3>2a · Plain-language mechanism</h3>
+<p><span class="ev fact">FACT</span> Kv7.2 and Kv7.3 (encoded by KCNQ2/KCNQ3) are voltage-gated potassium channels concentrated on neurons. They generate the "M-current," a steady outward flow of potassium ions that keeps a neuron's resting voltage stable and prevents it from firing in runaway bursts. <span class="src">Source: Gunthorpe, Large &amp; Sankar, <em>Epilepsia</em> 2012 (MoA review of retigabine).</span></p>
 <p>Plain language: neurons are like circuits that must stay below a firing threshold. The M-current acts as a constant brake. Azetukalner is a <strong>positive allosteric modulator</strong> of Kv7.2/7.3 — it latches onto the channel near its gate and holds it open longer and at lower voltages, strengthening the brake. This damps the hypersynchronous burst firing that produces seizures, without blocking sodium channels or boosting GABA like older anti-seizure medicines.</p>
-<p><span class="ev FACT">FACT</span> Human genetics validate the target: loss-of-function mutations in KCNQ2/KCNQ3 cause benign familial neonatal convulsions and developmental epileptic encephalopathies — i.e., when these channels break, people seize. <span class="src">Source: Gunthorpe et al., <em>Epilepsia</em> 2012; EMA orphan designation EU/3/20/2332 for KCNQ2-DEE.</span></p>
+<p><span class="ev fact">FACT</span> Human genetics validate the target: loss-of-function mutations in KCNQ2/KCNQ3 cause benign familial neonatal convulsions and developmental epileptic encephalopathies — i.e., when these channels break, people seize. <span class="src">Source: Gunthorpe et al., <em>Epilepsia</em> 2012; EMA orphan designation EU/3/20/2332 for KCNQ2-DEE.</span></p>
 
 <h3>2b · The ezogabine precedent — what it proved and what went wrong</h3>
-<p><span class="ev FACT">FACT</span> Ezogabine (retigabine), the first Kv7.2–7.5 opener, was approved by EMA and FDA in 2011 as adjunctive therapy for partial-onset seizures. In its Phase 3 trial (French et al., N=305 adults), maintenance-phase patients had median seizure-frequency reduction of 54.5% vs 18.9% placebo (p&lt;.001) and ≥50% responder rates of 55.5% vs 22.6% (p&lt;.001); only 3.3% became seizure-free. <span class="src">Source: Medscape summary of French et al. Phase 3.</span></p>
-<p><span class="ev FACT">FACT</span> Ezogabine was withdrawn from the market in 2017 after discovery of blue-grey pigmentation of skin, lips/nails, and retina; it also carried risks of urinary retention and CNS effects (dizziness, somnolence, confusion). A 2025 peer-reviewed review (PMC11850491) confirms withdrawal followed "declining use after discovery of its association with pigmentation changes in the retina, skin, and mucosae." <span class="src">Source: PMC "Targeting Kv7 Potassium Channels for Epilepsy" (2025).</span></p>
-<p><span class="ev FACT">FACT</span> The same review notes azetukalner has shown dose-dependent efficacy in drug-resistant focal seizures "with a good tolerability profile and no evidence of pigmentation-related adverse effects in early clinical studies." <span class="ev INTERPRETATION">INTERPRETATION</span> Azetukalner is a structurally distinct molecule from ezogabine; absence of pigmentation signals to date is encouraging but long-term, large-population exposure is still limited relative to a chronic-use drug. <span class="src">Source: PMC11850491.</span></p>
+<p><span class="ev fact">FACT</span> Ezogabine (retigabine), the first Kv7.2–7.5 opener, was approved by EMA and FDA in 2011 as adjunctive therapy for partial-onset seizures. In its Phase 3 trial (French et al., N=305 adults), maintenance-phase patients had median seizure-frequency reduction of 54.5% vs 18.9% placebo (p&lt;.001) and ≥50% responder rates of 55.5% vs 22.6% (p&lt;.001); only 3.3% became seizure-free. <span class="src">Source: Medscape summary of French et al. Phase 3.</span></p>
+<p><span class="ev fact">FACT</span> Ezogabine was withdrawn from the market in 2017 after discovery of blue-grey pigmentation of skin, lips/nails, and retina; it also carried risks of urinary retention and CNS effects (dizziness, somnolence, confusion). A 2025 peer-reviewed review (PMC11850491) confirms withdrawal followed "declining use after discovery of its association with pigmentation changes in the retina, skin, and mucosae." <span class="src">Source: PMC "Targeting Kv7 Potassium Channels for Epilepsy" (2025).</span></p>
+<p><span class="ev fact">FACT</span> The same review notes azetukalner has shown dose-dependent efficacy in drug-resistant focal seizures "with a good tolerability profile and no evidence of pigmentation-related adverse effects in early clinical studies." <span class="ev interp">INTERPRETATION</span> Azetukalner is a structurally distinct molecule from ezogabine; absence of pigmentation signals to date is encouraging but long-term, large-population exposure is still limited relative to a chronic-use drug. <span class="src">Source: PMC11850491.</span></p>
 
 <h3>2c · Why the mechanism could fail — failure modes, ranked</h3>
 <ol>
-<li><strong>Psychiatry tolerability window is narrow and dose-schedule sensitive.</strong> <span class="ev FACT">FACT</span> At the 20 mg psychiatry dose given without titration, neuropsychiatric events (confusion, speech difficulty/word-finding, coordination problems, a small number of psychotic episodes) emerged that had not appeared in Phase 2 X-NOVA. CEO Mortimer stated these events' rates/severity are consistent with the known azetukalner profile and the epilepsy program, and the company is evaluating dose-escalation (titration) modifications. <span class="src">Source: Sept 17, 2026 company PR; Sept 30, 2026 management commentary.</span> <span class="ev FACT">FACT</span> At the Sept 30, 2026 TD Cowen summit, Mortimer added that epilepsy OLE patients who titrated from lower doses to 25 mg, plus clinical-pharmacology dose-escalation data, support titration improving tolerability — while stressing the AEs are "not new for either the molecule or its mechanism." <span class="src">Market coverage of TD Cowen summit, Sept 30, 2026.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> This pattern — epilepsy patients titrating up to 25 mg in open-label extensions tolerate the drug, while psychiatry patients starting at 20 mg flat do not — points to a titration-dependent tolerability cliff rather than a new toxicity. If titration fixes it, the setback is delay, not death; if the events reflect on-target Kv7 effects in mood circuitry at efficacious exposures, the psychiatry program may be unrescuable.</li>
-<li><strong>Class CNS depressant effects cap dose.</strong> <span class="ev FACT">FACT</span> Dizziness was the leading treatment-emergent AE in X-TOLE2 (20.5% vs 3.2% placebo); discontinuations were 14.5% at 25 mg; somnolence and confusion are established class effects from the ezogabine era. <span class="src">Source: X-TOLE2 topline via NeurologyLive, Mar 2026; WikMD/ezogabine label history.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> Kv7 openers are fundamentally neuronal "brakes" — sedation-like CNS effects are mechanism-adjacent, not off-target surprises. Dose selection (15 vs 25 mg in epilepsy; 20 mg in MDD) is the main lever.</li>
-<li><strong>MDD efficacy signal was real but modest.</strong> <span class="ev FACT">FACT</span> Phase 2 X-NOVA missed its primary endpoint (MADRS change at week 6: −16.94 vs −13.90 placebo, Δ −3.04, p=0.135, n=168) while hitting HAM-D17 (p=0.042), anhedonia/SHAPS (p=0.046), early-onset MADRS at week 1 (p=0.047), and CGI-I (p=0.004). <span class="src">Source: peer-reviewed X-NOVA publication, PMC12117446.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> Effect size ~0.3 is in the range of approved adjunctive MDD agents, but Phase 3 X-NOVA2 uses HAM-D17 (the scale that was significant in Phase 2) as primary and is now unblinding at ~360 of 450 planned patients — ~20% under target enrollment, which trims power if the true effect is small. High placebo response remains the classic MDD trial killer.</li>
-<li><strong>Long-term pigmentation risk cannot be fully excluded.</strong> <span class="ev INTERPRETATION">INTERPRETATION</span> No pigmentation signals in >1,500 patient-years of azetukalner exposure (per company), but ezogabine's pigmentation emerged with chronic use; regulators will watch this in review and labeling. <span class="ev GAP">GAP</span> No public long-term retinal/dermatologic surveillance protocol detail.</li>
-<li><strong>Epilepsy replication risk is low but nonzero.</strong> <span class="ev FACT">FACT</span> X-TOLE3 is a near-replicate of X-TOLE2 (~360 patients, 15/25 mg, MPC primary). <span class="ev INTERPRETATION">INTERPRETATION</span> Two independent positive pivotal trials (X-TOLE, X-TOLE2) make an X-TOLE3 miss unlikely, but enrollment of a second refractory population can shift baseline severity/placebo response.</li>
+<li><strong>Psychiatry tolerability window is narrow and dose-schedule sensitive.</strong> <span class="ev fact">FACT</span> At the 20 mg psychiatry dose given without titration, neuropsychiatric events (confusion, speech difficulty/word-finding, coordination problems, a small number of psychotic episodes) emerged that had not appeared in Phase 2 X-NOVA. CEO Mortimer stated these events' rates/severity are consistent with the known azetukalner profile and the epilepsy program, and the company is evaluating dose-escalation (titration) modifications. <span class="src">Source: Sept 17, 2026 company PR; Sept 30, 2026 management commentary.</span> <span class="ev fact">FACT</span> At the Sept 30, 2026 TD Cowen summit, Mortimer added that epilepsy OLE patients who titrated from lower doses to 25 mg, plus clinical-pharmacology dose-escalation data, support titration improving tolerability — while stressing the AEs are "not new for either the molecule or its mechanism." <span class="src">Market coverage of TD Cowen summit, Sept 30, 2026.</span> <span class="ev interp">INTERPRETATION</span> This pattern — epilepsy patients titrating up to 25 mg in open-label extensions tolerate the drug, while psychiatry patients starting at 20 mg flat do not — points to a titration-dependent tolerability cliff rather than a new toxicity. If titration fixes it, the setback is delay, not death; if the events reflect on-target Kv7 effects in mood circuitry at efficacious exposures, the psychiatry program may be unrescuable.</li>
+<li><strong>Class CNS depressant effects cap dose.</strong> <span class="ev fact">FACT</span> Dizziness was the leading treatment-emergent AE in X-TOLE2 (20.5% vs 3.2% placebo); discontinuations were 14.5% at 25 mg; somnolence and confusion are established class effects from the ezogabine era. <span class="src">Source: X-TOLE2 topline via NeurologyLive, Mar 2026; WikMD/ezogabine label history.</span> <span class="ev interp">INTERPRETATION</span> Kv7 openers are fundamentally neuronal "brakes" — sedation-like CNS effects are mechanism-adjacent, not off-target surprises. Dose selection (15 vs 25 mg in epilepsy; 20 mg in MDD) is the main lever.</li>
+<li><strong>MDD efficacy signal was real but modest.</strong> <span class="ev fact">FACT</span> Phase 2 X-NOVA missed its primary endpoint (MADRS change at week 6: −16.94 vs −13.90 placebo, Δ −3.04, p=0.135, n=168) while hitting HAM-D17 (p=0.042), anhedonia/SHAPS (p=0.046), early-onset MADRS at week 1 (p=0.047), and CGI-I (p=0.004). <span class="src">Source: peer-reviewed X-NOVA publication, PMC12117446.</span> <span class="ev interp">INTERPRETATION</span> Effect size ~0.3 is in the range of approved adjunctive MDD agents, but Phase 3 X-NOVA2 uses HAM-D17 (the scale that was significant in Phase 2) as primary and is now unblinding at ~360 of 450 planned patients — ~20% under target enrollment, which trims power if the true effect is small. High placebo response remains the classic MDD trial killer.</li>
+<li><strong>Long-term pigmentation risk cannot be fully excluded.</strong> <span class="ev interp">INTERPRETATION</span> No pigmentation signals in >1,500 patient-years of azetukalner exposure (per company), but ezogabine's pigmentation emerged with chronic use; regulators will watch this in review and labeling. <span class="ev gap">GAP</span> No public long-term retinal/dermatologic surveillance protocol detail.</li>
+<li><strong>Epilepsy replication risk is low but nonzero.</strong> <span class="ev fact">FACT</span> X-TOLE3 is a near-replicate of X-TOLE2 (~360 patients, 15/25 mg, MPC primary). <span class="ev interp">INTERPRETATION</span> Two independent positive pivotal trials (X-TOLE, X-TOLE2) make an X-TOLE3 miss unlikely, but enrollment of a second refractory population can shift baseline severity/placebo response.</li>
 </ol>
 
 <h3>2d · Technical addendum — channel biophysics and selectivity</h3>
-<p><span class="ev FACT">FACT</span> Kv7.2/7.3 heteromers underlie the neuronal M-current: a slowly activating, non-inactivating potassium conductance that is already open at subthreshold voltages near resting membrane potential. By opposing depolarization, the M-current sets spike threshold and curbs repetitive burst firing — the exact pattern that becomes hypersynchronous in focal seizures. <span class="src">Gunthorpe et al., <em>Epilepsia</em> 2012.</span></p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> Azetukalner is a positive allosteric modulator: it binds a transmembrane site on the channel and shifts the voltage dependence of activation toward more negative potentials while slowing deactivation, so more channels are open at rest and stay open longer — strengthening the M-current brake without blocking sodium currents or potentiating GABA. The result is use-conditional dampening: quiescent neurons are barely touched, bursting neurons are suppressed.</p>
-<p><span class="ev FACT">FACT</span> Ezogabine opened Kv7.2 through Kv7.5, including Kv7.4 (bladder smooth muscle) and Kv7.5 (auditory pathways) — tissues plausibly linked to its urinary retention and pigmentary issues; azetukalner is described as a selective Kv7.2/7.3 opener, narrowing the pharmacology to the neuronal isoforms. <span class="src">PMC11850491 (2025); company disclosures.</span></p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> The psychiatry rationale rests on the same circuitry logic: Kv7 channels regulate excitability in midbrain dopamine (VTA) and limbic circuits implicated in anhedonia — the one MDD domain where azetukalner showed a significant Phase 2 signal (SHAPS p=0.046). If depression's reward-circuit dysfunction is partly a Kv7-tunable excitability defect, the drug's rapid week-1 MADRS signal is mechanistically coherent; if the MDD benefit was noise atop a sedating drug, Phase 3 will expose it.</p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> Why it should work in epilepsy: genetically validated target, chemically distinct from ezogabine, two positive pivots with p-values at 10<sup>−12</sup>, and a tolerability profile consistent with a titratable, mechanism-based brake. Why it might fail in psychiatry: the same "brake" applied to mood circuitry at a flat 20 mg starting dose produced confusion, word-finding difficulty, and rare psychotic episodes — either a titration artifact (fixable) or an on-target ceiling for psychiatric dosing (possibly not).</p>
-</section>
+<p><span class="ev fact">FACT</span> Kv7.2/7.3 heteromers underlie the neuronal M-current: a slowly activating, non-inactivating potassium conductance that is already open at subthreshold voltages near resting membrane potential. By opposing depolarization, the M-current sets spike threshold and curbs repetitive burst firing — the exact pattern that becomes hypersynchronous in focal seizures. <span class="src">Gunthorpe et al., <em>Epilepsia</em> 2012.</span></p>
+<p><span class="ev interp">INTERPRETATION</span> Azetukalner is a positive allosteric modulator: it binds a transmembrane site on the channel and shifts the voltage dependence of activation toward more negative potentials while slowing deactivation, so more channels are open at rest and stay open longer — strengthening the M-current brake without blocking sodium currents or potentiating GABA. The result is use-conditional dampening: quiescent neurons are barely touched, bursting neurons are suppressed.</p>
+<p><span class="ev fact">FACT</span> Ezogabine opened Kv7.2 through Kv7.5, including Kv7.4 (bladder smooth muscle) and Kv7.5 (auditory pathways) — tissues plausibly linked to its urinary retention and pigmentary issues; azetukalner is described as a selective Kv7.2/7.3 opener, narrowing the pharmacology to the neuronal isoforms. <span class="src">PMC11850491 (2025); company disclosures.</span></p>
+<p><span class="ev interp">INTERPRETATION</span> The psychiatry rationale rests on the same circuitry logic: Kv7 channels regulate excitability in midbrain dopamine (VTA) and limbic circuits implicated in anhedonia — the one MDD domain where azetukalner showed a significant Phase 2 signal (SHAPS p=0.046). If depression's reward-circuit dysfunction is partly a Kv7-tunable excitability defect, the drug's rapid week-1 MADRS signal is mechanistically coherent; if the MDD benefit was noise atop a sedating drug, Phase 3 will expose it.</p>
+<p><span class="ev interp">INTERPRETATION</span> Why it should work in epilepsy: genetically validated target, chemically distinct from ezogabine, two positive pivots with p-values at 10<sup>−12</sup>, and a tolerability profile consistent with a titratable, mechanism-based brake. Why it might fail in psychiatry: the same "brake" applied to mood circuitry at a flat 20 mg starting dose produced confusion, word-finding difficulty, and rare psychotic episodes — either a titration artifact (fixable) or an on-target ceiling for psychiatric dosing (possibly not).</p>
+    </section>
 <section id="pipeline">
-<h2>3 · Pipeline Overview</h2>
-<table>
+      <div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>One molecule, three shots on goal</h2></div></div>
+      <table>
 <tr><th>Program</th><th>Target</th><th>Indication</th><th>Stage</th><th>Status / Next</th></tr>
-<tr><td><strong>Azetukalner</strong> (XEN1101)</td><td>Kv7.2/7.3 opener</td><td>Focal onset seizures (adjunctive)</td><td>Phase 3 (X-TOLE3 ongoing)</td><td><span class="ev FACT">FACT</span> NDA filed Sept 17, 2026 on X-TOLE + X-TOLE2. X-TOLE3 enrolling (~360 pts); intended to support ex-U.S. filings; enrollment ex-Japan expected complete 2026.</td></tr>
-<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>Primary generalized tonic-clonic seizures (PGTCS)</td><td>Phase 3 (X-ACKT)</td><td><span class="ev FACT">FACT</span> ~160 pts, 25 mg, enrolling. MPC in monthly PGTCS frequency, 12-wk DBP.</td></tr>
-<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>MDD — X-NOVA2, X-NOVA3</td><td>Phase 3</td><td><span class="ev FACT">FACT</span> 20 mg monotherapy, ~450 pts/study, HAM-D17 primary at week 6. X-NOVA2 ~80% enrolled (~360) at Sept 17, 2026 pause; unblinding at current enrollment; topline Q1 2027. X-NOVA3 paused.</td></tr>
-<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>Bipolar depression I/II — X-CEED (2 studies)</td><td>Phase 3</td><td><span class="ev FACT">FACT</span> 20 mg monotherapy, ~400 pts/study, MADRS primary at week 6. Enrollment paused.</td></tr>
-<tr><td><strong>XEN1701</strong></td><td>NaV1.7 inhibitor</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev FACT">FACT</span> Completion expected H2 2026 to support Ph2 POC in acute pain. <span class="src">Q2 2026 PR.</span></td></tr>
-<tr><td><strong>XEN1120</strong></td><td>Kv7 modulator</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev FACT">FACT</span> Completion expected H2 2026 to support Ph2 POC in acute pain. <span class="src">Q2 2026 PR.</span></td></tr>
-<tr><td><strong>XEN1720</strong></td><td>NaV1.7 inhibitor</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev FACT">FACT</span> CTA approved; study underway in healthy adults. <span class="src">Q2 2026 PR.</span></td></tr>
-<tr><td>Oral small molecule</td><td>NaV1.1</td><td>Dravet syndrome (epilepsy)</td><td>IND-enabling</td><td><span class="ev FACT">FACT</span> Preclinical data suggest potential to address cause + symptoms of Dravet. <span class="src">Q2 2026 PR.</span></td></tr>
-<tr><td><strong>NBI-921355</strong> (partnered w/ Neurocrine)</td><td>NaV1.2/1.6 inhibitor</td><td>Epilepsy</td><td>Phase 1b</td><td><span class="ev FACT">FACT</span> Ongoing; data expected 2027. <span class="src">Q2 2026 PR.</span></td></tr>
-<tr><td><strong>XEN496</strong> (ezogabine pediatric)</td><td>Kv7 opener</td><td>KCNQ2-DEE</td><td><em>Discontinued</em></td><td><span class="ev FACT">FACT</span> EPIK Phase 3 and OLE terminated; reasons unrelated to safety per peer-reviewed review. <span class="src">PMC11850491; CT.gov records.</span></td></tr>
+<tr><td><strong>Azetukalner</strong> (XEN1101)</td><td>Kv7.2/7.3 opener</td><td>Focal onset seizures (adjunctive)</td><td>Phase 3 (X-TOLE3 ongoing)</td><td><span class="ev fact">FACT</span> NDA filed Sept 17, 2026 on X-TOLE + X-TOLE2. X-TOLE3 enrolling (~360 pts); intended to support ex-U.S. filings; enrollment ex-Japan expected complete 2026.</td></tr>
+<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>Primary generalized tonic-clonic seizures (PGTCS)</td><td>Phase 3 (X-ACKT)</td><td><span class="ev fact">FACT</span> ~160 pts, 25 mg, enrolling. MPC in monthly PGTCS frequency, 12-wk DBP.</td></tr>
+<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>MDD — X-NOVA2, X-NOVA3</td><td>Phase 3</td><td><span class="ev fact">FACT</span> 20 mg monotherapy, ~450 pts/study, HAM-D17 primary at week 6. X-NOVA2 ~80% enrolled (~360) at Sept 17, 2026 pause; unblinding at current enrollment; topline Q1 2027. X-NOVA3 paused.</td></tr>
+<tr><td><strong>Azetukalner</strong></td><td>Kv7.2/7.3 opener</td><td>Bipolar depression I/II — X-CEED (2 studies)</td><td>Phase 3</td><td><span class="ev fact">FACT</span> 20 mg monotherapy, ~400 pts/study, MADRS primary at week 6. Enrollment paused.</td></tr>
+<tr><td><strong>XEN1701</strong></td><td>NaV1.7 inhibitor</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev fact">FACT</span> Completion expected H2 2026 to support Ph2 POC in acute pain. <span class="src">Q2 2026 PR.</span></td></tr>
+<tr><td><strong>XEN1120</strong></td><td>Kv7 modulator</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev fact">FACT</span> Completion expected H2 2026 to support Ph2 POC in acute pain. <span class="src">Q2 2026 PR.</span></td></tr>
+<tr><td><strong>XEN1720</strong></td><td>NaV1.7 inhibitor</td><td>Acute pain</td><td>Phase 1 SAD/MAD</td><td><span class="ev fact">FACT</span> CTA approved; study underway in healthy adults. <span class="src">Q2 2026 PR.</span></td></tr>
+<tr><td>Oral small molecule</td><td>NaV1.1</td><td>Dravet syndrome (epilepsy)</td><td>IND-enabling</td><td><span class="ev fact">FACT</span> Preclinical data suggest potential to address cause + symptoms of Dravet. <span class="src">Q2 2026 PR.</span></td></tr>
+<tr><td><strong>NBI-921355</strong> (partnered w/ Neurocrine)</td><td>NaV1.2/1.6 inhibitor</td><td>Epilepsy</td><td>Phase 1b</td><td><span class="ev fact">FACT</span> Ongoing; data expected 2027. <span class="src">Q2 2026 PR.</span></td></tr>
+<tr><td><strong>XEN496</strong> (ezogabine pediatric)</td><td>Kv7 opener</td><td>KCNQ2-DEE</td><td><em>Discontinued</em></td><td><span class="ev fact">FACT</span> EPIK Phase 3 and OLE terminated; reasons unrelated to safety per peer-reviewed review. <span class="src">PMC11850491; CT.gov records.</span></td></tr>
 </table>
 
 <h3>3a · Pipeline ranked by value (most → least)</h3>
@@ -223,109 +358,104 @@ Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase
 <tr><td class="num"><strong>7</strong></td><td><strong>NBI-921355</strong> (Neurocrine-partnered)</td><td>Epilepsy</td><td>Partnered economics (milestones/royalties); Phase 1b data expected 2027. Modest, non-core value.</td></tr>
 <tr><td class="num"><strong>8</strong></td><td><strong>XEN496</strong></td><td>KCNQ2-DEE</td><td>Discontinued — zero value.</td></tr>
 </table>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> Value concentrates in ranks 1–2; ranks 3–7 are call options of declining size. The dossier's core question is therefore two-variable: does the epilepsy NDA get approved (~Sept 2027), and does X-NOVA2 rehabilitate psychiatry (Q1 2027)?</p>
+<p><span class="ev interp">INTERPRETATION</span> Value concentrates in ranks 1–2; ranks 3–7 are call options of declining size. The dossier's core question is therefore two-variable: does the epilepsy NDA get approved (~Sept 2027), and does X-NOVA2 rehabilitate psychiatry (Q1 2027)?</p>
 <p class="src">Pipeline table sources: Q2 2026 company PR (Aug 6, 2026); Sept 17, 2026 NDA/psychiatry PR. NBI-921352 (Neurocrine-partnered NaV1.6) Ph2 in FOS failed Nov 2023; no further FOS development — legacy partnered program, no longer in active pipeline.</p>
-</section>
-
+    </section>
 <section id="trials">
-<h2>4 · Trial Design Deep Dive: Endpoints, Statistical Plan, Powering, Readouts</h2>
-
-<h3>4a · X-TOLE2 — Phase 3, focal onset seizures (NCT05614063) — COMPLETED, POSITIVE</h3>
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>X-TOLE2 read positive; the trial details</h2></div></div>
+      <h3>4a · X-TOLE2 — Phase 3, focal onset seizures (NCT05614063) — COMPLETED, POSITIVE</h3>
 <table>
 <tr><th style="width:200px">Design element</th><th>Detail</th></tr>
-<tr><td>Design</td><td><span class="ev FACT">FACT</span> Multicenter, randomized, double-blind, placebo-controlled; azetukalner 15 mg or 25 mg orally with food as adjunctive therapy. <span class="src">Mar 9, 2026 company PR.</span></td></tr>
-<tr><td>Population</td><td><span class="ev FACT">FACT</span> 380 adults enrolled; 374 in safety/mITT. Highly refractory: median 5 prior ASMs, baseline ~12.75 seizures/month, &gt;50% on 3 concomitant ASMs. <span class="src">NeurologyLive summary of X-TOLE2 topline.</span></td></tr>
-<tr><td>Primary endpoint</td><td><span class="ev FACT">FACT</span> Median percent change (MPC) in monthly FOS frequency from baseline to week 12 (12-week double-blind period).</td></tr>
-<tr><td>Result</td><td><span class="ev FACT">FACT</span> 25 mg: −53.2% (p=6×10⁻¹²); 15 mg: −34.5% (p=0.00007); placebo: −10.4%. Placebo-adjusted MPC at 25 mg: <strong>−42.7%</strong> — exceeding Ph2b X-TOLE (−34.6%; 25 mg −52.8% vs placebo −18.2% over 8 weeks). <span class="src">Mar 9, 2026 PR.</span></td></tr>
-<tr><td>Key secondary</td><td><span class="ev FACT">FACT</span> ≥50% responder rate (RR50): 54.8% (25 mg), 37.6% (15 mg) vs 20.8% placebo (p=8×10⁻⁸ and p=0.003). <span class="src">Mar 9, 2026 PR.</span></td></tr>
-<tr><td>Safety</td><td><span class="ev FACT">FACT</span> Generally well tolerated, consistent with prior studies. Dizziness leading TEAE: 20.5% vs 3.2% placebo. Discontinuations higher at 25 mg (14.5%). <span class="src">NeurologyLive.</span></td></tr>
-<tr><td>Statistical read</td><td><span class="ev INTERPRETATION">INTERPRETATION</span> P-values at 10⁻¹² / 10⁻⁵ with a refractory population and a dose response across two doses is about as clean a Phase 3 epilepsy win as the field produces. The efficacy bar for FDA approval on this endpoint is well cleared; the review will hinge on safety labeling, not efficacy.</td></tr>
+<tr><td>Design</td><td><span class="ev fact">FACT</span> Multicenter, randomized, double-blind, placebo-controlled; azetukalner 15 mg or 25 mg orally with food as adjunctive therapy. <span class="src">Mar 9, 2026 company PR.</span></td></tr>
+<tr><td>Population</td><td><span class="ev fact">FACT</span> 380 adults enrolled; 374 in safety/mITT. Highly refractory: median 5 prior ASMs, baseline ~12.75 seizures/month, &gt;50% on 3 concomitant ASMs. <span class="src">NeurologyLive summary of X-TOLE2 topline.</span></td></tr>
+<tr><td>Primary endpoint</td><td><span class="ev fact">FACT</span> Median percent change (MPC) in monthly FOS frequency from baseline to week 12 (12-week double-blind period).</td></tr>
+<tr><td>Result</td><td><span class="ev fact">FACT</span> 25 mg: −53.2% (p=6×10⁻¹²); 15 mg: −34.5% (p=0.00007); placebo: −10.4%. Placebo-adjusted MPC at 25 mg: <strong>−42.7%</strong> — exceeding Ph2b X-TOLE (−34.6%; 25 mg −52.8% vs placebo −18.2% over 8 weeks). <span class="src">Mar 9, 2026 PR.</span></td></tr>
+<tr><td>Key secondary</td><td><span class="ev fact">FACT</span> ≥50% responder rate (RR50): 54.8% (25 mg), 37.6% (15 mg) vs 20.8% placebo (p=8×10⁻⁸ and p=0.003). <span class="src">Mar 9, 2026 PR.</span></td></tr>
+<tr><td>Safety</td><td><span class="ev fact">FACT</span> Generally well tolerated, consistent with prior studies. Dizziness leading TEAE: 20.5% vs 3.2% placebo. Discontinuations higher at 25 mg (14.5%). <span class="src">NeurologyLive.</span></td></tr>
+<tr><td>Statistical read</td><td><span class="ev interp">INTERPRETATION</span> P-values at 10⁻¹² / 10⁻⁵ with a refractory population and a dose response across two doses is about as clean a Phase 3 epilepsy win as the field produces. The efficacy bar for FDA approval on this endpoint is well cleared; the review will hinge on safety labeling, not efficacy.</td></tr>
 </table>
 
 <h3>4b · X-TOLE3 — Phase 3, FOS — ONGOING (replicate)</h3>
-<p><span class="ev FACT">FACT</span> Same design as X-TOLE2 (~360 patients, 15/25 mg, MPC primary over 12-week DBP; eligible patients may enter OLE up to 6 years). Intended to support ex-U.S. regulatory submissions; enrollment outside Japan expected complete in 2026. <span class="src">Sept 17, 2026 PR; company commentary.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> Positive X-TOLE3 would make azetukalner one of the few ASMs with two independent positive Phase 3s plus a positive Phase 2b.</p>
+<p><span class="ev fact">FACT</span> Same design as X-TOLE2 (~360 patients, 15/25 mg, MPC primary over 12-week DBP; eligible patients may enter OLE up to 6 years). Intended to support ex-U.S. regulatory submissions; enrollment outside Japan expected complete in 2026. <span class="src">Sept 17, 2026 PR; company commentary.</span> <span class="ev interp">INTERPRETATION</span> Positive X-TOLE3 would make azetukalner one of the few ASMs with two independent positive Phase 3s plus a positive Phase 2b.</p>
 
 <h3>4c · X-ACKT — Phase 3, PGTCS — ONGOING</h3>
-<p><span class="ev FACT">FACT</span> ~160 patients with primary generalized tonic-clonic seizures; 25 mg vs placebo adjunctive; primary endpoint MPC in monthly PGTCS frequency over 12-week DBP. <span class="src">Sept 17, 2026 PR.</span> <span class="ev GAP">GAP</span> No public readout timing; smaller n and a different seizure type add variance vs the FOS program.</p>
+<p><span class="ev fact">FACT</span> ~160 patients with primary generalized tonic-clonic seizures; 25 mg vs placebo adjunctive; primary endpoint MPC in monthly PGTCS frequency over 12-week DBP. <span class="src">Sept 17, 2026 PR.</span> <span class="ev gap">GAP</span> No public readout timing; smaller n and a different seizure type add variance vs the FOS program.</p>
 
 <h3>4d · X-NOVA — Phase 2, MDD — COMPLETED (peer-reviewed; primary missed)</h3>
 <table>
 <tr><th>Endpoint (week 6, mITT)</th><th>Placebo (n=54)</th><th>Azetukalner 20 mg (n=53)</th><th>Result</th></tr>
-<tr><td>MADRS change (primary)</td><td class="num">−13.90</td><td class="num">−16.94</td><td><span class="ev FACT">FACT</span> Δ −3.04, p=0.135 — <strong>not significant</strong></td></tr>
-<tr><td>HAM-D17 change (exploratory)</td><td class="num">−10.2</td><td class="num">−13.3</td><td><span class="ev FACT">FACT</span> Δ −3.1, p=0.042</td></tr>
-<tr><td>SHAPS anhedonia (secondary)</td><td class="num">−5.30</td><td class="num">−7.77</td><td><span class="ev FACT">FACT</span> Δ −2.46, p=0.046</td></tr>
-<tr><td>MADRS change at week 1</td><td class="num">−4.88</td><td class="num">−7.54</td><td><span class="ev FACT">FACT</span> p=0.047 (early onset signal)</td></tr>
-<tr><td>CGI-I ≥ minimally improved</td><td>59.3%</td><td>77.4%</td><td><span class="ev FACT">FACT</span> p=0.004</td></tr>
+<tr><td>MADRS change (primary)</td><td class="num">−13.90</td><td class="num">−16.94</td><td><span class="ev fact">FACT</span> Δ −3.04, p=0.135 — <strong>not significant</strong></td></tr>
+<tr><td>HAM-D17 change (exploratory)</td><td class="num">−10.2</td><td class="num">−13.3</td><td><span class="ev fact">FACT</span> Δ −3.1, p=0.042</td></tr>
+<tr><td>SHAPS anhedonia (secondary)</td><td class="num">−5.30</td><td class="num">−7.77</td><td><span class="ev fact">FACT</span> Δ −2.46, p=0.046</td></tr>
+<tr><td>MADRS change at week 1</td><td class="num">−4.88</td><td class="num">−7.54</td><td><span class="ev fact">FACT</span> p=0.047 (early onset signal)</td></tr>
+<tr><td>CGI-I ≥ minimally improved</td><td>59.3%</td><td>77.4%</td><td><span class="ev fact">FACT</span> p=0.004</td></tr>
 </table>
 <p class="src">Source: peer-reviewed X-NOVA publication, PMC12117446. n=168 total (10 mg n=57, 20 mg n=53, placebo n=54). Primary effect size 0.32.</p>
 
 <h3>4e · X-NOVA2 / X-NOVA3 — Phase 3, MDD — THE BINARY</h3>
 <table>
 <tr><th style="width:200px">Design element</th><th>Detail</th></tr>
-<tr><td>Design</td><td><span class="ev FACT">FACT</span> Multicenter, randomized, double-blind, placebo-controlled; 20 mg azetukalner orally with food as <strong>monotherapy</strong>; ~450 patients per study with moderate-to-severe MDD; 6-week DBP; OLE up to 12 months. <span class="src">Sept 17, 2026 PR.</span></td></tr>
-<tr><td>Primary endpoint</td><td><span class="ev FACT">FACT</span> Change from baseline in HAM-D17 at week 6 — the scale that was significant (p=0.042) in Phase 2 X-NOVA. <span class="src">Sept 17, 2026 PR.</span></td></tr>
-<tr><td>Powering caveat</td><td><span class="ev FACT">FACT</span> At the Sept 17, 2026 pause, X-NOVA2 was ~80% enrolled (~360 of 450). Company stated this is "sufficiently powered to demonstrate a clinically meaningful change" in HAM-D17, and will unblind at the current enrollment with topline in Q1 2027. <span class="src">Sept 17, 2026 PR.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> 80% enrollment preserves most power if the assumed effect holds, but any effect-size shortfall vs assumptions is magnified. MDD trials are also placebo-response-sensitive; monotherapy (no background antidepressant) raises both signal and placebo variance.</td></tr>
-<tr><td>Tolerability overlay</td><td><span class="ev FACT">FACT</span> Neuropsychiatric AEs (confusion, speech/coordination difficulty, small number of psychotic episodes) emerged in the larger Phase 3 psychiatry dataset after being absent in Phase 2 X-NOVA; enrollment paused Sept 17, 2026; dosing modifications under evaluation with DSMB. Already-enrolled patients continue. <span class="src">Sept 17, 2026 PR.</span></td></tr>
+<tr><td>Design</td><td><span class="ev fact">FACT</span> Multicenter, randomized, double-blind, placebo-controlled; 20 mg azetukalner orally with food as <strong>monotherapy</strong>; ~450 patients per study with moderate-to-severe MDD; 6-week DBP; OLE up to 12 months. <span class="src">Sept 17, 2026 PR.</span></td></tr>
+<tr><td>Primary endpoint</td><td><span class="ev fact">FACT</span> Change from baseline in HAM-D17 at week 6 — the scale that was significant (p=0.042) in Phase 2 X-NOVA. <span class="src">Sept 17, 2026 PR.</span></td></tr>
+<tr><td>Powering caveat</td><td><span class="ev fact">FACT</span> At the Sept 17, 2026 pause, X-NOVA2 was ~80% enrolled (~360 of 450). Company stated this is "sufficiently powered to demonstrate a clinically meaningful change" in HAM-D17, and will unblind at the current enrollment with topline in Q1 2027. <span class="src">Sept 17, 2026 PR.</span> <span class="ev interp">INTERPRETATION</span> 80% enrollment preserves most power if the assumed effect holds, but any effect-size shortfall vs assumptions is magnified. MDD trials are also placebo-response-sensitive; monotherapy (no background antidepressant) raises both signal and placebo variance.</td></tr>
+<tr><td>Tolerability overlay</td><td><span class="ev fact">FACT</span> Neuropsychiatric AEs (confusion, speech/coordination difficulty, small number of psychotic episodes) emerged in the larger Phase 3 psychiatry dataset after being absent in Phase 2 X-NOVA; enrollment paused Sept 17, 2026; dosing modifications under evaluation with DSMB. Already-enrolled patients continue. <span class="src">Sept 17, 2026 PR.</span></td></tr>
 </table>
 
 <h3>4f · X-CEED — Phase 3, bipolar depression I/II — PAUSED</h3>
-<p><span class="ev FACT">FACT</span> Two studies, 20 mg monotherapy, ~400 patients each, MADRS primary at week 6, 6-week DBP. Enrollment paused Sept 17, 2026. <span class="src">Sept 17, 2026 PR.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> BPD is effectively gated on the MDD readout and tolerability resolution.</p>
-</section>
-
+<p><span class="ev fact">FACT</span> Two studies, 20 mg monotherapy, ~400 patients each, MADRS primary at week 6, 6-week DBP. Enrollment paused Sept 17, 2026. <span class="src">Sept 17, 2026 PR.</span> <span class="ev interp">INTERPRETATION</span> BPD is effectively gated on the MDD readout and tolerability resolution.</p>
+    </section>
 <section id="reg">
-<h2>5 · Clinical / Regulatory Status &amp; Outlook</h2>
-<div class="tl">
-<div class="ev-item"><span class="dt">Mar 9, 2026</span> <span class="pill guid">guidance→landed</span><br>
-<span class="ev FACT">FACT</span> Positive X-TOLE2 topline (both doses hit primary); stock +~40–50% on the day. NDA planned Q3 2026. Late-breaking oral at AAN April 2026.</div>
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>NDA filed; psychiatry enrollment paused</h2></div></div>
+      <div class="tl">
+<div class="ev-item"><span class="dt">Mar 9, 2026</span> <span class="date-tag guidance">guidance→landed</span><br>
+<span class="ev fact">FACT</span> Positive X-TOLE2 topline (both doses hit primary); stock +~40–50% on the day. NDA planned Q3 2026. Late-breaking oral at AAN April 2026.</div>
 <div class="ev-item"><span class="dt">Aug 6, 2026</span><br>
-<span class="ev FACT">FACT</span> Q2 results: pre-NDA meeting with FDA completed successfully; NDA on track Q3 2026; $1.245B cash, runway into 2029.</div>
+<span class="ev fact">FACT</span> Q2 results: pre-NDA meeting with FDA completed successfully; NDA on track Q3 2026; $1.245B cash, runway into 2029.</div>
 <div class="ev-item"><span class="dt">Sept 17, 2026</span><br>
-<span class="ev FACT">FACT</span> <strong>NDA submitted</strong> for azetukalner in focal seizures. Same day: <strong>voluntary enrollment pause</strong> in MDD/BPD studies over neuropsychiatric AEs. Stock −~31% (closed down 30.7%), largest single-day drop since March 2017. Needham removed MDD/BPD from valuation; Deutsche Bank cut to Hold ($46 PT, from $90). Wells Fargo reiterated Overweight (no epilepsy read-through); RBC said safety issues unlikely to derail epilepsy approval. <span class="src">Dow Jones/Morningstar, Sept 17–18, 2026.</span></div>
+<span class="ev fact">FACT</span> <strong>NDA submitted</strong> for azetukalner in focal seizures. Same day: <strong>voluntary enrollment pause</strong> in MDD/BPD studies over neuropsychiatric AEs. Stock −~31% (closed down 30.7%), largest single-day drop since March 2017. Needham removed MDD/BPD from valuation; Deutsche Bank cut to Hold ($46 PT, from $90). Wells Fargo reiterated Overweight (no epilepsy read-through); RBC said safety issues unlikely to derail epilepsy approval. <span class="src">Dow Jones/Morningstar, Sept 17–18, 2026.</span></div>
 <div class="ev-item"><span class="dt">Sept 22, 2026</span><br>
-<span class="ev UNVERIFIED">UNVERIFIED</span> Securities-litigation firm (Levi &amp; Korsinsky / "SueWallSt") announced an "investigation" into alleged misleading statements on the psychiatry safety profile. <span class="ev INTERPRETATION">INTERPRETATION</span> Routine post-drop plaintiff-firm solicitation; no suit filed as of Oct 7, 2026. Overhang, not substance.</div>
-<div class="ev-item"><span class="dt">Sept 30, 2026</span> <span class="pill guid">guidance</span><br>
-<span class="ev FACT">FACT</span> At the TD Cowen Neuropsychiatry Summit, CEO Mortimer detailed the psychiatry setback: the neuropsychiatric AEs are "not new for either the molecule or its mechanism," with rates/severity not differing from the epilepsy program; the company cites epilepsy OLE patients who titrated from lower doses to 25 mg plus clinical-pharmacology dose-escalation studies as support that titration improves tolerability. <span class="src">Market coverage of TD Cowen summit, Sept 30, 2026.</span> <span class="ev FACT">FACT</span> Mortimer also disclosed 1,500 patient-years of epilepsy exposure (some X-TOLE patients dosed &gt;5 years) and plans to present updated <strong>60-month open-label X-TOLE data at the AES meeting in December 2026</strong>. On commercial: ASM launches are historically gradual; qualitative guidance will come closer to a potential approval.</div>
+<span class="ev unverified">UNVERIFIED</span> Securities-litigation firm (Levi &amp; Korsinsky / "SueWallSt") announced an "investigation" into alleged misleading statements on the psychiatry safety profile. <span class="ev interp">INTERPRETATION</span> Routine post-drop plaintiff-firm solicitation; no suit filed as of Oct 7, 2026. Overhang, not substance.</div>
+<div class="ev-item"><span class="dt">Sept 30, 2026</span> <span class="date-tag guidance">guidance</span><br>
+<span class="ev fact">FACT</span> At the TD Cowen Neuropsychiatry Summit, CEO Mortimer detailed the psychiatry setback: the neuropsychiatric AEs are "not new for either the molecule or its mechanism," with rates/severity not differing from the epilepsy program; the company cites epilepsy OLE patients who titrated from lower doses to 25 mg plus clinical-pharmacology dose-escalation studies as support that titration improves tolerability. <span class="src">Market coverage of TD Cowen summit, Sept 30, 2026.</span> <span class="ev fact">FACT</span> Mortimer also disclosed 1,500 patient-years of epilepsy exposure (some X-TOLE patients dosed &gt;5 years) and plans to present updated <strong>60-month open-label X-TOLE data at the AES meeting in December 2026</strong>. On commercial: ASM launches are historically gradual; qualitative guidance will come closer to a potential approval.</div>
 <div class="ev-item"><span class="dt">Oct 7, 2026</span><br>
-<span class="ev FACT">FACT</span> Wolf Popper LLP announced it "continues to investigate potential claims" on behalf of XENE purchasers — a second plaintiff-firm notice after Levi &amp; Korsinsky (Sept 22). <span class="src">GlobeNewswire, Oct 7, 2026.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> Still solicitation, no filed suit; headline overhang only.</div>
+<span class="ev fact">FACT</span> Wolf Popper LLP announced it "continues to investigate potential claims" on behalf of XENE purchasers — a second plaintiff-firm notice after Levi &amp; Korsinsky (Sept 22). <span class="src">GlobeNewswire, Oct 7, 2026.</span> <span class="ev interp">INTERPRETATION</span> Still solicitation, no filed suit; headline overhang only.</div>
 <div class="ev-item"><span class="dt">Oct 8–9, 2026</span><br>
-<span class="ev FACT">FACT</span> Stock set a new 52-week low of $35.06 on Oct 8, 2026; closed Oct 9 at $36.44 (+0.77%). Guggenheim initiated at Buy/$73 on Oct 5; RBC maintained Buy/$70 on Oct 1. <span class="src">stockanalysis.com, Oct 2026.</span></div>
-<div class="ev-item"><span class="dt">~Nov 2026 (inferred)</span> <span class="pill inf">inferred</span><br>
-<span class="ev INTERPRETATION">INTERPRETATION</span> FDA 60-day filing review of the NDA → acceptance decision expected ~mid-November 2026; a PDUFA date would be set at acceptance.</div>
-<div class="ev-item"><span class="dt">~Sept 2027 (guidance)</span> <span class="pill guid">guidance</span><br>
-<span class="ev FACT">FACT</span> Company modeling a standard 12-month review from the Sept 2026 filing (not priority review), with ~3 additional months for DEA scheduling (typical for ASMs) — implying potential commercial availability late 2027/early 2028 if approved. <span class="src">Management commentary, Sept 30, 2026.</span></div>
+<span class="ev fact">FACT</span> Stock set a new 52-week low of $35.06 on Oct 8, 2026; closed Oct 9 at $36.44 (+0.77%). Guggenheim initiated at Buy/$73 on Oct 5; RBC maintained Buy/$70 on Oct 1. <span class="src">stockanalysis.com, Oct 2026.</span></div>
+<div class="ev-item"><span class="dt">~Nov 2026 (inferred)</span> <span class="date-tag inferred">inferred</span><br>
+<span class="ev interp">INTERPRETATION</span> FDA 60-day filing review of the NDA → acceptance decision expected ~mid-November 2026; a PDUFA date would be set at acceptance.</div>
+<div class="ev-item"><span class="dt">~Sept 2027 (guidance)</span> <span class="date-tag guidance">guidance</span><br>
+<span class="ev fact">FACT</span> Company modeling a standard 12-month review from the Sept 2026 filing (not priority review), with ~3 additional months for DEA scheduling (typical for ASMs) — implying potential commercial availability late 2027/early 2028 if approved. <span class="src">Management commentary, Sept 30, 2026.</span></div>
 </div>
 <div class="callout">
 <strong>Regulatory read.</strong> The NDA rests on two positive trials (Ph2b X-TOLE + Ph3 X-TOLE2) with p-values far below typical thresholds and &gt;1,500 patient-years of safety exposure. The epilepsy review's live questions are labeling (dose, titration language, CNS AE warnings) and DEA scheduling — not whether the drug works. The psychiatry pause does not touch the epilepsy studies (explicitly stated by the company), and both Wells Fargo and RBC see no read-through to the epilepsy program.
 </div>
-</section>
+    </section>
 <section id="comp">
-<h2>6 · Competition — Clinical Differentiation Only</h2>
-
-<h3>6a · Direct Kv7 competition</h3>
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Rivals on trial facts, not marketing claims</h2></div></div>
+      <h3>6a · Direct Kv7 competition</h3>
 <table>
 <tr><th>Program</th><th>Stage</th><th>Differentiation vs azetukalner (clinical facts)</th></tr>
-<tr><td><strong>Opakalim / BHV-7000</strong> (Biohaven; worldwide rights licensed to SK Biopharmaceuticals Aug 26, 2026)</td><td>Phase 2/3, refractory focal epilepsy</td><td><span class="ev FACT">FACT</span> Selective Kv7.2/7.3 activator. RISE3 (BHV7000-303) fully enrolled June 2026 with &gt;600 patients; topline expected H2 2026. On Sept 4, 2026 FDA imposed a <strong>partial clinical hold</strong> (new enrollment paused) over a rodent-identified metabolite; RISE3 dosing/enrollment unaffected. SK deal: $400M near-term cash ($350M at closing + $50M one year later), up to $150M milestones, tiered royalties. <span class="src">Biohaven 8-K Sept 10, 2026; SK/Biohaven PR Aug 26, 2026.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> The most important external data point for the Kv7 class: a positive RISE3 validates the mechanism for a second molecule (good for azetukalner's commercial narrative); a negative or safety-marred RISE3 would invite class-level skepticism. Neither outcome changes azetukalner's own pivotal data.</td></tr>
-<tr><td><strong>Pynegabine, CB-003</strong> (various)</td><td>Phase 1</td><td><span class="ev FACT">FACT</span> Kv7.2/3 activators; completed Phase 1 safety/PK, results not yet reported. <span class="src">PMC11850491 (2025 review).</span> <span class="ev INTERPRETATION">INTERPRETATION</span> Years behind; not relevant to the 2026–2028 binary.</td></tr>
+<tr><td><strong>Opakalim / BHV-7000</strong> (Biohaven; worldwide rights licensed to SK Biopharmaceuticals Aug 26, 2026)</td><td>Phase 2/3, refractory focal epilepsy</td><td><span class="ev fact">FACT</span> Selective Kv7.2/7.3 activator. RISE3 (BHV7000-303) fully enrolled June 2026 with &gt;600 patients; topline expected H2 2026. On Sept 4, 2026 FDA imposed a <strong>partial clinical hold</strong> (new enrollment paused) over a rodent-identified metabolite; RISE3 dosing/enrollment unaffected. SK deal: $400M near-term cash ($350M at closing + $50M one year later), up to $150M milestones, tiered royalties. <span class="src">Biohaven 8-K Sept 10, 2026; SK/Biohaven PR Aug 26, 2026.</span> <span class="ev interp">INTERPRETATION</span> The most important external data point for the Kv7 class: a positive RISE3 validates the mechanism for a second molecule (good for azetukalner's commercial narrative); a negative or safety-marred RISE3 would invite class-level skepticism. Neither outcome changes azetukalner's own pivotal data.</td></tr>
+<tr><td><strong>Pynegabine, CB-003</strong> (various)</td><td>Phase 1</td><td><span class="ev fact">FACT</span> Kv7.2/3 activators; completed Phase 1 safety/PK, results not yet reported. <span class="src">PMC11850491 (2025 review).</span> <span class="ev interp">INTERPRETATION</span> Years behind; not relevant to the 2026–2028 binary.</td></tr>
 </table>
 
 <h3>6b · Focal epilepsy ASM landscape (where azetukalner would slot)</h3>
-<p><span class="ev FACT">FACT</span> &gt;30 ASMs are available, yet up to half of focal epilepsy patients remain uncontrolled; polytherapy is the norm and drug interactions plus titration burden complicate care. <span class="src">Sept 17, 2026 company PR (disease background).</span> Established adjunctive agents include levetiracetam, lamotrigine, brivaracetam, lacosamide, perampanel, and cenobamate (XCOPRI, SK Biopharmaceuticals).</p>
+<p><span class="ev fact">FACT</span> &gt;30 ASMs are available, yet up to half of focal epilepsy patients remain uncontrolled; polytherapy is the norm and drug interactions plus titration burden complicate care. <span class="src">Sept 17, 2026 company PR (disease background).</span> Established adjunctive agents include levetiracetam, lamotrigine, brivaracetam, lacosamide, perampanel, and cenobamate (XCOPRI, SK Biopharmaceuticals).</p>
 <p>Clinical differentiation of azetukalner, stated as facts not positioning:</p>
 <ul class="tight">
-<li><span class="ev FACT">FACT</span> If approved, it would be the <strong>only Kv7 potassium channel opener</strong> available for epilepsy — a mechanism no marketed ASM uses. <span class="src">Mar 9, 2026 PR.</span></li>
-<li><span class="ev FACT">FACT</span> Once-daily oral dosing <strong>with food</strong>; company reports <strong>no required titration</strong> and <strong>no meaningful drug–drug interactions</strong> — vs several ASMs that require weeks of titration and carry CYP-mediated interactions. <span class="src">Company commentary, Sept 30, 2026.</span></li>
-<li><span class="ev FACT">FACT</span> Efficacy demonstrated in a highly refractory population (median 5 prior ASMs, ~12.75 seizures/month at baseline): placebo-adjusted MPC −42.7% at 25 mg; RR50 54.8%. <span class="src">X-TOLE2 topline.</span></li>
-<li><span class="ev FACT">FACT</span> Four doses (10/15/20/25 mg) filed; company expects physicians may commonly start at 15 mg (lower discontinuation than 25 mg; 10/15 mg safety "nearly indistinguishable from placebo" aside from dizziness at 15 mg, per management). <span class="src">Management commentary, Sept 30, 2026.</span></li>
+<li><span class="ev fact">FACT</span> If approved, it would be the <strong>only Kv7 potassium channel opener</strong> available for epilepsy — a mechanism no marketed ASM uses. <span class="src">Mar 9, 2026 PR.</span></li>
+<li><span class="ev fact">FACT</span> Once-daily oral dosing <strong>with food</strong>; company reports <strong>no required titration</strong> and <strong>no meaningful drug–drug interactions</strong> — vs several ASMs that require weeks of titration and carry CYP-mediated interactions. <span class="src">Company commentary, Sept 30, 2026.</span></li>
+<li><span class="ev fact">FACT</span> Efficacy demonstrated in a highly refractory population (median 5 prior ASMs, ~12.75 seizures/month at baseline): placebo-adjusted MPC −42.7% at 25 mg; RR50 54.8%. <span class="src">X-TOLE2 topline.</span></li>
+<li><span class="ev fact">FACT</span> Four doses (10/15/20/25 mg) filed; company expects physicians may commonly start at 15 mg (lower discontinuation than 25 mg; 10/15 mg safety "nearly indistinguishable from placebo" aside from dizziness at 15 mg, per management). <span class="src">Management commentary, Sept 30, 2026.</span></li>
 </ul>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> The honest competitive risk is not efficacy but tolerability and prescriber inertia: dizziness/somnolence overlap with existing ASMs, and cenobamate set a high bar for refractory efficacy with its own tolerability trade-offs. No cross-trial efficacy comparisons are made here — the trials enrolled different populations at different times.</p>
+<p><span class="ev interp">INTERPRETATION</span> The honest competitive risk is not efficacy but tolerability and prescriber inertia: dizziness/somnolence overlap with existing ASMs, and cenobamate set a high bar for refractory efficacy with its own tolerability trade-offs. No cross-trial efficacy comparisons are made here — the trials enrolled different populations at different times.</p>
 
 <h3>6c · MDD competition (context for the psychiatry option)</h3>
-<p><span class="ev FACT">FACT</span> The MDD armamentarium includes SSRIs/SNRIs, atypical add-ons, and newer mechanisms: esketamine nasal spray (Spravato, J&amp;J), zuranolone (Zurzuvae, Biogen/Sage), dextromethorphan-bupropion (Auvelity, Axsome). <span class="ev INTERPRETATION">INTERPRETATION</span> An oral, once-daily, rapid-onset (week-1 signal in X-NOVA) monotherapy with an anhedonia signal would be clinically differentiated — <em>if</em> the tolerability question is resolved. That "if" is currently the whole of the psychiatry value.</p>
-</section>
-
+<p><span class="ev fact">FACT</span> The MDD armamentarium includes SSRIs/SNRIs, atypical add-ons, and newer mechanisms: esketamine nasal spray (Spravato, J&amp;J), zuranolone (Zurzuvae, Biogen/Sage), dextromethorphan-bupropion (Auvelity, Axsome). <span class="ev interp">INTERPRETATION</span> An oral, once-daily, rapid-onset (week-1 signal in X-NOVA) monotherapy with an anhedonia signal would be clinically differentiated — <em>if</em> the tolerability question is resolved. That "if" is currently the whole of the psychiatry value.</p>
+    </section>
 <section id="fin">
-<h2>7 · Financials (Q2 2026 10-Q, filed Aug 6, 2026)</h2>
-<table>
+      <div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Well funded: cash into 2029 on current plans</h2></div></div>
+      <table>
 <tr><th>Line (USD)</th><th>Q2 2026</th><th>H1 2026</th><th>Q2 2025 (comparison)</th></tr>
 <tr><td>Cash, cash equivalents + marketable securities</td><td class="num"><strong>$1,245.1M</strong> (June 30, 2026)</td><td>—</td><td class="num">$586.0M (Dec 31, 2025)</td></tr>
 <tr><td>Collaboration revenue</td><td class="num">$0</td><td class="num">$0</td><td class="num">$0 (Q2); $7.5M (H1 2025)</td></tr>
@@ -336,18 +466,17 @@ Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase
 <tr><td>EPS (basic &amp; diluted)</td><td class="num">−$1.11</td><td class="num">−$2.28</td><td class="num">−$1.07</td></tr>
 <tr><td>Weighted-avg shares</td><td class="num">99.6M</td><td class="num">93.5M</td><td class="num">79.0M</td></tr>
 </table>
-<p><span class="ev FACT">FACT</span> Company guidance: cash funds operations <strong>into 2029</strong> on current operating plans. <span class="src">Q2 2026 PR.</span> <span class="ev INTERPRETATION">INTERPRETATION</span> H1 2026 net loss of $213.0M implies ~$106M/quarter burn; $1,245M ÷ ~$106M ≈ 11–12 quarters — consistent with the into-2029 guidance even allowing for rising commercial-prep spend. No debt of consequence (total liabilities $53.4M, mostly payables/leases).</p>
+<p><span class="ev fact">FACT</span> Company guidance: cash funds operations <strong>into 2029</strong> on current operating plans. <span class="src">Q2 2026 PR.</span> <span class="ev interp">INTERPRETATION</span> H1 2026 net loss of $213.0M implies ~$106M/quarter burn; $1,245M ÷ ~$106M ≈ 11–12 quarters — consistent with the into-2029 guidance even allowing for rising commercial-prep spend. No debt of consequence (total liabilities $53.4M, mostly payables/leases).</p>
 <h3>Dilution history</h3>
 <ul class="tight">
-<li><span class="ev FACT">FACT</span> Shares outstanding: 80,010,790 (Dec 31, 2025) → 96,752,884 (June 30, 2026) → 96,840,432 (Aug 3, 2026). <span class="src">Q2 2026 10-Q.</span></li>
-<li><span class="ev FACT">FACT</span> H1 2026: issued 15,370,962 common shares + pre-funded warrants for <strong>$837.5M net</strong> — comprising a $707.6M underwritten equity + pre-funded warrant offering and a $130.0M ATM issuance. <span class="src">Q2 2026 10-Q (statement of equity; filing summaries).</span></li>
-<li><span class="ev INTERPRETATION">INTERPRETATION</span> The raise was executed from strength (post X-TOLE2, pre-NDA) and fully funds the company through the epilepsy approval decision and the X-NOVA2 readout. The ATM remains available — future at-the-market sales are the main dilution vector to watch.</li>
+<li><span class="ev fact">FACT</span> Shares outstanding: 80,010,790 (Dec 31, 2025) → 96,752,884 (June 30, 2026) → 96,840,432 (Aug 3, 2026). <span class="src">Q2 2026 10-Q.</span></li>
+<li><span class="ev fact">FACT</span> H1 2026: issued 15,370,962 common shares + pre-funded warrants for <strong>$837.5M net</strong> — comprising a $707.6M underwritten equity + pre-funded warrant offering and a $130.0M ATM issuance. <span class="src">Q2 2026 10-Q (statement of equity; filing summaries).</span></li>
+<li><span class="ev interp">INTERPRETATION</span> The raise was executed from strength (post X-TOLE2, pre-NDA) and fully funds the company through the epilepsy approval decision and the X-NOVA2 readout. The ATM remains available — future at-the-market sales are the main dilution vector to watch.</li>
 </ul>
-</section>
-
+    </section>
 <section id="fdmc">
-<h2>8 · FDMC / EV — Dilution-Honest</h2>
-<p class="src">Share counts from Q2 2026 10-Q (June 30, 2026). Price reference: $36.44 (Oct 9, 2026 close; 52-week low $35.06 set Oct 8, 2026).</p>
+      <div class="section-head"><div class="section-num">08 / VALUATION</div><div><h2>The dilution-honest share count and enterprise value</h2></div></div>
+      <p class="src">Share counts from Q2 2026 10-Q (June 30, 2026). Price reference: $36.44 (Oct 9, 2026 close; 52-week low $35.06 set Oct 8, 2026).</p>
 <table>
 <tr><th>Component</th><th class="num">Shares</th><th>Source</th></tr>
 <tr><td>Common shares outstanding</td><td class="num">96,752,884</td><td>10-Q balance sheet</td></tr>
@@ -365,55 +494,55 @@ Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase
 <tr><td>Plus: debt</td><td class="num">~$0</td><td>No funded debt; $53.4M total liabilities</td></tr>
 <tr><td><strong>Enterprise value</strong></td><td class="num"><strong>~$2.85B</strong></td><td>FDMC − cash</td></tr>
 </table>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> ~30% of the FDMC is net cash — the market assigns ~$2.9B EV to azetukalner with psychiatry value largely stripped after the September selloff. Options are ~10.5% of FD shares at a $35.79 average strike (near current price; dilution bite grows if the stock re-rates).</p>
-</section>
+<p><span class="ev interp">INTERPRETATION</span> ~30% of the FDMC is net cash — the market assigns ~$2.9B EV to azetukalner with psychiatry value largely stripped after the September selloff. Options are ~10.5% of FD shares at a $35.79 average strike (near current price; dilution bite grows if the stock re-rates).</p>
+    </section>
 <section id="catalysts">
-<h2>9 · Catalyst &amp; Event Map</h2>
-<div class="legend"><span class="pill hard">hard</span> confirmed date · <span class="pill guid">guidance</span> company-guided window · <span class="pill inf">inferred</span> analyst/inference-derived timing. <strong>Staleness check as of Oct 10, 2026:</strong> every event dated before today has already happened and is recorded in §5; all events below are still pending. Local datasets cross-checked: 2027 catalyst calendar (X-NOVA2 Q1 2027) and Q4-2026 dossier (XEN1701/XEN1120 Ph1 H2 2026) both carry these XENE events.</div>
+      <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The event map — and what “good” looks like</h2></div></div>
+      <div class="legend"><span class="date-tag hard">hard</span> confirmed date · <span class="date-tag guidance">guidance</span> company-guided window · <span class="date-tag inferred">inferred</span> analyst/inference-derived timing. <strong>Staleness check as of Oct 10, 2026:</strong> every event dated before today has already happened and is recorded in §5; all events below are still pending. Local datasets cross-checked: 2027 catalyst calendar (X-NOVA2 Q1 2027) and Q4-2026 dossier (XEN1701/XEN1120 Ph1 H2 2026) both carry these XENE events.</div>
 <table>
 <tr><th>Event</th><th>Timing</th><th>Date quality</th><th>What it is</th><th>What "good" looks like</th><th>What to watch</th></tr>
-<tr><td><strong>Q3 2026 earnings call</strong></td><td class="num">Nov 2, 2026 (est.)</td><td><span class="pill inf">inferred</span></td><td>First management update since the NDA filing + psychiatry pause.</td><td>NDA acceptance timeline reaffirmed; quarterly burn ≈ $105–115M; any psychiatry dosing-fix detail.</td><td>Burn acceleration from commercial-prep spend; X-TOLE3 enrollment status; tone on the titration fix.</td></tr>
-<tr><td><strong>FDA NDA acceptance (60-day filing review)</strong></td><td class="num">~Mid-Nov 2026</td><td><span class="pill inf">inferred</span></td><td>FDA accepts the FOS filing and sets a PDUFA date (~Sept 2027).</td><td>Acceptance + standard-review PDUFA date.</td><td>Refuse-to-file would be a severe tail event — low probability given two positive pivotal trials.</td></tr>
-<tr><td><strong>AES annual meeting — 60-month open-label X-TOLE data</strong></td><td class="num">Dec 2026</td><td><span class="pill guid">guidance</span></td><td><span class="ev FACT">FACT</span> Company plans to present updated 60-month open-label X-TOLE data at the American Epilepsy Society meeting. <span class="src">TD Cowen summit, Sept 30, 2026.</span></td><td>Durable seizure reduction and seizure-freedom periods at 5 years; no pigmentation signals in long-term exposure.</td><td>Any retinal/dermatologic surveillance language — regulators will be watching this in the NDA review.</td></tr>
-<tr><td><strong>XEN1701 (NaV1.7) &amp; XEN1120 (Kv7) Phase 1 completion</strong></td><td class="num">H2 2026</td><td><span class="pill guid">guidance</span></td><td>SAD/MAD completion to support Phase 2 proof-of-concept in acute pain. <span class="src">Q2 2026 PR; Q4-2026 dossier dataset.</span></td><td>Clean safety/PK supporting Phase 2 initiation.</td><td>Any tolerability flags; limited price impact expected — early-stage optionality only.</td></tr>
-<tr><td><strong>X-TOLE3 enrollment completion (ex-Japan)</strong></td><td class="num">H2 2026</td><td><span class="pill guid">guidance</span></td><td>Final replicate Phase 3 in FOS finishes enrolling outside Japan. <span class="src">Company commentary Sept 2026.</span></td><td>Completion on schedule → readout in 2027.</td><td>Japan enrollment pace; any baseline-severity shift vs X-TOLE2.</td></tr>
-<tr><td><strong>Opakalim (BHV-7000) RISE3 topline — competitor</strong></td><td class="num">H2 2026</td><td><span class="pill guid">guidance</span></td><td>Biohaven/SK Biopharmaceuticals: &gt;600-patient refractory FOS trial of the other late-stage Kv7.2/7.3 activator. <span class="src">Biohaven disclosures.</span></td><td>Positive efficacy without new safety flags → class validation; sentiment lift for XENE.</td><td>Sympathy repricing either way; the partial clinical hold (rodent metabolite, Sept 2026) remains a class overhang.</td></tr>
-<tr><td><strong>X-NOVA2 topline (MDD)</strong></td><td class="num">Q1 2027</td><td><span class="pill guid">guidance</span></td><td><em>The</em> swing catalyst: ~360 patients, 20 mg monotherapy, HAM-D17 primary at week 6, unblinding at current (~80%) enrollment. <span class="src">Sept 17, 2026 PR; 2027 catalyst calendar dataset.</span></td><td>Stat-sig HAM-D17 (the scale that hit p=0.042 in Phase 2) + anhedonia signal + tolerability deemed manageable.</td><td>Effect size vs the Phase 2 Δ −3.1 on HAM-D17; dropout/AE rates under the old flat-20-mg dosing; placebo response — the classic MDD trial killer.</td></tr>
-<tr><td><strong>Psychiatry dosing-fix / enrollment resumption</strong></td><td class="num">Undated</td><td><span class="pill inf">inferred</span></td><td>Company is evaluating titration-based dosing with the DSMB; protocol/regulatory updates to follow. <span class="src">Sept 17 &amp; 30, 2026 communications.</span></td><td>A credible titration fix announced ahead of X-NOVA2 → partial re-rating of the psychiatry option.</td><td>Whether the fix is a schedule tweak (delay, not death) or signals a narrower psychiatric therapeutic window.</td></tr>
-<tr><td><strong>NBI-921355 (Neurocrine-partnered) Phase 1b data</strong></td><td class="num">2027</td><td><span class="pill guid">guidance</span></td><td>Partnered NaV1.2/1.6 inhibitor in epilepsy; economics are milestones/royalties. <span class="src">Q2 2026 PR.</span></td><td>Clean safety → Phase 2 path.</td><td>Modest value contribution at best — partnered optionality.</td></tr>
-<tr><td><strong>X-TOLE3 readout; X-ACKT (PGTCS) readout</strong></td><td class="num">2027–2028</td><td><span class="pill inf">inferred</span></td><td>Confirmatory epilepsy readouts: third FOS pivotal + PGTCS expansion.</td><td>Positive X-TOLE3 (third positive pivotal) and a PGTCS signal.</td><td><span class="ev GAP">GAP</span> No guided dates; X-CEED/X-NOVA3 fate depends on the pause resolution.</td></tr>
-<tr><td><strong>FDA approval decision (FOS)</strong></td><td class="num">~Sept 2027</td><td><span class="pill guid">guidance</span></td><td>Company models a standard 12-month review from the Sept 2026 filing (not priority review). <span class="src">Management commentary, Sept 30, 2026.</span></td><td>Approval; then ~3 months DEA scheduling → commercial availability late 2027/early 2028.</td><td>Labeling (titration language, CNS AE warnings); CRL/delay risk — cash provides a floor.</td></tr>
-<tr><td><strong>X-NOVA3 / X-CEED fate</strong></td><td class="num">Gated</td><td><span class="pill inf">inferred</span></td><td>Paused MDD/BPD studies resume only on a resolved dosing regimen.</td><td>Resume on modified regimens after a clean X-NOVA2.</td><td>BPD uses MADRS primary (the scale that missed in Phase 2) — a higher bar than X-NOVA2's HAM-D17.</td></tr>
+<tr><td><strong>Q3 2026 earnings call</strong></td><td class="num">Nov 2, 2026 (est.)</td><td><span class="date-tag inferred">inferred</span></td><td>First management update since the NDA filing + psychiatry pause.</td><td>NDA acceptance timeline reaffirmed; quarterly burn ≈ $105–115M; any psychiatry dosing-fix detail.</td><td>Burn acceleration from commercial-prep spend; X-TOLE3 enrollment status; tone on the titration fix.</td></tr>
+<tr><td><strong>FDA NDA acceptance (60-day filing review)</strong></td><td class="num">~Mid-Nov 2026</td><td><span class="date-tag inferred">inferred</span></td><td>FDA accepts the FOS filing and sets a PDUFA date (~Sept 2027).</td><td>Acceptance + standard-review PDUFA date.</td><td>Refuse-to-file would be a severe tail event — low probability given two positive pivotal trials.</td></tr>
+<tr><td><strong>AES annual meeting — 60-month open-label X-TOLE data</strong></td><td class="num">Dec 2026</td><td><span class="date-tag guidance">guidance</span></td><td><span class="ev fact">FACT</span> Company plans to present updated 60-month open-label X-TOLE data at the American Epilepsy Society meeting. <span class="src">TD Cowen summit, Sept 30, 2026.</span></td><td>Durable seizure reduction and seizure-freedom periods at 5 years; no pigmentation signals in long-term exposure.</td><td>Any retinal/dermatologic surveillance language — regulators will be watching this in the NDA review.</td></tr>
+<tr><td><strong>XEN1701 (NaV1.7) &amp; XEN1120 (Kv7) Phase 1 completion</strong></td><td class="num">H2 2026</td><td><span class="date-tag guidance">guidance</span></td><td>SAD/MAD completion to support Phase 2 proof-of-concept in acute pain. <span class="src">Q2 2026 PR; Q4-2026 dossier dataset.</span></td><td>Clean safety/PK supporting Phase 2 initiation.</td><td>Any tolerability flags; limited price impact expected — early-stage optionality only.</td></tr>
+<tr><td><strong>X-TOLE3 enrollment completion (ex-Japan)</strong></td><td class="num">H2 2026</td><td><span class="date-tag guidance">guidance</span></td><td>Final replicate Phase 3 in FOS finishes enrolling outside Japan. <span class="src">Company commentary Sept 2026.</span></td><td>Completion on schedule → readout in 2027.</td><td>Japan enrollment pace; any baseline-severity shift vs X-TOLE2.</td></tr>
+<tr><td><strong>Opakalim (BHV-7000) RISE3 topline — competitor</strong></td><td class="num">H2 2026</td><td><span class="date-tag guidance">guidance</span></td><td>Biohaven/SK Biopharmaceuticals: &gt;600-patient refractory FOS trial of the other late-stage Kv7.2/7.3 activator. <span class="src">Biohaven disclosures.</span></td><td>Positive efficacy without new safety flags → class validation; sentiment lift for XENE.</td><td>Sympathy repricing either way; the partial clinical hold (rodent metabolite, Sept 2026) remains a class overhang.</td></tr>
+<tr><td><strong>X-NOVA2 topline (MDD)</strong></td><td class="num">Q1 2027</td><td><span class="date-tag guidance">guidance</span></td><td><em>The</em> swing catalyst: ~360 patients, 20 mg monotherapy, HAM-D17 primary at week 6, unblinding at current (~80%) enrollment. <span class="src">Sept 17, 2026 PR; 2027 catalyst calendar dataset.</span></td><td>Stat-sig HAM-D17 (the scale that hit p=0.042 in Phase 2) + anhedonia signal + tolerability deemed manageable.</td><td>Effect size vs the Phase 2 Δ −3.1 on HAM-D17; dropout/AE rates under the old flat-20-mg dosing; placebo response — the classic MDD trial killer.</td></tr>
+<tr><td><strong>Psychiatry dosing-fix / enrollment resumption</strong></td><td class="num">Undated</td><td><span class="date-tag inferred">inferred</span></td><td>Company is evaluating titration-based dosing with the DSMB; protocol/regulatory updates to follow. <span class="src">Sept 17 &amp; 30, 2026 communications.</span></td><td>A credible titration fix announced ahead of X-NOVA2 → partial re-rating of the psychiatry option.</td><td>Whether the fix is a schedule tweak (delay, not death) or signals a narrower psychiatric therapeutic window.</td></tr>
+<tr><td><strong>NBI-921355 (Neurocrine-partnered) Phase 1b data</strong></td><td class="num">2027</td><td><span class="date-tag guidance">guidance</span></td><td>Partnered NaV1.2/1.6 inhibitor in epilepsy; economics are milestones/royalties. <span class="src">Q2 2026 PR.</span></td><td>Clean safety → Phase 2 path.</td><td>Modest value contribution at best — partnered optionality.</td></tr>
+<tr><td><strong>X-TOLE3 readout; X-ACKT (PGTCS) readout</strong></td><td class="num">2027–2028</td><td><span class="date-tag inferred">inferred</span></td><td>Confirmatory epilepsy readouts: third FOS pivotal + PGTCS expansion.</td><td>Positive X-TOLE3 (third positive pivotal) and a PGTCS signal.</td><td><span class="ev gap">GAP</span> No guided dates; X-CEED/X-NOVA3 fate depends on the pause resolution.</td></tr>
+<tr><td><strong>FDA approval decision (FOS)</strong></td><td class="num">~Sept 2027</td><td><span class="date-tag guidance">guidance</span></td><td>Company models a standard 12-month review from the Sept 2026 filing (not priority review). <span class="src">Management commentary, Sept 30, 2026.</span></td><td>Approval; then ~3 months DEA scheduling → commercial availability late 2027/early 2028.</td><td>Labeling (titration language, CNS AE warnings); CRL/delay risk — cash provides a floor.</td></tr>
+<tr><td><strong>X-NOVA3 / X-CEED fate</strong></td><td class="num">Gated</td><td><span class="date-tag inferred">inferred</span></td><td>Paused MDD/BPD studies resume only on a resolved dosing regimen.</td><td>Resume on modified regimens after a clean X-NOVA2.</td><td>BPD uses MADRS primary (the scale that missed in Phase 2) — a higher bar than X-NOVA2's HAM-D17.</td></tr>
 </table>
-</section><section id="redflags">
-<h2>10 · Ranked Red Flags</h2>
-<ol>
-<li><strong>Psychiatry tolerability failure is the dominant risk.</strong> Neuropsychiatric AEs (confusion, aphasia/word-finding, coordination problems, rare psychotic episodes) at 20 mg without titration, absent in the smaller Phase 2. <span class="ev FACT">FACT</span> Needham removed all MDD/BPD projections from its valuation; Deutsche Bank downgraded to Hold and cut PT $90 → $46. <span class="src">Sept 18, 2026 analyst actions.</span></li>
-<li><strong>Phase 2 MDD primary missed.</strong> X-NOVA's MADRS primary: p=0.135 (Δ −3.04). Phase 3 bets on HAM-D17 — significant in Phase 2 (p=0.042) but an exploratory endpoint there. <span class="ev INTERPRETATION">INTERPRETATION</span> Endpoint-switching from a missed primary is a legitimate but higher-risk design choice.</li>
-<li><strong>X-NOVA2 unblinds under-enrolled (~360/450, 80%).</strong> Company asserts adequate power; any effect-size shortfall bites harder at n=360. <span class="ev INTERPRETATION">INTERPRETATION</span></li>
-<li><strong>Single-asset dependence.</strong> The 10-Q's lead risk factor: business "substantially depends upon the successful development of azetukalner." <span class="ev FACT">FACT</span> <span class="src">Q2 2026 10-Q.</span></li>
-<li><strong>Dilution overhang.</strong> +21% share count in H1 2026; active ATM; options ≈10.5% of FD shares with $35.79 average strike near the current price. <span class="ev FACT">FACT</span></li>
-<li><strong>NDA acceptance not yet confirmed</strong> (~mid-Nov 2026 inferred); standard review pushes approval to ~Sept 2027 + DEA scheduling. Long wait with headline risk. <span class="ev UNVERIFIED">UNVERIFIED</span> acceptance timing is inferred from the 60-day rule.</li>
-<li><strong>Plaintiff-firm "investigation" notices (Sept 22 + Oct 7, 2026).</strong> <span class="ev FACT">FACT</span> Levi &amp; Korsinsky announced an "investigation" Sept 22; Wolf Popper LLP announced it "continues to investigate" Oct 7. <span class="ev INTERPRETATION">INTERPRETATION</span> Routine post-drop plaintiff solicitations; no filed suit as of Oct 10, 2026; headline overhang only.</li>
-<li><strong>Class-level headline risk from Biohaven's opakalim</strong> (partial clinical hold over rodent metabolite; RISE3 topline H2 2026). Any safety scare in Kv7 could splash onto azetukalner sentiment regardless of molecular differences. <span class="ev INTERPRETATION">INTERPRETATION</span></li>
-<li><strong>Insider selling into strength (Aug 2026)</strong> — director Gannon sold 10,000 shares at ~$64.06; CMO Kenney sold 7,068 shares (10b5-1). Partially offset by Sept 30, 2026 open-market buys (see §12). <span class="ev FACT">FACT</span> <span class="src">Form 4 filings via stocktitan SEC summaries.</span></li>
-<li><strong>Commercial execution unproven.</strong> First-time launch; CCO hired 2025; gradual ASM launch curves are the norm (management's own framing). <span class="ev INTERPRETATION">INTERPRETATION</span> — relevant for valuation durability, not for the binary.</li>
+    </section>
+<section id="redflags">
+      <div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>Ranked red flags</h2></div></div>
+      <ol>
+<li><strong>Psychiatry tolerability failure is the dominant risk.</strong> Neuropsychiatric AEs (confusion, aphasia/word-finding, coordination problems, rare psychotic episodes) at 20 mg without titration, absent in the smaller Phase 2. <span class="ev fact">FACT</span> Needham removed all MDD/BPD projections from its valuation; Deutsche Bank downgraded to Hold and cut PT $90 → $46. <span class="src">Sept 18, 2026 analyst actions.</span></li>
+<li><strong>Phase 2 MDD primary missed.</strong> X-NOVA's MADRS primary: p=0.135 (Δ −3.04). Phase 3 bets on HAM-D17 — significant in Phase 2 (p=0.042) but an exploratory endpoint there. <span class="ev interp">INTERPRETATION</span> Endpoint-switching from a missed primary is a legitimate but higher-risk design choice.</li>
+<li><strong>X-NOVA2 unblinds under-enrolled (~360/450, 80%).</strong> Company asserts adequate power; any effect-size shortfall bites harder at n=360. <span class="ev interp">INTERPRETATION</span></li>
+<li><strong>Single-asset dependence.</strong> The 10-Q's lead risk factor: business "substantially depends upon the successful development of azetukalner." <span class="ev fact">FACT</span> <span class="src">Q2 2026 10-Q.</span></li>
+<li><strong>Dilution overhang.</strong> +21% share count in H1 2026; active ATM; options ≈10.5% of FD shares with $35.79 average strike near the current price. <span class="ev fact">FACT</span></li>
+<li><strong>NDA acceptance not yet confirmed</strong> (~mid-Nov 2026 inferred); standard review pushes approval to ~Sept 2027 + DEA scheduling. Long wait with headline risk. <span class="ev unverified">UNVERIFIED</span> acceptance timing is inferred from the 60-day rule.</li>
+<li><strong>Plaintiff-firm "investigation" notices (Sept 22 + Oct 7, 2026).</strong> <span class="ev fact">FACT</span> Levi &amp; Korsinsky announced an "investigation" Sept 22; Wolf Popper LLP announced it "continues to investigate" Oct 7. <span class="ev interp">INTERPRETATION</span> Routine post-drop plaintiff solicitations; no filed suit as of Oct 10, 2026; headline overhang only.</li>
+<li><strong>Class-level headline risk from Biohaven's opakalim</strong> (partial clinical hold over rodent metabolite; RISE3 topline H2 2026). Any safety scare in Kv7 could splash onto azetukalner sentiment regardless of molecular differences. <span class="ev interp">INTERPRETATION</span></li>
+<li><strong>Insider selling into strength (Aug 2026)</strong> — director Gannon sold 10,000 shares at ~$64.06; CMO Kenney sold 7,068 shares (10b5-1). Partially offset by Sept 30, 2026 open-market buys (see §12). <span class="ev fact">FACT</span> <span class="src">Form 4 filings via stocktitan SEC summaries.</span></li>
+<li><strong>Commercial execution unproven.</strong> First-time launch; CCO hired 2025; gradual ASM launch curves are the norm (management's own framing). <span class="ev interp">INTERPRETATION</span> — relevant for valuation durability, not for the binary.</li>
 </ol>
-</section>
-
+    </section>
 <section id="scenarios">
-<h2>11 · Bear / Base / Bull — Soft Scenario Targets</h2>
-<div class="callout warn"><strong>Framework note — soft, scenario-based targets.</strong> The targets below are explicitly <em>soft</em>: arithmetic sketches on fully-diluted shares (~112.4M) at the reference price of $36.44 (Oct 9, 2026 close), built from the dossier's own data (EV, share count, cash, pipeline). They are <strong>not predictions and not a recommendation</strong>; each case states its assumptions. Per the standing rule, <strong>no takeout/max-value scenario exceeds the top of the current sell-side price-target range ($90, Baird)</strong>. Cash floor: $1,245.1M ÷ 112.4M ≈ <strong>$11.08 per fully-diluted share</strong>.</div>
+      <div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Bear, base, bull — soft scenario targets</h2></div></div>
+      <div class="callout warn"><strong>Framework note — soft, scenario-based targets.</strong> The targets below are explicitly <em>soft</em>: arithmetic sketches on fully-diluted shares (~112.4M) at the reference price of $36.44 (Oct 9, 2026 close), built from the dossier's own data (EV, share count, cash, pipeline). They are <strong>not predictions and not a recommendation</strong>; each case states its assumptions. Per the standing rule, <strong>no takeout/max-value scenario exceeds the top of the current sell-side price-target range ($90, Baird)</strong>. Cash floor: $1,245.1M ÷ 112.4M ≈ <strong>$11.08 per fully-diluted share</strong>.</div>
 <div class="grid3">
 <div class="card"><h4>🐻 Bear — soft $22</h4>
 <p>X-NOVA2 misses on HAM-D17 or tolerability worsens → psychiatry value written off; epilepsy NDA approved ~Sept 2027 but launch is gradual; Kv7 sentiment dented by opakalim headlines.</p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Math:</strong> $22 × 112.4M = $2.47B fully-diluted equity; EV = $2.47B − $1.245B = <strong>$1.23B</strong>. <strong>Assumptions:</strong> epilepsy franchise worth ~$1.2B EV on slower uptake; psychiatry at ~$0; cash (~$11/share) cushions the downside. ≈ <strong>−40%</strong> from $36.44.</p></div>
+<p><span class="ev interp">INTERPRETATION</span> <strong>Math:</strong> $22 × 112.4M = $2.47B fully-diluted equity; EV = $2.47B − $1.245B = <strong>$1.23B</strong>. <strong>Assumptions:</strong> epilepsy franchise worth ~$1.2B EV on slower uptake; psychiatry at ~$0; cash (~$11/share) cushions the downside. ≈ <strong>−40%</strong> from $36.44.</p></div>
 <div class="card"><h4>➡️ Base — soft $68</h4>
 <p>NDA accepted → approval ~Sept 2027; X-NOVA2 (Q1 2027) hits HAM-D17 with manageable AEs after a titration-based dosing fix; X-NOVA3/X-CEED resume on modified regimens; X-TOLE3 confirms.</p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Math:</strong> $68 × 112.4M = $7.64B fully-diluted equity; EV = <strong>$6.40B</strong>. <strong>Assumptions:</strong> psychiatry option value returns; no financing needed (cash into 2029). Anchored to the current sell-side consensus average (~$68.6 across the 10 targets in §13). ≈ <strong>+87%</strong> from $36.44.</p></div>
+<p><span class="ev interp">INTERPRETATION</span> <strong>Math:</strong> $68 × 112.4M = $7.64B fully-diluted equity; EV = <strong>$6.40B</strong>. <strong>Assumptions:</strong> psychiatry option value returns; no financing needed (cash into 2029). Anchored to the current sell-side consensus average (~$68.6 across the 10 targets in §13). ≈ <strong>+87%</strong> from $36.44.</p></div>
 <div class="card"><h4>🐂 Bull — soft $90 (capped)</h4>
 <p>X-NOVA2 hits with clean tolerability read-through; titration fix validated; epilepsy approval on time; X-TOLE3 positive; strategic interest in the only late-stage Kv7 franchise.</p>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> <strong>Math:</strong> $90 × 112.4M = $10.11B fully-diluted equity; EV = <strong>$8.87B</strong>. <strong>Assumptions:</strong> takeout premium or full franchise value; requires both binaries to resolve positively. Capped at the top of current sell-side PTs (Baird $90) per the standing rule. ≈ <strong>+147%</strong> from $36.44.</p></div>
+<p><span class="ev interp">INTERPRETATION</span> <strong>Math:</strong> $90 × 112.4M = $10.11B fully-diluted equity; EV = <strong>$8.87B</strong>. <strong>Assumptions:</strong> takeout premium or full franchise value; requires both binaries to resolve positively. Capped at the top of current sell-side PTs (Baird $90) per the standing rule. ≈ <strong>+147%</strong> from $36.44.</p></div>
 </div>
 <h3>Scenario matrix — what moves the stock</h3>
 <table>
@@ -425,33 +554,33 @@ Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase
 <tr><td>Psychiatry dosing-fix update</td><td>Undated</td><td>Partial re-rating ahead of X-NOVA2</td><td>Program limbo; continued overhang</td></tr>
 <tr><td>FDA approval (FOS)</td><td>~Sept 2027</td><td>First commercial product; takeout speculation</td><td>CRL/delay = major drawdown; cash provides floor</td></tr>
 </table>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> For a holder-through-the-binary style, the position is: long the epilepsy approval (high-probability, well-powered data), long a free-ish call option on psychiatry (X-NOVA2, Q1 2027), with $1.245B cash limiting financing risk. The key swing factor is the <strong>X-NOVA2 readout</strong> — it determines whether azetukalner is a one-indication or a franchise asset.</p>
-</section><section id="mgmt">
-<h2>12 · Management Track Record &amp; Insider Signals</h2>
-<h3>Leadership</h3>
+<p><span class="ev interp">INTERPRETATION</span> For a holder-through-the-binary style, the position is: long the epilepsy approval (high-probability, well-powered data), long a free-ish call option on psychiatry (X-NOVA2, Q1 2027), with $1.245B cash limiting financing risk. The key swing factor is the <strong>X-NOVA2 readout</strong> — it determines whether azetukalner is a one-indication or a franchise asset.</p>
+    </section>
+<section id="mgmt">
+      <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management and insider signals</h2></div></div>
+      <h3>Leadership</h3>
 <ul class="tight">
-<li><strong>Ian Mortimer</strong> — President, CEO &amp; Director. Long-tenured Xenon executive (joined as CFO in 2013; CEO since 2019) who stewarded the pivot to azetukalner and the X-TOLE program through two positive pivots and the NDA filing. <span class="ev INTERPRETATION">INTERPRETATION</span> Execution record on the epilepsy program is strong; the psychiatry pause is the first major clinical setback under his tenure.</li>
+<li><strong>Ian Mortimer</strong> — President, CEO &amp; Director. Long-tenured Xenon executive (joined as CFO in 2013; CEO since 2019) who stewarded the pivot to azetukalner and the X-TOLE program through two positive pivots and the NDA filing. <span class="ev interp">INTERPRETATION</span> Execution record on the epilepsy program is strong; the psychiatry pause is the first major clinical setback under his tenure.</li>
 <li><strong>Thomas "Tucker" Kelly</strong> — CFO (joined ~2025); led the $837.5M H1 2026 financing from a position of strength. Guides standard 12-month NDA review + DEA scheduling. <span class="src">JPM Jan 2026 transcript; Sept 30, 2026 commentary.</span></li>
-<li><strong>Darren Cline</strong> — Chief Commercial Officer (joined ~2025); commercial leadership team being built ahead of potential launch. <span class="ev INTERPRETATION">INTERPRETATION</span> Forward-integration hiring signals genuine launch intent rather than a build-to-sell posture — though it does not preclude a takeout.</li>
+<li><strong>Darren Cline</strong> — Chief Commercial Officer (joined ~2025); commercial leadership team being built ahead of potential launch. <span class="ev interp">INTERPRETATION</span> Forward-integration hiring signals genuine launch intent rather than a build-to-sell posture — though it does not preclude a takeout.</li>
 <li><strong>Dr. Christopher Kenney</strong> — Chief Medical Officer; presented the X-NOVA and X-TOLE programs.</li>
-<li><strong>Wider executive team</strong> — <span class="ev FACT">FACT</span> Thomas Kelly (CFO, J.D.), Darren Cline (CCO, M.B.A.), Andrea DiFabio (Chief Legal Officer &amp; Corporate Secretary), Matthew Ronsheim (COO, Ph.D.), James Empfield (EVP Drug Discovery, Ph.D.), Robin Sherrington (EVP Strategy &amp; Innovation, Ph.D.), Shelley McCloskey (EVP Human Resources), Colleen Alabiso (SVP Corporate Affairs). <span class="src">Source: company profile via market data, Oct 2026.</span></li>
+<li><strong>Wider executive team</strong> — <span class="ev fact">FACT</span> Thomas Kelly (CFO, J.D.), Darren Cline (CCO, M.B.A.), Andrea DiFabio (Chief Legal Officer &amp; Corporate Secretary), Matthew Ronsheim (COO, Ph.D.), James Empfield (EVP Drug Discovery, Ph.D.), Robin Sherrington (EVP Strategy &amp; Innovation, Ph.D.), Shelley McCloskey (EVP Human Resources), Colleen Alabiso (SVP Corporate Affairs). <span class="src">Source: company profile via market data, Oct 2026.</span></li>
 </ul>
 <h3>Insider signals (Form 4s)</h3>
 <table>
 <tr><th>Insider</th><th>Action</th><th>Detail</th></tr>
-<tr><td>Ian Mortimer (CEO)</td><td><strong>Buy</strong></td><td><span class="ev FACT">FACT</span> 30,000 shares @ $37.38 (~$1.12M), <strong>Sept 30, 2026</strong> — his first open-market purchase in Form 4 records going back to 2021; direct holdings more than doubled to 49,923 (spouse holds 14,300). In March 2026 he sold ~$17M of stock at prices near $60 under 10b5-1. <span class="src">FilingExplorer, Oct 2026.</span></td></tr>
-<tr><td>Thomas Kelly (CFO)</td><td><strong>Buy</strong></td><td><span class="ev FACT">FACT</span> 15,000 shares @ $37.316 (~$560k), <strong>Sept 30, 2026</strong> — his first reported holding of Xenon common stock. <span class="src">FilingExplorer, Oct 2026.</span></td></tr>
-<tr><td>Steven Gannon (director)</td><td>Sell</td><td><span class="ev FACT">FACT</span> 10,000 shares @ ~$64.06 avg, Aug 11, 2026.</td></tr>
-<tr><td>Christopher Kenney (CMO)</td><td>Sell</td><td><span class="ev FACT">FACT</span> 7,068 shares, Aug 28, 2026, under Rule 10b5-1 plan adopted May 29, 2026 (pre-planned).</td></tr>
-<tr><td>Gary Patou (director)</td><td>Sell</td><td><span class="ev FACT">FACT</span> 1,322 shares @ $53.14, June 5, 2026, under 10b5-1 (tax-withholding on RSU vest).</td></tr>
+<tr><td>Ian Mortimer (CEO)</td><td><strong>Buy</strong></td><td><span class="ev fact">FACT</span> 30,000 shares @ $37.38 (~$1.12M), <strong>Sept 30, 2026</strong> — his first open-market purchase in Form 4 records going back to 2021; direct holdings more than doubled to 49,923 (spouse holds 14,300). In March 2026 he sold ~$17M of stock at prices near $60 under 10b5-1. <span class="src">FilingExplorer, Oct 2026.</span></td></tr>
+<tr><td>Thomas Kelly (CFO)</td><td><strong>Buy</strong></td><td><span class="ev fact">FACT</span> 15,000 shares @ $37.316 (~$560k), <strong>Sept 30, 2026</strong> — his first reported holding of Xenon common stock. <span class="src">FilingExplorer, Oct 2026.</span></td></tr>
+<tr><td>Steven Gannon (director)</td><td>Sell</td><td><span class="ev fact">FACT</span> 10,000 shares @ ~$64.06 avg, Aug 11, 2026.</td></tr>
+<tr><td>Christopher Kenney (CMO)</td><td>Sell</td><td><span class="ev fact">FACT</span> 7,068 shares, Aug 28, 2026, under Rule 10b5-1 plan adopted May 29, 2026 (pre-planned).</td></tr>
+<tr><td>Gary Patou (director)</td><td>Sell</td><td><span class="ev fact">FACT</span> 1,322 shares @ $53.14, June 5, 2026, under 10b5-1 (tax-withholding on RSU vest).</td></tr>
 </table>
-<p><span class="ev INTERPRETATION">INTERPRETATION</span> The $1.7M combined open-market buy by CEO+CFO (Sept 30) days after the ~31% selloff is the strongest insider signal available — discretionary purchases at ~$37, not 10b5-1 sales. It does not de-risk the X-NOVA2 binary, but it indicates management views the selloff as overdone. <span class="ev FACT">FACT</span> Institutional ownership is high (~95% per market data); FMR LLC (Fidelity) holds ~10.3% (13G/A).</p>
+<p><span class="ev interp">INTERPRETATION</span> The $1.7M combined open-market buy by CEO+CFO (Sept 30) days after the ~31% selloff is the strongest insider signal available — discretionary purchases at ~$37, not 10b5-1 sales. It does not de-risk the X-NOVA2 binary, but it indicates management views the selloff as overdone. <span class="ev fact">FACT</span> Institutional ownership is high (~95% per market data); FMR LLC (Fidelity) holds ~10.3% (13G/A).</p>
 <p class="src">Insider data: Form 4 summaries via stocktitan SEC filing feed; Oct 2026 insider-buying reports.</p>
-</section>
-
+    </section>
 <section id="refs">
-<h2>13 · References, As-Of Date &amp; Filings Used</h2>
-<p><strong>As-of date: October 10, 2026.</strong> Price references: $36.44 (Oct 9, 2026 close).</p>
+      <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2></div></div>
+      <p><strong>As-of date: October 10, 2026.</strong> Price references: $36.44 (Oct 9, 2026 close).</p>
 <h3>Filings &amp; company disclosures used</h3>
 <ul class="tight">
 <li>Q2 2026 Form 10-Q, Xenon Pharmaceuticals Inc., filed Aug 6, 2026 (financials, share counts, options/RSU/PSU counts, risk factors).</li>
@@ -484,48 +613,52 @@ Azetukalner is the most advanced Kv7 potassium channel opener in epilepsy: Phase
 <div class="callout">
 <strong>Disclosures &amp; limits.</strong> This dossier is a neutral third-party research document prepared for general distribution. It contains no personal information, no holdings or position data, and no attributions. It offers no DCF and no buy/sell recommendation; §11 carries explicitly soft, scenario-based per-share targets with stated assumptions (not a formal price target). No cross-trial head-to-head efficacy claims are made. Commercial discussion is intentionally lean; the analysis weights the clinical binary catalysts. All forward-looking statements are the company's or the author's inferences and are labeled accordingly.
 </div>
-</section>
-
-<footer>
-XENE deep-dive dossier · as of October 10, 2026 · single-file HTML · Evidence labels: FACT / INTERPRETATION / GAP / UNVERIFIED throughout. Soft scenario targets in §11 are illustrative only.
-</footer>
-
+    </section>
 </main>
-</div>
+
+<footer><strong>XENE deep-dive dossier</strong> · as of October 10, 2026 · Evidence labels: FACT / INTERPRETATION / GAP / UNVERIFIED throughout. Soft scenario targets in §11 are illustrative only.</footer>
+
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
 
 <script>
 (function(){
-  /* dark / light theme */
-  var k='xene-dossier-theme',r=document.documentElement,b=document.getElementById('themeToggle');
-  function set(t){r.setAttribute('data-theme',t);try{localStorage.setItem(k,t);}catch(e){}
-    b.textContent=(t==='dark')?'\u2600 Light':'\u263E Dark';
-    b.setAttribute('aria-label','Switch to '+((t==='dark')?'light':'dark')+' mode');}
-  var init='light';
-  try{init=localStorage.getItem(k)||'';}catch(e){init='';}
-  if(!init&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){init='dark';}
-  if(!init){init='light';}
-  set(init);
-  b.addEventListener('click',function(){set(r.getAttribute('data-theme')==='dark'?'light':'dark');});
-  /* back to top */
-  var bt=document.getElementById('backTop');
-  window.addEventListener('scroll',function(){bt.classList.toggle('show',window.scrollY>500);},{passive:true});
-  bt.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-  /* collapsible sections */
-  document.querySelectorAll('main > section > h2').forEach(function(h){
-    var s=h.parentElement;
-    var t=document.createElement('button');
-    t.className='sec-toggle';t.type='button';
-    t.setAttribute('aria-expanded','true');t.setAttribute('aria-label','Collapse section');
-    t.innerHTML='<span aria-hidden="true">\u25BE</span>';
-    h.insertBefore(t,h.firstChild);
-    t.addEventListener('click',function(ev){
-      ev.stopPropagation();
-      var c=s.classList.toggle('collapsed');
-      t.setAttribute('aria-expanded',String(!c));
-      t.setAttribute('aria-label',c?'Expand section':'Collapse section');
-      t.firstChild.textContent=c?'\u25B8':'\u25BE';
+  /* Theme toggle (shared key across all dossiers) */
+  const themeBtn=document.getElementById('themeToggle');
+  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'\u2600 Light mode':'\u25D0 Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+  let startTheme='light';
+  try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+  applyTheme(startTheme);
+  themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  /* Collapsible sections */
+  document.querySelectorAll('main > section').forEach(function(sec){
+    const head=sec.querySelector('.section-head'); if(!head)return;
+    const body=document.createElement('div'); body.className='section-body';
+    let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+    sec.appendChild(body);
+    const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+    btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+    btn.addEventListener('click',function(){
+      const c=sec.classList.toggle('collapsed');
+      btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+      btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
     });
+    head.appendChild(btn);
   });
+
+  /* Expand a collapsed section when navigated to via jump nav */
+  function expandForHash(){var id=location.hash.replace('#','');if(!id)return;
+    var s=document.getElementById(id);
+    if(s&&s.tagName==='SECTION'&&s.classList.contains('collapsed')){
+      s.classList.remove('collapsed');
+      var b=s.querySelector('.collapse-btn');if(b){b.textContent='\u2212';b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse section');}}}
+  window.addEventListener('hashchange',expandForHash);expandForHash();
+
+  /* Back to top */
+  const toTop=document.getElementById('toTop');
+  function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
 })();
 </script>
 </body>
