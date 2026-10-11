@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>PepGen Deep-Dive Dossier · Audited Oct 10, 2026</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:1fr;gap:2px}.section-head>div:last-child{padding-right:50px}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · PEPG</span><span class="stamp">Deep-dive dossier · September 13, 2026 · audited October 10, 2026</span></div>
+        <h1>The market sold the class. PepGen is testing a different mechanism.</h1>
+        <p class="hero-dek">A source-weighted investigation of whether Novartis’s HARBOR failure invalidates DM1 splicing—or instead exposes a degrader, delivery, and endpoint problem that PepGen’s steric blocker may avoid.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$2.62</div>
+        <div class="quote-label">Fixed market snapshot · Oct 9, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$81M</strong> est. enterprise value · <strong>~$1.45</strong> est. cash per share<br>$181M implied equity (69.26M shares) · ~$100M est. cash &amp; securities</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#hold">Hold</a><a href="#harbor">HARBOR</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The question is narrower than the selloff</h2><p class="lede">HARBOR showed that one DMPK-degrading drug did not separate from placebo on vHOT. It did not show whether HARBOR achieved molecular correction, and it did not test PepGen’s non-degrading steric-block mechanism. Since then, Dyne’s one-year ACHIEVE data (landed Sept. 30) has partially rehabilitated vHOT as an endpoint—without resolving the degrader-versus-steric-block question.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$81M</div><p><span class="ev interp">INTERPRETATION</span> Oct 9: $181M implied equity less ~$100M estimated cash (June $117.2M less ~$17M Q3 burn at the H1 run rate). No debt identified. Estimate, not reported.</p></article>
+        <article class="decision"><div class="tag">Est. cash per share</div><div class="big">~$1.45</div><p><span class="ev interp">INTERPRETATION</span> ~$100M estimated cash ÷ 69.26M shares. This is not a liquidation floor: operating burn and future financing matter.</p></article>
+        <article class="decision warn"><div class="tag">Next decisive readout</div><div class="big">Nov. 2026</div><p><span class="ev unverified">UNVERIFIED</span> Company-guided FREEDOM2 10 mg/kg MAD data; cohort fully enrolled, seven of eight participants had completed dosing as of August 6 (latest disclosure).</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">Partial U.S. hold</div><p><span class="ev fact">FACT</span> FDA questions concern submitted preclinical pharmacology and toxicology; no U.S. sites are open. No new disclosure between Aug. 6 and Oct. 10, 2026.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>Why “splicing invalidated” is too broad</h3><ul><li>HARBOR disclosed an endpoint miss, not a molecular failure; Novartis released no DMPK-knockdown or splicing data.</li><li>PGN-EDODM1 blocks expanded CUG repeats without degrading DMPK, unlike del-desiran and z-basivarsen.</li><li>Peer-reviewed MARINA work linked inferred functional MBNL improvement with vHOT and QMT changes, although correlations were modest and do not prove pivotal efficacy.</li><li>Dyne’s Sept. 30 one-year ACHIEVE data showed vHOT improvement at 6 months and functional improvement versus placebo and a matched natural-history cohort at 12 months—partially rehabilitating vHOT as a measure, though z-basivarsen is a degrader.</li><li>The September selloff in PEPG was muted relative to DYN, consistent with differentiated mechanism but persistent endpoint risk.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the low price does not remove</h3><ul><li>The 5 mg/kg MAD mean was 7.3% versus 6.8% placebo; 22.9% required excluding one of six active patients.</li><li>vHOT is still a high-risk pivotal endpoint even after Dyne’s supportive data.</li><li>The U.S. hold has no disclosed resolution timeline.</li><li>Runway reaches into Q4 2027, but PepGen says significant additional funding is needed beyond initial 2026 readouts.</li><li>At $2.62 the stock is below the ~$3.10 RA Capital last-financing price cited by secondary sources—financing overhang, not confirmation of value.</li></ul></article>
+      </div>
+      <p class="source-note">Valuation inputs: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> and <a href="https://finnhub.io/?q=%22PEPG%22" target="_blank" rel="noopener">Finnhub market snapshot (Oct 9, 2026)</a>. HARBOR: <a href="https://www.novartis.com/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis, Sept. 8, 2026</a>. Dyne: <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">BioSpace/Dyne, Sept. 29, 2026</a>.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>The market is pricing a small operating stub</h2><p class="lede">At $2.62, implied equity was about $181M against roughly $100M of estimated cash. That makes the clinical platform cheap in enterprise-value terms, but not protected from burn, dilution, or a failed dose readout.</p></div></div>
+      <div class="chart-card">
+        <div class="chart-top"><div><div class="chart-title">PEPG daily close</div><div class="source-note">USD · fixed series through September 11, 2026</div></div><div class="range" role="group" aria-label="Chart range"><button data-range="63" aria-pressed="false">3M</button><button data-range="126" aria-pressed="false">6M</button><button data-range="252" aria-pressed="true">1Y</button></div></div>
+        <div class="chart-stats"><div class="chart-stat"><b id="rangeReturn">+148.3%</b><span>Range return</span></div><div class="chart-stat"><b id="rangeLow">$1.19</b><span>Closing low</span></div><div class="chart-stat"><b id="rangeHigh">$7.17</b><span>Closing high</span></div></div>
+        <div class="chart-shell" id="chartShell"><svg id="priceChart" role="img" aria-labelledby="chartTitle chartDesc" viewBox="0 0 1000 330" preserveAspectRatio="none"><title id="chartTitle">PEPG daily closing price</title><desc id="chartDesc">Interactive line chart of PepGen daily closes. Use the range buttons to view three, six, or twelve months.</desc></svg><div class="chart-tooltip" id="chartTip"></div></div>
+        <div class="chart-caption">The price chart is a dated build-time snapshot, not a live quote. Line scale starts above zero. Source: Finnhub instrument data; prior build fetched September 12, 2026.</div>
+      </div>
+      <div class="readthrough"><strong>October price action.</strong> <span class="ev fact">FACT</span> PEPG closed at $2.62 on October 9, 2026 (Finnhub), down ~12% from the September 11 snapshot close of $2.98. Finnhub 52-week range: $1.31–$7.80. Market capitalization is displayed at ~$166M on a stale share count; $2.62 × 69.26M August shares implies ~$181M. <span class="ev interp">INTERPRETATION</span> The drift since HARBOR is a slow bleed on no new disclosure, not a re-pricing on new information.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">SEP 8</span><h3>HARBOR misses</h3><p>Novartis disclosed no statistically significant vHOT benefit at 54 weeks in 159 participants. Numerical efficacy and biomarker data remain undisclosed.</p></article>
+        <article><span class="event-mark">SAME DAY</span><h3>DYN reprices harder</h3><p>Reuters reported Dyne down about 18%, a more direct read-through because z-basivarsen also degrades DMPK and uses vHOT in its registrational expansion.</p></article>
+        <article><span class="event-mark">SEP 30</span><h3>Dyne partially rehabilitates vHOT</h3><p>Dyne reported one-year ACHIEVE data: functional improvement versus baseline, placebo, and a matched natural-history cohort at 12 months; vHOT improvement at 6 months. <span class="ev interp">INTERPRETATION</span> This does not de-risk the degrader question for PepGen, but it weakens the “vHOT is dead” read.</p></article>
+      </div>
+      <p class="source-note"><a href="https://www.reuters.com/legal/litigation/dyne-sarepta-shares-tumble-novartis-setback-weighs-muscle-disease-drug-2026-09-08/" target="_blank" rel="noopener">Reuters sector reaction</a> · <a href="https://clinicaltrials.gov/study/NCT06411288" target="_blank" rel="noopener">HARBOR registry record</a> · <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Dyne WMS data</a>.</p>
+    </section>
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>The disease chain—and where a drug can break it</h2><p class="lede">DM1 is not simply low DMPK. Expanded CUG RNA is retained in nuclear foci, sequesters MBNL proteins, and drives a broad fetal-splicing reversion across muscle, heart, and brain.</p></div></div>
+      <div class="science-chain" aria-label="DM1 disease mechanism">
+        <article><b>01</b><h3>CTG expansion</h3><p>Expanded repeats in the DMPK 3′ UTR generate toxic CUG-repeat RNA. Repeat size and phenotype correlate only probabilistically because of somatic mosaicism and tissue differences.</p></article>
+        <article><b>02</b><h3>Nuclear RNA foci</h3><p>Expanded transcripts are retained in nuclei. Mouse models expressing CUG repeats outside the DMPK locus still develop myotonia and myopathy.</p></article>
+        <article><b>03</b><h3>MBNL sequestration</h3><p>MBNL proteins bind the repeats and become functionally depleted; CELF1 dysregulation adds a second splicing disturbance.</p></article>
+        <article><b>04</b><h3>Program-level spliceopathy</h3><p>CLCN1, BIN1, SCN5A, INSR and many other transcripts revert toward fetal isoforms, mapping to myotonia, weakness, conduction disease, and systemic features.</p></article>
+      </div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Strongest causal anchor</div><h3>Correcting one splice event can correct one phenotype</h3><p>In mice, morpholino correction of <em>Clcn1</em> splicing eliminated myotonia while other mis-splicing and nuclear foci persisted. That validates splicing as causal for a specific symptom—but also shows that one corrected transcript is not the whole disease.</p><p class="source-note"><span class="ev fact">FACT · MOUSE</span> <a href="https://pubmed.ncbi.nlm.nih.gov/18008009/" target="_blank" rel="noopener">Wheeler et al., JCI 2007</a>.</p></article>
+        <article class="paper-card"><div class="program-kicker">Clinical bridge</div><h3>Molecular correction has correlated with function</h3><p>In MARINA, inferred functional MBNL change correlated with QMT change (r=0.3612, p=0.0499) and vHOT change (r=−0.4250, p=0.0216). These are supportive associations from an early-stage study, not proof of Phase 3 success.</p><p class="source-note"><span class="ev fact">FACT · HUMAN</span> <a href="https://www.cell.com/molecular-therapy-family/molecular-therapy/pdf/S1525-0016(26)00198-X.pdf" target="_blank" rel="noopener">Molecular Therapy, 2026</a>.</p></article>
+      </div>
+      <div class="splice-table-wrap">
+        <table class="study-table splice-table"><thead><tr><th>Splice event</th><th>Linked phenotype</th><th>Causal strength</th><th>Why it matters</th></tr></thead><tbody>
+          <tr><td data-label="Splice event">CLCN1</td><td data-label="Phenotype">Myotonia</td><td data-label="Strength"><strong>A</strong></td><td data-label="Why it matters">Direct rescue in mouse is the strongest splice-to-symptom proof.</td></tr>
+          <tr><td data-label="Splice event">BIN1</td><td data-label="Phenotype">T-tubule defects / weakness</td><td data-label="Strength"><strong>A · mouse</strong></td><td data-label="Why it matters">Forced exon skipping reproduced structural and strength deficits.</td></tr>
+          <tr><td data-label="Splice event">SCN5A</td><td data-label="Phenotype">Conduction delay / arrhythmia</td><td data-label="Strength"><strong>A · mouse / B · human</strong></td><td data-label="Why it matters">A muscle-only readout cannot cover the cardiac disease burden.</td></tr>
+          <tr><td data-label="Splice event">INSR</td><td data-label="Phenotype">Insulin resistance</td><td data-label="Strength"><strong>B</strong></td><td data-label="Why it matters">DM1 is systemic; clinical value cannot be reduced to hand myotonia.</td></tr>
+        </tbody></table>
+      </div>
+      <p class="source-note">Foundational literature: Taneja et al., <em>J Cell Biol</em> 1995 (PMID 7896884) · <a href="https://pubmed.ncbi.nlm.nih.gov/10976074/" target="_blank" rel="noopener">Mankodi et al., Science 2000</a> · Kanadia et al., <em>Science</em> 2003 (PMID 14671308).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>PGN-EDODM1: a clean mechanism, an unresolved dose curve</h2><p class="lede">PepGen conjugates an arginine-rich cell-penetrating peptide to a neutral PMO. The PMO binds the expanded CUG tract and frees MBNL without cutting DMPK RNA.</p></div></div>
+      <div class="moa-box"><h3>Steric block in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> DM1 muscle cells trap the splicing protein MBNL on toxic CUG-repeat RNA. PGN-EDODM1 is a short synthetic oligo (a molecular “patch”) attached to a cell-penetrating peptide that drags it into muscle nuclei. It sticks to the repeat RNA and covers it, freeing MBNL to resume its normal splicing job—without destroying the DMPK transcript itself.</p><p><strong>Technical.</strong> A neutral phosphorodiamidate morpholino oligomer (PMO), complementary to the expanded CUG tract, conjugated to PepGen’s EDO (enhanced delivery oligonucleotide) arginine-rich peptide for systemic muscle delivery. Binding is steric blockade of MBNL sequestration, not RNase-mediated degradation: mutant and wild-type DMPK RNA are preserved, avoiding the haploinsufficiency concern attached to degrader competitors.</p></div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card">
+          <div class="program-kicker">Sole active clinical program</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">PGN-EDODM1 · DM1</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> FDA Fast Track and Orphan Drug; EMA Orphan Medicinal Product. All non-DM1 research programs are paused.</p>
+          <div class="status-row"><span class="pill">Phase 2 ongoing</span><span class="pill hold">Partial U.S. hold</span><span class="pill">IV Q4W in Phase 2</span></div>
+          <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Evidence status</th></tr></thead><tbody>
+            <tr><td data-label="Study">FREEDOM-DM1<br><small>NCT06204809</small></td><td data-label="Design">Phase 1 SAD; 24 adults; 5 / 10 / 15 mg/kg; biopsy at Day 28 and Week 16.</td><td data-label="Evidence">Completed; registry details partly mirror-derived.</td></tr>
+            <tr><td data-label="Study">FREEDOM2-DM1<br><small>NCT06667453</small></td><td data-label="Design">Phase 2, quadruple-masked; 24 estimated; Q4W × 12 weeks; primary endpoint AEs through Day 112.</td><td data-label="Evidence">Registry verified; company-reported dose cohorts.</td></tr>
+            <tr><td data-label="Study">FREEDOM-OLE<br><small>NCT07220603</small></td><td data-label="Design">Open-label extension; 48 planned; IV Q4W.</td><td data-label="Evidence">Recruiting via mirror; 16 enrolled company-reported Aug. 6.</td></tr>
+          </tbody></table>
+          <p class="source-note"><a href="https://clinicaltrials.gov/study/NCT06667453" target="_blank" rel="noopener">FREEDOM2 registry</a> · <a href="https://clinicaltrials.gov/study/NCT06204809" target="_blank" rel="noopener">FREEDOM registry</a> · <a href="https://clinicaltrials.gov/study/NCT07220603" target="_blank" rel="noopener">OLE registry</a>.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">Phase 1 · single dose · company-reported</div><h3>Mean splicing correction at Day 28</h3>
+          <div class="bar-set" aria-label="Single-dose mean splicing correction by dose">
+            <div class="bar-row"><div class="bar-label">5 mg/kg</div><div class="bar-track"><div class="bar-fill" style="width:22.9%"></div></div><div class="bar-value">12.3%</div></div>
+            <div class="bar-row"><div class="bar-label">10 mg/kg</div><div class="bar-track"><div class="bar-fill" style="width:54.2%"></div></div><div class="bar-value">29.1%</div></div>
+            <div class="bar-row"><div class="bar-label">15 mg/kg</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">53.7%</div></div>
+          </div>
+          <p class="source-note"><span class="ev unverified">UNVERIFIED</span> Different n by dose (6 / 4 / 6) and a 22-gene panel; no meaningful functional improvement versus placebo after a single dose. <a href="https://www.businesswire.com/news/home/20250924280988/en/PepGen-Announces-Highest-Mean-Splicing-Correction-Reported-in-DM1-Patients" target="_blank" rel="noopener">Company release</a>.</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">Phase 2 · 5 mg/kg MAD · n=8</div><h3 style="margin-top:6px">The low dose did not separate cleanly</h3><div class="outlier-metrics"><div><b>7.3%</b><span>Active mean · n=6</span></div><div><b>6.8%</b><span>Placebo mean · n=2</span></div><div><b>22.9%</b><span>Active ex-outlier · n=5</span></div></div><p style="font-size:13px;margin:0">One active participant worsened 70.8%, pulling down the mean. vHOT trends reverted to baseline by Week 16; no meaningful 10mWRT or handgrip improvement was observed.</p></div>
+        </article>
+      </div>
+      <div class="fail-grid" aria-label="Ways the steric-block mechanism could fail">
+        <article><h3>1 · Delivery at a tolerable dose</h3><p>The peptide must get enough PMO into human muscle nuclei at 10–12.5 mg/kg. Mouse proof (Pip6a-PMO) does not establish human therapeutic index.</p></article>
+        <article><h3>2 · Renal therapeutic index</h3><p>Arginine-rich PPMOs carry a renal/electrolyte class signal; a mild transient kidney-biomarker DLT already appeared at 15 mg/kg SAD. Repeat dosing can narrow the window.</p></article>
+        <article><h3>3 · Splicing → function break</h3><p>MARINA’s MBNL–function correlations were modest (r ≈ 0.36–0.43); CELF1 dysregulation is untouched by steric blockade. Correction can be real and still not move function.</p></article>
+        <article><h3>4 · Cardiac delivery gap</h3><p>Cardiac muscle is consistently harder for PPMOs to reach than skeletal muscle, while conduction disease is a major cause of DM1 mortality. Cardiac target engagement at clinical dose is not publicly established.</p></article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Safety signal to carry forward</h3><p>At 15 mg/kg SAD, one transient kidney-biomarker elevation met the protocol definition of a dose-limiting toxicity but was classified as mild and resolved without intervention. Earlier 10 mg/kg data included one treatment-related SAE of abdominal pain, described as potentially confounded by prohibited off-label medication.</p></article>
+        <article><h3>What FREEDOM2 has shown so far</h3><p><span class="ev unverified">UNVERIFIED</span> As of August 6, PepGen reported no SAEs or dose-limiting toxicities in FREEDOM2 or the OLE, no cumulative toxicity at 5 or 10 mg/kg, and no treatment discontinuations.</p></article>
+        <article><h3>What remains unknowable</h3><p><span class="ev gap">GAP</span> Public data do not establish durability, dose-response under repeat dosing, patient-level consistency, or whether higher molecular correction will convert to functional separation.</p></article>
+      </div>
+      <div class="delivery-panel">
+        <div><span class="ev interp">INTERPRETATION</span><h3>The platform diligence question is therapeutic index</h3><p>Peptide conjugation can transform systemic PMO uptake in DM1 mouse models, but arginine-rich PPMOs carry a renal/electrolyte class signal. PepGen has no identified peer-reviewed EDO platform paper, so product-specific NHP renal data at multiples of the intended dose remain the central preclinical evidence gap.</p></div>
+        <div><span class="ev gap">GAP</span><h3>Cardiac delivery</h3><p>Cardiac muscle is consistently harder for PPMOs to reach than skeletal muscle, while cardiac conduction disease is a major cause of DM1 mortality. Clinical-dose cardiac target engagement for PGN-EDODM1 is not publicly established in peer-reviewed evidence.</p></div>
+        <div><span class="ev fact">FACT · MOUSE</span><h3>Proof that peptide delivery can matter</h3><p>In HSA<sup>LR</sup> mice, Pip6a-PMO-CAG7 corrected splicing after systemic dosing; three doses abolished myotonia and corrected 85% of dysregulated transcripts. Mouse efficacy does not establish human therapeutic index.</p></div>
+      </div>
+      <p class="source-note">Delivery literature: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6819114/" target="_blank" rel="noopener">Klein et al., JCI 2019</a> · Roberts, Langer &amp; Wood, <em>Nat Rev Drug Discov</em> 2020 (PMID 32782413). Clinical claims: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> · <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526091536/pepg-20251231.htm" target="_blank" rel="noopener">FY2025 10-K</a> · <a href="https://www.businesswire.com/news/home/20260330100190/en/PepGen-Announces-Topline-Results-from-Lowest-Dose-5-mgkg-MAD-Cohort-in-the-Ongoing-Phase-2-FREEDOM2-Study-Demonstrating-Favorable-Safety-Splicing-and-vHOT-Data" target="_blank" rel="noopener">5 mg/kg company topline</a>.</p>
+    </section>
+
+    <section id="hold">
+      <div class="section-head"><div class="section-num">05 / HOLD</div><div><h2>The hold is a preclinical-pharm/tox problem until shown otherwise</h2><p class="lede">The filing is unusually explicit about what FDA did—and did not—cite. That narrows the issue, but does not make it trivial.</p></div></div>
+      <div class="quote-panel"><blockquote>“The partial clinical hold did not cite any questions regarding the blinded clinical data from the FREEDOM Phase 1 study previously submitted to the FDA.”</blockquote><cite>FY2025 10-K · PepGen’s description of FDA notice</cite></div>
+      <div class="hold-grid">
+        <article><span class="ev fact">FACT</span><h3>Restricted in the U.S.</h3><p>No U.S. FREEDOM2 sites are open. Enrollment and dosing continue in Canada, the U.K., South Korea, Australia, and New Zealand.</p></article>
+        <article><span class="ev fact">FACT</span><h3>Questions on prior studies</h3><p>The company says FDA questions concern previously submitted preclinical pharmacology and toxicology, and that additional analyses are being supplied.</p></article>
+        <article><span class="ev gap">GAP</span><h3>No disclosed timetable</h3><p>The hold remained in effect in the August 6 10-Q. There is no public target date for resolution or list of required studies, and no new disclosure was identified between Aug. 6 and Oct. 10, 2026.</p></article>
+        <article><span class="ev unverified">UNVERIFIED</span><h3>Reported mouse blood-pressure signal</h3><p>A Stifel note cited by BioSpace described reduced blood pressure in a subchronic mouse study, with no hypotension signal in NHP or Phase 1 SAD. This is not in the primary filing.</p></article>
+      </div>
+      <p class="source-note"><a href="https://www.businesswire.com/news/home/20260304006219/en/PepGen-Announces-Regulatory-Updates-on-FREEDOM2" target="_blank" rel="noopener">PepGen regulatory update</a> · <a href="https://www.biospace.com/fda/pepgens-mid-stage-myotonic-dystrophy-study-hit-with-surprise-pause" target="_blank" rel="noopener">BioSpace / Stifel recap</a>.</p>
+    </section>
+    <section id="harbor">
+      <div class="section-head"><div class="section-num">06 / HARBOR</div><div><h2>What failed—and what the press release cannot tell us</h2><p class="lede">HARBOR was a 159-person, 54-week Phase 3 trial of q8w del-desiran. The primary vHOT endpoint missed. Everything else central to mechanism interpretation remains undisclosed.</p></div></div>
+      <div class="harbor-grid">
+        <article class="harbor-fact"><h3>Known</h3><ul><li>Randomized, double-blind, placebo-controlled; 159 participants.</li><li>Seven IV doses, every eight weeks; primary endpoint vHOT through Week 54.</li><li>No statistically significant improvement versus placebo on vHOT.</li><li>Novartis said secondary and exploratory activity was observed, without numbers.</li><li>Safety was described as generally consistent with prior data.</li></ul></article>
+        <article class="harbor-gap"><h3>Unknown</h3><ul><li>vHOT effect size, confidence interval, or p-value.</li><li>HARBOR dose.</li><li>DMPK knockdown and splicing correction at 54 weeks.</li><li>Magnitude and consistency of secondary-endpoint effects.</li><li>Whether Novartis will continue, redesign, or stop the program.</li></ul></article>
+      </div>
+      <div class="readthrough"><strong>September 30 update: Dyne’s one-year ACHIEVE data.</strong> <span class="ev unverified">UNVERIFIED · COMPANY</span> Dyne reported that a pooled ACHIEVE MAD group (N=25–26; 3.4 mg/kg Q4W plus 5.4 and 6.8 mg/kg Q8W) showed functional improvement versus baseline, versus placebo, and versus a propensity-matched END-DM1 natural-history cohort across multiple measures at 12 months, with continued vHOT improvement at 6 months (Dyne press release, Sept. 29, 2026). <span class="ev interp">INTERPRETATION</span> This partially rehabilitates vHOT as a measurable clinical endpoint—it is no longer “dead” post-HARBOR—but it does not answer the degrader question: z-basivarsen degrades DMPK, exactly like the failed del-desiran. The steric-block versus degrader distinction for PepGen remains untested.</div>
+      <div class="scenario-table">
+        <div class="scenario-head"><span>Future HARBOR disclosure</span><span>Read-through to PepGen</span><span>Read-through to Dyne</span></div>
+        <div class="scenario-row"><span data-label="Disclosure"><b>No meaningful knockdown / splicing</b><small>Delivery or dose failure</small></span><span data-label="To PepGen">Limited; differentiated delivery becomes more important.</span><span data-label="To Dyne">Meaningful but not fatal; same TfR1 concept, different construct and chemistry.</span></div>
+        <div class="scenario-row"><span data-label="Disclosure"><b>Good molecular correction, no function</b><small>Mechanism-to-clinic break</small></span><span data-label="To PepGen">Bearish for the splicing hypothesis, though DMPK preservation remains a distinction.</span><span data-label="To Dyne">Most bearish: same DMPK-degradation consequence plus vHOT reliance.</span></div>
+        <div class="scenario-row"><span data-label="Disclosure"><b>Narrow vHOT miss, secondary wins</b><small>Endpoint / design problem</small></span><span data-label="To PepGen">vHOT becomes less credible; broader endpoints and longer trials likely needed.</span><span data-label="To Dyne">Directly negative for the Q1 2027 REC design and regulatory path.</span></div>
+      </div>
+      <p class="source-note"><span class="ev interp">INTERPRETATION</span> Scenario analysis, not prediction. Sources: <a href="https://www.novartis.com/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis</a> · <a href="https://clinicaltrials.gov/study/NCT06411288" target="_blank" rel="noopener">ClinicalTrials.gov</a> · <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Dyne WMS data</a>.</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">07 / LANDSCAPE</div><div><h2>Same disease target, materially different intervention</h2><p class="lede">The useful comparison is not “RNA therapy” versus “RNA therapy.” It is delivery, oligo chemistry, whether DMPK is degraded, endpoint choice, and evidence maturity.</p></div></div>
+      <div class="compare compare-four">
+        <article class="compare-card"><div class="program-kicker">PepGen</div><div class="name">PGN-EDODM1</div><dl><dt>Cargo / delivery</dt><dd>PMO + EDO peptide</dd><dt>Action</dt><dd>Steric block; DMPK preserved</dd><dt>Evidence</dt><dd>Phase 2; low-dose MAD mixed</dd><dt>Next</dt><dd>10 mg/kg data · Nov. 2026</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#9b3d1c">Novartis</div><div class="name">del-desiran</div><dl><dt>Cargo / delivery</dt><dd>siRNA + full TfR1 mAb</dd><dt>Action</dt><dd>Degrades mutant + wild-type DMPK</dd><dt>Evidence</dt><dd>Phase 3 vHOT miss</dd><dt>Key gap</dt><dd>No HARBOR biomarker data</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#7d6000">Dyne</div><div class="name">z-basivarsen</div><dl><dt>Cargo / delivery</dt><dd>Gapmer ASO + TfR1 Fab</dd><dt>Action</dt><dd>Degrades DMPK</dd><dt>Evidence</dt><dd>1-yr ACHIEVE MAD: functional improvement vs placebo + matched natural history (company-reported)</dd><dt>Next</dt><dd>REC topline Q1 2027; accel-approval filing target Q3 2027</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#4b6270">ARTHEx</div><div class="name">ATX-01</div><dl><dt>Cargo / delivery</dt><dd>IV anti-miR-23b oligo</dd><dt>Action</dt><dd>Raises MBNL translation; reduces foci</dd><dt>Evidence</dt><dd>Phase 1/2a, preliminary data only</dd><dt>Distinction</dt><dd>Direct MBNL-restoration strategy</dd></dl></article>
+      </div>
+      <div class="readthrough"><strong>Mandatory cross-trial caveat.</strong> Different assays, panels, doses, timepoints, populations, and sample sizes make the reported 53.7% PepGen SAD correction and Dyne’s 13–27% MAD correction non-comparable. This table maps mechanisms and evidence maturity; it is not an efficacy ranking.</div>
+      <p class="source-note">Dyne: <a href="https://www.neurology.org/doi/10.1212/WNL.0000000000217179" target="_blank" rel="noopener">AAN 2025 abstract</a> and <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Sept. 2026 one-year data</a>. ARTHEx: <a href="https://www.morningstar.com/news/pr-newswire/20260527la68576/arthex-biotech-delivers-multiple-presentations-at-idmc-15-highlighting-clinical-progress-of-atx-01-and-mechanistic-insights-for-myotonic-dystrophy-type-1-dm1-and-2-dm2" target="_blank" rel="noopener">IDMC-15 release</a>.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">08 / PIPELINE</div><div><h2>One asset, ranked by value</h2><p class="lede">PepGen is a single-asset company. Every dollar of enterprise value is a bet on PGN-EDODM1; the platform is an unpriced option until DM1 validates it.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">1</span><div><div class="pipe-name">PGN-EDODM1</div><div class="pipe-desc">Myotonic dystrophy type 1 (DM1)</div></div></div><div class="pipe-desc">Phase 2 (FREEDOM2). Carries essentially 100% of attributable pipeline value: all near-term catalysts, all functional and safety evidence, and all of the ~$81M operating stub. Fast Track + Orphan Drug (FDA); Orphan Medicinal Product (EMA). Sole registrational path.</div><div class="pipe-status">Phase 2 · active</div></div>
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">2</span><div><div class="pipe-name">EDO platform / paused programs</div><div class="pipe-desc">All non-DM1 research</div></div></div><div class="pipe-desc">Option value only. <span class="ev fact">FACT</span> All non-DM1 research programs are paused (Q2 2026 10-Q). Core EDO technology is in-licensed (OUI/MRC) with associated economics and diligence obligations—so platform value, if any, is encumbered. No value attributed in the bear/base framing until DM1 de-risks delivery.</div><div class="pipe-status dead">Paused · option</div></div>
+      </div>
+      <p class="source-note"><span class="ev interp">INTERPRETATION</span> Value ranking, not a company statement. Primary source for program status: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a>.</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The sequence that will resolve the thesis</h2><p class="lede">Catalysts are tagged by date quality: <span class="date-tag hard">HARD</span> confirmed date · <span class="date-tag guidance">GUIDANCE</span> company-guided window · <span class="date-tag inferred">INFERRED</span> estimated, not committed · <span class="date-tag gap">GAP</span> no timeline · <span class="date-tag landed">LANDED</span> already occurred. As of October 10, 2026.</p></div></div>
+      <div class="timeline">
+        <div class="event landed"><div class="event-date">SEP 29–30, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>Dyne 1-year ACHIEVE data at WMS</b>Pooled MAD (N=25–26) showed functional improvement versus baseline, placebo, and a propensity-matched END-DM1 natural-history cohort at 12 months; vHOT improvement at 6 months. <span class="ev interp">INTERPRETATION</span> Partially rehabilitates vHOT as an endpoint; does not test steric blockade (z-basivarsen is a degrader).</div></div>
+        <div class="event primary"><div class="event-date">NOV 2026<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>FREEDOM2 10 mg/kg MAD data — the central test</b><strong>What “good” looks like:</strong> mean splicing correction materially above the 5 mg/kg MAD with per-patient consistency across all 6 active participants (no outlier-driven story); no SAEs or dose-limiting toxicities; directional functional improvement (vHOT, 10mWRT, handgrip) versus the n=2 placebo.<br><strong>Watch for:</strong> full per-patient distribution and assay consistency with the SAD 22-gene panel; renal safety under repeat dosing; durability read; whether 12.5 mg/kg enrollment is confirmed underway.</div></div>
+        <div class="event"><div class="event-date">~NOV 11, 2026<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Q3 2026 earnings</b>MarketBeat reporting-schedule estimate, not a company commitment.<br><strong>What “good” looks like:</strong> cash ≥ ~$100M; ATM usage disclosed and modest; 12.5 mg/kg enrollment confirmed.<br><strong>Watch for:</strong> remaining ATM capacity, runway restatement, financing commentary ahead of the November readout.</div></div>
+        <div class="event"><div class="event-date">BY EARLY JAN 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>FREEDOM-OLE update</b>Sixteen participants were enrolled as of August 6, including six of eight from the 5 mg/kg cohort; DSMB recommended OLE dose escalation 5 → 10 mg/kg.<br><strong>What “good” looks like:</strong> no cumulative toxicity with longer repeat dosing; emerging durability trends.<br><strong>Watch for:</strong> dropouts and reasons; how many OLE participants are at 10 mg/kg.</div></div>
+        <div class="event"><div class="event-date">Q1 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>Dyne ACHIEVE registrational expansion topline</b>Primary endpoint: change from baseline in vHOT at 6 months (REC mean baseline vHOT 8.3 seconds); Dyne targets a U.S. accelerated-approval submission in Q3 2027.<br><strong>What “good” looks like (for PEPG):</strong> a clean vHOT win further rehabilitates the endpoint class PepGen also measures.<br><strong>Watch for:</strong> effect size versus the 8.3-second baseline; whether the filing timeline holds.</div></div>
+        <div class="event"><div class="event-date">1H 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>FREEDOM2 12.5 mg/kg data</b>DSMB recommended advancing to the highest dose cohort with no protocol modifications; enrollment start was “shortly” as of August 6—unconfirmed since.<br><strong>What “good” looks like:</strong> dose-response confirmation; therapeutic index holds at the highest dose.<br><strong>Watch for:</strong> renal signal at 12.5 mg/kg; then the end-of-Phase-2 meeting and registrational design.</div></div>
+        <div class="event"><div class="event-date">MAR 2027<br><span class="date-tag inferred">REGISTRY EST.</span></div><div class="event-body"><b>FREEDOM2 primary completion</b>Registry estimate, not a company commitment; planned end-of-Phase-2 meeting follows Cohorts 2 and 3, subject to data.</div></div>
+        <div class="event"><div class="event-date">UNKNOWN<br><span class="date-tag gap">GAP</span></div><div class="event-body"><b>U.S. partial-hold resolution</b>No company timetable is disclosed. Lifting the hold reopens U.S. sites and clears the registrational path; a requirement for new preclinical studies would extend timelines and burn.</div></div>
+      </div>
+      <p class="source-note">Timing: <a href="https://www.businesswire.com/news/home/20260806833210/en/PepGen-Reports-Second-Quarter-2026-Financial-Results-and-Recent-Corporate-Highlights" target="_blank" rel="noopener">PepGen Q2 release</a> · <a href="https://clinicaltrials.gov/study/NCT06667453" target="_blank" rel="noopener">FREEDOM2 registry</a> · <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Dyne WMS data</a> · Q3 earnings date estimate via MarketBeat.</p>
+    </section>
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">10 / SCENARIOS</div><div><h2>Bear, base, bull—with soft price anchors</h2><p class="lede">Scenario-based soft targets built from this dossier’s own numbers. These are illustrative anchors tied to the November readout, not price targets or recommendations.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear case</div><div class="pt">$0.75–$1.25</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> 10 mg/kg fails to separate on splicing or function, or a renal/safety signal halts escalation.</li><li><strong>Math:</strong> EV collapses to a ~$0–20M stub; equity = ~$100M cash less 2–3 quarters of additional burn and wind-down costs (~$35–50M) ≈ $50–65M ÷ 69.26M shares ≈ $0.72–0.94. A distressed raise would expand the share count and push lower.</li><li><strong>Why it’s bounded:</strong> cash is real (June: $117.2M), but it is not a floor—burn continues and financing at distressed prices is punitive.</li></ul></article>
+        <article class="scen-card base"><div class="tag">Base case</div><div class="pt">$3.00–$4.00</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> 10 mg/kg is constructive but mixed—splicing improvement without clean functional separation; 12.5 mg/kg becomes the decider.</li><li><strong>Math:</strong> EV re-rates to ~$150–200M (≈2–2.5× the current stub); post-raise equity ≈ $175M EV + ~$150M pro-forma cash (est. $100M − ~$25M burn + ~$75M raise at ~$2.50–3.00, adding ~25–30M shares) ≈ $325M ÷ ~94M fully diluted shares ≈ $3.46.</li><li><strong>Why this range:</strong> acknowledges both the higher-dose optionality and the near-certain dilutive financing the 10-Q flags as needed beyond initial 2026 readouts.</li></ul></article>
+        <article class="scen-card bull"><div class="tag">Bull case</div><div class="pt">$8.00–$11.00</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> 10 mg/kg shows clean, consistent separation—splicing correction with per-patient consistency, no SAEs/DLTs, and directional-to-meaningful functional improvement versus placebo.</li><li><strong>Math:</strong> EV re-rates to ~$450–650M (DM1 lead steric blocker + platform optionality; no cross-trial efficacy ranking against Dyne is made); equity ≈ $550M EV + ~$100M cash ≈ $650M ÷ 69.26M shares ≈ $9.39.</li><li><strong>Ceiling discipline:</strong> the top of this range is capped at/below the $11.40 sell-side consensus average (MarketBeat, Oct. 2026, six firms, “Moderate Buy”)—maximum-value cases do not overshoot the street.</li></ul></article>
+      </div>
+      <div class="assump"><b>Shared assumptions (all scenarios):</b> 69.26M shares outstanding (Aug. 2, 2026, 10-Q); est. cash ~$100M at Sept. 30, 2026 (<span class="ev interp">INTERPRETATION</span>: $117.2M June less ~$17M Q3 burn at the H1 2026 run rate); no debt; no probability assigned to any scenario. External anchors for context only: MarketBeat consensus “Moderate Buy,” average price target $11.40 (secondary aggregator, <span class="ev unverified">UNVERIFIED</span>); one independent writeup (Han Seoul Ohno, Aug. 2026) modeled a 35–40% mean splice correction rerating the stock toward $5–6/share on a positive readout (<span class="ev unverified">UNVERIFIED</span> secondary opinion).</div>
+      <p class="source-note">Share count and cash: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a>. Consensus data: <a href="http://www.marketbeat.com/stocks/NASDAQ/PEPG/" target="_blank" rel="noopener">MarketBeat</a>. Independent model: <a href="https://hanseoulohno.substack.com/p/speculative-series-pepgen-inc-pepg" target="_blank" rel="noopener">Substack</a>.</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">11 / FINANCIALS</div><div><h2>Cheap enterprise value, expensive path</h2><p class="lede">The balance sheet can fund the decisive readouts. It cannot fund a registrational program without more capital, and a low share price makes that financing more punitive.</p></div></div>
+      <div class="fin-grid">
+        <div><div class="metric-stack"><div class="metric"><b>$117.2M</b><span>Cash, equivalents &amp; securities · Jun. 30, 2026</span></div><div class="metric"><b>$34.2M</b><span>Operating cash used · 6M 2026</span></div><div class="metric"><b>$17.8M</b><span>Q2 2026 net loss</span></div><div class="metric"><b>$396.7M</b><span>Accumulated deficit · Jun. 30, 2026</span></div></div><div class="runway"><b>Company-guided into Q4 2027</b><p>Covers “currently planned operations.” The 10-Q says significant additional funding is needed to advance PGN-EDODM1 beyond initial 2026 FREEDOM2 data.</p></div></div>
+        <article class="paper-card"><h3>Capital structure and overhang</h3><table class="cap-table"><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Shares outstanding · Aug. 2</td><td>69.26M</td></tr><tr><td>Options outstanding · $4.89 WAEP</td><td>8.14M</td></tr><tr><td>Unvested service RSUs</td><td>1.10M</td></tr><tr><td>Total reserved shares</td><td>13.32M</td></tr><tr><td>Reserved / outstanding</td><td>~19%</td></tr><tr><td>Debt / preferred / warrants identified</td><td>None</td></tr></tbody></table><div class="overhang"><b>$400M shelf + $100M ATM</b><p style="font-size:13px;margin:7px 0 0">Both are available financing tools; remaining capacity is not disclosed in the reviewed material.</p></div></article>
+      </div>
+      <div class="valuation-bridge">
+        <div><span>Equity value</span><b>$206.4M</b><small>$2.98 × 69.26M · Sep 11, 2026</small></div><i>−</i><div><span>June cash &amp; securities</span><b>$117.2M</b><small>Before ongoing burn</small></div><i>=</i><div class="bridge-result"><span>Approx. enterprise value</span><b>~$89.2M</b><small><span class="ev interp">INTERPRETATION</span> · Sep 11 snapshot</small></div>
+      </div>
+      <div class="readthrough"><strong>October 9 update.</strong> <span class="ev interp">INTERPRETATION</span> $2.62 × 69.26M ≈ $181M implied equity, less ~$100M estimated cash (June $117.2M less ~$17M Q3 burn at the H1 run rate) → est. EV ≈ $81M. Burn estimate only; Q3 2026 results are expected ~November 11, 2026 (inferred, not company-guided).</div>
+      <div class="readthrough"><strong>Nominal downside is not capped at cash per share.</strong> ~$1.45/share is a snapshot ratio, not a floor: clinical failure can accelerate wind-down costs, financing needs, and value destruction. Conversely, a positive 10 mg/kg readout would reprice a currently small operating EV, but no probability is assigned here.</div>
+      <p class="source-note">Financials and equity: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a>. Market snapshot: <a href="https://finnhub.io/?q=%22PEPG%22" target="_blank" rel="noopener">Finnhub (Oct 9, 2026)</a>.</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management and insider signals</h2><p class="lede">The signal is institutional sponsorship without insider buying. RA Capital is dominant; officers are economically incentivized, but mostly through grants and repriced options.</p></div></div>
+      <div class="people-grid">
+        <article class="paper-card"><h3>Leadership</h3><dl class="people-list"><dt>James McArthur, Ph.D.</dt><dd>President &amp; CEO; 2025 total compensation $3.32M.</dd><dt>Noel P. Donnelly, M.B.A.</dt><dd>CFO; 2025 total compensation $1.76M.</dd><dt>Joseph D. Vittiglio, J.D.</dt><dd>Chief Business &amp; Legal Officer; joined December 2025.</dd><dt>Paul Streck, M.D., M.B.A.</dt><dd>EVP, R&amp;D.</dd></dl></article>
+        <article class="paper-card"><h3>Ownership concentration</h3><dl class="people-list"><dt>RA Capital affiliates</dt><dd>29.1%; two board seats; participated in 2024 and 2025 financings.</dd><dt>Oxford Science Enterprises</dt><dd>7.2%.</dd><dt>Commodore / Viking</dt><dd>5.1% / 5.0%.</dd><dt>Officers &amp; directors as a group</dt><dd>1.3% on the proxy basis.</dd></dl></article>
+        <article class="paper-card"><h3>Insider read</h3><ul class="check-list"><li>No open-market buys by McArthur, Donnelly, or directors in the last 12 months.</li><li>March officer sales were mandatory sell-to-cover transactions, not discretionary trades.</li><li>3.56M employee options were repriced to $4.53, with a service condition generally through March 31, 2027.</li><li><span class="ev gap">GAP</span> Two Form 4 bodies could not be retrieved.</li></ul></article>
+      </div>
+      <p class="source-note">Primary source: <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526186927/pepg-20260428.htm" target="_blank" rel="noopener">2026 proxy</a> and Form 4s available through the <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001835597&type=&dateb=&owner=include&count=40&action=getcompany" target="_blank" rel="noopener">EDGAR company index</a>.</p>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">13 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">The first five can alter value on a near-term timeline. The rest determine durability if the November dataset is constructive.</p></div></div>
+      <ol class="risk-list">
+        <li><b>Single-asset dependence</b><span>PGN-EDODM1 is the only product candidate in clinical development; all other research is paused.</span></li>
+        <li><b>Unresolved U.S. hold</b><span>No U.S. sites and no disclosed resolution timetable.</span></li>
+        <li><b>Weak low-dose separation</b><span>5 mg/kg MAD was 7.3% versus 6.8% placebo; ex-outlier analysis drives the constructive reading.</span></li>
+        <li><b>vHOT endpoint risk</b><span>HARBOR failed on vHOT, which FREEDOM2 also measures and Dyne uses in its REC. Dyne’s Sept. 30 data only partially rehabilitates it.</span></li>
+        <li><b>Financing wall</b><span>Runway into Q4 2027; more capital required beyond initial 2026 readouts.</span></li>
+        <li><b>Dilution overhang</b><span>~19% of outstanding shares reserved; shelf and ATM create issuance capacity.</span></li>
+        <li><b>Governance optics</b><span>3.56M employee options repriced after stock weakness, with a March 2027 retention cliff.</span></li>
+        <li><b>Licensed platform IP</b><span>Core EDO technology depends on OUI/MRC license economics and diligence obligations.</span></li>
+        <li><b>No revenue / thin insider ownership</b><span>$396.7M accumulated deficit; officers and directors hold 1.3%.</span></li>
+        <li><b>Litigation overhang</b><span>Trade-press investigations followed 2026 events; no new filed suit was identified. Earlier Karam action was dismissed.</span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">14 / OPEN</div><div><h2>The evidence that would change the view</h2><p class="lede">A deep dive should end with falsifiers, not a verdict. These are the highest-value missing pieces as of October 10, 2026.</p></div></div>
+      <div class="open-grid">
+        <article><span>01</span><h3>Full HARBOR dataset</h3><p>Numerical vHOT and secondary results, DMPK knockdown, splicing correction, and patient-level consistency.</p></article>
+        <article><span>02</span><h3>FREEDOM2 10 mg/kg</h3><p>Pre-specified analysis, all-patient distribution, assay details, safety, durability, and functional outcomes—not just group means.</p></article>
+        <article><span>03</span><h3>Hold resolution package</h3><p>Specific FDA questions, whether new studies are required, and a credible timeline to reopen U.S. sites.</p></article>
+        <article><span>04</span><h3>Dose-curve integrity</h3><p>Whether repeat-dose tissue concentration and splicing scale consistently from 5 to 10 and 12.5 mg/kg.</p></article>
+        <article><span>05</span><h3>Cash and issuance</h3><p>Q3 2026 cash, remaining ATM capacity, and financing strategy after the November readout.</p></article>
+        <article><span>06</span><h3>12.5 mg/kg start</h3><p>Confirmation that the highest-dose cohort enrolled after the August “shortly” guidance.</p></article>
+      </div>
+      <div class="verdict-box"><div><span class="ev interp">INTERPRETATION</span><h3>Current research posture</h3></div><p>The sub-$3 setup offers large percentage sensitivity to a successful higher-dose readout because the operating EV is small. But the thesis is not “cash-backed safety”; it is that the market may be overgeneralizing a degrader/vHOT failure to a differentiated steric blocker before the decisive 10 mg/kg data. That hypothesis is coherent, not proven.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">15 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Filings, registries, and peer-reviewed literature carry the most weight. Company claims remain labeled unverified until corroborated.</p></div></div>
+      <div class="sources">
+        <article class="source-group"><h3>SEC &amp; registries</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526336754/pepg-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q<small>SEC EDGAR · filed Aug. 6, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526091536/pepg-20251231.htm" target="_blank" rel="noopener">FY2025 10-K<small>SEC EDGAR · filed Mar. 4, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1835597/000119312526186927/pepg-20260428.htm" target="_blank" rel="noopener">2026 DEF 14A<small>SEC EDGAR · filed Apr. 28, 2026</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06667453" target="_blank" rel="noopener">FREEDOM2-DM1<small>ClinicalTrials.gov · NCT06667453</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06411288" target="_blank" rel="noopener">HARBOR<small>ClinicalTrials.gov · NCT06411288</small></a>
+        </article>
+        <article class="source-group"><h3>Peer-reviewed science</h3>
+          <p class="source-note">Taneja et al., <em>J Cell Biol</em> 1995 (PMID 7896884) · nuclear foci in DM1<br>Kanadia et al., <em>Science</em> 2003 (PMID 14671308) · MBNL1-loss model</p>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/10976074/" target="_blank" rel="noopener">Mankodi et al., 2000<small>CUG-repeat sufficiency in mouse</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/18008009/" target="_blank" rel="noopener">Wheeler et al., 2007<small>Clcn1 splice correction rescues myotonia in mouse</small></a>
+          <a href="https://www.cell.com/molecular-therapy-family/molecular-therapy/pdf/S1525-0016(26)00198-X.pdf" target="_blank" rel="noopener">Molecular Therapy, 2026<small>MARINA molecular pathology and function correlations</small></a>
+          <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0331163" target="_blank" rel="noopener">END-DM1 protocol, 2026<small>Natural history, heterogeneity, vHOT methodology</small></a>
+        </article>
+        <article class="source-group"><h3>Company disclosures · unverified tier</h3>
+          <a href="https://www.businesswire.com/news/home/20260806833210/en/PepGen-Reports-Second-Quarter-2026-Financial-Results-and-Recent-Corporate-Highlights" target="_blank" rel="noopener">PepGen Q2 update<small>Aug. 6, 2026</small></a>
+          <a href="https://www.businesswire.com/news/home/20260330100190/en/PepGen-Announces-Topline-Results-from-Lowest-Dose-5-mgkg-MAD-Cohort-in-the-Ongoing-Phase-2-FREEDOM2-Study-Demonstrating-Favorable-Safety-Splicing-and-vHOT-Data" target="_blank" rel="noopener">FREEDOM2 5 mg/kg topline<small>Mar. 30, 2026</small></a>
+          <a href="https://www.businesswire.com/news/home/20250924280988/en/PepGen-Announces-Highest-Mean-Splicing-Correction-Reported-in-DM1-Patients" target="_blank" rel="noopener">FREEDOM Phase 1 data<small>Sept. 24, 2025</small></a>
+          <a href="https://www.novartis.com/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis HARBOR update<small>Sept. 8, 2026</small></a>
+          <a href="https://www.biospace.com/press-releases/dyne-therapeutics-announces-additional-one-year-clinical-data-from-phase-1-2-achieve-trial-of-z-basivarsen-dyne-101-for-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Dyne one-year ACHIEVE data<small>Sept. 29, 2026 · company release</small></a>
+        </article>
+        <article class="source-group"><h3>Context &amp; market</h3>
+          <a href="https://www.reuters.com/legal/litigation/dyne-sarepta-shares-tumble-novartis-setback-weighs-muscle-disease-drug-2026-09-08/" target="_blank" rel="noopener">Reuters sector selloff<small>Sept. 8, 2026</small></a>
+          <a href="https://www.neurology.org/doi/10.1212/WNL.0000000000217179" target="_blank" rel="noopener">Dyne AAN abstract<small>ACHIEVE 12-month conference evidence</small></a>
+          <a href="https://www.morningstar.com/news/pr-newswire/20260218la90836/the-new-england-journal-of-medicine-publishes-results-from-phase-12-marina-trial-of-delpacibart-etedesiran-del-desiran-for-treatment-of-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">MARINA NEJM summary<small>Feb. 2026</small></a>
+          <a href="https://finnhub.io/?q=%22PEPG%22" target="_blank" rel="noopener">PEPG market data<small>Finnhub snapshot · Oct. 9, 2026</small></a>
+          <a href="https://hanseoulohno.substack.com/p/speculative-series-pepgen-inc-pepg" target="_blank" rel="noopener">Independent PEPG writeup<small>Substack · Aug. 2026 · secondary opinion</small></a>
+          <a href="http://www.marketbeat.com/stocks/NASDAQ/PEPG/" target="_blank" rel="noopener">Analyst consensus<small>MarketBeat · “Moderate Buy,” avg PT $11.40</small></a>
+        </article>
+      </div>
+      <div class="method"><strong>Method.</strong> Original build as of September 13, 2026; audited and updated as of October 10, 2026. Filings used: Q2 2026 10-Q, FY2025 10-K, 2026 DEF 14A, May 2026 S-3, and available Form 4s. Evidence labels distinguish primary/peer-reviewed fact, interpretation, gap, and unverified company or secondary claims. Cross-trial comparisons are not head-to-head. Scenario anchors in section 10 are soft and illustrative; no probability estimate or recommendation is included.</div>
+    </section>
+  </main>
+
+  <footer><strong>PEPG deep-dive dossier</strong> · Built September 13, 2026 · audited October 10, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    const prices=[["2025-09-02",1.2],["2025-09-03",1.19],["2025-09-04",1.28],["2025-09-05",1.4],["2025-09-08",1.49],["2025-09-09",1.48],["2025-09-10",1.4],["2025-09-11",1.35],["2025-09-12",1.48],["2025-09-15",1.59],["2025-09-16",1.94],["2025-09-17",1.87],["2025-09-18",2.05],["2025-09-19",1.88],["2025-09-22",2.12],["2025-09-23",1.95],["2025-09-24",2.66],["2025-09-25",5.88],["2025-09-26",5.07],["2025-09-29",4.64],["2025-09-30",4.62],["2025-10-01",4.71],["2025-10-02",5.08],["2025-10-03",5.13],["2025-10-06",4.96],["2025-10-07",4.91],["2025-10-08",4.87],["2025-10-09",5.03],["2025-10-10",4.715],["2025-10-13",4.55],["2025-10-14",4.58],["2025-10-15",4.89],["2025-10-16",4.8],["2025-10-17",4.89],["2025-10-20",4.95],["2025-10-21",4.88],["2025-10-22",4.55],["2025-10-23",4.5],["2025-10-24",4.57],["2025-10-27",5.43],["2025-10-28",4.98],["2025-10-29",4.51],["2025-10-30",4.53],["2025-10-31",4.66],["2025-11-03",4.53],["2025-11-04",4.53],["2025-11-05",4.54],["2025-11-06",4.21],["2025-11-07",4.62],["2025-11-10",4.26],["2025-11-11",4.65],["2025-11-12",5.13],["2025-11-13",4.89],["2025-11-14",4.74],["2025-11-17",5.35],["2025-11-18",5.74],["2025-11-19",5.53],["2025-11-20",5.09],["2025-11-21",5.56],["2025-11-24",5.79],["2025-11-25",6.05],["2025-11-26",6.09],["2025-11-28",6.44],["2025-12-01",5.79],["2025-12-02",5.1],["2025-12-03",5.25],["2025-12-04",5.31],["2025-12-05",5.44],["2025-12-08",5.59],["2025-12-09",5.7],["2025-12-10",5.85],["2025-12-11",5.74],["2025-12-12",5.66],["2025-12-15",5.47],["2025-12-16",5.52],["2025-12-17",5.27],["2025-12-18",5.2],["2025-12-19",5.42],["2025-12-22",5.44],["2025-12-23",5.34],["2025-12-24",5.78],["2025-12-26",5.81],["2025-12-29",6.11],["2025-12-30",6.42],["2025-12-31",6.51],["2026-01-02",7.17],["2026-01-05",6.67],["2026-01-06",6.84],["2026-01-07",7.15],["2026-01-08",6.74],["2026-01-09",6.47],["2026-01-12",5.68],["2026-01-13",5.6],["2026-01-14",5.15],["2026-01-15",4.99],["2026-01-16",5.2],["2026-01-20",5.95],["2026-01-21",5.41],["2026-01-22",5.63],["2026-01-23",5.45],["2026-01-26",5.31],["2026-01-27",5.6],["2026-01-28",5.22],["2026-01-29",5.22],["2026-01-30",5.13],["2026-02-02",5.08],["2026-02-03",5.36],["2026-02-04",4.91],["2026-02-05",4.29],["2026-02-06",4.48],["2026-02-09",4.67],["2026-02-10",5.51],["2026-02-11",5.73],["2026-02-12",6.79],["2026-02-13",6.44],["2026-02-17",6.79],["2026-02-18",6.54],["2026-02-19",6.66],["2026-02-20",6.22],["2026-02-23",6.34],["2026-02-24",6.32],["2026-02-25",6.4],["2026-02-26",6.24],["2026-02-27",6.22],["2026-03-02",6.53],["2026-03-03",6.42],["2026-03-04",6.76],["2026-03-05",5.505],["2026-03-06",5.685],["2026-03-09",5.57],["2026-03-10",6.16],["2026-03-11",6.29],["2026-03-12",6.15],["2026-03-13",5.325],["2026-03-16",5.35],["2026-03-17",5.09],["2026-03-18",5.12],["2026-03-19",4.77],["2026-03-20",4.7],["2026-03-23",4.78],["2026-03-24",4.72],["2026-03-25",4.88],["2026-03-26",4.89],["2026-03-27",4.52],["2026-03-30",4.23],["2026-03-31",1.77],["2026-04-01",1.74],["2026-04-02",1.73],["2026-04-06",1.82],["2026-04-07",1.67],["2026-04-08",1.66],["2026-04-09",1.61],["2026-04-10",1.64],["2026-04-13",1.69],["2026-04-14",1.69],["2026-04-15",1.72],["2026-04-16",1.67],["2026-04-17",1.7],["2026-04-20",1.73],["2026-04-21",1.61],["2026-04-22",1.66],["2026-04-23",1.59],["2026-04-24",1.54],["2026-04-27",1.6],["2026-04-28",1.58],["2026-04-29",1.55],["2026-04-30",1.64],["2026-05-01",1.75],["2026-05-04",1.8],["2026-05-05",1.93],["2026-05-06",1.845],["2026-05-07",1.79],["2026-05-08",1.76],["2026-05-11",1.7],["2026-05-12",1.68],["2026-05-13",1.78],["2026-05-14",1.65],["2026-05-15",1.55],["2026-05-18",1.47],["2026-05-19",1.38],["2026-05-20",1.44],["2026-05-21",1.54],["2026-05-22",1.51],["2026-05-26",1.53],["2026-05-27",1.52],["2026-05-28",1.5],["2026-05-29",1.5],["2026-06-01",1.47],["2026-06-02",1.45],["2026-06-03",1.42],["2026-06-04",1.48],["2026-06-05",1.41],["2026-06-08",1.35],["2026-06-09",1.38],["2026-06-10",1.38],["2026-06-11",1.51],["2026-06-12",1.47],["2026-06-15",1.53],["2026-06-16",1.59],["2026-06-17",1.7],["2026-06-18",1.79],["2026-06-22",1.83],["2026-06-23",1.82],["2026-06-24",1.77],["2026-06-25",1.71],["2026-06-26",1.7],["2026-06-29",1.78],["2026-06-30",1.8],["2026-07-01",1.81],["2026-07-02",1.76],["2026-07-06",1.89],["2026-07-07",2.05],["2026-07-08",1.99],["2026-07-09",2.3],["2026-07-10",2.34],["2026-07-13",2.44],["2026-07-14",2.44],["2026-07-15",2.4],["2026-07-16",2.25],["2026-07-17",2.25],["2026-07-20",2.2],["2026-07-21",2.12],["2026-07-22",1.92],["2026-07-23",2.1],["2026-07-24",1.93],["2026-07-27",1.9],["2026-07-28",1.83],["2026-07-29",1.71],["2026-07-30",1.78],["2026-07-31",1.76],["2026-08-03",1.88],["2026-08-04",1.93],["2026-08-05",1.98],["2026-08-06",2.41],["2026-08-07",2.85],["2026-08-10",2.99],["2026-08-11",2.9],["2026-08-12",2.9],["2026-08-13",2.98],["2026-08-14",2.99],["2026-08-17",3.04],["2026-08-18",2.91],["2026-08-19",3.05],["2026-08-20",3.035],["2026-08-21",3.14],["2026-08-24",3.19],["2026-08-25",3.425],["2026-08-26",3.22],["2026-08-27",3.07],["2026-08-28",3.08],["2026-08-31",2.99],["2026-09-01",3.12],["2026-09-02",3.18],["2026-09-03",3.18],["2026-09-04",3.11],["2026-09-08",3.21],["2026-09-09",3.15],["2026-09-10",3.02],["2026-09-11",2.98]];
+
+    const svg=document.getElementById('priceChart'), shell=document.getElementById('chartShell'), tip=document.getElementById('chartTip');
+    let range=252, visible=[];
+    const NS='http://www.w3.org/2000/svg';
+    function el(name,attrs){attrs=attrs||{};const n=document.createElementNS(NS,name);for(const k of Object.keys(attrs))n.setAttribute(k,attrs[k]);return n}
+    function money(v){return '$'+v.toFixed(2)}
+    function prettyDate(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}
+    function themeVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+    function render(){
+      visible=prices.slice(-range); svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(function(n){n.remove()});
+      const W=1000,H=330,L=62,R=20,T=20,B=42; const vals=visible.map(function(d){return d[1]}); const min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); const pad=(max-min)*.12||1; const lo=Math.max(0,min-pad),hi=max+pad;
+      const lineC=themeVar('--chart-line'), areaC=themeVar('--chart-area'), gridC=themeVar('--chart-grid'), textC=themeVar('--chart-text');
+      const x=function(i){return L+i*(W-L-R)/(visible.length-1)}, y=function(v){return T+(hi-v)*(H-T-B)/(hi-lo)};
+      const grid=el('g');
+      for(let i=0;i<5;i++){const val=lo+(hi-lo)*(4-i)/4, yy=T+i*(H-T-B)/4;grid.append(el('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:gridC,'stroke-width':'1'}));const tx=el('text',{x:L-10,y:yy+4,'text-anchor':'end',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent='$'+val.toFixed(2);grid.append(tx)}
+      const ticks=[0,Math.floor((visible.length-1)/2),visible.length-1];ticks.forEach(function(i){const tx=el('text',{x:x(i),y:H-13,'text-anchor':i===0?'start':i===visible.length-1?'end':'middle',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent=new Date(visible[i][0]+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'});grid.append(tx)});svg.append(grid);
+      let d='';visible.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(2)+','+y(p[1]).toFixed(2)});const area=el('path',{d:d+'L'+x(visible.length-1)+','+(H-B)+'L'+x(0)+','+(H-B)+'Z',fill:areaC,opacity:'.75'});svg.append(area);svg.append(el('path',{d:d,fill:'none',stroke:lineC,'stroke-width':'3','vector-effect':'non-scaling-stroke','stroke-linejoin':'round'}));
+      const hover=el('g',{opacity:'0'});const vline=el('line',{y1:T,y2:H-B,stroke:'#d85f2a','stroke-width':'1.5','stroke-dasharray':'4 4','vector-effect':'non-scaling-stroke'}),dot=el('circle',{r:'6',fill:'#fff',stroke:'#d85f2a','stroke-width':'3','vector-effect':'non-scaling-stroke'});hover.append(vline,dot);svg.append(hover);
+      const hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent',tabindex:'0','aria-label':'Explore chart values'});svg.append(hit);
+      function show(evt){const rect=shell.getBoundingClientRect(), px=Math.max(0,Math.min(rect.width,(evt.clientX||rect.left)-rect.left));const plotLeft=L/W*rect.width,plotRight=(W-R)/W*rect.width;const frac=Math.max(0,Math.min(1,(px-plotLeft)/(plotRight-plotLeft)));const i=Math.round(frac*(visible.length-1)),p=visible[i],xx=x(i),yy=y(p[1]);hover.setAttribute('opacity','1');vline.setAttribute('x1',xx);vline.setAttribute('x2',xx);dot.setAttribute('cx',xx);dot.setAttribute('cy',yy);tip.style.display='block';tip.style.left=(xx/W*rect.width)+'px';tip.style.top=(yy/H*rect.height)+'px';tip.textContent=prettyDate(p[0])+' · '+money(p[1])}
+      hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',function(){hover.setAttribute('opacity','0');tip.style.display='none'});
+      const ret=(visible[visible.length-1][1]/visible[0][1]-1)*100;document.getElementById('rangeReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';document.getElementById('rangeLow').textContent=money(min);document.getElementById('rangeHigh').textContent=money(max);
+    }
+    document.querySelectorAll('.range button').forEach(function(b){b.addEventListener('click',function(){range=Number(b.dataset.range);document.querySelectorAll('.range button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render()})});
+    render();
+
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀ Light mode':'◐ Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('pepg-theme',t)}catch(e){}render()}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('pepg-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>
