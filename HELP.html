@@ -1,380 +1,526 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/><meta content="light dark" name="color-scheme"/><link href="data:," rel="icon"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>HELP — Helus Pharma Inc. · Deep-Dive Dossier · 2026-10-10</title>
-<style>
-  :root{
-    --ink:#1a2230; --ink2:#3c4657; --mut:#68748a; --line:#dde3ec; --bg:#f7f8fa;
-    --card:#ffffff; --accent:#1d4ed8; --accent2:#0e7490; --good:#166534; --warn:#92400e; --bad:#991b1b;
-    --pill:#eef2f7;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-  header.hero{background:#101a2e;color:#fff;padding:46px 0 34px}
-  header.hero h1{margin:0 0 6px;font-size:34px;letter-spacing:.2px}
-  header.hero h1 .tick{color:#9fc1ff}
-  header.hero .sub{color:#c4cfdf;font-size:15px;max-width:820px}
-  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-  .meta span{background:#1c2a46;border:1px solid #31415f;color:#dbe5f5;font-size:12.5px;padding:4px 10px;border-radius:20px}
-  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-  nav.toc .wrap{display:flex;gap:2px;overflow-x:auto;padding:10px 22px}
-  nav.toc a{white-space:nowrap;font-size:14px;color:var(--ink2);text-decoration:none;padding:12px 14px;border-radius:8px;display:inline-flex;align-items:center;min-height:44px}
-  nav.toc a:hover{background:var(--pill);color:var(--accent)}
-  main{padding:26px 0 60px}
-  section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 30px;margin:0 0 22px}
-  section.card h2{margin:0 0 4px;font-size:23px}
-  section.card h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  section.card h3{font-size:17px;margin:26px 0 8px;color:var(--ink)}
-  section.card h4{font-size:15px;margin:20px 0 6px;color:var(--ink)}
-  .secsub{color:var(--mut);font-size:14px;margin:0 0 14px}
-  p{margin:10px 0}
-  ul{margin:8px 0;padding-left:22px}
-  li{margin:5px 0}
-  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
-  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  th{background:#f1f4f9;font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2)}
-  tr:last-child td{border-bottom:none}
-  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-       padding:2px 9px;border-radius:12px;margin:0 4px 2px 0;vertical-align:middle}
-  .fact{background:#dbeafe;color:#1e40af}
-  .interp{background:#fef3c7;color:#92400e}
-  .gap{background:#e5e7eb;color:#4b5563}
-  .unv{background:#fff;border:1.5px solid #f87171;color:#b91c1c}
-  .hard{background:#dcfce7;color:#166534}
-  .guidance{background:#fef9c3;color:#854d0e}
-  .inferred{background:#f3e8ff;color:#6b21a8}
-  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
-  .kpi .box{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .kpi .box .v{font-size:21px;font-weight:700}
-  .kpi .box .l{font-size:12.5px;color:var(--mut)}
-  .callout{border-left:4px solid var(--accent);background:#f0f6ff;padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:15px}
-  .callout.warn{border-color:#d97706;background:#fffbeb}
-  .callout.bad{border-color:#dc2626;background:#fef2f2}
-  .timeline{position:relative;margin:18px 0 6px;padding-left:26px;border-left:3px solid var(--line)}
-  .tl{position:relative;padding:0 0 20px 8px}
-  .tl:before{content:"";position:absolute;left:-34px;top:4px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--accent)}
-  .tl .when{font-weight:700;font-size:15px}
-  .tl .what{font-size:14.5px;color:var(--ink2)}
-  .ref li{font-size:13.5px;color:var(--ink2)}
-  .ref a{color:var(--accent);text-decoration:none;word-break:break-all}
-  .ref a:hover{text-decoration:underline}
-  footer{color:var(--mut);font-size:13px;padding:0 0 40px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .twrap{overflow-x:auto;margin:12px 0;-webkit-overflow-scrolling:touch}
-  .twrap table{margin:0;min-width:640px}
-  section.card h2{cursor:pointer}
-  section.card h2::after{content:"▾";float:right;color:var(--mut);font-size:16px;margin-left:10px}
-  section.card.collapsed h2::after{content:"▸"}
-  section.card.collapsed .secbody{display:none}
-  #themeBtn{background:var(--pill);color:var(--ink2);border:1px solid var(--line);border-radius:8px;
-    font-size:14px;padding:12px 14px;min-height:44px;min-width:44px;cursor:pointer;white-space:nowrap;margin-left:auto}
-  #themeBtn:hover{background:var(--line)}
-  #toTop{position:fixed;right:18px;bottom:18px;z-index:60;display:none;background:var(--accent);color:#fff;
-    border:none;border-radius:24px;padding:14px 20px;font-size:15px;font-weight:700;cursor:pointer;min-height:48px;
-    box-shadow:0 4px 14px rgba(0,0,0,.25)}
-  #toTop:hover{filter:brightness(1.12)}
-  .softbox{border:2px dashed var(--accent);background:#f0f6ff;padding:12px 16px;border-radius:10px;margin:14px 0;font-size:14.5px}
-  /* ---------- dark theme ---------- */
-  [data-theme="dark"]{--ink:#e9edf4;--ink2:#c6cede;--mut:#98a2b6;--line:#2b3850;--bg:#0d1320;--card:#151d2f;
-    --accent:#8db4ff;--accent2:#63c7e2;--pill:#1c2740}
-  [data-theme="dark"] nav.toc{background:#101827}
-  [data-theme="dark"] th{background:#1b2540}
-  [data-theme="dark"] code{background:#1b2540}
-  [data-theme="dark"] .kpi .box{background:#101827}
-  [data-theme="dark"] .callout{background:#12233f}
-  [data-theme="dark"] .callout.warn{background:#2a2110}
-  [data-theme="dark"] .callout.bad{background:#2e1518}
-  [data-theme="dark"] .softbox{background:#12233f}
-  [data-theme="dark"] .fact{background:#1e3a8a;color:#dbeafe}
-  [data-theme="dark"] .interp{background:#713f12;color:#fef3c7}
-  [data-theme="dark"] .gap{background:#374151;color:#e5e7eb}
-  [data-theme="dark"] .unv{background:#3a1414;color:#fca5a5;border-color:#f87171}
-  [data-theme="dark"] .hard{background:#14532d;color:#bbf7d0}
-  [data-theme="dark"] .guidance{background:#713f12;color:#fde68a}
-  [data-theme="dark"] .inferred{background:#3b0764;color:#e9d5ff}
-  [data-theme="dark"] .tl:before{background:#151d2f}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}section.card{padding:20px}
-    header.hero h1{font-size:26px}header.hero{padding:34px 0 26px}
-    th,td{padding:8px 9px;font-size:13.5px}.wrap{padding:0 14px}}
-  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-  .small{font-size:13.5px;color:var(--mut)}
-  code{background:#f1f4f9;padding:1px 6px;border-radius:6px;font-size:13.5px}
+<style>:root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+
+/* ============ legacy component compat (re-skinned on PEPG variables) ============ */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.box{background:var(--raised);box-shadow:var(--shadow);padding:18px;min-width:0}
+.box .v{font:600 26px/1.1 var(--serif);letter-spacing:-.02em;overflow-wrap:break-word}
+.box .l{font-size:12px;color:var(--muted);margin-top:6px}
+.tablewrap,.tscroll,.twrap,.table-wrap{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
+.tablewrap table,.tscroll table,.twrap table,.table-wrap table{margin:0;min-width:560px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+td{vertical-align:top;padding:11px 8px;border-bottom:1px solid var(--line)}
+tr.past td{background:var(--pill-bg);color:var(--muted)}
+.callout{background:var(--mint);padding:22px;margin:16px 0;border-left:5px solid var(--teal);font-size:14.5px}
+.callout.bad{border-left-color:var(--red)}
+.warn{background:var(--orange-soft);padding:22px;margin:16px 0;border-left:5px solid var(--orange);font-size:14.5px}
+.verdict{background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}
+.verdict h3{color:var(--panel-text)}
+.verdict p{color:#d0dedb;margin:0}
+.flag{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--orange);padding:18px 20px;margin:14px 0;box-shadow:var(--shadow)}
+.flag h4{margin:0 0 6px;font-size:15px}
+.flag p{font-size:13.5px;color:var(--ink-2);margin:6px 0 0}
+.flag .rank,.flag .sev{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--orange-soft);color:#8e351d;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+html[data-theme="dark"] .flag .rank,html[data-theme="dark"] .flag .sev{color:var(--orange)}
+.flag .sev.med{background:#f4edcf;color:#67510e}
+html[data-theme="dark"] .flag .sev.med{background:#2e2a17;color:#d8c26a}
+.flag .sev.low{background:var(--mint);color:var(--teal-dark)}
+.risk{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--red);padding:18px 20px;margin:14px 0;font-size:14.5px}
+.risk .rank{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--red);color:#fff;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+.risk.base{background:var(--mint);border-left-color:var(--teal)}
+.risk.base .rank{background:var(--teal)}
+.risk.bull{background:#e8eef0;border-left-color:var(--teal-dark)}
+html[data-theme="dark"] .risk.bull{background:#1e2c29}
+.risk.bull .rank{background:var(--teal-dark)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:16px}
+.card{background:var(--raised);padding:22px;box-shadow:var(--shadow);min-width:0}
+.card h4{margin:0 0 8px;font-size:15px}
+.card p{font-size:13.5px;color:var(--ink-2);margin:0}
+.refs{font-size:13.5px;color:var(--muted);padding-left:20px}
+.refs li{margin:7px 0;word-break:break-word}
+.src{font-size:12px;color:var(--muted)}
+.ref{font-size:12px;color:var(--muted)}
+.fine{font-size:12.5px;color:var(--muted)}
+.small{font-size:13px;color:var(--muted)}
+.audit{background:var(--surface);border:1px solid var(--line);padding:18px 20px;margin-top:18px;font-size:13.5px}
+.keybox{border:1px solid var(--line);padding:14px 18px;background:var(--surface);margin:14px 0;font-size:14.5px}
+.keybox b.t{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:4px}
+.soft{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.softbox{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.tight li{margin:6px 0}
+.gwl{margin:10px 0;padding-left:20px}
+.gwl li{margin:8px 0;font-size:14px}
+.lbl{font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+@media(max-width:620px){.grid2,.kpi{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
+<div class="topline"></div>
 <header class="hero">
-  <div class="wrap">
-    <h1><span class="tick">HELP</span> · Helus Pharma Inc.</h1>
-    <div class="sub">Comprehensive deep-dive dossier on the deuterated-psilocin program in adjunctive major depressive disorder.
-    Built for a buy-and-hold-through-the-binary investor. No DCF, no recommendation — bear/base/bull carry explicit <b>SOFT</b> scenario values only. The binary catalyst carries the weight.</div>
-    <div class="meta">
-      <span>Nasdaq / Cboe CA: HELP</span>
-      <span>Built: 2026-10-07 · Audited &amp; enhanced: 2026-10-10</span>
-      <span>Price ref: ~$11.80 (2026-10-09 close)</span>
-      <span>Core binary: APPROACH Ph3 topline, Q4 2026</span>
-      <span>FDA Breakthrough Therapy Designation (HLP003, adjunctive MDD)</span>
-    </div>
-  </div>
+<div class="hero-grid">
+<div>
+<div class="ticker-line"><span class="ticker">NASDAQ · HELP</span><span class="stamp">Deep-dive dossier · Audited October 10, 2026</span></div>
+<h1>One Phase 3 readout carries the whole company.</h1>
+<p class="hero-dek">Comprehensive deep-dive dossier on the deuterated-psilocin program in adjunctive major depressive disorder. Built for a buy-and-hold-through-the-binary investor. No DCF, no recommendation — bear/base/bull carry explicit SOFT scenario values only. The binary catalyst carries the weight.</p>
+</div>
+<div aria-label="Market snapshot" class="hero-quote">
+<div class="quote-price">~$11.80</div>
+<div class="quote-label">Price reference · Oct 9, 2026 close</div>
+<div class="quote-meta">Nasdaq / Cboe CA · Core binary: APPROACH Ph3 topline, Q4 2026 · FDA Breakthrough Therapy Designation (HLP003, adjunctive MDD)</div>
+</div>
+</div>
 </header>
-
-<nav class="toc"><div class="wrap">
-  <a href="#s1">1 · Identity &amp; Thesis</a>
-  <a href="#s2">2 · Science</a>
-  <a href="#s3">3 · Pipeline</a>
-  <a href="#s4">4 · Trial Design</a>
-  <a href="#s5">5 · Clinical / Regulatory</a>
-  <a href="#s6">6 · Competition</a>
-  <a href="#s7">7 · Financials</a>
-  <a href="#s8">8 · FDMC / EV</a>
-  <a href="#s9">9 · Catalyst Map</a>
-  <a href="#s10">10 · Red Flags</a>
-  <a href="#s11">11 · Scenarios</a>
-  <a href="#s12">12 · Management</a>
-  <a href="#s13">13 · References</a>
-  <button id="themeBtn" aria-label="Toggle dark mode">◐ Dark</button>
-</div></nav>
-
-<main class="wrap">
-
+<div class="jump-wrap">
+<nav aria-label="Jump to section" class="jump">
+<a href="#s1">Frame</a><a href="#s2">Science</a><a href="#s3">Pipeline</a><a href="#s4">Trial</a><a href="#s5">Clinical</a><a href="#s6">Landscape</a><a href="#s7">Financials</a><a href="#s8">Value</a><a href="#s9">Catalysts</a><a href="#s10">Risks</a><a href="#s11">Scenarios</a><a href="#s12">People</a><a href="#s13">Sources</a>
+<button aria-pressed="false" class="theme-toggle" id="themeToggle" type="button">◐ Dark mode</button>
+</nav>
+</div>
+<main>
 <!-- ============ 1 ============ -->
-<section class="card" id="s1">
-<h2><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
-<p class="secsub">Who the company is, what the rename changed, and what the position hinges on.</p>
+<section id="s1"><div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A one-trial company wearing a two-program pipeline</h2><p class="lede">Who the company is, what the rename changed, and what the position hinges on.</p></div></div><div aria-label="Evidence legend" class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+
 
 <div class="twrap"><table>
 <tr><th style="width:200px">Item</th><th>Detail</th></tr>
-<tr><td>Company</td><td><b>Helus Pharma Inc.</b> ("Helus"; pronounced "heal us") <span class="tag fact">Fact</span><br>
-  Legal name changed from <b>Cybin Inc.</b> to Helus Pharma Inc. effective <b>October 1, 2026</b>, approved by shareholders at the annual and special meeting on September 22, 2026. The business name "Helus Pharma" had already been adopted January 5, 2026. New CUSIP 423492107; ISIN CA4234921076. (GlobeNewswire company release, Oct 1 2026.) <span class="tag fact">Fact</span></td></tr>
-<tr><td>Tickers</td><td>Nasdaq Global Market: <b>HELP</b> (moved from NYSE American on Jan 5, 2026; ticker changed from CYBN to HELP at that time); Cboe Canada: HELP. <span class="tag fact">Fact</span><br>
-  Note: the old <code>CYBN</code> ticker is retired — screening under CYBN returns stale data. <span class="tag interp">Interpretation</span></td></tr>
-<tr><td>What it is</td><td>Clinical-stage pharma developing proprietary <b>novel serotonergic agonists (NSAs)</b> — synthetic molecules designed to activate serotonin pathways believed to promote neuroplasticity — for depression, anxiety and related conditions. Operations in Canada, the US, UK and Ireland. Founded 2019 (as Cybin). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Lead asset</td><td><b>HLP003</b> (formerly <b>CYB003</b>) — proprietary deuterated psilocin analog, oral, for <b>adjunctive treatment of major depressive disorder (MDD)</b>. FDA Breakthrough Therapy Designation (BTD), granted March 13, 2024. In Phase 3 <b>PARADIGM</b> program. <span class="tag fact">Fact</span></td></tr>
-
+<tr><td>Company</td><td><b>Helus Pharma Inc.</b> ("Helus"; pronounced "heal us") <span class="ev fact">FACT</span><br/>
+  Legal name changed from <b>Cybin Inc.</b> to Helus Pharma Inc. effective <b>October 1, 2026</b>, approved by shareholders at the annual and special meeting on September 22, 2026. The business name "Helus Pharma" had already been adopted January 5, 2026. New CUSIP 423492107; ISIN CA4234921076. (GlobeNewswire company release, Oct 1 2026.) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Tickers</td><td>Nasdaq Global Market: <b>HELP</b> (moved from NYSE American on Jan 5, 2026; ticker changed from CYBN to HELP at that time); Cboe Canada: HELP. <span class="ev fact">FACT</span><br/>
+  Note: the old <code>CYBN</code> ticker is retired — screening under CYBN returns stale data. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>What it is</td><td>Clinical-stage pharma developing proprietary <b>novel serotonergic agonists (NSAs)</b> — synthetic molecules designed to activate serotonin pathways believed to promote neuroplasticity — for depression, anxiety and related conditions. Operations in Canada, the US, UK and Ireland. Founded 2019 (as Cybin). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Lead asset</td><td><b>HLP003</b> (formerly <b>CYB003</b>) — proprietary deuterated psilocin analog, oral, for <b>adjunctive treatment of major depressive disorder (MDD)</b>. FDA Breakthrough Therapy Designation (BTD), granted March 13, 2024. In Phase 3 <b>PARADIGM</b> program. <span class="ev fact">FACT</span></td></tr>
 </table></div>
-
-<div class="callout"><b>Thesis in one paragraph.</b> Helus is a single-asset Phase 3 psychedelic story wearing a two-program pipeline. The entire investment case is the <b>PARADIGM</b> program for HLP003: two pivotal trials (APPROACH, n=223, topline <b>Q4 2026</b>; EMBRACE, n=330, registry primary completion June 7, 2027) testing two 16 mg oral doses, three weeks apart, as an <i>add-on</i> to stable antidepressants, against an inactive placebo, with MADRS change at 6 weeks as the primary endpoint. Phase 2 (n≈34 at the primary readout) showed a 14-point MADRS separation from placebo at 3 weeks (p&lt;0.0001) and durable 12-month responses in the tiny cohort that stayed in follow-up (n=7 on two 16 mg doses). <span class="tag fact">Fact</span> The company does not disclose formal powering assumptions. <span class="tag gap">Gap</span> The binary is asymmetric by construction: one positive pivotal readout validates the platform; a miss on APPROACH leaves only EMBRACE — with a higher bar and ~6 months of extra burn. <span class="tag interp">Interpretation</span></div>
-
+<div class="callout"><b>Thesis in one paragraph.</b> Helus is a single-asset Phase 3 psychedelic story wearing a two-program pipeline. The entire investment case is the <b>PARADIGM</b> program for HLP003: two pivotal trials (APPROACH, n=223, topline <b>Q4 2026</b>; EMBRACE, n=330, registry primary completion June 7, 2027) testing two 16 mg oral doses, three weeks apart, as an <i>add-on</i> to stable antidepressants, against an inactive placebo, with MADRS change at 6 weeks as the primary endpoint. Phase 2 (n≈34 at the primary readout) showed a 14-point MADRS separation from placebo at 3 weeks (p&lt;0.0001) and durable 12-month responses in the tiny cohort that stayed in follow-up (n=7 on two 16 mg doses). <span class="ev fact">FACT</span> The company does not disclose formal powering assumptions. <span class="ev gap">GAP</span> The binary is asymmetric by construction: one positive pivotal readout validates the platform; a miss on APPROACH leaves only EMBRACE — with a higher bar and ~6 months of extra burn. <span class="ev interp">INTERPRETATION</span></div>
 <h3>The rename — what it signals</h3>
 <ul>
-<li>The legal rename (shareholder-approved Sept 22, 2026; effective Oct 1, 2026) follows the January 2026 adoption of the "Helus Pharma" business name and the Nasdaq uplist. <span class="tag fact">Fact</span></li>
-<li>Company-stated rationale: reflect the "anticipated transformation from a clinical stage discovery and development company to a commercial-ready pharmaceutical company." <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span> — this is forward positioning ahead of data, not evidence of data quality; it also retires the "Cybin" psychedelic-era brand as the company courts mainstream pharma investors.</li>
-<li>Practical consequence: filings continue on SEDAR+ and SEC EDGAR under the new profile; pipeline assets were renamed in lockstep — CYB003 → <b>HLP003</b>, CYB004 → <b>HLP004</b>, and the discovery platform is HLP005. <span class="tag fact">Fact</span></li>
+<li>The legal rename (shareholder-approved Sept 22, 2026; effective Oct 1, 2026) follows the January 2026 adoption of the "Helus Pharma" business name and the Nasdaq uplist. <span class="ev fact">FACT</span></li>
+<li>Company-stated rationale: reflect the "anticipated transformation from a clinical stage discovery and development company to a commercial-ready pharmaceutical company." <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span> — this is forward positioning ahead of data, not evidence of data quality; it also retires the "Cybin" psychedelic-era brand as the company courts mainstream pharma investors.</li>
+<li>Practical consequence: filings continue on SEDAR+ and SEC EDGAR under the new profile; pipeline assets were renamed in lockstep — CYB003 → <b>HLP003</b>, CYB004 → <b>HLP004</b>, and the discovery platform is HLP005. <span class="ev fact">FACT</span></li>
 </ul>
 </section>
-
 <!-- ============ 2 ============ -->
-<section class="card" id="s2">
-<h2><span class="num">2</span>Science: Mechanism of Action</h2>
-<p class="secsub">Plain-language MoA, what deuteration is supposed to add, and — honestly — why it could fail. Academic literature consulted beyond company materials.</p>
+<section id="s2"><div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Deuterated psilocin: the PK story and the honest failure list</h2><p class="lede">Plain-language MoA, what deuteration is supposed to add, and — honestly — why it could fail. Academic literature consulted beyond company materials.</p></div></div>
+
 
 <h3>What HLP003 is, in plain language</h3>
-<p>HLP003 is a <b>deuterated analog of psilocin</b>. Psilocin is the active metabolite of psilocybin (the "magic mushroom" compound): when someone takes psilocybin, the body rapidly converts it to psilocin, which then activates serotonin receptors in the brain — most importantly the <b>5-HT2A receptor</b>. Helus describes HLP003 as a serotonergic agonist with activity at multiple 5-HT receptors including 5-HT2A. <span class="tag fact">Fact</span></p>
-<p>"Deuterated" means some hydrogen atoms in the molecule have been swapped for <b>deuterium</b> (heavy hydrogen — same chemistry, twice the mass). The carbon–deuterium bond is harder for metabolic enzymes to break than a carbon–hydrogen bond (the <i>kinetic isotope effect</i>), which can slow metabolism, smooth out blood-level peaks and troughs, and reduce patient-to-patient variability. This is the same trick behind the FDA-approved deuterated drug deutetrabenazine (Austedo) for Huntington's chorea — deuteration as a medicinal-chemistry tool is precedented, though each molecule stands or falls on its own data. <span class="tag interp">Interpretation</span></p>
-<p>The company's stated rationale: first-generation psychedelics (psilocybin, DMT) have limitations — variable pharmacokinetics, long clinic sessions, scalability — and a deuterated, purpose-built molecule can deliver the therapeutic pharmacology with a cleaner, more practical profile. HLP003 is <b>oral</b>; its sibling HLP004 is a deuterated DMT (DMT-d10) given <b>intramuscularly</b>, with acute effects lasting ~90 minutes and discharge readiness within ~3 hours in Phase 1. <span class="tag fact">Fact</span></p>
-
+<p>HLP003 is a <b>deuterated analog of psilocin</b>. Psilocin is the active metabolite of psilocybin (the "magic mushroom" compound): when someone takes psilocybin, the body rapidly converts it to psilocin, which then activates serotonin receptors in the brain — most importantly the <b>5-HT2A receptor</b>. Helus describes HLP003 as a serotonergic agonist with activity at multiple 5-HT receptors including 5-HT2A. <span class="ev fact">FACT</span></p>
+<p>"Deuterated" means some hydrogen atoms in the molecule have been swapped for <b>deuterium</b> (heavy hydrogen — same chemistry, twice the mass). The carbon–deuterium bond is harder for metabolic enzymes to break than a carbon–hydrogen bond (the <i>kinetic isotope effect</i>), which can slow metabolism, smooth out blood-level peaks and troughs, and reduce patient-to-patient variability. This is the same trick behind the FDA-approved deuterated drug deutetrabenazine (Austedo) for Huntington's chorea — deuteration as a medicinal-chemistry tool is precedented, though each molecule stands or falls on its own data. <span class="ev interp">INTERPRETATION</span></p>
+<p>The company's stated rationale: first-generation psychedelics (psilocybin, DMT) have limitations — variable pharmacokinetics, long clinic sessions, scalability — and a deuterated, purpose-built molecule can deliver the therapeutic pharmacology with a cleaner, more practical profile. HLP003 is <b>oral</b>; its sibling HLP004 is a deuterated DMT (DMT-d10) given <b>intramuscularly</b>, with acute effects lasting ~90 minutes and discharge readiness within ~3 hours in Phase 1. <span class="ev fact">FACT</span></p>
 <h3>Why the field thinks this could work for depression</h3>
 <ul>
-<li><b>Randomized evidence exists for the drug class.</b> Psilocybin has beaten control arms in randomized trials for MDD and treatment-resistant depression: Davis et al. (JAMA Psychiatry 2021) in MDD; Goodwin et al. (NEJM 2022) — the 233-patient COMPASS trial of 25 mg vs 10 mg vs 1 mg psilocybin in TRD; Carhart-Harris et al. (NEJM 2021) — psilocybin vs escitalopram; Raison et al. (JAMA 2023) — single-dose psilocybin in MDD; von Rotz et al. (eClinicalMedicine 2023). <span class="tag fact">Fact</span> HLP003 is a chemical cousin, not the same molecule — class evidence is supportive, not dispositive. <span class="tag interp">Interpretation</span></li>
-<li><b>Neuroplasticity hypothesis.</b> Psychedelics promote structural and functional neural plasticity in preclinical models — Ly et al. (Cell Reports 2018) coined the "psychoplastogen" framing. The theory: a 5-HT2A-driven plasticity window lets entrenched depressive circuits reorganize, producing durable benefit after intermittent dosing rather than daily drug exposure. Company materials invoke neuroplasticity as the rationale. <span class="tag fact">Fact</span> Whether human antidepressant durability actually flows from plasticity (vs. expectancy, or the psychological experience itself) is unresolved in the literature. <span class="tag gap">Gap</span></li>
-<li><b>Adjunctive positioning is pharmacologically coherent.</b> A completed drug–drug interaction study showed HLP003 did not meaningfully alter plasma levels of six CYP450 substrates, suggesting low PK interaction risk with SSRIs/SNRIs — the background meds in PARADIGM. <span class="tag fact">Fact</span></li>
-<li><b>IP moat.</b> 350+ patent applications filed, 100+ granted worldwide covering the NSA platform. <span class="tag fact">Fact</span></li>
+<li><b>Randomized evidence exists for the drug class.</b> Psilocybin has beaten control arms in randomized trials for MDD and treatment-resistant depression: Davis et al. (JAMA Psychiatry 2021) in MDD; Goodwin et al. (NEJM 2022) — the 233-patient COMPASS trial of 25 mg vs 10 mg vs 1 mg psilocybin in TRD; Carhart-Harris et al. (NEJM 2021) — psilocybin vs escitalopram; Raison et al. (JAMA 2023) — single-dose psilocybin in MDD; von Rotz et al. (eClinicalMedicine 2023). <span class="ev fact">FACT</span> HLP003 is a chemical cousin, not the same molecule — class evidence is supportive, not dispositive. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Neuroplasticity hypothesis.</b> Psychedelics promote structural and functional neural plasticity in preclinical models — Ly et al. (Cell Reports 2018) coined the "psychoplastogen" framing. The theory: a 5-HT2A-driven plasticity window lets entrenched depressive circuits reorganize, producing durable benefit after intermittent dosing rather than daily drug exposure. Company materials invoke neuroplasticity as the rationale. <span class="ev fact">FACT</span> Whether human antidepressant durability actually flows from plasticity (vs. expectancy, or the psychological experience itself) is unresolved in the literature. <span class="ev gap">GAP</span></li>
+<li><b>Adjunctive positioning is pharmacologically coherent.</b> A completed drug–drug interaction study showed HLP003 did not meaningfully alter plasma levels of six CYP450 substrates, suggesting low PK interaction risk with SSRIs/SNRIs — the background meds in PARADIGM. <span class="ev fact">FACT</span></li>
+<li><b>IP moat.</b> 350+ patent applications filed, 100+ granted worldwide covering the NSA platform. <span class="ev fact">FACT</span></li>
 </ul>
-
 <h3>Why it could fail — the honest list</h3>
 <ul>
-<li><b>The target is not novel.</b> HLP003 hits the same 5-HT2A pharmacology as psilocybin. If COMPASS's psilocybin succeeds in TRD, HLP003 must differentiate on profile/convenience, not mechanism; if the class stumbles at FDA, HLP003 inherits the overhang. The deuteration is a PK optimization, not a new biology. <span class="tag interp">Interpretation</span></li>
-<li><b>Functional unblinding.</b> This is the field's central methodological wound — and the FDA's. Psychedelic effects are unmistakable, so patients (and raters) can usually tell active from placebo; expectancy then inflates the measured drug–placebo separation. The FDA flagged exactly this in rejecting Lykos's MDMA application (adcomm 9–2 on efficacy, 10–1 on benefit–risk; ~90% of MDMA-arm subjects guessed their assignment correctly). Muthukumaraswamy et al. (Expert Rev Clin Pharmacol 2021) formalized the blinding/expectancy critique for psychedelic RCTs. PARADIGM uses an <b>inactive placebo</b> in both pivotal trials — the design most vulnerable to this critique. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span> — no active-placebo or low-dose control arm was included.</li>
-<li><b>Phase 2 was small and its long-term data uncontrolled.</b> The primary Phase 2 readout was n=34 (24 active pooled across 12/16 mg, 10 placebo) with a 14.08-point MADRS separation at 3 weeks (p=0.0005, Cohen's d=2.15). The celebrated 12-month figures — ~23-point MADRS reduction, 100% response, 71% remission — come from <b>7 patients</b> who received two 16 mg doses and stayed in open-label follow-up, with the placebo arm crossed over to active. Large effects in tiny, selected samples routinely shrink in Phase 3; psychiatry is littered with such examples (Sage's zuranolone in MDD is the recent cautionary tale). <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>Adjunctive serotonergic load.</b> HLP003 is dosed <i>on top of</i> SSRIs/SNRIs. No PK interaction was found, but pharmacodynamic serotonergic risk (serotonin syndrome spectrum) is inherent to stacking serotonergic agents — the trials will have to show the safety database is clean, and regulators will scrutinize it. <span class="tag interp">Interpretation</span></li>
-<li><b>No published evidence that deuteration improves the therapeutic index here.</b> The deuteration story is PK elegance; whether it translates into better efficacy, safety, or durability versus plain psilocin/psilocybin in humans has not been shown in any peer-reviewed publication identified. <span class="tag gap">Gap</span></li>
-<li><b>Durability claim rests on uncontrolled follow-up.</b> The 12-month Phase 2 data have no concurrent control; natural course, regression to the mean, and concomitant antidepressants all confound. EXTEND (up to 1 year, blinded, with redosing provisions) is designed to generate controlled durability data — it does not exist yet. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
+<li><b>The target is not novel.</b> HLP003 hits the same 5-HT2A pharmacology as psilocybin. If COMPASS's psilocybin succeeds in TRD, HLP003 must differentiate on profile/convenience, not mechanism; if the class stumbles at FDA, HLP003 inherits the overhang. The deuteration is a PK optimization, not a new biology. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Functional unblinding.</b> This is the field's central methodological wound — and the FDA's. Psychedelic effects are unmistakable, so patients (and raters) can usually tell active from placebo; expectancy then inflates the measured drug–placebo separation. The FDA flagged exactly this in rejecting Lykos's MDMA application (adcomm 9–2 on efficacy, 10–1 on benefit–risk; ~90% of MDMA-arm subjects guessed their assignment correctly). Muthukumaraswamy et al. (Expert Rev Clin Pharmacol 2021) formalized the blinding/expectancy critique for psychedelic RCTs. PARADIGM uses an <b>inactive placebo</b> in both pivotal trials — the design most vulnerable to this critique. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span> — no active-placebo or low-dose control arm was included.</li>
+<li><b>Phase 2 was small and its long-term data uncontrolled.</b> The primary Phase 2 readout was n=34 (24 active pooled across 12/16 mg, 10 placebo) with a 14.08-point MADRS separation at 3 weeks (p=0.0005, Cohen's d=2.15). The celebrated 12-month figures — ~23-point MADRS reduction, 100% response, 71% remission — come from <b>7 patients</b> who received two 16 mg doses and stayed in open-label follow-up, with the placebo arm crossed over to active. Large effects in tiny, selected samples routinely shrink in Phase 3; psychiatry is littered with such examples (Sage's zuranolone in MDD is the recent cautionary tale). <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Adjunctive serotonergic load.</b> HLP003 is dosed <i>on top of</i> SSRIs/SNRIs. No PK interaction was found, but pharmacodynamic serotonergic risk (serotonin syndrome spectrum) is inherent to stacking serotonergic agents — the trials will have to show the safety database is clean, and regulators will scrutinize it. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>No published evidence that deuteration improves the therapeutic index here.</b> The deuteration story is PK elegance; whether it translates into better efficacy, safety, or durability versus plain psilocin/psilocybin in humans has not been shown in any peer-reviewed publication identified. <span class="ev gap">GAP</span></li>
+<li><b>Durability claim rests on uncontrolled follow-up.</b> The 12-month Phase 2 data have no concurrent control; natural course, regression to the mean, and concomitant antidepressants all confound. EXTEND (up to 1 year, blinded, with redosing provisions) is designed to generate controlled durability data — it does not exist yet. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
 </ul>
 </section>
-
 <!-- ============ 3 ============ -->
-<section class="card" id="s3">
-<h2><span class="num">3</span>Pipeline Overview</h2>
-<p class="secsub"><b>Ranked by estimated risk-adjusted value, most → least.</b> HLP003 carries ~all of the valuation; HLP004 is option value pending its (overdue) next-study design; HLP005 is a preclinical lottery ticket. Commercial discussion is intentionally lean — the binary is the product here.</p>
+<section id="s3"><div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>HLP003 carries the valuation; HLP004 is an option</h2><p class="lede"><b>Ranked by estimated risk-adjusted value, most → least.</b> HLP003 carries ~all of the valuation; HLP004 is option value pending its (overdue) next-study design; HLP005 is a preclinical lottery ticket. Commercial discussion is intentionally lean — the binary is the product here.</p></div></div>
+
+
 <div class="twrap"><table>
 <tr><th>Value rank</th><th>Program</th><th>What it is</th><th>Indication</th><th>Stage</th><th>Status</th></tr>
-<tr><td><b>#1</b><br><span class="small">~90%+ of value</span></td><td><b>HLP003</b><br><span class="small">(ex-CYB003)</span></td><td>Deuterated psilocin analog, oral, 2× 16 mg doses 3 weeks apart</td><td>Adjunctive MDD</td><td><b>Phase 3</b></td><td>PARADIGM: APPROACH topline Q4 2026; EMBRACE enrolling; EXTEND rollover ongoing. FDA BTD (Mar 2024). <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>#2</b><br><span class="small">option value</span></td><td><b>HLP004</b><br><span class="small">(ex-CYB004)</span></td><td>Deuterated DMT (DMT-d10), intramuscular</td><td>GAD (adjunctive to SoC)</td><td><b>Phase 2 complete</b></td><td>Signal-detection study (n=36): ~10.4-pt HAM-A reduction at 6 wks (p&lt;0.0001), effects from Day 2, durable to ≥6 months; 67% responders / 39% remission at 6 months. Next-study design targeted by end of Q3 2026. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>#3</b><br><span class="small">lottery ticket</span></td><td><b>HLP005</b></td><td>Next-gen NSA discovery platform (tryptamine/phenethylamine scaffolds)</td><td>Psychiatric / neurologic</td><td><b>Preclinical</b></td><td>Development candidate selection anticipated H2 2027. <span class="tag fact">Fact</span></td></tr>
+<tr><td><b>#1</b><br/><span class="small">~90%+ of value</span></td><td><b>HLP003</b><br/><span class="small">(ex-CYB003)</span></td><td>Deuterated psilocin analog, oral, 2× 16 mg doses 3 weeks apart</td><td>Adjunctive MDD</td><td><b>Phase 3</b></td><td>PARADIGM: APPROACH topline Q4 2026; EMBRACE enrolling; EXTEND rollover ongoing. FDA BTD (Mar 2024). <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>#2</b><br/><span class="small">option value</span></td><td><b>HLP004</b><br/><span class="small">(ex-CYB004)</span></td><td>Deuterated DMT (DMT-d10), intramuscular</td><td>GAD (adjunctive to SoC)</td><td><b>Phase 2 complete</b></td><td>Signal-detection study (n=36): ~10.4-pt HAM-A reduction at 6 wks (p&lt;0.0001), effects from Day 2, durable to ≥6 months; 67% responders / 39% remission at 6 months. Next-study design targeted by end of Q3 2026. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>#3</b><br/><span class="small">lottery ticket</span></td><td><b>HLP005</b></td><td>Next-gen NSA discovery platform (tryptamine/phenethylamine scaffolds)</td><td>Psychiatric / neurologic</td><td><b>Preclinical</b></td><td>Development candidate selection anticipated H2 2027. <span class="ev fact">FACT</span></td></tr>
 </table></div>
 <ol>
-<li><b>#1 — HLP003 (adjunctive MDD, Phase 3).</b> The only asset with a registrational path and near-term binary (APPROACH, Q4 2026). Carries essentially the entire enterprise value; everything else is a call option on this working. <span class="tag interp">Interpretation</span></li>
-<li><b>#2 — HLP004 (GAD, Phase 2 complete).</b> Real signal (n=36: ~10.4-pt HAM-A reduction at 6 wks, p&lt;0.0001, durable to ≥6 months) but no next-study design announced — the "end of Q3 2026" design target is now <b>past due</b>. Valued as optionality until a Phase 2b/3 path is disclosed. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>#3 — HLP005 (preclinical discovery).</b> No candidate, no data; valued at zero in any disciplined model. <span class="tag interp">Interpretation</span></li>
+<li><b>#1 — HLP003 (adjunctive MDD, Phase 3).</b> The only asset with a registrational path and near-term binary (APPROACH, Q4 2026). Carries essentially the entire enterprise value; everything else is a call option on this working. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>#2 — HLP004 (GAD, Phase 2 complete).</b> Real signal (n=36: ~10.4-pt HAM-A reduction at 6 wks, p&lt;0.0001, durable to ≥6 months) but no next-study design announced — the "end of Q3 2026" design target is now <b>past due</b>. Valued as optionality until a Phase 2b/3 path is disclosed. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>#3 — HLP005 (preclinical discovery).</b> No candidate, no data; valued at zero in any disciplined model. <span class="ev interp">INTERPRETATION</span></li>
 </ol>
-<p class="small">HLP004 originated partly via the October 2023 acquisition of Small Pharma (short-duration serotonergic agonists, incl. IV/IM SPL028 learnings). <span class="tag fact">Fact</span></p>
+<p class="small">HLP004 originated partly via the October 2023 acquisition of Small Pharma (short-duration serotonergic agonists, incl. IV/IM SPL028 learnings). <span class="ev fact">FACT</span></p>
 </section>
-
 <!-- ============ 4 ============ -->
-<section class="card" id="s4">
-<h2><span class="num">4</span>Trial Design Deep Dive — PARADIGM</h2>
-<p class="secsub">The two pivotal trials, the extension, and what the statistics do and don't tell us.</p>
+<section id="s4"><div class="section-head"><div class="section-num">04 / TRIAL DESIGN</div><div><h2>PARADIGM: the trial design behind the Q4 binary</h2><p class="lede">The two pivotal trials, the extension, and what the statistics do and don't tell us.</p></div></div>
+
 
 <h3>Program architecture</h3>
-<p>PARADIGM (launched November 13, 2024) = two 12-week randomized, double-blind, placebo-controlled pivotal trials plus EXTEND, a blinded long-term extension (up to ~1 year, with redosing provisions for non-responders/relapsers). Combined enrollment target ≈ 550. <span class="tag fact">Fact</span></p>
-
+<p>PARADIGM (launched November 13, 2024) = two 12-week randomized, double-blind, placebo-controlled pivotal trials plus EXTEND, a blinded long-term extension (up to ~1 year, with redosing provisions for non-responders/relapsers). Combined enrollment target ≈ 550. <span class="ev fact">FACT</span></p>
 <h3>APPROACH — the first pivotal (the Q4 2026 binary)</h3>
 <div class="twrap"><table>
 <tr><th style="width:190px">Element</th><th>Detail</th></tr>
-<tr><td>Design</td><td>Randomized 1:1, double-blind, placebo-controlled; n=<b>223</b> enrolled (enrollment completed ahead of schedule, announced July 21, 2026). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Arms</td><td>HLP003 <b>16 mg</b> vs <b>inactive placebo</b>; two doses, Day 1 and Day 22. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Population</td><td>Adults 18–85, first MDD episode before age 60; moderate-to-severe MDD (MADRS ≥ 24, CGI-S ≥ 4); <b>inadequate response (&lt;50% improvement) on a stable antidepressant dose</b>. <b>Excludes</b> treatment-resistant MDD (≥2 failed antidepressants), psychotic/bipolar disorders, significant suicide risk (C-SSRS), psychedelic exposure within 12 months (or ≥10 lifetime uses), and ketamine/esketamine within 6 months. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Primary endpoint</td><td>Change from baseline in <b>MADRS total score at Day 42</b> (6 weeks after first dose) vs placebo. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Key secondary</td><td>Same MADRS measure at <b>Day 84</b> (12 weeks). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Baseline (n=202 reported)</td><td>Mean MADRS 33.1 (HLP003) / 33.3 (placebo); median age 44.0 / 50.0; 64.4% female each arm. (Psych Congress 2026 posters.) <span class="tag fact">Fact</span></td></tr>
-<tr><td>Powering</td><td><b>Not disclosed.</b> CMO Amir Inamdar has said the company has not disclosed formal powering assumptions. <span class="tag gap">Gap</span> At ~111 patients/arm, the trial is powered for large effect sizes only — roughly the magnitude Phase 2 suggested (d≈2), which is far above typical antidepressant effects (d≈0.3). <span class="tag interp">Interpretation</span></td></tr>
+<tr><td>Design</td><td>Randomized 1:1, double-blind, placebo-controlled; n=<b>223</b> enrolled (enrollment completed ahead of schedule, announced July 21, 2026). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Arms</td><td>HLP003 <b>16 mg</b> vs <b>inactive placebo</b>; two doses, Day 1 and Day 22. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Population</td><td>Adults 18–85, first MDD episode before age 60; moderate-to-severe MDD (MADRS ≥ 24, CGI-S ≥ 4); <b>inadequate response (&lt;50% improvement) on a stable antidepressant dose</b>. <b>Excludes</b> treatment-resistant MDD (≥2 failed antidepressants), psychotic/bipolar disorders, significant suicide risk (C-SSRS), psychedelic exposure within 12 months (or ≥10 lifetime uses), and ketamine/esketamine within 6 months. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Primary endpoint</td><td>Change from baseline in <b>MADRS total score at Day 42</b> (6 weeks after first dose) vs placebo. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Key secondary</td><td>Same MADRS measure at <b>Day 84</b> (12 weeks). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Baseline (n=202 reported)</td><td>Mean MADRS 33.1 (HLP003) / 33.3 (placebo); median age 44.0 / 50.0; 64.4% female each arm. (Psych Congress 2026 posters.) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Powering</td><td><b>Not disclosed.</b> CMO Amir Inamdar has said the company has not disclosed formal powering assumptions. <span class="ev gap">GAP</span> At ~111 patients/arm, the trial is powered for large effect sizes only — roughly the magnitude Phase 2 suggested (d≈2), which is far above typical antidepressant effects (d≈0.3). <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <h3>EMBRACE — the second pivotal</h3>
 <div class="twrap"><table>
 <tr><th style="width:190px">Element</th><th>Detail</th></tr>
-<tr><td>Design</td><td>Randomized <b>1:1:1</b>, double-blind, placebo-controlled; target n=<b>330</b>; ~60 sites across US, Europe, Australia. Recruiting as of Sept 27, 2026 (CT.gov NCT06793397). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Arms</td><td>HLP003 <b>16 mg</b> vs HLP003 <b>8 mg</b> vs <b>inactive placebo</b> — adds a dose-response leg. Two doses, 3 weeks apart. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Endpoints</td><td>Same as APPROACH: MADRS change at Day 42 (primary), Day 84 (key secondary). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Registry dates</td><td>CT.gov primary completion: <b>2027-06-07</b>. The company has given <b>no readout guidance</b> for EMBRACE (its milestone releases cover only APPROACH topline Q4 2026 and EMBRACE initiation); H1 2027 topline is therefore <b>inferred</b> from the registry date. <span class="tag fact">Fact</span> <span class="tag inferred">Inferred</span></td></tr>
+<tr><td>Design</td><td>Randomized <b>1:1:1</b>, double-blind, placebo-controlled; target n=<b>330</b>; ~60 sites across US, Europe, Australia. Recruiting as of Sept 27, 2026 (CT.gov NCT06793397). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Arms</td><td>HLP003 <b>16 mg</b> vs HLP003 <b>8 mg</b> vs <b>inactive placebo</b> — adds a dose-response leg. Two doses, 3 weeks apart. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Endpoints</td><td>Same as APPROACH: MADRS change at Day 42 (primary), Day 84 (key secondary). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Registry dates</td><td>CT.gov primary completion: <b>2027-06-07</b>. The company has given <b>no readout guidance</b> for EMBRACE (its milestone releases cover only APPROACH topline Q4 2026 and EMBRACE initiation); H1 2027 topline is therefore <b>inferred</b> from the registry date. <span class="ev fact">FACT</span> <span class="date-tag inferred">Inferred</span></td></tr>
 </table></div>
-
 <h3>What Phase 2 actually showed (the prior)</h3>
 <div class="twrap"><table>
 <tr><th>Readout</th><th>Result</th></tr>
-<tr><td>Topline (Nov 30, 2023; n=34)</td><td>12 mg + 16 mg pooled: mean MADRS improvement 13.75 pts at 3 weeks vs placebo, <b>p&lt;0.0001</b>; interim single-dose analysis showed 14.08-pt separation (p=0.0005, Cohen's d=2.15) with 53.3% response on active vs 0% on placebo. Two 12 mg doses: 79% response and 79% remission at 6 weeks (n=22 active). No treatment-related SAEs; AEs mild–moderate, self-limiting. <span class="tag fact">Fact</span></td></tr>
-<tr><td>4-month update</td><td>75% response/remission rates sustained at 4 months. (Company PR.) <span class="tag fact">Fact</span></td></tr>
-<tr><td>12-month update (Nov 18, 2024)</td><td>Two 16 mg doses (n=7 active-active): mean MADRS change ≈ <b>−23 pts</b>; 100% responders, 71% remitters (the two non-remitters scored MADRS 11, just above the ≤10 remission cutoff). Two 12 mg doses (n=10): −18 pts; 60% response, 50% remission. No new AEs, no suicidality signals. <b>Open-label, uncontrolled, high attrition</b> — treat as hypothesis-generating, not as a Phase 3 prior. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></td></tr>
+<tr><td>Topline (Nov 30, 2023; n=34)</td><td>12 mg + 16 mg pooled: mean MADRS improvement 13.75 pts at 3 weeks vs placebo, <b>p&lt;0.0001</b>; interim single-dose analysis showed 14.08-pt separation (p=0.0005, Cohen's d=2.15) with 53.3% response on active vs 0% on placebo. Two 12 mg doses: 79% response and 79% remission at 6 weeks (n=22 active). No treatment-related SAEs; AEs mild–moderate, self-limiting. <span class="ev fact">FACT</span></td></tr>
+<tr><td>4-month update</td><td>75% response/remission rates sustained at 4 months. (Company PR.) <span class="ev fact">FACT</span></td></tr>
+<tr><td>12-month update (Nov 18, 2024)</td><td>Two 16 mg doses (n=7 active-active): mean MADRS change ≈ <b>−23 pts</b>; 100% responders, 71% remitters (the two non-remitters scored MADRS 11, just above the ≤10 remission cutoff). Two 12 mg doses (n=10): −18 pts; 60% response, 50% remission. No new AEs, no suicidality signals. <b>Open-label, uncontrolled, high attrition</b> — treat as hypothesis-generating, not as a Phase 3 prior. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-<div class="callout warn"><b>Statistical reality check.</b> A 14-point MADRS separation with d&gt;2 in n=34 is an extraordinary signal — and extraordinary small-sample signals are precisely the ones that attenuate in larger trials (winner's curse). The registrational bar that matters is the one COMPASS just cleared in TRD: a 3.6-point separation at p&lt;0.001 (n=258). APPROACH at n=223 needs a separation in the low-to-mid single digits, cleanly significant, to be viable — a far cry from Phase 2's 14 points, and well within the range where unblinding-driven expectancy could be doing real work. <span class="tag interp">Interpretation</span></div>
+<div class="callout warn"><b>Statistical reality check.</b> A 14-point MADRS separation with d&gt;2 in n=34 is an extraordinary signal — and extraordinary small-sample signals are precisely the ones that attenuate in larger trials (winner's curse). The registrational bar that matters is the one COMPASS just cleared in TRD: a 3.6-point separation at p&lt;0.001 (n=258). APPROACH at n=223 needs a separation in the low-to-mid single digits, cleanly significant, to be viable — a far cry from Phase 2's 14 points, and well within the range where unblinding-driven expectancy could be doing real work. <span class="ev interp">INTERPRETATION</span></div>
 </section>
-
 <!-- ============ 5 ============ -->
-<section class="card" id="s5">
-<h2><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
-<p class="secsub">Where the program stands with regulators, and what the FDA's psychedelic posture means for it.</p>
+<section id="s5"><div class="section-head"><div class="section-num">05 / CLINICAL &amp; REGULATORY</div><div><h2>Breakthrough designation in a cautious FDA</h2><p class="lede">Where the program stands with regulators, and what the FDA's psychedelic posture means for it.</p></div></div>
+
+
 <ul>
-<li><b>FDA Breakthrough Therapy Designation</b> for HLP003 in adjunctive MDD, granted <b>March 13, 2024</b> — provides expedited review pathway and closer FDA interaction on trial design. BTD is not an approval and does not lower the efficacy bar. <span class="tag fact">Fact</span></li>
-<li><b>Trial design was aligned with FDA</b> before PARADIGM launched (company statement, Nov 2024). <span class="tag fact">Fact</span> Details of that alignment (e.g., whether FDA accepted the inactive-placebo design without reservation) are not public. <span class="tag gap">Gap</span></li>
-<li><b>The Lykos precedent (Aug 2024).</b> FDA issued a complete response letter for MDMA-assisted therapy in PTSD after an advisory committee voted 9–2 against efficacy and 10–1 that benefits did not outweigh risks. Central issues: functional unblinding, expectancy bias, and whether psychotherapy contributed to benefit. FDA requested another Phase 3. <span class="tag fact">Fact</span> The decision was application-specific, but it put every subsequent psychedelic sponsor on notice about blinding and trial conduct. <span class="tag interp">Interpretation</span></li>
-<li><b>FDA psychedelic guidance.</b> Draft guidance issued June 2023; finalized July 2026 (per Yale Journal on Regulation). It explicitly warns that perceptual effects can defeat traditional placebos and suggests alternatives (e.g., sub-perceptual/psychoactive comparators, dose–response designs). EMBRACE's 16 mg / 8 mg / placebo structure partially answers the dose–response suggestion; APPROACH does not. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>Regulatory tailwinds in 2026.</b> FDA held a public hearing on psychedelic therapy access in September 2026; Commissioner Makary has publicly signaled an approval decision for at least one priority psychedelic compound by late summer/fall 2026. COMPASS is in a rolling NDA for COMP360 with final submission targeted Q4 2026. <span class="tag fact">Fact</span> A first-ever psychedelic approval would de-risk the regulatory path conceptually — but also set the comparator bar. <span class="tag interp">Interpretation</span></li>
-<li><b>Controlled-substance reality.</b> HLP003/HLP004 are Schedule I (US), Schedule III (Canada CDSA), Class A/Schedule 1 (UK). Approval would require DEA rescheduling proceedings and a REMS-like supervised-administration framework (the Spravato precedent). This is a post-binary commercial consideration, kept lean per the mandate. <span class="tag fact">Fact</span></li>
-<li><b>Company-stated path:</b> if APPROACH data hold, Helus aims to file an NDA in <b>2028</b> (reported via company commentary, trade press). <span class="tag unv">Unverified</span> — no formal NDA-filing guidance appears in the company's primary filings reviewed.</li>
+<li><b>FDA Breakthrough Therapy Designation</b> for HLP003 in adjunctive MDD, granted <b>March 13, 2024</b> — provides expedited review pathway and closer FDA interaction on trial design. BTD is not an approval and does not lower the efficacy bar. <span class="ev fact">FACT</span></li>
+<li><b>Trial design was aligned with FDA</b> before PARADIGM launched (company statement, Nov 2024). <span class="ev fact">FACT</span> Details of that alignment (e.g., whether FDA accepted the inactive-placebo design without reservation) are not public. <span class="ev gap">GAP</span></li>
+<li><b>The Lykos precedent (Aug 2024).</b> FDA issued a complete response letter for MDMA-assisted therapy in PTSD after an advisory committee voted 9–2 against efficacy and 10–1 that benefits did not outweigh risks. Central issues: functional unblinding, expectancy bias, and whether psychotherapy contributed to benefit. FDA requested another Phase 3. <span class="ev fact">FACT</span> The decision was application-specific, but it put every subsequent psychedelic sponsor on notice about blinding and trial conduct. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>FDA psychedelic guidance.</b> Draft guidance issued June 2023; finalized July 2026 (per Yale Journal on Regulation). It explicitly warns that perceptual effects can defeat traditional placebos and suggests alternatives (e.g., sub-perceptual/psychoactive comparators, dose–response designs). EMBRACE's 16 mg / 8 mg / placebo structure partially answers the dose–response suggestion; APPROACH does not. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Regulatory tailwinds in 2026.</b> FDA held a public hearing on psychedelic therapy access in September 2026; Commissioner Makary has publicly signaled an approval decision for at least one priority psychedelic compound by late summer/fall 2026. COMPASS is in a rolling NDA for COMP360 with final submission targeted Q4 2026. <span class="ev fact">FACT</span> A first-ever psychedelic approval would de-risk the regulatory path conceptually — but also set the comparator bar. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Controlled-substance reality.</b> HLP003/HLP004 are Schedule I (US), Schedule III (Canada CDSA), Class A/Schedule 1 (UK). Approval would require DEA rescheduling proceedings and a REMS-like supervised-administration framework (the Spravato precedent). This is a post-binary commercial consideration, kept lean per the mandate. <span class="ev fact">FACT</span></li>
+<li><b>Company-stated path:</b> if APPROACH data hold, Helus aims to file an NDA in <b>2028</b> (reported via company commentary, trade press). <span class="ev unverified">UNVERIFIED</span> — no formal NDA-filing guidance appears in the company's primary filings reviewed.</li>
 </ul>
 </section>
-
 <!-- ============ 6 ============ -->
-<section class="card" id="s6">
-<h2><span class="num">6</span>Competition — Clinical Differentiation Only</h2>
-<p class="secsub">No marketing language. No cross-trial efficacy rankings. Each program described on its own design and population.</p>
+<section id="s6"><div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>A crowded psychedelic field, one deuterated lane</h2><p class="lede">No marketing language. No cross-trial efficacy rankings. Each program described on its own design and population.</p></div></div>
+
+
 <div class="twrap"><table>
 <tr><th>Competitor</th><th>Program</th><th>Population / design</th><th>Status</th><th>Differentiation vs HLP003</th></tr>
-<tr><td><b>COMPASS Pathways (CMPS)</b></td><td>COMP360 — synthetic psilocybin, 25 mg</td><td><b>Treatment-resistant depression</b> (failed ≥2 antidepressants); single dose vs placebo</td><td>COMP005 (n=258) met primary: −3.6 MADRS vs placebo at 6 wks, p&lt;0.001; COMP006 two-dose data: 39% clinically meaningful response, durable to 26 wks. Rolling NDA underway, final submission targeted Q4 2026; commercial launch targeted H1 2027. <span class="tag fact">Fact</span></td><td>Different population (TRD vs Helus's non-TRD adjunctive MDD — Helus <i>excludes</i> ≥2 failures); non-deuterated psilocybin vs deuterated psilocin analog; COMPASS is ~18 months ahead regulatorily. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Definium Therapeutics (DFTX)</b> <span class="small">(renamed from MindMed in 2026)</span></td><td>DT120 ODT — lysergide (LSD) tartrate, orally disintegrating tablet</td><td>GAD: Panorama Ph3 (n=245), single 100 µg dose, HAM-A at 12 wks; MDD: Ascend Ph3 (n≈175)</td><td>Panorama topline (Sept 2026): Δ5.1 HAM-A vs placebo at 12 wks (p&lt;0.0001, d=0.64). Company guides pre-NDA meeting Q4 2026 and GAD NDA filing H1 2027; Ascend MDD topline expected 2027. BTD for GAD. <span class="tag fact">Fact</span></td><td>Different molecule (LSD vs deuterated psilocin), different lead indication (GAD vs MDD), longer session (~8h supervision vs HLP004's ~3h discharge). DT120 is ahead in GAD — the indication where HLP004 is still pre-Phase-3. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Atai Beckley (ATAI)</b></td><td>VLS-01 (buccal DMT) in TRD; EMP-01 (MDMA) in social anxiety</td><td>TRD; social anxiety disorder</td><td>Late-stage; formed via Atai–Beckley merger. <span class="tag fact">Fact</span></td><td>DMT-based like HLP004 (buccal vs IM); TRD focus vs Helus adjunctive-MDD. <span class="tag interp">Interpretation</span></td></tr>
-<tr><td><b>GH Research (GHRS)</b></td><td>GH001 — inhaled 5-MeO-DMT</td><td>TRD</td><td>Phase 2b complete; Phase 3 planned. <span class="tag fact">Fact</span></td><td>Ultra-short duration inhaled route; different receptor pharmacology (5-MeO-DMT). <span class="tag interp">Interpretation</span></td></tr>
-<tr><td><b>Reunion Neuroscience</b></td><td>RE104 — 4-OH-DiPT prodrug</td><td>Postpartum depression / MDD adjunctive</td><td>Phase 2. <span class="tag fact">Fact</span></td><td>Earlier stage; adjacent indication. <span class="tag interp">Interpretation</span></td></tr>
-<tr><td><b>Spravato (J&J) — esketamine</b></td><td>NMDA antagonist nasal spray</td><td>TRD + MDD with acute suicidal ideation; adjunctive; REMS supervised administration</td><td>Approved; ~$1.7B annual run rate (J&amp;J Q2 2025, cited in company materials). <span class="tag fact">Fact</span></td><td>Only approved rapid-acting adjunctive antidepressant; proves the supervised-administration commercial model psychedelics would follow. Different mechanism entirely. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Auvelity (AXSM)</b> / SSRIs / SNRIs</td><td>Dextromethorphan-bupropion; standard antidepressants</td><td>MDD (incl. adjunctive use of atypical antipsychotics)</td><td>Approved/marketed. <span class="tag fact">Fact</span></td><td>Background SoC in PARADIGM; atypical antipsychotics are the current adjunctive standard Helus positions against. <span class="tag fact">Fact</span></td></tr>
+<tr><td><b>COMPASS Pathways (CMPS)</b></td><td>COMP360 — synthetic psilocybin, 25 mg</td><td><b>Treatment-resistant depression</b> (failed ≥2 antidepressants); single dose vs placebo</td><td>COMP005 (n=258) met primary: −3.6 MADRS vs placebo at 6 wks, p&lt;0.001; COMP006 two-dose data: 39% clinically meaningful response, durable to 26 wks. Rolling NDA underway, final submission targeted Q4 2026; commercial launch targeted H1 2027. <span class="ev fact">FACT</span></td><td>Different population (TRD vs Helus's non-TRD adjunctive MDD — Helus <i>excludes</i> ≥2 failures); non-deuterated psilocybin vs deuterated psilocin analog; COMPASS is ~18 months ahead regulatorily. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Definium Therapeutics (DFTX)</b> <span class="small">(renamed from MindMed in 2026)</span></td><td>DT120 ODT — lysergide (LSD) tartrate, orally disintegrating tablet</td><td>GAD: Panorama Ph3 (n=245), single 100 µg dose, HAM-A at 12 wks; MDD: Ascend Ph3 (n≈175)</td><td>Panorama topline (Sept 2026): Δ5.1 HAM-A vs placebo at 12 wks (p&lt;0.0001, d=0.64). Company guides pre-NDA meeting Q4 2026 and GAD NDA filing H1 2027; Ascend MDD topline expected 2027. BTD for GAD. <span class="ev fact">FACT</span></td><td>Different molecule (LSD vs deuterated psilocin), different lead indication (GAD vs MDD), longer session (~8h supervision vs HLP004's ~3h discharge). DT120 is ahead in GAD — the indication where HLP004 is still pre-Phase-3. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Atai Beckley (ATAI)</b></td><td>VLS-01 (buccal DMT) in TRD; EMP-01 (MDMA) in social anxiety</td><td>TRD; social anxiety disorder</td><td>Late-stage; formed via Atai–Beckley merger. <span class="ev fact">FACT</span></td><td>DMT-based like HLP004 (buccal vs IM); TRD focus vs Helus adjunctive-MDD. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>GH Research (GHRS)</b></td><td>GH001 — inhaled 5-MeO-DMT</td><td>TRD</td><td>Phase 2b complete; Phase 3 planned. <span class="ev fact">FACT</span></td><td>Ultra-short duration inhaled route; different receptor pharmacology (5-MeO-DMT). <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Reunion Neuroscience</b></td><td>RE104 — 4-OH-DiPT prodrug</td><td>Postpartum depression / MDD adjunctive</td><td>Phase 2. <span class="ev fact">FACT</span></td><td>Earlier stage; adjacent indication. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Spravato (J&amp;J) — esketamine</b></td><td>NMDA antagonist nasal spray</td><td>TRD + MDD with acute suicidal ideation; adjunctive; REMS supervised administration</td><td>Approved; ~$1.7B annual run rate (J&amp;J Q2 2025, cited in company materials). <span class="ev fact">FACT</span></td><td>Only approved rapid-acting adjunctive antidepressant; proves the supervised-administration commercial model psychedelics would follow. Different mechanism entirely. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Auvelity (AXSM)</b> / SSRIs / SNRIs</td><td>Dextromethorphan-bupropion; standard antidepressants</td><td>MDD (incl. adjunctive use of atypical antipsychotics)</td><td>Approved/marketed. <span class="ev fact">FACT</span></td><td>Background SoC in PARADIGM; atypical antipsychotics are the current adjunctive standard Helus positions against. <span class="ev fact">FACT</span></td></tr>
 </table></div>
-<p class="small">Deliberately excluded from head-to-head: no cross-trial efficacy comparisons are made in this dossier, per standing policy — trial populations, endpoints, and timepoints differ. <span class="tag fact">Fact</span></p>
+<p class="small">Deliberately excluded from head-to-head: no cross-trial efficacy comparisons are made in this dossier, per standing policy — trial populations, endpoints, and timepoints differ. <span class="ev fact">FACT</span></p>
 </section>
-
 <!-- ============ 7 ============ -->
-<section class="card" id="s7">
-<h2><span class="num">7</span>Financials</h2>
-<p class="secsub">From the Q1 FY2027 MD&A (three months ended June 30, 2026; dated August 14, 2026) and company releases. Fiscal year ends March 31. All figures USD.</p>
+<section id="s7"><div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Cash, burn, and the runway to the readout</h2><p class="lede">From the Q1 FY2027 MD&amp;A (three months ended June 30, 2026; dated August 14, 2026) and company releases. Fiscal year ends March 31. All figures USD.</p></div></div>
+
+
 <div class="kpi">
-  <div class="box"><div class="v">$166.4M</div><div class="l">Cash &amp; equivalents, Jun 30 2026 <span class="tag fact">Fact</span></div></div>
-  <div class="box"><div class="v">$175.1M</div><div class="l">Working capital, Jun 30 2026 <span class="tag fact">Fact</span></div></div>
-  <div class="box"><div class="v">−$37.1M</div><div class="l">Operating cash burn, quarter ended Jun 30 2026 <span class="tag fact">Fact</span></div></div>
-  <div class="box"><div class="v">~4.5 qtrs</div><div class="l">Implied runway at Q1 burn rate <span class="tag interp">Interp</span></div></div>
+<div class="box"><div class="v">$166.4M</div><div class="l">Cash &amp; equivalents, Jun 30 2026 <span class="ev fact">FACT</span></div></div>
+<div class="box"><div class="v">$175.1M</div><div class="l">Working capital, Jun 30 2026 <span class="ev fact">FACT</span></div></div>
+<div class="box"><div class="v">−$37.1M</div><div class="l">Operating cash burn, quarter ended Jun 30 2026 <span class="ev fact">FACT</span></div></div>
+<div class="box"><div class="v">~4.5 qtrs</div><div class="l">Implied runway at Q1 burn rate <span class="ev interp">INTERPRETATION</span></div></div>
 </div>
 <div class="twrap"><table>
 <tr><th style="width:230px">Item</th><th>Detail</th></tr>
-<tr><td>Cash trajectory</td><td>Cash: $157.3M (Mar 31, 2026) → <b>$166.4M (Jun 30, 2026)</b>, after a <b>$50M underwritten offering</b> (10,309,280 shares at <b>$4.85</b>, closed June 25, 2026; ~$3M commission). FY2026 net loss $148.0M; cash-based opex $131.7M. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Burn</td><td>Net cash used in operations: $37.1M in Q1 FY2027 vs $29.6M in the prior-year quarter (+25%). At the Q1 rate, cash covers roughly 4.5 quarters — i.e., into late 2027 on a straight-line basis, before any financing. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span> Burn typically rises into a second pivotal trial and NDA prep; straight-line math is optimistic. <span class="tag interp">Interpretation</span></td></tr>
-<tr><td>Dilution history</td><td>1-for-38 share consolidation Sept 19, 2024 (all figures restated). 2025 ATM (Cantor): 1,997,205 shares at avg $7.83 for $15.6M gross (Feb–Sept 2025). June 2026: $50M at $4.85. July–Aug 2026: ~11.1M shares from RSU vesting + pre-funded warrant exercises (non-cash for the most part). <span class="tag fact">Fact</span></td></tr>
-<tr><td>Live dilution facility</td><td><b>2026 ATM program</b> (Cantor Fitzgerald): up to <b>$100M</b>, established Dec 30, 2025, effective to Oct 17, 2027. <b>No shares sold under it as of June 30, 2026.</b> Usage after June 30 is not disclosed in the materials reviewed. <span class="tag fact">Fact</span> <span class="tag gap">Gap</span> — the ATM is the most likely pre-EMBRACE financing tool; watch Q2 FY2027 filings.</td></tr>
-<tr><td>Debt</td><td>No long-term debt identified in the MD&A excerpts reviewed; the company funds via equity. <span class="tag gap">Gap</span> — full balance-sheet line items beyond cash/working capital were not exhaustively reviewed.</td></tr>
-<tr><td>Warrant overhang</td><td>12,016,335 warrants outstanding at MD&A date (Aug 14, 2026), weighted-average exercise <b>$10.11</b> — essentially at-the-money vs the current ~$10.6 price. Exercise would bring ~$121M cash but add ~16% to basic shares. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></td></tr>
+<tr><td>Cash trajectory</td><td>Cash: $157.3M (Mar 31, 2026) → <b>$166.4M (Jun 30, 2026)</b>, after a <b>$50M underwritten offering</b> (10,309,280 shares at <b>$4.85</b>, closed June 25, 2026; ~$3M commission). FY2026 net loss $148.0M; cash-based opex $131.7M. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Burn</td><td>Net cash used in operations: $37.1M in Q1 FY2027 vs $29.6M in the prior-year quarter (+25%). At the Q1 rate, cash covers roughly 4.5 quarters — i.e., into late 2027 on a straight-line basis, before any financing. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span> Burn typically rises into a second pivotal trial and NDA prep; straight-line math is optimistic. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Dilution history</td><td>1-for-38 share consolidation Sept 19, 2024 (all figures restated). 2025 ATM (Cantor): 1,997,205 shares at avg $7.83 for $15.6M gross (Feb–Sept 2025). June 2026: $50M at $4.85. July–Aug 2026: ~11.1M shares from RSU vesting + pre-funded warrant exercises (non-cash for the most part). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Live dilution facility</td><td><b>2026 ATM program</b> (Cantor Fitzgerald): up to <b>$100M</b>, established Dec 30, 2025, effective to Oct 17, 2027. <b>No shares sold under it as of June 30, 2026.</b> Usage after June 30 is not disclosed in the materials reviewed. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span> — the ATM is the most likely pre-EMBRACE financing tool; watch Q2 FY2027 filings.</td></tr>
+<tr><td>Debt</td><td>No long-term debt identified in the MD&amp;A excerpts reviewed; the company funds via equity. <span class="ev gap">GAP</span> — full balance-sheet line items beyond cash/working capital were not exhaustively reviewed.</td></tr>
+<tr><td>Warrant overhang</td><td>12,016,335 warrants outstanding at MD&amp;A date (Aug 14, 2026), weighted-average exercise <b>$10.11</b> — essentially at-the-money vs the current ~$10.6 price. Exercise would bring ~$121M cash but add ~16% to basic shares. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-<div class="callout"><b>Financing read-through.</b> Cash covers operations into late 2027 on current burn — enough to reach the APPROACH readout (Q4 2026) and most of the way to EMBRACE (H1 2027), but not through an NDA filing (2028). The company will very likely need to raise before or around the EMBRACE readout. The $100M ATM is the path of least resistance; positive APPROACH data would let it raise from strength, a miss would force it from weakness. <span class="tag interp">Interpretation</span></div>
+<div class="callout"><b>Financing read-through.</b> Cash covers operations into late 2027 on current burn — enough to reach the APPROACH readout (Q4 2026) and most of the way to EMBRACE (H1 2027), but not through an NDA filing (2028). The company will very likely need to raise before or around the EMBRACE readout. The $100M ATM is the path of least resistance; positive APPROACH data would let it raise from strength, a miss would force it from weakness. <span class="ev interp">INTERPRETATION</span></div>
 </section>
-
 <!-- ============ 8 ============ -->
-<section class="card" id="s8">
-<h2><span class="num">8</span>Fully-Diluted Market Cap &amp; Enterprise Value</h2>
-<p class="secsub">Dilution-honest share count from the August 14, 2026 MD&A. Price reference <b>~$11.80</b> (Oct 9, 2026 close; +10.1% on the day, 52-week range $3.76–$15.15). <span class="tag fact">Fact</span></p>
+<section id="s8"><div class="section-head"><div class="section-num">08 / VALUE</div><div><h2>The dilution-honest share count</h2><p class="lede">Dilution-honest share count from the August 14, 2026 MD&amp;A. Price reference <b>~$11.80</b> (Oct 9, 2026 close; +10.1% on the day, 52-week range $3.76–$15.15). <span class="ev fact">FACT</span></p></div></div>
+
+
 <div class="twrap"><table>
 <tr><th>Component</th><th>Shares</th><th>Source / note</th></tr>
-<tr><td>Common shares outstanding (Aug 14, 2026)</td><td><b>73,060,172</b></td><td>MD&A; = 61,984,078 (Jun 30) + 7,889,846 RSU-vesting shares (Jul 1) + 2,997,248 pre-funded warrant exercises (Aug 10) + 189,000 warrant exercises (Aug 10). Reconciles exactly. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Stock options</td><td>1,111,967</td><td>MD&A date. <span class="tag fact">Fact</span></td></tr>
-<tr><td>RSUs (outstanding + obligated)</td><td>2,155,476</td><td>1,645,678 outstanding + 509,798 obligation crystallized Aug 10. <span class="tag fact">Fact</span></td></tr>
-<tr><td>PSUs (price-target vesting)</td><td>425,000</td><td>Granted Aug 3 to two new officers; vest on share-price targets. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Warrants</td><td>12,016,335</td><td>WAEP $10.11. <span class="tag fact">Fact</span></td></tr>
-<tr><td>Pre-funded warrants</td><td>0</td><td>Fully exercised Aug 10. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Fully-diluted total</b></td><td><b>≈ 88,768,950</b></td><td>Sum of the above. <span class="tag interp">Interpretation</span></td></tr>
+<tr><td>Common shares outstanding (Aug 14, 2026)</td><td><b>73,060,172</b></td><td>MD&amp;A = 61,984,078 (Jun 30) + 7,889,846 RSU-vesting shares (Jul 1) + 2,997,248 pre-funded warrant exercises (Aug 10) + 189,000 warrant exercises (Aug 10). Reconciles exactly. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Stock options</td><td>1,111,967</td><td>MD&amp;A date. <span class="ev fact">FACT</span></td></tr>
+<tr><td>RSUs (outstanding + obligated)</td><td>2,155,476</td><td>1,645,678 outstanding + 509,798 obligation crystallized Aug 10. <span class="ev fact">FACT</span></td></tr>
+<tr><td>PSUs (price-target vesting)</td><td>425,000</td><td>Granted Aug 3 to two new officers; vest on share-price targets. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Warrants</td><td>12,016,335</td><td>WAEP $10.11. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Pre-funded warrants</td><td>0</td><td>Fully exercised Aug 10. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Fully-diluted total</b></td><td><b>≈ 88,768,950</b></td><td>Sum of the above. <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
 <div class="kpi">
-  <div class="box"><div class="v">~$862M</div><div class="l">Basic mcap (73.06M × $11.80) <span class="tag interp">Interp</span></div></div>
-  <div class="box"><div class="v">~$1,048M</div><div class="l">Fully-diluted mcap (88.77M × $11.80) <span class="tag interp">Interp</span></div></div>
-  <div class="box"><div class="v">~$694M</div><div class="l">Basic EV (~$862M − ~$168M net cash) <span class="tag interp">Interp</span></div></div>
-  <div class="box"><div class="v">~$880M</div><div class="l">FD EV (~$1,048M − ~$168M net cash) <span class="tag interp">Interp</span></div></div>
+<div class="box"><div class="v">~$862M</div><div class="l">Basic mcap (73.06M × $11.80) <span class="ev interp">INTERPRETATION</span></div></div>
+<div class="box"><div class="v">~$1,048M</div><div class="l">Fully-diluted mcap (88.77M × $11.80) <span class="ev interp">INTERPRETATION</span></div></div>
+<div class="box"><div class="v">~$694M</div><div class="l">Basic EV (~$862M − ~$168M net cash) <span class="ev interp">INTERPRETATION</span></div></div>
+<div class="box"><div class="v">~$880M</div><div class="l">FD EV (~$1,048M − ~$168M net cash) <span class="ev interp">INTERPRETATION</span></div></div>
 </div>
-<p class="small">Net cash ≈ $166.4M (Jun 30) + ~$1.5M warrant-exercise proceeds (Aug 10), less two-plus months of burn since — figure is approximate; debt assumed nil (not exhaustively verified). FD share count is ~21% above basic — dilution-honest math matters here. The $10.11 warrant strike now sits ~14% in the money at $11.80: exercise would bring ~$121M of cash in but add ~16% to the share count. <span class="tag interp">Interpretation</span></p>
+<p class="small">Net cash ≈ $166.4M (Jun 30) + ~$1.5M warrant-exercise proceeds (Aug 10), less two-plus months of burn since — figure is approximate; debt assumed nil (not exhaustively verified). FD share count is ~21% above basic — dilution-honest math matters here. The $10.11 warrant strike now sits ~14% in the money at $11.80: exercise would bring ~$121M of cash in but add ~16% to the share count. <span class="ev interp">INTERPRETATION</span></p>
 </section>
-
 <!-- ============ 9 ============ -->
-<section class="card" id="s9">
-<h2><span class="num">9</span>Catalyst / Event Map</h2>
-<p class="secsub">Every known upcoming event for the stock, tagged by date quality. Cross-checked against the 2027 catalyst calendar and Q4 2026 dossier datasets (records v16-0085, Q4-2026 HELP row).</p>
+<section id="s9"><div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>APPROACH in Q4 2026 — then EMBRACE</h2><p class="lede">Every known upcoming event for the stock, tagged by date quality. Cross-checked against the 2027 catalyst calendar and Q4 2026 dossier datasets (records v16-0085, Q4-2026 HELP row).</p></div></div>
+
+
 <p class="secsub">Every known upcoming event for the stock, tagged by date quality. <b>Oct 10 audit:</b> added the Oct 21 investor presentation (announced Oct 8); flagged the HLP004 next-study design deadline as <b>past due</b>; added Q2 FY2027 results as a financing checkpoint. Cross-checked against the 2027 catalyst calendar and Q4 2026 dossier datasets.</p>
 <div class="twrap"><table>
 <tr><th>Event</th><th>Date / window</th><th>Quality</th><th>What "good" looks like</th><th>What to watch</th></tr>
-<tr><td><b>Investor presentation</b> (HLP003 Ph3 + HLP004 Ph2 updates, KOLs, Q&amp;A)</td><td><b>Oct 21, 2026</b>, 9:00 am EDT</td><td><span class="tag hard">Hard</span></td><td>HLP004 next-study design + timelines disclosed; APPROACH window narrowed; supportive KOL framing; no ATM-overhang language</td><td>Whether the overdue HLP004 design appears; any APPROACH timing refinement; cash/ATM commentary <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>APPROACH topline</b> — first pivotal, HLP003 16 mg vs placebo, n=223, MADRS at 6 wks</td><td><b>Q4 2026</b></td><td><span class="tag guidance">Guidance</span></td><td>Statistically significant MADRS separation (low-to-mid single digits acceptable — COMPASS cleared 3.6 pts at p&lt;0.001 in TRD as the class precedent); sane placebo response; no suicidality/safety imbalance</td><td>Absolute separation vs Phase 2's 14 pts; dropout/adherence rates; any unblinding discussion in the PR; baseline age imbalance (median 44 vs 50) <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>HLP004 next-study design</b> — was targeted "by end of Q3 2026"</td><td><b>Past due</b> (deadline was Sept 30, 2026)</td><td><span class="tag guidance">Guidance</span> → overdue</td><td>Design announced, ideally at the Oct 21 event; credible Phase 2b/3 path in GAD</td><td>No announcement as of Oct 10 — delay explanation; GAD timeline vs DFTX DT120 (NDA targeted H1 2027) <span class="tag gap">Gap</span></td></tr>
-<tr><td><b>Q2 FY2027 results</b> (quarter ended Sept 30, 2026)</td><td><b>Nov 2026</b> (typical cadence; Q1 reported Aug 14)</td><td><span class="tag inferred">Inferred</span></td><td>Cash position disclosed; ATM untapped pre-data; burn in line</td><td>ATM usage (or not); burn trajectory into EMBRACE <span class="tag gap">Gap</span></td></tr>
-<tr><td><b>COMPASS (CMPS): COMP360 final NDA submission</b> (TRD)</td><td><b>Q4 2026</b></td><td><span class="tag guidance">Guidance</span> · competitor</td><td>Rolling submission completes on schedule — first classic-psychedelic NDA at FDA</td><td>FDA posture/methodology language; read-through for the class's blinding bar <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Definium (DFTX): pre-NDA meeting</b> for DT120 ODT in GAD</td><td><b>Q4 2026</b></td><td><span class="tag guidance">Guidance</span> · competitor</td><td>—</td><td>Meeting outcome; GAD NDA (H1 2027) on track — the indication where HLP004 competes <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>EMBRACE topline</b> — second pivotal, 16 mg / 8 mg / placebo, n=330</td><td><b>H1 2027</b></td><td><span class="tag inferred">Inferred</span></td><td>Replicates APPROACH; 16 mg &gt; 8 mg dose-response supports the pivotal dose</td><td>Company has issued <b>no</b> readout guidance — inferred from CT.gov primary completion 2027-06-07 (NCT06793397); whether formal guidance appears <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Definium Ascend Ph3 topline</b> (DT120 in MDD, n≈175)</td><td><b>2027</b></td><td><span class="tag guidance">Guidance</span> · competitor</td><td>—</td><td>Second psychedelic Ph3 MDD readout; population/design differ from PARADIGM — no cross-trial ranking <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>HLP005 development-candidate selection</b></td><td><b>H2 2027</b></td><td><span class="tag guidance">Guidance</span></td><td>—</td><td>Preclinical milestone; minor vs the clinical binaries <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>HLP003 NDA filing</b> (if APPROACH data hold)</td><td><b>2028</b></td><td><span class="tag unv">Unverified</span></td><td>—</td><td>Referenced in company commentary (trade press) only; no formal guidance in filings reviewed <span class="tag unv">Unverified</span></td></tr>
-<tr><td><b>Financing watch</b> — $100M ATM (unused as of Jun 30, 2026)</td><td><b>Ongoing</b></td><td>—</td><td>Raise from strength after positive APPROACH</td><td>ATM usage/timing; warrant exercises ($10.11 strike now ~14% in the money) <span class="tag gap">Gap</span></td></tr>
+<tr><td><b>Investor presentation</b> (HLP003 Ph3 + HLP004 Ph2 updates, KOLs, Q&amp;A)</td><td><b>Oct 21, 2026</b>, 9:00 am EDT</td><td><span class="date-tag hard">Hard</span></td><td>HLP004 next-study design + timelines disclosed; APPROACH window narrowed; supportive KOL framing; no ATM-overhang language</td><td>Whether the overdue HLP004 design appears; any APPROACH timing refinement; cash/ATM commentary <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>APPROACH topline</b> — first pivotal, HLP003 16 mg vs placebo, n=223, MADRS at 6 wks</td><td><b>Q4 2026</b></td><td><span class="date-tag guidance">Guidance</span></td><td>Statistically significant MADRS separation (low-to-mid single digits acceptable — COMPASS cleared 3.6 pts at p&lt;0.001 in TRD as the class precedent); sane placebo response; no suicidality/safety imbalance</td><td>Absolute separation vs Phase 2's 14 pts; dropout/adherence rates; any unblinding discussion in the PR; baseline age imbalance (median 44 vs 50) <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>HLP004 next-study design</b> — was targeted "by end of Q3 2026"</td><td><b>Past due</b> (deadline was Sept 30, 2026)</td><td><span class="date-tag guidance">Guidance</span> → overdue</td><td>Design announced, ideally at the Oct 21 event; credible Phase 2b/3 path in GAD</td><td>No announcement as of Oct 10 — delay explanation; GAD timeline vs DFTX DT120 (NDA targeted H1 2027) <span class="ev gap">GAP</span></td></tr>
+<tr><td><b>Q2 FY2027 results</b> (quarter ended Sept 30, 2026)</td><td><b>Nov 2026</b> (typical cadence; Q1 reported Aug 14)</td><td><span class="date-tag inferred">Inferred</span></td><td>Cash position disclosed; ATM untapped pre-data; burn in line</td><td>ATM usage (or not); burn trajectory into EMBRACE <span class="ev gap">GAP</span></td></tr>
+<tr><td><b>COMPASS (CMPS): COMP360 final NDA submission</b> (TRD)</td><td><b>Q4 2026</b></td><td><span class="date-tag guidance">Guidance</span> · competitor</td><td>Rolling submission completes on schedule — first classic-psychedelic NDA at FDA</td><td>FDA posture/methodology language; read-through for the class's blinding bar <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Definium (DFTX): pre-NDA meeting</b> for DT120 ODT in GAD</td><td><b>Q4 2026</b></td><td><span class="date-tag guidance">Guidance</span> · competitor</td><td>—</td><td>Meeting outcome; GAD NDA (H1 2027) on track — the indication where HLP004 competes <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>EMBRACE topline</b> — second pivotal, 16 mg / 8 mg / placebo, n=330</td><td><b>H1 2027</b></td><td><span class="date-tag inferred">Inferred</span></td><td>Replicates APPROACH; 16 mg &gt; 8 mg dose-response supports the pivotal dose</td><td>Company has issued <b>no</b> readout guidance — inferred from CT.gov primary completion 2027-06-07 (NCT06793397); whether formal guidance appears <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Definium Ascend Ph3 topline</b> (DT120 in MDD, n≈175)</td><td><b>2027</b></td><td><span class="date-tag guidance">Guidance</span> · competitor</td><td>—</td><td>Second psychedelic Ph3 MDD readout; population/design differ from PARADIGM — no cross-trial ranking <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>HLP005 development-candidate selection</b></td><td><b>H2 2027</b></td><td><span class="date-tag guidance">Guidance</span></td><td>—</td><td>Preclinical milestone; minor vs the clinical binaries <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>HLP003 NDA filing</b> (if APPROACH data hold)</td><td><b>2028</b></td><td><span class="ev unverified">UNVERIFIED</span></td><td>—</td><td>Referenced in company commentary (trade press) only; no formal guidance in filings reviewed <span class="ev unverified">UNVERIFIED</span></td></tr>
+<tr><td><b>Financing watch</b> — $100M ATM (unused as of Jun 30, 2026)</td><td><b>Ongoing</b></td><td>—</td><td>Raise from strength after positive APPROACH</td><td>ATM usage/timing; warrant exercises ($10.11 strike now ~14% in the money) <span class="ev gap">GAP</span></td></tr>
 </table></div>
 <p class="small">Stale-data sweep (Oct 10): the only pre-today catalyst was the HLP004 design target (end of Q3 2026) — flagged past-due above, not deleted, so the miss is visible. The Oct 1 legal name change is reflected throughout; screening under CYBN returns stale data.</p>
 </section>
-
 <!-- ============ 10 ============ -->
-<section class="card" id="s10">
-<h2><span class="num">10</span>Ranked Red Flags</h2>
-<p class="secsub">Ordered by potential impact on the binary, not by likelihood.</p>
+<section id="s10"><div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>What could sink the binary</h2><p class="lede">Ordered by potential impact on the binary, not by likelihood.</p></div></div>
+
+
 <ol>
-<li><b>Phase 2 → Phase 3 translation risk is extreme here.</b> n=34 primary readout; the 12-month durability story is n=7, uncontrolled, with the placebo arm crossed over. Winner's-curse attenuation is the base-rate expectation in psychiatry Phase 3. <span class="tag interp">Interpretation</span></li>
-<li><b>Inactive placebo in both pivotal trials.</b> The design maximally exposed to functional unblinding — the exact issue at the heart of the Lykos CRL. A positive readout will face the "was it the drug or the trip + expectancy?" question from FDA reviewers and skeptics alike. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>Powering undisclosed; n=223 is modest.</b> ~111/arm detects only large effects. If the true effect is COMPASS-like (3–4 MADRS points), this trial is borderline — and the company won't say what it assumed. <span class="tag gap">Gap</span> <span class="tag interp">Interpretation</span></li>
-<li><b>CEO churn: three transitions in ~18 months.</b> Drysdale (2020–2025) → Cola (ousted at the board's request, Apr 2026) → So (interim, twice) → Halstead (Aug 2026). Halstead's Intra-Cellular/J&amp;J pedigree is strong, but the turnover pattern warrants attention, not celebration. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>Financing wall before the second binary.</b> ~4.5 quarters of cash at current burn; the $100M ATM is live and unused (as of Jun 30). A raise is highly likely before/during the EMBRACE window — timing and pricing depend entirely on APPROACH. <span class="tag interp">Interpretation</span></li>
-<li><b>Baseline age imbalance.</b> Median age 44.0 (HLP003) vs 50.0 (placebo) among the 202 with reported baselines. Probably noise, but a 6-year median gap in a 223-patient depression trial is worth noting when the readout lands. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>TRD excluded — narrower label, selected population.</b> Excluding ≥2-failure patients (and recent psychedelic/ketamine users) enriches for response but limits generalizability and the eventual label's breadth. <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>Heavy RSU-based compensation just vested.</b> July 2026: 4.1M RSUs granted (4.0M immediately vested, partially locked up); August: 1.175M RSUs + 425k PSUs to two new officers. Alignment or dilution depends on your priors — the share count did the talking (+11.1M shares in six weeks). <span class="tag fact">Fact</span> <span class="tag interp">Interpretation</span></li>
-<li><b>No psychedelic has ever been approved.</b> The entire class is pre-precedent at FDA (COMPASS pending). BTD ≠ approval; the finalized July 2026 psychedelic guidance raises the methodological bar. <span class="tag fact">Fact</span></li>
-<li><b>Deuteration benefit is theoretical in humans.</b> No peer-reviewed data show deuterated psilocin beats psilocybin/psilocin on efficacy, safety, or durability. The "better molecule" thesis is PK reasoning, not clinical fact. <span class="tag gap">Gap</span></li>
+<li><b>Phase 2 → Phase 3 translation risk is extreme here.</b> n=34 primary readout; the 12-month durability story is n=7, uncontrolled, with the placebo arm crossed over. Winner's-curse attenuation is the base-rate expectation in psychiatry Phase 3. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Inactive placebo in both pivotal trials.</b> The design maximally exposed to functional unblinding — the exact issue at the heart of the Lykos CRL. A positive readout will face the "was it the drug or the trip + expectancy?" question from FDA reviewers and skeptics alike. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Powering undisclosed; n=223 is modest.</b> ~111/arm detects only large effects. If the true effect is COMPASS-like (3–4 MADRS points), this trial is borderline — and the company won't say what it assumed. <span class="ev gap">GAP</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>CEO churn: three transitions in ~18 months.</b> Drysdale (2020–2025) → Cola (ousted at the board's request, Apr 2026) → So (interim, twice) → Halstead (Aug 2026). Halstead's Intra-Cellular/J&amp;J pedigree is strong, but the turnover pattern warrants attention, not celebration. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Financing wall before the second binary.</b> ~4.5 quarters of cash at current burn; the $100M ATM is live and unused (as of Jun 30). A raise is highly likely before/during the EMBRACE window — timing and pricing depend entirely on APPROACH. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Baseline age imbalance.</b> Median age 44.0 (HLP003) vs 50.0 (placebo) among the 202 with reported baselines. Probably noise, but a 6-year median gap in a 223-patient depression trial is worth noting when the readout lands. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>TRD excluded — narrower label, selected population.</b> Excluding ≥2-failure patients (and recent psychedelic/ketamine users) enriches for response but limits generalizability and the eventual label's breadth. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Heavy RSU-based compensation just vested.</b> July 2026: 4.1M RSUs granted (4.0M immediately vested, partially locked up); August: 1.175M RSUs + 425k PSUs to two new officers. Alignment or dilution depends on your priors — the share count did the talking (+11.1M shares in six weeks). <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+<li><b>No psychedelic has ever been approved.</b> The entire class is pre-precedent at FDA (COMPASS pending). BTD ≠ approval; the finalized July 2026 psychedelic guidance raises the methodological bar. <span class="ev fact">FACT</span></li>
+<li><b>Deuteration benefit is theoretical in humans.</b> No peer-reviewed data show deuterated psilocin beats psilocybin/psilocin on efficacy, safety, or durability. The "better molecule" thesis is PK reasoning, not clinical fact. <span class="ev gap">GAP</span></li>
 </ol>
 </section>
-
 <!-- ============ 11 ============ -->
-<section class="card" id="s11">
-<h2><span class="num">11</span>Bear / Base / Bull + Scenarios</h2>
-<p class="secsub">Framed for a hold-through-the-binary investor. Bear/base/bull now carry explicit <b>SOFT</b> scenario values — illustrative, built from this dossier's own numbers, <b>not</b> price targets and <b>not</b> a recommendation. Maximum-value framing stays capped at the street-high analyst target of <b>$68.24</b>.</p>
-<div class="softbox"><b>SOFT scenario-value assumptions (labeled).</b> Basic shares 73.06M (Aug 14, 2026 MD&amp;A <span class="tag fact">Fact</span>); fully-diluted ≈ 88.77M (derived, §8 <span class="tag interp">Interp</span>); cash ≈ <b>$130M estimated current</b> ($166.4M at Jun 30 <span class="tag fact">Fact</span> − ~3.3 months of burn at $37.1M/qtr + ~$1.5M warrant proceeds <span class="tag interp">Interp</span>); bull case hard-capped at street-high $68.24 per standing rule. Values are scenario illustrations only — the binary, not the model, carries the weight.</div>
+<section id="s11"><div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Three paths, priced with soft anchors</h2><p class="lede">Framed for a hold-through-the-binary investor. Bear/base/bull now carry explicit <b>SOFT</b> scenario values — illustrative, built from this dossier's own numbers, <b>not</b> price targets and <b>not</b> a recommendation. Maximum-value framing stays capped at the street-high analyst target of <b>$68.24</b>.</p></div></div>
+
+
+<div class="softbox"><b>SOFT scenario-value assumptions (labeled).</b> Basic shares 73.06M (Aug 14, 2026 MD&amp;A <span class="ev fact">FACT</span>); fully-diluted ≈ 88.77M (derived, §8 <span class="ev interp">INTERPRETATION</span>); cash ≈ <b>$130M estimated current</b> ($166.4M at Jun 30 <span class="ev fact">FACT</span> − ~3.3 months of burn at $37.1M/qtr + ~$1.5M warrant proceeds <span class="ev interp">INTERPRETATION</span>); bull case hard-capped at street-high $68.24 per standing rule. Values are scenario illustrations only — the binary, not the model, carries the weight.</div>
 <div class="twrap"><table>
 <tr><th>Scenario</th><th>Key assumption</th><th>Equity-value basis (SOFT)</th><th>SOFT value</th></tr>
 <tr><td><b>Bear — APPROACH misses</b></td><td>Primary endpoint not met; EMBRACE becomes long-odds salvage</td><td>~$90M cash remaining after burn to the EMBRACE window + ~$60M residual option value (HLP004 Ph2 signal, IP, platform) ≈ $150M ÷ 88.77M FD</td><td><b>~$2</b></td></tr>
@@ -382,45 +528,43 @@
 <tr><td><b>Bull — both pivotals hit</b></td><td>APPROACH + EMBRACE positive; NDA path 2028; scarcity value as a late-stage psychedelic franchise</td><td>Naive comps would imply far higher; <b>capped at street-high $68.24</b> per standing max-value rule</td><td><b>~$60–68</b></td></tr>
 </table></div>
 <div class="grid2">
-<div class="callout bad"><b>Bear — APPROACH misses (primary endpoint not met).</b> The Phase 2 signal fails to replicate at n=223. Stock re-rates to cash-plus-option value; EMBRACE (H1 2027) becomes a long-odds salvage readout with the same design questions. Financing, if needed, comes from weakness via the ATM. HLP004's 36-patient GAD signal is insufficient to carry the valuation. Downside is a function of cash (~$166M) and burn, not of pipeline promises. <span class="tag interp">Interpretation</span></div>
-<div class="callout"><b>Base — APPROACH hits, EMBRACE decides.</b> A clean, statistically significant MADRS separation (low-to-mid single digits, p well under 0.05, no safety signal) validates the platform and sets up EMBRACE as the confirmatory readout in H1 2027. Company raises from strength via the ATM to fund EMBRACE completion and NDA prep; NDA filing targeted 2028. HLP004 advances to its next study. The story becomes execution: two trials, one filing. <span class="tag interp">Interpretation</span></div>
+<div class="callout bad"><b>Bear — APPROACH misses (primary endpoint not met).</b> The Phase 2 signal fails to replicate at n=223. Stock re-rates to cash-plus-option value; EMBRACE (H1 2027) becomes a long-odds salvage readout with the same design questions. Financing, if needed, comes from weakness via the ATM. HLP004's 36-patient GAD signal is insufficient to carry the valuation. Downside is a function of cash (~$166M) and burn, not of pipeline promises. <span class="ev interp">INTERPRETATION</span></div>
+<div class="callout"><b>Base — APPROACH hits, EMBRACE decides.</b> A clean, statistically significant MADRS separation (low-to-mid single digits, p well under 0.05, no safety signal) validates the platform and sets up EMBRACE as the confirmatory readout in H1 2027. Company raises from strength via the ATM to fund EMBRACE completion and NDA prep; NDA filing targeted 2028. HLP004 advances to its next study. The story becomes execution: two trials, one filing. <span class="ev interp">INTERPRETATION</span></div>
 </div>
-<div class="callout" style="border-color:#166534;background:#f0fdf4"><b>Bull — both pivotals hit.</b> APPROACH positive Q4 2026 and EMBRACE positive H1 2027 (with a dose-response leg supporting 16 mg) → NDA filing 2028 as the first deuterated psychedelic for adjunctive MDD, with COMPASS having (plausibly) already broken the regulatory seal in TRD. Scarcity value as one of two late-stage psychedelic franchises invites strategic interest; any takeout/max-value framing must stay at or below the street-high analyst target of <b>$68.24</b>. HLP004 becomes a real second franchise in GAD. <span class="tag interp">Interpretation</span></div>
+<div class="callout"><b>Bull — both pivotals hit.</b> APPROACH positive Q4 2026 and EMBRACE positive H1 2027 (with a dose-response leg supporting 16 mg) → NDA filing 2028 as the first deuterated psychedelic for adjunctive MDD, with COMPASS having (plausibly) already broken the regulatory seal in TRD. Scarcity value as one of two late-stage psychedelic franchises invites strategic interest; any takeout/max-value framing must stay at or below the street-high analyst target of <b>$68.24</b>. HLP004 becomes a real second franchise in GAD. <span class="ev interp">INTERPRETATION</span></div>
 <h3>Scenario analyses</h3>
 <ul>
-<li><b>Mixed readout (one trial hits, one misses):</b> the most analytically interesting branch. A hit on APPROACH + miss on EMBRACE (or vice versa) forces the question the field dreads: was the positive the fluke, or the negative the underpowered one? FDA has approved on one strong pivotal plus supportive data in psychiatry before — but with the unblinding cloud, a split decision likely means a third trial or a narrowed path, plus a financing from ambiguity. <span class="tag interp">Interpretation</span></li>
-<li><b>Positive but "soft" APPROACH (p&lt;0.05, small separation, e.g., 2–3 points):</b> statistically a win, commercially/regulatorily debatable. Expect fierce debate over clinical meaningfulness (the COMPASS 3.6-point precedent cuts both ways) and an immediate focus on EMBRACE's dose-response leg to arbitrate. <span class="tag interp">Interpretation</span></li>
-<li><b>Safety signal:</b> not the base case (Phase 1/2 database is clean: no treatment-related SAEs, no suicidality signal), but serotonergic stacking on SSRIs/SNRIs and the class's suicidality scrutiny mean any imbalance in suicidality-related events would dominate the readout narrative regardless of efficacy. <span class="tag interp">Interpretation</span></li>
-<li><b>Financing-first scenario:</b> company taps the $100M ATM before APPROACH data (unlikely given the readout is weeks away) or immediately after — from strength on a hit, from weakness on a miss. Warrant exercises at $10.11 add up to ~$121M of non-dilutive-ish capital if the price holds above strike, at the cost of ~16% share expansion. <span class="tag interp">Interpretation</span></li>
+<li><b>Mixed readout (one trial hits, one misses):</b> the most analytically interesting branch. A hit on APPROACH + miss on EMBRACE (or vice versa) forces the question the field dreads: was the positive the fluke, or the negative the underpowered one? FDA has approved on one strong pivotal plus supportive data in psychiatry before — but with the unblinding cloud, a split decision likely means a third trial or a narrowed path, plus a financing from ambiguity. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Positive but "soft" APPROACH (p&lt;0.05, small separation, e.g., 2–3 points):</b> statistically a win, commercially/regulatorily debatable. Expect fierce debate over clinical meaningfulness (the COMPASS 3.6-point precedent cuts both ways) and an immediate focus on EMBRACE's dose-response leg to arbitrate. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Safety signal:</b> not the base case (Phase 1/2 database is clean: no treatment-related SAEs, no suicidality signal), but serotonergic stacking on SSRIs/SNRIs and the class's suicidality scrutiny mean any imbalance in suicidality-related events would dominate the readout narrative regardless of efficacy. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Financing-first scenario:</b> company taps the $100M ATM before APPROACH data (unlikely given the readout is weeks away) or immediately after — from strength on a hit, from weakness on a miss. Warrant exercises at $10.11 add up to ~$121M of non-dilutive-ish capital if the price holds above strike, at the cost of ~16% share expansion. <span class="ev interp">INTERPRETATION</span></li>
 </ul>
 </section>
-
 <!-- ============ 12 ============ -->
-<section class="card" id="s12">
-<h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
-<p class="secsub">Who runs it, what they've done, and what they're doing with their own money.</p>
+<section id="s12"><div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management and insider signals</h2><p class="lede">Who runs it, what they've done, and what they're doing with their own money.</p></div></div>
+
+
 <div class="twrap"><table>
 <tr><th>Person</th><th>Role</th><th>Track record / signal</th></tr>
-<tr><td><b>Michael Halstead</b></td><td>CEO (since Aug 5, 2026)</td><td>Former <b>President of Intra-Cellular Therapies</b>; helped scale it from clinical-stage to commercial and led its <b>$14.6B sale to J&amp;J (2025)</b> — the single strongest operator credential in the story. Bought ~$1.35M of HELP stock in the open market (~$11.59–12.47/share) shortly after appointment; not under a 10b5-1 plan. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Eric So</b></td><td>Co-founder, Executive Chairman; interim CEO (twice)</td><td>Founder continuity through all three CEO transitions. Holds ~4M shares; bought more in Aug–Sep 2026 (with Glavine: 385,000 shares, ~$4.55M, Aug 31–Sep 4). No 10b5-1. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Paul Glavine</b></td><td>Co-founder, Chief Growth Officer</td><td>Holds ~4M shares; co-buyer in the Aug–Sep 2026 insider purchases. Awarded 1,046,899 RSUs (Sept 1) + 248,000 immediately-vesting units (Sept 30) per Schedule 13D filings. <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Amir Inamdar, MBBS</b></td><td>Chief Medical Officer</td><td>Psychiatrist; fronting the PARADIGM program (Psych Congress 2026 presenting author). <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Greg Cavers</b></td><td>CFO</td><td>Signed the October 2026 6-K (name-change amendment). <span class="tag fact">Fact</span></td></tr>
-<tr><td><b>Departed: Doug Drysdale</b></td><td>CEO 2020–2025</td><td>Led the company from founding through Phase 2 and BTD. Departure terms not detailed in materials reviewed. <span class="tag gap">Gap</span></td></tr>
-<tr><td><b>Departed: Michael Cola</b></td><td>CEO until Apr 20, 2026</td><td>Stepped down <b>at the request of the board</b>, effective immediately (company release). Reason not disclosed. <span class="tag fact">Fact</span></td></tr>
+<tr><td><b>Michael Halstead</b></td><td>CEO (since Aug 5, 2026)</td><td>Former <b>President of Intra-Cellular Therapies</b>; helped scale it from clinical-stage to commercial and led its <b>$14.6B sale to J&amp;J (2025)</b> — the single strongest operator credential in the story. Bought ~$1.35M of HELP stock in the open market (~$11.59–12.47/share) shortly after appointment; not under a 10b5-1 plan. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Eric So</b></td><td>Co-founder, Executive Chairman; interim CEO (twice)</td><td>Founder continuity through all three CEO transitions. Holds ~4M shares; bought more in Aug–Sep 2026 (with Glavine: 385,000 shares, ~$4.55M, Aug 31–Sep 4). No 10b5-1. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Paul Glavine</b></td><td>Co-founder, Chief Growth Officer</td><td>Holds ~4M shares; co-buyer in the Aug–Sep 2026 insider purchases. Awarded 1,046,899 RSUs (Sept 1) + 248,000 immediately-vesting units (Sept 30) per Schedule 13D filings. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Amir Inamdar, MBBS</b></td><td>Chief Medical Officer</td><td>Psychiatrist; fronting the PARADIGM program (Psych Congress 2026 presenting author). <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Greg Cavers</b></td><td>CFO</td><td>Signed the October 2026 6-K (name-change amendment). <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Departed: Doug Drysdale</b></td><td>CEO 2020–2025</td><td>Led the company from founding through Phase 2 and BTD. Departure terms not detailed in materials reviewed. <span class="ev gap">GAP</span></td></tr>
+<tr><td><b>Departed: Michael Cola</b></td><td>CEO until Apr 20, 2026</td><td>Stepped down <b>at the request of the board</b>, effective immediately (company release). Reason not disclosed. <span class="ev fact">FACT</span></td></tr>
 </table></div>
 <ul>
-<li><b>Net insider signal: positive and unusually large.</b> Four executives bought ~688,000 shares for ~$8.4M in open-market purchases (no prearranged plans), at prices 2×+ the June $4.85 raise — including the new CEO buying $1.35M within weeks of taking the job, ahead of the Phase 3 readout. No insider selling reported. <span class="tag fact">Fact</span> Caveat: insider buying ahead of a binary can reflect genuine conviction or overconfidence; it is not data. <span class="tag interp">Interpretation</span></li>
-<li><b>Institutional:</b> Point72 entities disclosed 686,669 shares (1.4% of class as of Mar 31, 2026), including 666,985 warrant shares (Schedule 13G/A). <span class="tag fact">Fact</span></li>
-<li><b>Sell-side:</b> 10–11 analysts, all Buy/Overweight; consensus target ~$39.87–$48.60 depending on source; street range <b>$14.88–$68.24</b> (S&amp;P Global via stockanalysis.com). Recent: Barclays Overweight $35 (Sept 21, 2026), TD Cowen $62, Wells Fargo Overweight $16. Barclays explicitly framed its $35 as an illustrative scenario on Phase 2 outcomes, not a prediction of the APPROACH result. October 2026: Jefferies maintained Buy (Oct 5, per TipRanks); Canaccord Genuity Buy reiterated (Sept 23, per TipRanks). <span class="tag fact">Fact</span></li>
-<li><b>Board:</b> eight directors elected Sept 2026, including Freda Lewis-Hall (ex-Pfizer CMO) and Eric Hoskins (ex-Ontario health minister) — credible biopharma/policy names. <span class="tag fact">Fact</span></li>
+<li><b>Net insider signal: positive and unusually large.</b> Four executives bought ~688,000 shares for ~$8.4M in open-market purchases (no prearranged plans), at prices 2×+ the June $4.85 raise — including the new CEO buying $1.35M within weeks of taking the job, ahead of the Phase 3 readout. No insider selling reported. <span class="ev fact">FACT</span> Caveat: insider buying ahead of a binary can reflect genuine conviction or overconfidence; it is not data. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Institutional:</b> Point72 entities disclosed 686,669 shares (1.4% of class as of Mar 31, 2026), including 666,985 warrant shares (Schedule 13G/A). <span class="ev fact">FACT</span></li>
+<li><b>Sell-side:</b> 10–11 analysts, all Buy/Overweight; consensus target ~$39.87–$48.60 depending on source; street range <b>$14.88–$68.24</b> (S&amp;P Global via stockanalysis.com). Recent: Barclays Overweight $35 (Sept 21, 2026), TD Cowen $62, Wells Fargo Overweight $16. Barclays explicitly framed its $35 as an illustrative scenario on Phase 2 outcomes, not a prediction of the APPROACH result. October 2026: Jefferies maintained Buy (Oct 5, per TipRanks); Canaccord Genuity Buy reiterated (Sept 23, per TipRanks). <span class="ev fact">FACT</span></li>
+<li><b>Board:</b> eight directors elected Sept 2026, including Freda Lewis-Hall (ex-Pfizer CMO) and Eric Hoskins (ex-Ontario health minister) — credible biopharma/policy names. <span class="ev fact">FACT</span></li>
 </ul>
 </section>
-
 <!-- ============ 13 ============ -->
-<section class="card" id="s13">
-<h2><span class="num">13</span>References, As-Of, Filings Used</h2>
-<p class="secsub">Full references list. Source order followed: SEC/SEDAR filings → FDA/labels → CT.gov → papers/conferences → company PR/decks → trade press.</p>
+<section id="s13"><div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Full references list. Source order followed: SEC/SEDAR filings → FDA/labels → CT.gov → papers/conferences → company PR/decks → trade press.</p></div></div>
+
+
 <h3>Filings used</h3>
 <ul class="ref">
 <li>Helus Pharma (as Cybin Inc. d/b/a Helus Pharma) — MD&amp;A for the three months ended June 30, 2026, dated August 14, 2026 (Q1 FY2027), via Form 6-K (SEDAR+/SEC EDGAR). Primary source for cash ($166.4M), burn ($37.1M), share counts, warrants, ATM, subsequent events. <a href="https://www.bhnet.org/75289/helus-pharma-advances-late-stage-mental-health-pipeline-help-sec-filing/">bhnet.org mirror of the 6-K exhibit</a></li>
@@ -474,35 +618,40 @@
 <h3>As-of &amp; methodology note</h3>
 <p class="small"><b>As-of date: October 10, 2026</b> (built Oct 7; audited &amp; enhanced Oct 10 — price reference updated to $11.80 Oct 9 close, Oct 21 investor presentation added, HLP004 design deadline flagged past-due, SOFT scenario values added to §11, pipeline explicitly value-ranked in §3). Filings used: Q1 FY2027 MD&amp;A (Aug 14, 2026), June 2026 offering documents, 2026 6-Ks (CEO transitions, name change). Every substantive claim is tagged FACT / INTERPRETATION / GAP / UNVERIFIED inline. No DCF, no buy/sell recommendation; §11 values are SOFT scenario illustrations. Maximum-value framing capped at the street-high analyst target ($68.24). No cross-trial head-to-head efficacy claims are made. Commercial sections kept lean per the hold-through-the-binary mandate.</p>
 </section>
-
 </main>
-<button id="toTop" aria-label="Back to top">↑ Top</button>
-<footer><div class="wrap">
+
+<footer><div>
 <p>Biotech Research · Not investment advice. Verify all figures against primary filings before acting.</p>
 </div></footer>
-<script>
-(function(){
-  var root=document.documentElement,btn=document.getElementById('themeBtn');
-  function setTheme(t){root.setAttribute('data-theme',t);try{localStorage.setItem('help-theme',t);}catch(e){}
-    if(btn)btn.textContent=(t==='dark')?'☀ Light':'◐ Dark';}
-  var saved='light';try{saved=localStorage.getItem('help-theme')||'light';}catch(e){}
-  setTheme(saved);
-  if(btn)btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');});
-  var toTop=document.getElementById('toTop');
-  window.addEventListener('scroll',function(){toTop.style.display=(window.scrollY>600)?'block':'none';},{passive:true});
-  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-  document.querySelectorAll('section.card').forEach(function(s){
-    var h=s.querySelector('h2');if(!h)return;
-    var body=document.createElement('div');body.className='secbody';
-    Array.prototype.slice.call(s.children).forEach(function(ch){if(ch!==h)body.appendChild(ch);});
-    s.appendChild(body);
-    h.setAttribute('tabindex','0');h.setAttribute('role','button');
-    h.setAttribute('aria-label','Toggle section');
-    function toggle(){s.classList.toggle('collapsed');}
-    h.addEventListener('click',toggle);
-    h.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+
+<button aria-label="Back to top" class="totop" id="toTop" type="button">↑</button><script>/* Theme toggle */
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀ Light mode':'◐ Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';
+try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+/* Collapsible sections */
+document.querySelectorAll('main > section').forEach(function(sec){
+  const head=sec.querySelector('.section-head'); if(!head)return;
+  const body=document.createElement('div'); body.className='section-body';
+  let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+  sec.appendChild(body);
+  const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+  btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+  btn.addEventListener('click',function(){
+    const c=sec.classList.toggle('collapsed');
+    btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+    btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
   });
-})();
-</script>
-</body>
+  head.appendChild(btn);
+});
+
+/* Back to top */
+const toTop=document.getElementById('toTop');
+function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script></body>
 </html>
