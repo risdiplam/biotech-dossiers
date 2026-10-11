@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GLUE — Monte Rosa Therapeutics | Deep-Dive Investment Dossier</title>
+<style>
+  :root{
+    --ink:#1a2332; --muted:#5b6b82; --line:#e2e8f0; --bg:#f7f9fc;
+    --card:#ffffff; --accent:#0f4c81; --accent2:#0b6e4f;
+    --fact:#0b6e4f; --interp:#0f4c81; --gap:#9a6a00; --unver:#8a1f1f;
+    --hard:#0b6e4f; --guid:#0f4c81; --infr:#7a5c00;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:16px}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+  header.hero{background:var(--ink);color:#fff;padding:38px 0 30px}
+  header.hero h1{margin:0;font-size:30px;letter-spacing:.2px}
+  header.hero .sub{color:#c7d2e2;margin-top:8px;font-size:15px}
+  .kpi{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .kpi .pill{background:#26314a;border:1px solid #3b4a6b;border-radius:8px;padding:8px 14px;font-size:13.5px}
+  .kpi .pill b{color:#fff}
+  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap}
+  nav.toc .wrap{display:flex;gap:4px}
+  nav.toc a{padding:13px 12px;font-size:13.5px;color:var(--muted);text-decoration:none;border-bottom:3px solid transparent}
+  nav.toc a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  section.block{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:26px 0;padding:28px 30px}
+  section.block h2{margin:0 0 4px;font-size:22px;color:var(--accent)}
+  section.block .lede{color:var(--muted);font-size:14px;margin-bottom:16px}
+  h3{font-size:17px;margin:22px 0 8px;color:var(--ink)}
+  h4{font-size:15px;margin:16px 0 6px}
+  p{margin:10px 0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th{text-align:left;background:#eef2f7;padding:10px 12px;border:1px solid var(--line);font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+  td{padding:10px 12px;border:1px solid var(--line);vertical-align:top}
+  .ev{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.6px;border-radius:20px;padding:2px 10px;margin-right:6px;vertical-align:middle}
+  .ev.fact{background:#e3f3ec;color:var(--fact);border:1px solid #bfe3d2}
+  .ev.interp{background:#e6eef9;color:var(--interp);border:1px solid #c4d6ef}
+  .ev.gap{background:#faf3df;color:var(--gap);border:1px solid #e8d9a8}
+  .ev.unver{background:#fbe9e9;color:var(--unver);border:1px solid #f0bcbc}
+  .dq{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.6px;border-radius:6px;padding:2px 9px;margin-right:6px}
+  .dq.hard{background:#dff0e8;color:var(--hard)}
+  .dq.guid{background:#e2eaf8;color:var(--guid)}
+  .dq.infr{background:#f3ecd7;color:var(--infr)}
+  .tl{position:relative;margin:18px 0 6px;padding-left:26px;border-left:3px solid var(--line)}
+  .tl .ev-row{position:relative;padding:10px 0 14px}
+  .tl .ev-row::before{content:"";position:absolute;left:-35px;top:16px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--accent)}
+  .tl .ev-row.past::before{border-color:#94a3b8}
+  .tl .date{font-weight:700;font-size:14px}
+  .callout{border-left:4px solid var(--accent);background:#eef3fa;padding:14px 18px;border-radius:0 8px 8px 0;margin:16px 0;font-size:15px}
+  .warn{border-left:4px solid #b7791f;background:#faf6e8;padding:14px 18px;border-radius:0 8px 8px 0;margin:16px 0;font-size:15px}
+  .risk{background:#fbeeee;border:1px solid #f0c9c9;border-radius:8px;padding:14px 18px;margin:12px 0;font-size:15px}
+  .risk .rank{display:inline-block;background:var(--unver);color:#fff;font-weight:700;border-radius:6px;font-size:12.5px;padding:2px 10px;margin-right:8px}
+  ul.tight li{margin:6px 0}
+  .refs{font-size:13.5px;color:var(--muted)}
+  .refs li{margin:7px 0;word-break:break-word}
+  .refs a{color:var(--accent)}
+  footer{color:var(--muted);font-size:13px;padding:26px 0 46px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}section.block{padding:20px}}
+  .num{font-variant-numeric:tabular-nums}
+  .src{font-size:12.5px;color:var(--muted)}
+
+  /* ---- audit pass 2026-10-10: theme toggle, collapsibles, back-to-top, mobile ---- */
+  .themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:0 14px;min-height:44px;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .themebtn:hover{color:var(--accent);border-color:var(--accent)}
+  nav.toc .wrap{align-items:center}
+  nav.toc a{min-height:44px;display:inline-flex;align-items:center}
+  .navctl{margin-left:auto;display:inline-flex;gap:6px;align-items:center;flex:none}
+  .navctl .themebtn{border:none}
+  .sect-toggle{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);cursor:pointer;font-size:13px;min-width:44px;min-height:44px;padding:6px 10px;margin-right:10px;vertical-align:middle;flex:none}
+  .sect-toggle:hover{color:var(--accent);border-color:var(--accent)}
+  section.block h2{display:flex;align-items:center}
+  section.block.collapsed .sbody{display:none}
+  #toTop{position:fixed;right:18px;bottom:18px;z-index:100;background:var(--accent);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:20px;cursor:pointer;display:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  #toTop.show{display:block}
+  .tscroll{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
+  .tscroll table{margin:0;min-width:640px}
+  .keybox{border:1px solid var(--line);border-radius:8px;padding:12px 16px;background:#f2f6fb;margin:14px 0;font-size:14.5px}
+  .keybox b.t{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin-bottom:4px}
+  tr.past td{background:#f4f6f9;color:var(--muted)}
+  tr.past td:first-child{border-left:4px solid #94a3b8}
+  .soft{border:2px dashed var(--accent);border-radius:8px;padding:14px 18px;margin:14px 0;background:#f4f8fd}
+  html[data-theme="dark"]{--ink:#dbe4f0;--muted:#9fb0c8;--line:#2b3a52;--bg:#101724;--card:#182234;--accent:#7db3e8;--accent2:#5fce9d;--fact:#5fce9d;--interp:#7db3e8;--gap:#e0b64f;--unver:#ef8a8a;--hard:#5fce9d;--guid:#7db3e8;--infr:#e0b64f}
+  html[data-theme="dark"] header.hero{background:#0b1220}
+  html[data-theme="dark"] .kpi .pill{background:#1c2942;border-color:#33456a}
+  html[data-theme="dark"] nav.toc{background:#141d30}
+  html[data-theme="dark"] th{background:#1c2942}
+  html[data-theme="dark"] .callout{background:#16283f}
+  html[data-theme="dark"] .keybox{background:#16283f}
+  html[data-theme="dark"] .soft{background:#14202f}
+  html[data-theme="dark"] .warn{background:#2a2415}
+  html[data-theme="dark"] .risk{background:#2a1d1d;border-color:#5a2f2f}
+  html[data-theme="dark"] .risk[style]{background:#16283f !important;border-color:#2b3a52 !important}
+  html[data-theme="dark"] .tl .ev-row::before{background:#182234}
+  html[data-theme="dark"] tr.past td{background:#141d30}
+  html[data-theme="dark"] .ev.fact{background:#14301f}
+  html[data-theme="dark"] .ev.interp{background:#16283f}
+  html[data-theme="dark"] .ev.gap{background:#2a2415}
+  html[data-theme="dark"] .ev.unver{background:#2a1d1d}
+  html[data-theme="dark"] .dq.hard{background:#14301f}
+  html[data-theme="dark"] .dq.guid{background:#16283f}
+  html[data-theme="dark"] .dq.infr{background:#2a2415}
+  @media(max-width:480px){
+    header.hero h1{font-size:23px}
+    .wrap{padding:0 16px}
+    section.block{padding:18px 16px}
+    section.block h2{font-size:19px}
+    body{font-size:15.5px}
+    #toTop{right:12px;bottom:12px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Monte Rosa Therapeutics, Inc. (Nasdaq: GLUE)</h1>
+    <div class="sub">Deep-dive investment dossier &mdash; molecular glue degrader platform &middot; NEK7 / GSPT1 / VAV1 programs &middot; Audited &amp; enhanced Oct 10, 2026</div>
+    <div class="kpi">
+      <span class="pill">Price <b class="num">$10.30</b> <span style="color:#9fb0c8">(Oct 9, 2026 close)</span></span>
+      <span class="pill">Basic mcap <b class="num">~$868M</b></span>
+      <span class="pill">FD mcap <b class="num">~$1.22B</b></span>
+      <span class="pill">EV <b class="num">~$597M</b></span>
+      <span class="pill">Cash <b class="num">$626.0M</b> <span style="color:#9fb0c8">(Jun 30, 2026)</span></span>
+      <span class="pill">52-wk <b class="num">$7.24&ndash;$25.77</b></span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#s1">1. Thesis Snapshot</a><a href="#s2">2. Science</a><a href="#s3">3. Pipeline</a>
+  <a href="#s4">4. Trial Deep Dive</a><a href="#s5">5. Clinical/Regulatory</a><a href="#s6">6. Competition</a>
+  <a href="#s7">7. Financials</a><a href="#s8">8. FDMC / EV</a><a href="#s9">9. Catalyst Map</a>
+  <a href="#s10">10. Red Flags</a><a href="#s11">11. Scenarios</a><a href="#s12">12. Management</a>
+  <a href="#s13">13. References</a>
+  <span class="navctl">
+    <button class="themebtn" id="expandAll" type="button">Expand all</button>
+    <button class="themebtn" id="collapseAll" type="button">Collapse all</button>
+    <button class="themebtn" id="themeToggle" type="button">☾ Dark</button>
+  </span>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ============ 1 ============ -->
+<section class="block" id="s1">
+<h2>1. Identity &amp; Thesis Snapshot</h2>
+<div class="lede">Who the company is and what the investment hinges on. Evidence labels: <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span> <span class="ev gap">GAP</span> <span class="ev unver">UNVERIFIED</span></div>
+
+<p><span class="ev fact">FACT</span> Monte Rosa Therapeutics, Inc. is a clinical-stage biotechnology company headquartered in Boston, Massachusetts, listed on the Nasdaq Global Select Market under ticker GLUE. It develops small-molecule medicines called molecular glue degraders (MGDs), discovered via its proprietary QuEEN&trade; (Quantitative and Engineered Elimination of Neosubstrates) discovery engine, which combines AI-guided chemistry, chemical libraries, structural biology, and proteomics. <span class="src">(Company 8-K Oct 1, 2026; 10-Q for quarter ended Mar 31, 2026)</span></p>
+
+<p><span class="ev fact">FACT</span> Three programs are in the clinic: MRT-8102 (wholly owned, NEK7-directed MGD for NLRP3/IL-1&ndash;driven inflammatory diseases; Phase 1 complete), MRT-2359 (wholly owned, GSPT1-directed MGD for MYC-driven solid tumors including metastatic castration-resistant prostate cancer; Phase 1/2), and MRT-6160 (VAV1-directed MGD, out-licensed to Novartis; Phase 2 in Sj&ouml;gren&rsquo;s disease initiated September 2026, Novartis-funded). Discovery programs include CDK2- and cyclin E1&ndash;directed MGDs. <span class="src">(Company Q2 2026 PR; 8-K Sept 8, 2026)</span></p>
+
+<p><span class="ev fact">FACT</span> Strategic collaborations: Roche (October 2023; $50M upfront, &gt;$2B in potential milestones plus tiered royalties; oncology and neurology targets; Monte Rosa retains pipeline ownership) and Novartis (VAV1 license: $150M upfront, up to $2.1B in development/regulatory/sales milestones, Novartis funds Phase 2, Monte Rosa co-funds Phase 3 with 30% U.S. profit/loss share plus tiered ex-U.S. royalties; plus a second September 2025 discovery collaboration: $120M upfront, up to $5.7B total value, tiered royalties). <span class="src">(Company PRs Oct 2023, Mar 2026, Sept 2025)</span></p>
+
+<div class="callout"><strong>Thesis in one paragraph.</strong> <span class="ev interp">INTERPRETATION</span> GLUE is an oral targeted-protein-degradation platform whose lead asset, the NEK7 degrader MRT-8102, just delivered the first clinical proof-of-concept for NEK7 degradation: 80&ndash;90% median target knockdown with broad normalization of ASCVD-linked inflammatory biomarkers and a clean 4-week safety profile. The investment is a pure clinical-binary setup: value depends on whether Phase 2 trials in gout (data H2 2027), hidradenitis suppurativa, and coronary artery disease convert a biomarker signal into clinical benefit. The balance sheet (runway into 2029 per company guidance, plus Novartis milestone optionality) funds the company through multiple readouts, but the evidence so far is biomarker-only, insiders have been consistent net sellers, and the market has discounted the stock ~40% over six months despite positive data.</div>
+
+<p><span class="ev fact">FACT</span> As of October 9, 2026 (close): last price $10.30; 52-week range $7.24&ndash;$25.77; basic market cap ~$868M (Finnhub, checked Oct 10, 2026). Consensus sell-side rating is Moderate Buy with an average price target of <strong>$27.63</strong> across ~10 analysts (MarketBeat, Oct 2026; 10 research reports in the past 90 days); the highest published target is $37 (Piper Sandler, Jan 14, 2026). HC Wainwright initiated at Buy/$25 on Oct 1, 2026.</p><p><span class="ev fact">FACT</span> <strong>Sentiment:</strong> 24.13% of the float is sold short with 17.08 days to cover (MarketBeat, Oct 2026) &mdash; elevated bearish positioning that amplifies moves around data events in either direction.</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="block" id="s2">
+<h2>2. Science: Mechanism of Action &amp; Why It Could Fail</h2>
+<div class="lede">Plain-language mechanism, the academic literature behind each target, and failure modes.</div>
+
+<h3>How molecular glue degraders work (plain language)</h3>
+<p><span class="ev fact">FACT</span> Cells tag unwanted proteins with ubiquitin so the proteasome &mdash; the cell&rsquo;s recycling machinery &mdash; destroys them. The tagging is done by E3 ubiquitin ligases; one of them is cereblon. Molecular glue degraders are small molecules that stick a disease-causing protein to an E3 ligase it would not normally touch (creating a new protein&ndash;protein contact, a &ldquo;neosubstrate&rdquo; interaction). The ligase then ubiquitinates the target and the proteasome degrades it. Unlike inhibitors, which must occupy a binding pocket continuously, degraders act catalytically and can eliminate proteins that lack druggable pockets. <span class="src">(Company 10-Q; general TPD literature)</span></p>
+
+<p><span class="ev interp">INTERPRETATION</span> The practical differences versus heterobifunctional PROTACs (Arvinas, Nurix, Kymera): molecular glues are single, monovalent small molecules &mdash; typically better oral bioavailability, lower molecular weight, no linker to optimize &mdash; but the glueable target&ndash;ligase pairs must be discovered empirically rather than designed, which is what the QuEEN engine (proteomics + structural biology + AI chemistry) is built to do. Selectivity is the central claim and the central risk: a glue that degrades off-target neosubstrates can cause toxicity unrelated to the intended target.</p>
+
+<h3>Target 1: NEK7 &rarr; NLRP3 inflammasome (MRT-8102)</h3>
+<p><span class="ev fact">FACT</span> NEK7 (NIMA-related kinase 7) is a licensing factor for the NLRP3 inflammasome: it binds NLRP3 downstream of potassium efflux and is required for inflammasome assembly, caspase-1 activation, and release of IL-1&beta; and IL-18. Degrading NEK7 therefore shuts off NLRP3-driven inflammation upstream of IL-1&beta;/IL-6. <span class="src">(He Y. et al., <em>Nature</em> 530:354&ndash;357, 2016; Shi H. et al., <em>Nat. Immunol.</em> 17:250&ndash;258, 2016)</span></p><p><span class="ev interp">INTERPRETATION</span> <strong>Why it should work:</strong> degrading NEK7 shuts off IL-1&beta;, IL-18, and the DAMP feed-forward loop simultaneously &mdash; broader than blocking any single downstream cytokine &mdash; in an oral small molecule. GFORCE-1&rsquo;s Lp(a) reduction (&minus;24%, described by the company as comparable to PCSK9 inhibitors, with no LDL-C or triglyceride increase) adds a lipid-axis kicker no anti-inflammatory biologic has shown. <span class="src">(Company PR Oct 1, 2026)</span></p>
+
+<p>The academic foundation for NEK7 as a target:</p>
+<ul class="tight">
+<li><span class="ev fact">FACT</span> Three independent 2016 studies converged on NEK7 as essential for NLRP3 activation: He et al. showed NEK7 acts downstream of K<sup>+</sup> efflux (<em>Nature</em>); Shi et al. showed NEK7 coordinates NLRP3 activation versus mitosis (<em>Nat. Immunol.</em>); Schmid-Burgk et al. identified NEK7 in a genome-wide CRISPR screen (<em>J. Biol. Chem.</em> 291:103&ndash;109).</li>
+<li><span class="ev fact">FACT</span> The NLRP3 &rarr; IL-1&beta; &rarr; IL-6 &rarr; CRP axis is clinically validated in atherosclerosis: the CANTOS trial (canakinumab, anti&ndash;IL-1&beta;) reduced cardiovascular events in post-MI patients with elevated hsCRP, at the cost of fatal infections (Ridker P.M. et al., <em>N. Engl. J. Med.</em> 377:1119&ndash;1131, 2017). Colchicine (broad anti-inflammatory) reduced CV events in LoDoCo2 (Nidorf S.M. et al., <em>N. Engl. J. Med.</em> 383:1838&ndash;1847, 2020) and is FDA-approved (Lodoco) for ASCVD risk reduction.</li>
+<li><span class="ev fact">FACT</span> NEK7 also has a mitotic function: Shi et al. demonstrated that NLRP3 activation and mitosis are mutually exclusive events coordinated by NEK7 &mdash; NEK7 is required at the centrosome/spindle during cell division.</li>
+</ul>
+
+<h4>Why NEK7 degradation could fail</h4>
+<ul class="tight">
+<li><span class="ev interp">INTERPRETATION</span> <strong>Mitotic liability.</strong> Because NEK7 is required for mitosis, chronic systemic NEK7 degradation could impair proliferating cells (gut, marrow, immune). A 4-week Phase 1 in healthy-ish volunteers does not derisk months/years of dosing in CAD, gout, or HS. This is the single most important biological risk to the program.</li>
+<li><span class="ev interp">INTERPRETATION</span> <strong>Biomarker &ne; outcomes.</strong> hsCRP/IL-6 reductions are encouraging but CANTOS proved the bar: anti-inflammatory therapy must reduce hard events, and it carried a fatal-infection signal. Degrading NEK7 upstream of IL-1&beta; should phenocopy canakinumab &mdash; including, potentially, its infection risk, which 4 weeks cannot exclude.</li>
+<li><span class="ev interp">INTERPRETATION</span> <strong>Redundancy.</strong> NLRP3-independent inflammatory pathways (NLRC4, AIM2, IL-6 trans-signaling) may sustain disease in CAD/gout/HS even with full NEK7 knockdown.</li>
+<li><span class="ev gap">GAP</span> No published data on the depth/duration of NEK7 degradation needed in human tissue (vs. blood) for clinical effect, nor on recovery kinetics after dosing stops.</li>
+</ul>
+
+<h3>Target 2: GSPT1 (MRT-2359)</h3>
+<p><span class="ev fact">FACT</span> GSPT1 (G1-to-S phase transition 1) is a translation-termination factor. Cereblon-recruiting degraders of GSPT1 trigger the integrated stress response via ATF4, causing death preferentially in cells with high translational demand &mdash; the basis for activity in MYC-driven cancers. The class precedent is BMS&rsquo;s CC-90009, a cereblon E3 ligase modulator that selectively degrades GSPT1 and showed anti-leukemic activity in AML (Surka C. et al., <em>Blood</em> 137:661&ndash;677, 2021; commentary: Grant S., <em>Blood</em> 137:584&ndash;586, 2021).</p><p><span class="ev interp">INTERPRETATION</span> <strong>Why it should work:</strong> MYC-driven tumors run protein synthesis near maximum capacity; blocking translation termination via GSPT1 degradation triggers the ATF4 stress response and kills high-translation-demand cells preferentially. The AR-mutant enrichment strategy in mCRPC concentrates the signal where MYC/AR crosstalk is strongest. <span class="src">(Surka et al., <em>Blood</em> 2021; company Q1 2026 PR)</span></p>
+<ul class="tight">
+<li><span class="ev interp">INTERPRETATION</span> <strong>Failure modes:</strong> (1) GSPT1 is essential in normal proliferating tissue &mdash; therapeutic window depends entirely on selectivity for MYC-driven tumor cells; (2) resistance via cereblon downregulation or mTOR-pathway hyperactivation was described preclinically for CC-90009 (Grant 2021); (3) MRT-2359 is being developed in combination with AR inhibitors, so single-agent contribution is hard to isolate; (4) the clinical dataset is tiny (15 evaluable patients at ASCO GU 2026).</li>
+<li><span class="ev gap">GAP</span> Whether the GSPT1-degrader class has a clinically acceptable therapeutic window in solid tumors is unproven; BMS&rsquo;s CC-90009 AML experience (myelosuppression/hypotension signals reported in its Phase 1) is a cautionary data point but detailed comparison to MRT-2359&rsquo;s selectivity profile has not been publicly disclosed.</li>
+</ul>
+
+<h3>Target 3: VAV1 (MRT-6160, partnered to Novartis)</h3>
+<p><span class="ev fact">FACT</span> VAV1 is a guanine-nucleotide exchange factor downstream of both T-cell and B-cell receptors; degrading it suppresses lymphocyte activation. Monte Rosa reported &gt;90% sustained VAV1 degradation in peripheral blood T cells in Phase 1 with suppression of inflammatory biomarkers and no serious adverse effects. Novartis now runs Phase 2 in Sj&ouml;gren&rsquo;s disease. <span class="src">(Company 8-K Sept 8, 2026)</span></p><p><span class="ev interp">INTERPRETATION</span> <strong>Why it should work:</strong> VAV1 sits at a single signaling node downstream of both the T-cell and B-cell receptors, so degrading it suppresses both arms of adaptive immunity with one oral agent &mdash; a broader mechanism than most single-cytokine or single-lineage autoimmune drugs. Novartis&rsquo;s decision to fund and run Phase 2 is the strongest external validation of the biology. <span class="src">(Company 8-K Sept 8, 2026)</span></p>
+<ul class="tight">
+<li><span class="ev interp">INTERPRETATION</span> <strong>Failure modes:</strong> broad immunosuppression (infection/malignancy risk with chronic T/B-cell suppression); Sj&ouml;gren&rsquo;s is heterogeneous and has no approved systemic therapy &mdash; endpoint selection (e.g., ESSDAI) is noisy; economics to Monte Rosa are capped (30% U.S. profit share, milestones).</li>
+</ul>
+
+<h3>Platform-level risk</h3>
+<p><span class="ev interp">INTERPRETATION</span> The QuEEN engine&rsquo;s selectivity claims rest largely on company-disclosed proteomics. Molecular glues have a documented history of off-target neosubstrate degradation (the IMiD drugs degrade IKZF1/3, SALL4 &mdash; the latter linked to thalidomide teratogenicity; Ito T. et al., <em>Science</em> 327:1345&ndash;1350, 2010). Each new glue is a new selectivity experiment; platform validation requires repeated clinical success, not one Phase 1.</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="block" id="s3">
+<h2>3. Pipeline Overview</h2>
+<div class="lede">All disclosed programs, <strong>ranked by estimated contribution to enterprise value (most &rarr; least)</strong>. Rank reflects ownership, clinical validation, funding, and economics &mdash; not just stage.</div>
+<div class="tscroll"><table>
+<tr><th>#</th><th>Program</th><th>Target / Modality</th><th>Indication(s)</th><th>Stage</th><th>Rights / Economics</th><th>Why this rank</th></tr>
+<tr><td class="num"><strong>1</strong></td><td><strong>MRT-8102</strong></td><td>NEK7-directed MGD, oral QD</td><td>Coronary artery disease; gout; hidradenitis suppurativa</td><td>Phase 1 complete (GFORCE-1); Phase 2 program: GFORCE-2 (CAD, H1 2027), GEMINI-1 (gout, Q4&rsquo;26&ndash;Q1&rsquo;27), GALAXY-1 (HS, H1 2027) <span class="dq guid">guidance</span></td><td>Wholly owned</td><td>Lead asset: first clinical NEK7-degrader proof-of-concept, wholly owned, largest indication breadth &mdash; carries the thesis.</td></tr>
+<tr><td class="num"><strong>2</strong></td><td><strong>MRT-6160</strong> (DDY391)</td><td>VAV1-directed MGD, oral</td><td>Sj&ouml;gren&rsquo;s disease (Novartis Phase 2a/b)</td><td>Phase 2 (Novartis-run, 52-week treatment)</td><td>Novartis exclusive license: $150M upfront received; up to $2.1B milestones ($50M received Sept 2026); Novartis funds Ph2; Monte Rosa co-funds Ph3, 30% U.S. P&amp;L share, tiered ex-U.S. royalties</td><td>De-risked economics: partner-funded, milestone cash, platform validation &mdash; but upside capped by the deal structure.</td></tr>
+<tr><td class="num"><strong>3</strong></td><td><strong>MRT-2359</strong></td><td>GSPT1-directed MGD, oral</td><td>MYC-driven solid tumors; mCRPC (+ AR inhibitor)</td><td>Phase 1/2 (MRT-2359-001); Phase 2 MODeFIRe-1 dosing</td><td>Wholly owned</td><td>Wholly-owned upside option, but the dataset is tiny and confounded and the solid-tumor therapeutic window is unproven &mdash; below the partnered, funded VAV1 asset.</td></tr>
+<tr><td class="num"><strong>4</strong></td><td>Cyclin E1 MGD</td><td>CCNE1-directed MGD</td><td>Oncology (undisclosed)</td><td>Preclinical; IND planned 2027 <span class="dq guid">guidance</span></td><td>Wholly owned</td><td>Next wholly-owned clinical candidate; value is pure option until IND.</td></tr>
+<tr><td class="num"><strong>5</strong></td><td>CDK2 MGD</td><td>CDK2-directed MGD</td><td>Oncology (undisclosed)</td><td>Discovery/preclinical</td><td>Wholly owned</td><td>Earlier than cyclin E1; option value only.</td></tr>
+<tr><td class="num"><strong>6</strong></td><td>Roche collaboration</td><td>Multiple MGD targets</td><td>Cancer + neurological diseases</td><td>Discovery/preclinical</td><td>Roche: $50M upfront; &gt;$2B milestones; tiered royalties; $7M preclinical milestone achieved Dec 2025</td><td>Non-dilutive validation, but programs are Roche-owned; Monte Rosa economics are milestones/royalties.</td></tr>
+<tr><td class="num"><strong>7</strong></td><td>Novartis 2nd collaboration</td><td>Novel degraders, immune-mediated diseases</td><td>Undisclosed</td><td>Discovery (options-based)</td><td>$120M upfront (Sept 2025); up to $5.7B total value; tiered royalties</td><td>Earliest stage; value contingent on Novartis exercising its options.</td></tr>
+</table></div>
+<p><span class="ev fact">FACT</span> The company states it has &ldquo;three programs in the clinic&rdquo; and &ldquo;the industry&rsquo;s leading pipeline of first-in-class and only-in-class MGDs.&rdquo; The &ldquo;only-in-class&rdquo; characterization of the NEK7 program is consistent with no other clinical-stage NEK7 degrader identified in public sources. <span class="src">(Company PRs 2026)</span></p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="block" id="s4">
+<h2>4. Trial Design Deep Dive</h2>
+<div class="lede">Endpoints, design, statistical disclosure, and readouts to date. No p-values were disclosed for GFORCE-1; medians only.</div>
+
+<h3>GFORCE-1: MRT-8102 Phase 1 (completed; data Oct 1, 2026)</h3>
+<div class="tscroll"><table>
+<tr><th>Element</th><th>Detail</th></tr>
+<tr><td>Design</td><td><span class="ev fact">FACT</span> Phase 1 study in <strong>108 obese subjects with elevated cardiovascular disease risk</strong>; randomized to MRT-8102 <strong>5 mg, 20 mg, or 40 mg once daily</strong> or placebo; <strong>4 weeks of treatment + 4 weeks of safety follow-up</strong>. Registry: NCT07119125. <span class="src">(Company 8-K Oct 1, 2026)</span></td></tr>
+<tr><td>Endpoints</td><td><span class="ev fact">FACT</span> NEK7 degradation (pharmacodynamic), reductions in ASCVD-linked biomarkers (DAMPs, cytokines, hsCRP, Lp(a), fibrinogen), safety/tolerability. <span class="ev gap">GAP</span> The company did not disclose the formal statistical plan, powering assumptions, or hypothesis-testing hierarchy; results were presented as median percent changes with no p-values or confidence intervals disclosed.</td></tr>
+<tr><td>NEK7 degradation</td><td><span class="ev fact">FACT</span> Median <strong>80&ndash;90% NEK7 degradation across all three dose levels</strong> (5/20/40 mg), described as robust and sustained; biomarker reductions were similar across doses (flat dose-response). <span class="src">(Company 8-K Oct 1, 2026)</span></td></tr>
+<tr><td>Biomarker results (median change, 4 wks)</td><td><span class="ev fact">FACT</span> Calprotectin <strong>&minus;56%</strong>; S100A12 <strong>&minus;46%</strong>; serum amyloid A <strong>&minus;51%</strong>; HMGB1 <strong>&minus;40%</strong> and IL-1&beta; <strong>&minus;37%</strong> (medians in the top-quartile-at-baseline subset, per company PR); fibrinogen <strong>&minus;28%</strong>; IL-6 <strong>&minus;54%</strong>; hsCRP <strong>&minus;85%</strong> (86% of subjects reached &lt;2 mg/L); Lp(a) <strong>&minus;24%</strong> (described by the company as comparable to PCSK9 inhibitors) with no increase in LDL-C or triglycerides. DAMPs reduced to levels comparable to healthy volunteers in the study. <span class="src">(Company 8-K Oct 1, 2026)</span></td></tr>
+<tr><td>Safety</td><td><span class="ev fact">FACT</span> No serious adverse events; treatment-emergent AE rates <strong>33% (MRT-8102) vs 30% (placebo)</strong>; no increased infection signal over 8 weeks. <span class="src">(Company 8-K Oct 1, 2026)</span></td></tr><tr><td>Precision-medicine signal</td><td><span class="ev fact">FACT</span> Carriers of NLRP3 risk alleles (~30% of the GFORCE-1 population) had significantly higher baseline biomarker levels, particularly DAMPs and IL-1&beta; &mdash; a higher-risk, genetically enrichable population for potential future development. <span class="src">(Company PR Oct 1, 2026)</span></td></tr>
+</table></div>
+<div class="warn"><strong>Reading the readout honestly.</strong> <span class="ev interp">INTERPRETATION</span> The flat dose-response (similar effects at 5, 20, and 40 mg) suggests target saturation at the lowest dose &mdash; good for dose selection, but it also means the study cannot demonstrate a dose-response relationship, which weakens causal inference. The medians-only disclosure with no variance, p-values, or placebo-adjusted deltas is a thin statistical package for a 108-patient study; the market&rsquo;s reaction (shares fell 6.75% on Oct 2, 2026) reflected both sell-the-news and the &ldquo;biomarkers, not outcomes&rdquo; critique. The correct frame: GFORCE-1 is target-engagement + safety proof-of-concept, not efficacy proof.</div>
+
+<h3>MRT-8102 Phase 2 program (planned)</h3>
+<div class="tscroll"><table>
+<tr><th>Trial</th><th>Indication</th><th>Status / Timing</th><th>Design notes</th></tr>
+<tr><td><strong>GEMINI-1</strong></td><td>Gout</td><td>Initiation Q4 2026 / Q1 2027 <span class="dq guid">guidance</span>; initial data H2 2027</td><td><span class="ev fact">FACT</span> The study will investigate <strong>prevention of flare recurrence following management of acute flares</strong> with MRT-8102. Biomarker and genetic enrichment strategies planned (NLRP3 risk-allele carriers were ~30% of GFORCE-1 with higher baseline DAMP/IL-1&beta;). <span class="src">(Company PR Oct 1, 2026)</span> <span class="ev gap">GAP</span> Primary endpoint (flare recurrence vs. biomarker) not yet disclosed.</td></tr>
+<tr><td><strong>GFORCE-2</strong></td><td>Stable CAD with residual inflammation (Phase 2b)</td><td>Initiation H1 2027 <span class="dq guid">guidance</span></td><td><span class="ev fact">FACT</span> Focused Phase 2b: <strong>6-month dosing</strong>; endpoints include local pathogenic drivers of ASCVD, systemic biomarkers, and <strong>cardiovascular imaging &mdash; e.g., fat attenuation index (FAI) &mdash; to assess plaque biology</strong>, plus inflammatory, thrombogenic, and lipid mediators. The stated goal is to connect FAI imaging + NLRP3 genetics + molecular drivers to design an efficient Phase 3 in the most disease-modifiable population. Design remains <strong>subject to regulatory feedback and completion of long-term preclinical toxicology</strong>. <span class="src">(Company PR Oct 1, 2026)</span> <span class="ev interp">INTERPRETATION</span> This design materially supersedes the March 2026 guidance (a 12-week study in CKD patients starting H2 2026) &mdash; the company pivoted to a plaque-biology-focused CAD study. Watch whether FDA accepts the 6-month design without further tox. This is the key execution gating item.</td></tr>
+<tr><td><strong>GALAXY-1</strong></td><td>Moderate-to-severe hidradenitis suppurativa</td><td>Initiation H1 2027 <span class="dq guid">guidance</span></td><td><span class="ev gap">GAP</span> Design/endpoints not yet disclosed.</td></tr>
+</table></div>
+
+<h3>MRT-2359: GSPT1 in mCRPC and MYC-driven solid tumors</h3>
+<div class="tscroll"><table>
+<tr><th>Element</th><th>Detail</th></tr>
+<tr><td>MRT-2359-001 (Phase 1/2)</td><td><span class="ev fact">FACT</span> Phase 1/2 study of oral MRT-2359 in selected cancer patients (N=174 planned); status &ldquo;active, not recruiting&rdquo; (enrollment closed ~March 2026). <span class="src">(CT.gov via Larvol)</span></td></tr>
+<tr><td>ASCO GU Feb 2026 interim (+ enzalutamide, heavily pretreated mCRPC)</td><td><span class="ev fact">FACT</span> In patients with AR mutations: PSA responses in <strong>5 of 5</strong>, 100% disease control rate (2 RECIST partial responses + 3 stable disease, all with target-lesion reductions). Across all <strong>15 evaluable</strong> patients: 67% RECIST disease control rate; 10 of 15 with target-lesion reductions. Generally well tolerated: primarily Grade 1&ndash;2 AEs; no treatment discontinuations due to AEs. <span class="src">(Company Q1 2026 PR)</span></td></tr>
+<tr><td>MODeFIRe-1 (Phase 2)</td><td><span class="ev fact">FACT</span> First patient dosed <strong>Aug 24, 2026</strong>; MRT-2359 + apalutamide in mCRPC with AR mutations (NCT07745361); up to 25 patients; endpoints: PSA and RECIST response, duration of response, rPFS, safety. Updated data from the enzalutamide Phase 1/2 arm expected by <strong>year-end 2026</strong>. <span class="src">(Company 8-K Aug 24, 2026)</span></td></tr>
+</table></div>
+<div class="warn"><strong>Sample-size discipline.</strong> <span class="ev interp">INTERPRETATION</span> A 5/5 PSA response in a biomarker-selected subset is a signal, not a result: with n=5, the 95% confidence interval on a 100% response rate extends down to ~48%. The MODeFIRe-1 design (n&le;25, single-arm, AR-mutant enriched) is an efficient signal-seeking study, but single-arm PSA/RECIST data in combination with an AR inhibitor cannot isolate MRT-2359&rsquo;s contribution &mdash; the year-end 2026 update must be read with that confound in mind.</div>
+
+<h3>MRT-6160: Novartis Phase 2 in Sj&ouml;gren&rsquo;s disease</h3>
+<p><span class="ev fact">FACT</span> Phase 2a/b, randomized, double-blind, placebo-controlled, multicenter; up to <strong>52 weeks</strong> of treatment to support Phase 3 dose selection (NCT07737743). First patient visit September 2026 triggered a <strong>$50M milestone</strong> to Monte Rosa. Phase 1 showed &gt;90% sustained VAV1 degradation in peripheral T cells. <span class="src">(Company 8-K Sept 8, 2026)</span> <span class="ev interp">INTERPRETATION</span> With 52 weeks of treatment, a readout is realistically a 2028 event &mdash; this program is a call option on the platform, not a near-term catalyst.</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="block" id="s5">
+<h2>5. Clinical / Regulatory Status &amp; Outlook</h2>
+<div class="lede">Where each program stands with regulators and what has to go right.</div>
+<ul class="tight">
+<li><span class="ev fact">FACT</span> <strong>MRT-8102:</strong> Phase 1 complete with no clinical hold disclosed; the gating item for GFORCE-2 is <strong>regulatory feedback on the 6-month design plus additional long-term toxicology</strong> &mdash; standard for a chronic-dosing anti-inflammatory, and the explicit reason a CAD Phase 2 cannot start until H1 2027. <span class="src">(8-K Oct 1, 2026)</span></li>
+<li><span class="ev fact">FACT</span> The company also disclosed supportive nonclinical data: 3-month cynomolgus monkey toxicology and a cyno obesity study showing NEK7 degradation reduced body weight/fat, alone and with semaglutide. <span class="src">(FY2025 PR, Mar 17, 2026)</span> <span class="ev gap">GAP</span> No human metabolic/weight data disclosed; the obesity angle is preclinical only.</li>
+<li><span class="ev fact">FACT</span> <strong>MRT-2359:</strong> Phase 2 (MODeFIRe-1) enrolling under NCT07745361; no regulatory holds disclosed.</li>
+<li><span class="ev fact">FACT</span> <strong>MRT-6160:</strong> Novartis-run Phase 2 under NCT07737743; Novartis holds exclusive worldwide development/manufacturing/commercialization rights from Phase 2 onward.</li>
+<li><span class="ev interp">INTERPRETATION</span> Regulatory risk is concentrated in GFORCE-2: the FDA will weigh chronic NEK7 degradation (mitotic liability) against a biomarker-driven CAD rationale. A requirement for longer tox or a narrower population would delay the program&rsquo;s most valuable readout. The gout and HS Phase 2s face lower regulatory bars (shorter dosing, symptom endpoints) and are the nearer-term binary events.</li>
+</ul>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="block" id="s6">
+<h2>6. Competition: Clinical Differentiation Only</h2>
+<div class="lede">Mechanistic and clinical-stage differentiation. No head-to-head efficacy claims are made anywhere in this dossier.</div>
+
+<h3>Targeted protein degradation: modality peers</h3>
+<div class="tscroll"><table>
+<tr><th>Company</th><th>Modality</th><th>Differentiation vs. Monte Rosa</th></tr>
+<tr><td><strong>Arvinas</strong></td><td>Heterobifunctional PROTACs</td><td><span class="ev fact">FACT</span> Bifunctional molecules (target ligand + linker + E3 ligand), e.g., ER and AR degraders. PROTACs are larger, often with oral-bioavailability challenges; Monte Rosa&rsquo;s monovalent glues are smaller classic small molecules.</td></tr>
+<tr><td><strong>Nurix</strong></td><td>Oral TPD (incl. cereblon-recruiting degraders)</td><td><span class="ev fact">FACT</span> Bexobrutideg (NX-5948), a BTK degrader, also works via the cereblon E3 ligase complex (OncLive, 2025) &mdash; same E3 as Monte Rosa&rsquo;s glues, different modality and targets. Nurix&rsquo;s clinical validation is in hematology; Monte Rosa is the only TPD company in the clinic with a NEK7 program.</td></tr>
+<tr><td><strong>Kymera</strong></td><td>Heterobifunctional degraders</td><td><span class="ev fact">FACT</span> KT-474 (IRAK4 degrader, partnered with Sanofi) is in Phase 2 for HS and atopic dermatitis &mdash; directly overlapping GALAXY-1&rsquo;s HS indication with a different node (IRAK4 vs. NEK7/NLRP3) in the inflammatory cascade. <span class="ev interp">INTERPRETATION</span> KT-474&rsquo;s HS readout is a relevant sentiment comp for HS-degrader viability.</td></tr>
+<tr><td><strong>BMS (CELMoDs)</strong></td><td>Cereblon E3 ligase modulators (molecular glues)</td><td><span class="ev fact">FACT</span> CC-90009 is the clinical-stage GSPT1-degrader precedent (Surka et al., <em>Blood</em> 2021) &mdash; the direct class comp for MRT-2359&rsquo;s target, though developed in AML, not solid tumors.</td></tr>
+</table></div>
+
+<h3>Anti-inflammatory / cardiometabolic: pathway competitors</h3>
+<ul class="tight">
+<li><span class="ev fact">FACT</span> <strong>Anti&ndash;IL-1&beta;:</strong> canakinumab (CANTOS, Ridker <em>NEJM</em> 2017) proved that IL-1&beta; blockade reduces CV events but was never commercialized for ASCVD (fatal-infection signal, cost). MRT-8102 acts upstream at NEK7/NLRP3 &mdash; same axis, oral small molecule, broader cytokine suppression (IL-1&beta; + IL-18 + downstream IL-6/CRP).</li>
+<li><span class="ev fact">FACT</span> <strong>Anti&ndash;IL-6:</strong> ziltivekimab (Novo Nordisk) showed hsCRP reduction in CKD (RESCUE) with a CV-outcomes trial (ZEUS) ongoing &mdash; a biologic competitor on the same CRP-lowering thesis, injectable vs. oral.</li>
+<li><span class="ev fact">FACT</span> <strong>Colchicine</strong> (Lodoco): FDA-approved 2023 for ASCVD risk reduction on the basis of LoDoCo2/COLCOT; cheap, generic, broad microtubule mechanism with GI tolerability limits. Sets the &ldquo;good enough&rdquo; oral anti-inflammatory bar in CAD.</li>
+<li><span class="ev fact">FACT</span> <strong>NLRP3 inhibitors:</strong> dapansutrile (Olatec, in clinical development for gout flares and heart failure) and VENT-03 (Ventus, Phase 1) inhibit NLRP3 directly. <span class="ev interp">INTERPRETATION</span> Degrading NEK7 vs. inhibiting NLRP3: degradation removes the licensing factor (potentially more complete pathway shutoff and longer PD effect), but carries the mitotic-liability question that a reversible inhibitor may avoid. No clinical comparison exists.</li>
+<li><span class="ev fact">FACT</span> <strong>Gout:</strong> urate-lowering therapies (allopurinol, febuxostat) treat hyperuricemia, not flares; flare treatment is colchicine/NSAIDs/IL-1 blockade. <strong>HS:</strong> approved biologics adalimumab, secukinumab, bimekizumab; povorcitinib (Incyte, JAK1) in Phase 3. MRT-8102 would be the only oral NLRP3-pathway agent in either indication if Phase 2 succeeds.</li>
+</ul>
+<p><span class="ev interp">INTERPRETATION</span> Monte Rosa&rsquo;s genuine white space: no clinical-stage NEK7 degrader exists, and no oral NLRP3-pathway drug is approved in gout or HS. The commercial sections are intentionally lean &mdash; the binary is clinical, not commercial &mdash; but the strategic value of an oral anti-inflammatory with biologic-like CRP suppression is exactly what underwrites the Novartis and Roche partnerships.</p>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="block" id="s7">
+<h2>7. Financials</h2>
+<div class="lede">From SEC filings. All figures in USD; quarters are calendar quarters.</div>
+<div class="tscroll"><table>
+<tr><th>Item</th><th>Q2 2026</th><th>Q2 2025</th><th>Source</th></tr>
+<tr><td>Collaboration revenue</td><td class="num">$9.0M</td><td class="num">$23.2M</td><td rowspan="6">Company PR Aug 6, 2026; 10-Q for quarter ended Jun 30, 2026 (revenue from Roche + Novartis agreements)</td></tr>
+<tr><td>R&amp;D expense</td><td class="num">$48.0M</td><td class="num">$30.7M</td></tr>
+<tr><td>G&amp;A expense</td><td class="num">$10.1M</td><td class="num">$8.1M</td></tr>
+<tr><td>Net loss</td><td class="num">($43.4M)</td><td class="num">($12.3M)</td></tr>
+<tr><td>Cash, cash equivalents, restricted cash + marketable securities</td><td class="num">$626.0M (Jun 30, 2026)</td><td class="num">$671.2M (Mar 31, 2026)</td></tr>
+<tr><td>Quarterly cash decrease</td><td class="num">$45.2M</td><td>&mdash;</td></tr>
+</table></div>
+<ul class="tight">
+<li><span class="ev fact">FACT</span> <strong>Runway:</strong> the company expects cash, cash equivalents, restricted cash, and marketable securities to fund operations <strong>into 2029</strong> (guidance as of the Q2 2026 report). <span class="ev interp">INTERPRETATION</span> That guidance predates the September 2026 $50M Novartis milestone (cash-in) and the initiation of three Phase 2 programs (cash-out); net effect is roughly neutral in the near term, but burn will step up as GFORCE-2/GEMINI-1/GALAXY-1 enroll.</li>
+<li><span class="ev fact">FACT</span> <strong>Deferred revenue</strong> (future collaboration revenue): $15.2M (Roche) + $112.5M (Novartis VAV1 agreement) as of June 30, 2026. <span class="src">(StockTitan 10-Q summary)</span></li>
+<li><span class="ev fact">FACT</span> <strong>Financing history:</strong> May 2024 offering &mdash; 10.64M shares + 10.64M pre-funded warrants at $4.70, ~$96.4M net. January 2026 upsized offering &mdash; 13.0M shares (incl. full 1.875M greenshoe) + 1.375M pre-funded warrants at $24.00, <strong>$323.8M net</strong> ($345M gross). ATM: 2022 sales agreement terminated Jan 7, 2026; new $100M ATM prospectus filed Feb 11, 2026 &mdash; <strong>no ATM shares sold in Q1 2026</strong>. <span class="src">(10-Q Mar 31, 2026)</span></li>
+<li><span class="ev fact">FACT</span> <strong>Non-dilutive inflows since:</strong> $50M Novartis milestone (Sept 8, 2026, MRT-6160 Phase 2 start); $7M Roche preclinical milestone (Dec 2025); $120M Novartis second-collaboration upfront (Sept 2025).</li>
+<li><span class="ev interp">INTERPRETATION</span> The financing cadence is disciplined (raises into strength: $4.70 in 2024, $24.00 in Jan 2026), but the share count has roughly tripled since the 2024 offering. Any future raise before Phase 2 readouts would likely come via the $100M ATM &mdash; a steady drip rather than an event &mdash; or a marketed offering around positive data.</li>
+</ul>
+
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="block" id="s8">
+<h2>8. Fully-Diluted Market Cap &amp; Enterprise Value</h2>
+<div class="lede">Dilution-honest share count from the latest SEC filings. Pre-funded warrants are included (exercisable for $0.0001, counted in basic EPS).</div>
+<div class="tscroll"><table>
+<tr><th>Component</th><th>Shares</th><th>As of / Source</th></tr>
+<tr><td>Common stock outstanding</td><td class="num">84,479,418</td><td><span class="ev fact">FACT</span> May 1, 2026 (10-Q cover)</td></tr>
+<tr><td>Pre-funded warrants outstanding</td><td class="num">16,997,296</td><td><span class="ev fact">FACT</span> Mar 31, 2026 (10-Q Note 10; 5,016,628 exercised in Q1 2026)</td></tr>
+<tr><td>Stock options outstanding (WAEP $8.98)</td><td class="num">15,989,324</td><td><span class="ev fact">FACT</span> Mar 31, 2026 (10-Q Note 11)</td></tr>
+<tr><td>Unvested RSUs</td><td class="num">1,149,012</td><td><span class="ev fact">FACT</span> Mar 31, 2026 (10-Q Note 11)</td></tr>
+<tr><td>Oct 2026 inducement grants (options + RSUs)</td><td class="num">105,875</td><td><span class="ev fact">FACT</span> Oct 2, 2026 (8-K: 86,725 options + 19,150 RSUs)</td></tr>
+<tr><td><strong>Fully-diluted share count (est.)</strong></td><td class="num"><strong>~118.7M</strong></td><td><span class="ev interp">INTERPRETATION</span> Sum of the above; excludes future evergreen additions (5% annual on the 2021 Plan; 3,277,186 added Jan 1, 2026) and unexercised ESPP pool</td></tr>
+</table></div>
+<div class="tscroll"><table>
+<tr><th>Valuation math</th><th>Value</th><th>Basis</th></tr>
+<tr><td>Reference price</td><td class="num">$10.17</td><td><span class="ev fact">FACT</span> Oct 7, 2026 (Finnhub)</td></tr>
+<tr><td>Basic market cap</td><td class="num">~$896M</td><td><span class="ev fact">FACT</span> Finnhub, Oct 7, 2026 (implies ~88.1M basic shares incl. exercised pre-funded warrants)</td></tr>
+<tr><td><strong>Fully-diluted market cap</strong></td><td class="num"><strong>~$1.21B</strong></td><td><span class="ev interp">INTERPRETATION</span> 118.7M &times; $10.17</td></tr>
+<tr><td>Less: cash &amp; marketable securities</td><td class="num">($626.0M)</td><td><span class="ev fact">FACT</span> Jun 30, 2026 (incl. restricted cash)</td></tr>
+<tr><td><strong>Enterprise value</strong></td><td class="num"><strong>~$581M</strong></td><td><span class="ev interp">INTERPRETATION</span> FDMC minus June 30 cash; debt ~nil (no debt disclosed)</td></tr>
+</table></div>
+<div class="callout"><span class="ev interp">INTERPRETATION</span> Pro-forma note: the $50M Novartis milestone (received Sept 2026) less estimated Q3 2026 burn (~$45M, run-rate basis) leaves pro-forma cash near ~$630M &mdash; the EV math above is therefore approximately current. <span class="ev unver">UNVERIFIED</span> Q3 2026 cash has not been reported; the pro-forma figure is an estimate, not a filing.</div>
+
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="block" id="s9">
+<h2>9. Catalyst / Event Map</h2>
+<div class="lede">Every known event for the stock &mdash; each with date quality, what &ldquo;good&rdquo; looks like, and what to watch. Events dated before October 10, 2026 that have already occurred are flagged completed. Built from company filings and PRs. Date quality: <span class="dq hard">hard</span> confirmed date &middot; <span class="dq guid">guidance</span> company-guided window &middot; <span class="dq infr">inferred</span> estimated.</div>
+<div class="tscroll"><table>
+<tr><th>Timing</th><th>Date quality</th><th>Event</th><th>Status</th><th>What &ldquo;good&rdquo; looks like</th><th>What to watch</th></tr>
+<tr class="past"><td class="num">Sept 8, 2026</td><td><span class="dq hard">hard</span></td><td><strong>$50M Novartis milestone:</strong> first patient visit in MRT-6160 Phase 2a/b (Sj&ouml;gren&rsquo;s, NCT07737743; 52-week treatment)</td><td>&#9989; Completed</td><td>Outcome: non-dilutive cash received; first VAV1 Phase 2 underway</td><td>Each additional Novartis Phase 2 start carries further milestone payments</td></tr>
+<tr class="past"><td class="num">Oct 1, 2026</td><td><span class="dq hard">hard</span></td><td><strong>GFORCE-1 Phase 1 readout</strong> (MRT-8102, NCT07119125)</td><td>&#9989; Completed</td><td>Outcome: 80&ndash;90% median NEK7 degradation; broad biomarker normalization (hsCRP &minus;85%, Lp(a) &minus;24%); clean 4-week safety; NLRP3-allele enrichment signal</td><td>Shares fell 6.75% the next session (sell-the-news) &mdash; the tape pays for clinical outcomes, not biomarkers</td></tr>
+<tr><td class="num">Nov 2026</td><td><span class="dq infr">inferred</span></td><td><strong>Q3 2026 earnings</strong> <span class="ev gap">GAP</span> date not announced (prior report Aug 6, 2026)</td><td>Upcoming</td><td>Cash update post&ndash;$50M milestone; GFORCE-2 regulatory-feedback disclosure; GEMINI-1 start timing confirmed</td><td>Burn trajectory as three Phase 2s spool up</td></tr>
+<tr><td class="num">By year-end 2026</td><td><span class="dq guid">guidance</span></td><td><strong>MRT-2359 + enzalutamide Phase 1/2 updated data</strong> (mCRPC)</td><td>Upcoming</td><td>AR-mutant PSA signal replicates at larger n; &ge;1 RECIST partial response; no new safety signal</td><td>Single-arm + AR-inhibitor combo confound: MRT-2359&rsquo;s contribution cannot be isolated; Grade &ge;3 AE rate</td></tr>
+<tr><td class="num">Q4 2026 / Q1 2027</td><td><span class="dq guid">guidance</span></td><td><strong>GEMINI-1 Phase 2 initiation</strong> (MRT-8102, gout)</td><td>Upcoming</td><td>Starts on schedule with enrichment design (biomarker + NLRP3-allele) disclosed; primary endpoint = flare recurrence</td><td>Endpoint choice: a biomarker-only primary would weaken the binary</td></tr>
+<tr><td class="num">H1 2027</td><td><span class="dq guid">guidance</span></td><td><strong>GFORCE-2 Phase 2b initiation</strong> (MRT-8102, stable CAD)</td><td>Upcoming</td><td>Regulatory feedback clean; long-term tox complete; 6-month FAI-imaging design intact</td><td>Any FDA requirement for longer tox or a narrower population = 6&ndash;12 month delay</td></tr>
+<tr><td class="num">H1 2027</td><td><span class="dq guid">guidance</span></td><td><strong>GALAXY-1 Phase 2 initiation</strong> (MRT-8102, hidradenitis suppurativa)</td><td>Upcoming</td><td>Starts on schedule with endpoints aligned to HS precedents</td><td>Kymera&rsquo;s KT-474 (IRAK4) HS readout as a sentiment comp for degrader viability in HS</td></tr>
+<tr><td class="num">2027</td><td><span class="dq guid">guidance</span></td><td><strong>Cyclin E1 MGD IND submission</strong></td><td>Upcoming</td><td>Filed on time; first new wholly-owned clinical candidate since MRT-8102</td><td>IND clearance vs. clinical hold</td></tr>
+<tr><td class="num">H2 2027</td><td><span class="dq guid">guidance</span></td><td><strong>GEMINI-1 initial data</strong> (gout) &mdash; <strong>the primary binary in the thesis window</strong></td><td>Upcoming</td><td>Flare-recurrence reduction + biomarker normalization + clean chronic-dosing safety</td><td>Mitotic-liability signals on longer exposure; dose selected from flat GFORCE-1 dose-response</td></tr>
+<tr><td class="num">2027&ndash;2028</td><td><span class="dq infr">inferred</span></td><td><strong>MODeFIRe-1 Phase 2 data</strong> (MRT-2359 + apalutamide, mCRPC; &le;25 pts, first dosed Aug 2026)</td><td>Upcoming</td><td>PSA and RECIST responses in AR-mutant mCRPC</td><td>No company guidance on readout timing; single-arm design</td></tr>
+<tr><td class="num">~H2 2028</td><td><span class="dq infr">inferred</span></td><td><strong>MRT-6160 Novartis Phase 2 readout</strong> (Sj&ouml;gren&rsquo;s)</td><td>Upcoming</td><td>Dose selection for Phase 3; ESSDAI improvement</td><td>52-week treatment starting Sept 2026 &rarr; data realistically 2028, not a near-term catalyst</td></tr>
+<tr><td class="num">Ongoing</td><td><span class="dq infr">inferred</span></td><td><strong>Additional Novartis MRT-6160 Phase 2 initiations</strong> (deal pays milestones &ldquo;beginning upon initiation of Phase 2 studies&rdquo;)</td><td>Upcoming</td><td>Each new Phase 2 start = non-dilutive milestone cash extending runway</td><td>Novartis trial registry beyond NCT07737743 is the leading indicator</td></tr>
+</table></div>
+
+<p><span class="ev interp">INTERPRETATION</span> The catalyst stack is back-loaded: the next 12 months are initiation-heavy (three Phase 2 starts) with the first true efficacy binary (GEMINI-1 gout data) in H2 2027. The year-end 2026 MRT-2359 update is the only near-term data event and the most likely source of near-term volatility.</p>
+
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="block" id="s10">
+<h2>10. Ranked Red Flags</h2>
+<div class="lede">Ordered by potential impact on the thesis. Each flag states what would resolve or confirm it.</div>
+<div class="risk"><span class="rank">#1</span><strong>Biomarker-only evidence; no clinical-outcome data.</strong> <span class="ev fact">FACT</span> Every MRT-8102 efficacy claim to date is a biomarker median from a 4-week, 108-patient Phase 1 with no disclosed p-values. CANTOS proved the pathway matters for events &mdash; but also proved the bar is events, not CRP. <em>Resolves with:</em> GEMINI-1 clinical endpoints (H2 2027).</div>
+<div class="risk"><span class="rank">#2</span><strong>Chronic-dosing safety is untested; NEK7 has a mitotic role.</strong> <span class="ev fact">FACT</span> NEK7 is required for mitosis (Shi et al., <em>Nat. Immunol.</em> 2016). Four weeks of dosing cannot derisk 6-month (GFORCE-2) or chronic gout/HS dosing. The company itself flags that GFORCE-2 needs more long-term tox. <em>Confirms with:</em> any marrow/GI/immune signal in longer studies.</div>
+<div class="risk"><span class="rank">#3</span><strong>Insiders are consistent net sellers; zero buys in 12 months.</strong> <span class="ev fact">FACT</span> 30+ insider sells vs. 0 buys in the past year (Insider Monkey Form 4 aggregation). CEO Markus Warmuth sold ~49,500 shares in the past year (e.g., 9,500 at $23.18 on Jul 16, 2026; 8,000 at $17.64 on Apr 14, 2026) while retaining ~585,000 shares. COO, CSO, and CMO also sold into $17&ndash;$24 strength. <span class="ev interp">INTERPRETATION</span> Sales are small relative to holdings and partly 10b5-1 (e.g., COO&rsquo;s July sales), but the complete absence of insider buying through a positive Phase 1 readout is a negative signal.</div>
+<div class="risk"><span class="rank">#4</span><strong>Burn is accelerating into three simultaneous Phase 2s.</strong> <span class="ev fact">FACT</span> Quarterly cash use was $45.2M in Q2 2026 and R&amp;D is rising (guidance: runway into 2029). <span class="ev interp">INTERPRETATION</span> Three Phase 2 starts in H1 2027 will push burn higher; the &ldquo;into 2029&rdquo; guidance leaves limited cushion if any program needs expansion or if the ATM is used at weak prices.</div>
+<div class="risk"><span class="rank">#5</span><strong>MRT-2359 dataset is tiny and confounded.</strong> <span class="ev fact">FACT</span> The headline 5/5 AR-mutant PSA response is n=5; the combination with enzalutamide/apalutamide prevents isolating MRT-2359&rsquo;s contribution. mCRPC post-AR-inhibitor is a crowded space (AR degraders, PARP inhibitors, radioligands).</div>
+<div class="risk"><span class="rank">#6</span><strong>Market has discounted the story despite good data.</strong> <span class="ev fact">FACT</span> Shares are down ~40% over six months and fell 6.75% on the positive Phase 1 readout (Oct 2, 2026). <span class="ev interp">INTERPRETATION</span> The tape is telling you the marginal buyer does not pay for biomarker readouts &mdash; Phase 2 execution must be flawless to re-rate. The 24.13% short interest (MarketBeat, Oct 2026) means any positive clinical surprise has squeeze fuel, but the burden of proof is entirely on the company.</div>
+<div class="risk"><span class="rank">#7</span><strong>GSPT1 class safety precedent.</strong> <span class="ev fact">FACT</span> BMS&rsquo;s CC-90009 (GSPT1 degrader, <em>Blood</em> 2021) is the class precedent; GSPT1 is essential in normal proliferating tissue, so the therapeutic window in solid tumors is unproven. <span class="ev gap">GAP</span> Head-to-head selectivity comparison between MRT-2359 and CC-90009 has not been publicly disclosed.</div>
+<div class="risk"><span class="rank">#8</span><strong>Partnered economics cap the upside on MRT-6160.</strong> <span class="ev fact">FACT</span> Monte Rosa&rsquo;s VAV1 economics are milestones + 30% U.S. profit share + tiered ex-U.S. royalties &mdash; Novartis captures the operating leverage. This is a platform-validation asset, not a company-maker.</div>
+<div class="risk"><span class="rank">#9</span><strong>Platform selectivity is company-asserted.</strong> <span class="ev interp">INTERPRETATION</span> QuEEN&rsquo;s &ldquo;unprecedented selectivity&rdquo; rests on company-disclosed proteomics; molecular glues have a real history of off-target neosubstrate degradation (IMiDs/SALL4). One clean Phase 1 does not validate a platform.</div>
+<div class="risk"><span class="rank">#10</span><strong>Dilution overhang is structural.</strong> <span class="ev fact">FACT</span> FD shares (~118.7M) exceed basic (~88M) by ~35%; the 2021 Plan evergreen adds 5% annually; a $100M ATM is live. Future raises are a when-not-if proposition for a 2029-runway company running three Phase 2s.</div>
+
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="block" id="s11">
+<h2>11. Bear / Base / Bull Cases &amp; Scenarios</h2>
+<div class="lede">Framed around the clinical binary. The price levels below are <strong>SOFT</strong> &mdash; illustrative scenario arithmetic from this dossier&rsquo;s own EV / share-count / cash figures, not a model output and not a recommendation. Max-value discipline: no scenario exceeds the highest published sell-side target of <strong>$37</strong> (Piper Sandler, Jan 14, 2026).</div>
+<div class="grid2">
+<div class="risk"><span class="rank">BEAR</span><strong>Biomarker signal fails to translate.</strong> GEMINI-1 (H2 2027) shows CRP reduction without flare benefit, or GFORCE-2 stalls on regulatory/tox requirements; MRT-2359 year-end update disappoints on a larger n; burn forces a dilutive raise into weakness. The platform reverts to a preclinical-option value and the partnered milestones become the main support. <span class="ev interp">INTERPRETATION</span> Downside is cushioned &mdash; not eliminated &mdash; by ~$630M pro-forma cash and Novartis/Roche validation.</div>
+<div class="risk" style="background:#eef6f1;border-color:#bfe3d2"><span class="rank" style="background:var(--accent2)">BASE</span><strong>Signal replicates; execution on schedule.</strong> MRT-2359 update confirms AR-mutant activity; GEMINI-1/GFORCE-2/GALAXY-1 initiate on guidance; GFORCE-2 clears regulatory feedback; Novartis starts additional MRT-6160 Phase 2s (each a milestone). The stock trades on Phase 2 execution with the H2 2027 gout readout as the defining binary. Cash plus milestones fund operations into 2029 per company guidance.</div>
+</div>
+<div class="risk" style="background:#eef3fa;border-color:#c4d6ef"><span class="rank" style="background:var(--accent)">BULL</span><strong>Clinical proof-of-concept in patients.</strong> GEMINI-1 shows gout-flare reduction with biomarker normalization; GFORCE-2 demonstrates durable anti-inflammatory effect in CAD; MRT-2359 posts RECIST responses in MODeFIRe-1. An oral NLRP3-pathway drug with biologic-like CRP suppression becomes a takeout candidate for a pharma already partnered on the platform (Novartis, Roche). <strong>Max-value discipline:</strong> any takeout framing must not exceed the highest published sell-side price target, <strong>$37/share</strong> (Piper Sandler, Jan 14, 2026) &mdash; the ceiling for upside scenarios in this dossier.</div>
+<div class="soft"><strong>Soft scenario price levels (illustrative arithmetic &mdash; not a price target).</strong><br>
+<span class="ev interp">INTERPRETATION</span> Formula: (implied pipeline EV + pro-forma cash) &divide; fully-diluted shares. Assumptions, all from this dossier: FD shares 118.7M (Section 8); pro-forma cash ~$630M (Jun 30, 2026 $626M + $50M Novartis milestone &minus; ~$46M estimated Q3 burn &mdash; <span class="ev unver">UNVERIFIED</span> estimate, Q3 not yet reported); debt ~nil. <strong>Not modeled:</strong> the $100M ATM and the 5% annual evergreen &mdash; actual per-share values would be lower if those are exercised.</div>
+<div class="tscroll"><table>
+<tr><th>Scenario</th><th>What has to be true</th><th>Implied pipeline EV</th><th>+ Cash</th><th>&divide; FD shares</th><th>Soft level</th></tr>
+<tr><td><strong>Bear</strong></td><td>GEMINI-1 fails to convert biomarkers to flare benefit, or GFORCE-2 stalls on tox/regulatory; MRT-2359 year-end update disappoints; dilutive raise into weakness</td><td class="num">$100M (platform option + partner validation only)</td><td class="num">$600M (after elevated burn)</td><td class="num">118.7M</td><td class="num"><strong>~$6</strong></td></tr>
+<tr><td><strong>Base</strong></td><td>MRT-2359 signal replicates; all three Phase 2s initiate on guidance; GFORCE-2 clears regulatory feedback; Novartis starts additional MRT-6160 Phase 2s (milestones land)</td><td class="num">$800M</td><td class="num">$620M</td><td class="num">118.7M</td><td class="num"><strong>~$12</strong></td></tr>
+<tr><td><strong>Bull</strong></td><td>Clinical proof-of-concept: GEMINI-1 flare reduction, GFORCE-2 plaque-biology signal, MRT-2359 RECIST responses; takeout optionality (Novartis/Roche already partnered on the platform)</td><td class="num">$2.10B</td><td class="num">$630M</td><td class="num">118.7M</td><td class="num"><strong>~$23</strong></td></tr>
+</table></div>
+<p><span class="ev interp">INTERPRETATION</span> At ~$10.30, the market prices roughly the base case minus a biomarker-only discount: a fully-diluted EV of ~$597M sits between a cash-shell floor and a single-indication Phase 2 platform. The bear level (~$6) approximates cash minus a year of elevated burn; the bull level (~$23) stays below both the $27.63 consensus average and the $37 sell-side ceiling.</p>
+
+<h3>Scenario analyses</h3>
+<ul class="tight">
+<li><strong>Novartis milestone cadence:</strong> <span class="ev fact">FACT</span> The VAV1 deal pays milestones &ldquo;beginning upon initiation of Phase 2 studies&rdquo; (plural). <span class="ev interp">INTERPRETATION</span> Each additional Novartis Phase 2 start is a non-dilutive cash event that extends runway without ATM use &mdash; watch Novartis&rsquo;s trial registry (beyond NCT07737743) as the leading indicator.</li>
+<li><strong>ATM vs. marketed offering:</strong> <span class="ev fact">FACT</span> A $100M ATM shelf is effective (Feb 2026) with zero usage in Q1 2026. <span class="ev interp">INTERPRETATION</span> Management has shown it raises into strength ($24 in Jan 2026); a marketed raise is most likely to follow positive data (e.g., post&ndash;year-end-2026 MRT-2359 update), while ATM drips would signal opportunistic top-ups.</li>
+<li><strong>GFORCE-2 regulatory outcome:</strong> <span class="ev interp">INTERPRETATION</span> Three branches &mdash; (a) FDA aligns on 6-month design: program proceeds H1 2027 (base); (b) FDA requires longer tox or narrower population: 6&ndash;12 month delay, higher cost (bear-leaning); (c) FDA encourages an outcomes-oriented design: longer/expensive but higher strategic value (bull-leaning, needs funding).</li>
+<li><strong>Platform read-through:</strong> <span class="ev interp">INTERPRETATION</span> A clean GEMINI-1 safety profile on chronic dosing would de-risk the mitotic-liability concern (#2 red flag) across all NEK7 indications simultaneously &mdash; the highest-leverage single data point in the pipeline.</li>
+</ul>
+
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="block" id="s12">
+<h2>12. Management Track Record &amp; Insider Signals</h2>
+<div class="lede">Officers, directors, and what insider filings show. Career-history claims are omitted where not verified in current sources.</div>
+<div class="tscroll"><table>
+<tr><th>Name</th><th>Role</th><th>Insider signal (Form 4, last 12 mo)</th></tr>
+<tr><td><strong>Markus Warmuth</strong></td><td>President &amp; CEO</td><td><span class="ev fact">FACT</span> Sold ~49,500 shares in the past year (e.g., 9,500 @ $23.18 Jul 16, 2026; 8,000 @ $17.64 Apr 14, 2026; 5,466 @ $17.92 Mar 2, 2026); retains ~585,038 shares directly. Zero purchases.</td></tr>
+<tr><td><strong>Jennifer Champoux</strong></td><td>Chief Operating Officer</td><td><span class="ev fact">FACT</span> Exercised options and sold (e.g., 4,351 shares @ $23.38 Jul 15, 2026 under a 10b5-1 plan adopted Feb 19, 2026); holds 62,371 shares + 26,947 options.</td></tr>
+<tr><td><strong>Sharon Townson</strong></td><td>Chief Scientific Officer</td><td><span class="ev fact">FACT</span> Multiple sales in May&ndash;Jul 2026 ($19&ndash;$24 range); holds ~67,845 shares.</td></tr>
+<tr><td><strong>Filip Janku</strong></td><td>Chief Medical Officer</td><td><span class="ev fact">FACT</span> Sales in Feb and Jun 2026 (including 30,000 @ $21.42 and 11,845 @ $20.22); holds ~59,992 shares.</td></tr>
+<tr><td><strong>Philip Nickson</strong></td><td>Chief Business &amp; Legal Officer</td><td><span class="ev fact">FACT</span> Sales in Jan and Apr 2026; holds ~55,000 shares.</td></tr>
+</table></div>
+<ul class="tight">
+<li><span class="ev fact">FACT</span> Board/large holders include Versant Ventures (founding VC; sold down from 2024: ~1.57M shares remaining per Oct 2024 filings) and NEA (Ali Behbahani, director). T. Rowe Price disclosed 8,861,282 shares (10.5%) as of June 30, 2026; Vestal Point disclosed 4,600,000 shares (5.4%) as of May 2026. Institutions own ~80% of the stock. <span class="src">(13G/A filings; MarketBeat)</span></li>
+<li><span class="ev interp">INTERPRETATION</span> Management has executed well on business development (two Novartis deals, Roche deal, raises into strength) &mdash; the BD track record is the strongest evidence of management quality. The offset is the insider-trading pattern: broad-based selling into strength with no buying, which is inconsistent with strong internal conviction at current prices, even allowing for 10b5-1 plans and diversification.</li>
+<li><span class="ev fact">FACT</span> <strong>CEO background (verified):</strong> Markus Warmuth, M.D. (Ludwig Maximilian University, Munich) &mdash; seven years as CEO of H3 Biomedicine (Eisai joint venture in genomics-based precision oncology); prior roles at the Novartis Institutes for BioMedical Research (NIBR) and the Genomics Institute of the Novartis Research Foundation (GNF), including Head of Oncology Pharmacology &mdash; his teams contributed to the development of ceritinib and ribociclib and the discovery of allosteric SHP2 and Abl (asciminib) inhibitors; Entrepreneur-in-Residence at Third Rock Ventures; currently also a Venture Partner at Versant Ventures and a board member at Ventus Therapeutics; CEO of Monte Rosa since September 2019. <span class="src">(Investment Reports interview with Warmuth; Ventus Therapeutics bio; TheOrg)</span></li><li><span class="ev gap">GAP</span> Detailed career histories for the remaining executive team (COO, CSO, CMO, CBLO) and quantified prior operating outcomes were not verified against primary sources in this dossier&rsquo;s research pass.</li>
+</ul>
+
+</section>
+
+<!-- ============ 13 ============ -->
+<section class="block" id="s13">
+<h2>13. References, As-Of Date &amp; Filings Used</h2>
+<div class="lede">Source order: SEC filings &rarr; CT.gov &rarr; papers/conferences &rarr; company PRs &rarr; trade press.</div>
+<p><strong>As-of date: October 10, 2026.</strong> Price and market-cap figures as of October 9, 2026 close (Finnhub, checked Oct 10, 2026); financial figures as of June 30, 2026 (Q2 2026 10-Q) except where noted. This dossier was audited and enhanced on October 10, 2026: price/market data refreshed; catalyst map rebuilt as a table with per-event &ldquo;good&rdquo;/&ldquo;watch&rdquo; guidance; pipeline re-ranked by value; soft scenario price levels added; CEO career history verified and added; GFORCE-2 redesign (Oct 1, 2026 PR) incorporated.</p>
+<h4>SEC filings used</h4>
+<ul class="refs tight">
+<li>Form 10-Q for the quarterly period ended March 31, 2026 (filed May 2026) &mdash; share counts, options/RSU tables, offering history, collaboration terms</li>
+<li>Form 10-K for the year ended December 31, 2025 (filed March 17, 2026) &mdash; annual results, risk factors</li>
+<li>Form 8-K dated August 24, 2026 &mdash; MODeFIRe-1 first patient dosed; MRT-2359 year-end data guidance</li>
+<li>Form 8-K dated September 8, 2026 &mdash; Novartis MRT-6160 Phase 2 initiation; $50M milestone</li>
+<li>Form 8-K dated October 1, 2026 &mdash; GFORCE-1 Phase 1 results (MRT-8102)</li>
+<li>Form 8-K dated October 2, 2026 &mdash; inducement grants (86,725 options + 19,150 RSUs)</li>
+<li>Schedule 13G/A filings: T. Rowe Price (June 30, 2026), Vestal Point Capital (May 2026), Montanova/Averill (2026)</li>
+<li>Form 4 filings (2025&ndash;2026): Warmuth, Champoux, Townson, Janku, Nickson, Dunn, Manning</li>
+</ul>
+<h4>ClinicalTrials.gov identifiers</h4>
+<ul class="refs tight">
+<li>NCT07119125 &mdash; GFORCE-1 (MRT-8102 Phase 1)</li>
+<li>NCT07745361 &mdash; MODeFIRe-1 (MRT-2359 + apalutamide Phase 2)</li>
+<li>NCT07737743 &mdash; MRT-6160 Phase 2a/b in Sj&ouml;gren&rsquo;s disease (Novartis)</li>
+<li>NCT06597799 &mdash; MRT-8102 SAD/MAD in healthy volunteers</li>
+</ul>
+<h4>Academic papers</h4>
+<ul class="refs tight">
+<li>He Y., Zeng M.Y., Yang D., Motro B., N&uacute;&ntilde;ez G. NEK7 is an essential mediator of NLRP3 activation downstream of potassium efflux. <em>Nature</em> 530:354&ndash;357 (2016).</li>
+<li>Shi H. et al. NLRP3 activation and mitosis are mutually exclusive events coordinated by NEK7, a new inflammasome component. <em>Nat. Immunol.</em> 17:250&ndash;258 (2016).</li>
+<li>Schmid-Burgk J.L. et al. A genome-wide CRISPR screen identifies NEK7 as an essential component of NLRP3 inflammasome activation. <em>J. Biol. Chem.</em> 291:103&ndash;109 (2016).</li>
+<li>Surka C. et al. CC-90009, a novel cereblon E3 ligase modulator, targets acute myeloid leukemia blasts and leukemia stem cells. <em>Blood</em> 137:661&ndash;677 (2021).</li>
+<li>Grant S. Targeting cereblon in AML. <em>Blood</em> 137:584&ndash;586 (2021).</li>
+<li>Ridker P.M. et al. Antiinflammatory therapy with canakinumab for atherosclerotic disease. <em>N. Engl. J. Med.</em> 377:1119&ndash;1131 (2017). [CANTOS]</li>
+<li>Nidorf S.M. et al. Colchicine in patients with chronic coronary disease. <em>N. Engl. J. Med.</em> 383:1838&ndash;1847 (2020). [LoDoCo2]</li>
+<li>Coll R.C. et al. A small-molecule inhibitor of the NLRP3 inflammasome for the treatment of inflammatory diseases. <em>Nat. Med.</em> 21:248&ndash;255 (2015). [MCC950]</li>
+<li>Ito T. et al. Identification of a primary target of thalidomide teratogenicity. <em>Science</em> 327:1345&ndash;1350 (2010). [cereblon/IMiD precedent]</li>
+<li>Company presentations: ASCO GU 2026 (MRT-2359 interim); Oct 1, 2026 conference call/webcast (GFORCE-1)</li>
+</ul>
+<h4>Company press releases &amp; trade press</h4>
+<ul class="refs tight">
+<li>Monte Rosa PRs: Q2 2026 results (Aug 6, 2026); Q1 2026 results; FY2025 results (Mar 17, 2026); Roche collaboration (Oct 17, 2023); Novartis second collaboration (Sept 2025)</li>
+<li>BioSpace &mdash; Monte Rosa announces positive GFORCE-1 Phase 1 results (Oct 1, 2026): https://www.biospace.com/press-releases/monte-rosa-therapeutics-announces-positive-results-for-mrt-8102-in-gforce-1-phase-1-study-showing-normalization-of-key-pathogenic-drivers-of-ascvd-in-subjects-with-elevated-cvd-risk</li><li>GlobeNewswire &mdash; Monte Rosa GFORCE-1 Phase 1 results + Phase 2 program details (Oct 1, 2026): https://www.globenewswire.com/news-release/2026/10/01/3372740/0/en/monte-rosa-therapeutics-announces-positive-results-for-mrt-8102-in-gforce-1-phase-1-study-showing-normalization-of-key-pathogenic-drivers-of-ascvd-in-subjects-with-elevated-cvd-ris.html</li><li>MarketBeat &mdash; GLUE analyst forecast / short interest (Oct 2026): https://www.MarketBeat.com/stocks/NASDAQ/GLUE/</li><li>Investment Reports &mdash; interview with Markus Warmuth (career history): https://www.investmentreports.co/interview/markus-warmuth-1031</li><li>Ventus Therapeutics &mdash; Markus Warmuth bio: https://www.ventustx.com/?p=2098</li>
+<li>SEC EDGAR &mdash; GFORCE-1 8-K: https://www.sec.gov/Archives/edgar/data/1826457/000119312526409833/glue-20261001.htm</li>
+<li>StockTitan &mdash; GLUE SEC filings index: https://www.stocktitan.net/sec-filings/GLUE/</li>
+<li>MarketBeat &mdash; GLUE analyst forecast page (consensus Moderate Buy, avg target ~$28, Oct 2026): http://marketbeat.com/stocks/NASDAQ/GLUE/forecast/</li>
+<li>Insider Monkey &mdash; GLUE insider trading: https://www.insidermonkey.com/insider-trading/company/monte+rosa+therapeutics+inc/1826457/</li>
+<li>Minichart &mdash; $50M Novartis milestone (Sept 8, 2026): https://www.minichart.com.sg/2026/09/08/monte-rosa-earns-50m-milestone-payment-as-novartis-starts-phase-2-trial/</li>
+<li>Finnhub &mdash; GLUE market data: https://finnhub.io/?q=%22GLUE%22</li>
+</ul>
+<div class="warn"><strong>Limitations &amp; disclosures.</strong> This dossier is an independent research document for informational purposes only and is not investment advice, a recommendation, or an offer to buy or sell any security. Biomarker data are not clinical-outcome data. All forward-looking statements (trial timing, regulatory outcomes, milestone payments) are subject to company guidance changes. Financial figures derive from SEC filings as cited; pro-forma estimates are labeled as such. No personal information of any kind is contained in this document.</div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer><div class="wrap">
+Monte Rosa Therapeutics (GLUE) deep-dive dossier &middot; As of October 10, 2026 (audited &amp; enhanced) &middot; Filings: 10-Q (Q1 &amp; Q2 2026), 10-K FY2025, 8-Ks (Aug 24 / Sept 8 / Oct 1 / Oct 2, 2026) &middot; Single-file HTML, no external dependencies.
+</div></footer>
+
+<button id="toTop" aria-label="Back to top" title="Back to top">↑</button>
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.getElementById('themeToggle');
+  function setTheme(t){root.setAttribute('data-theme',t);try{localStorage.setItem('glue-theme',t);}catch(e){}
+    btn.textContent=(t==='dark'?'☀ Light':'☾ Dark');
+    btn.setAttribute('aria-label','Switch to '+(t==='dark'?'light':'dark')+' mode');}
+  var saved=null;try{saved=localStorage.getItem('glue-theme');}catch(e){}
+  setTheme(saved||((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'));
+  btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');});
+  var blocks=document.querySelectorAll('section.block');
+  blocks.forEach(function(sec){
+    var h2=sec.querySelector('h2');if(!h2)return;
+    var body=document.createElement('div');body.className='sbody';
+    Array.prototype.slice.call(sec.children).forEach(function(k){if(k!==h2){body.appendChild(k);}});
+    sec.appendChild(body);
+    var t=document.createElement('button');t.className='sect-toggle';t.type='button';
+    t.setAttribute('aria-expanded','true');t.setAttribute('aria-label','Collapse section');t.textContent='▾';
+    t.addEventListener('click',function(){
+      var c=sec.classList.toggle('collapsed');
+      t.textContent=c?'▸':'▾';t.setAttribute('aria-expanded',String(!c));
+      t.setAttribute('aria-label',c?'Expand section':'Collapse section');
+    });
+    h2.insertBefore(t,h2.firstChild);
+  });
+  function setAll(collapse){
+    blocks.forEach(function(sec){
+      sec.classList.toggle('collapsed',collapse);
+      var t=sec.querySelector('.sect-toggle');
+      if(t){t.textContent=collapse?'▸':'▾';t.setAttribute('aria-expanded',String(!collapse));
+        t.setAttribute('aria-label',collapse?'Expand section':'Collapse section');}
+    });
+  }
+  document.getElementById('expandAll').addEventListener('click',function(){setAll(false);});
+  document.getElementById('collapseAll').addEventListener('click',function(){setAll(true);});
+  var toTop=document.getElementById('toTop');
+  window.addEventListener('scroll',function(){toTop.classList.toggle('show',window.scrollY>600);},{passive:true});
+  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>
