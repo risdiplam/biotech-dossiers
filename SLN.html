@@ -1,161 +1,304 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>SLN — Silence Therapeutics plc · Deep-Dive Dossier · 2026-10-10</title>
-<style>
-  :root{
-    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
-    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
-    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
-    --hard:#166534; --guid:#b45309; --inf:#6b7280;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
-  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
-  header.top .wrap{max-width:1080px;margin:0 auto}
-  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
-  header.top h1 .tick{color:#7fd4d1}
-  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
-  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
-  .pricebar .pill b{color:#fff;font-size:14px}
-  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
-  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
-  nav.toc a:hover{background:var(--wash);color:var(--ink)}
-  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
-  section{padding:30px 0;border-bottom:1px solid var(--line)}
-  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
-  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  h3{font-size:16.5px;margin:26px 0 8px}
-  h4{font-size:14.5px;margin:20px 0 6px}
-  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
-  p,li{font-size:14.5px}
-  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
-  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
-  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
-  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
-  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
-  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
-  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
-  tr:nth-child(even) td{background:#fbfcfd}
-  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
-  .callout.warn{border-left-color:var(--unver)}
-  .callout p{margin:6px 0}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
-  .card h4{margin:0 0 8px;font-size:15px}
-  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
-  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
-  .tl-item{position:relative;margin:0 0 18px}
-  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
-  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
-  .tl-item .dt{font-weight:700;font-size:13.5px}
-  .tl-item .ev{font-size:14px;margin:2px 0}
-  .tl-item .note{font-size:12.5px;color:var(--muted)}
-  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
-  .flag .rank{display:inline-block;background:var(--ink);color:#fff;font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
-  .refs{font-size:13px;color:var(--muted)}
-  .refs li{margin-bottom:8px}
-  .refs a{color:var(--accent-ink)}
-  .fine{font-size:12.5px;color:var(--muted)}
-  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
-  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px;font-size:12px;color:var(--muted)}
-  .verdict{background:var(--ink);color:#fff;border-radius:10px;padding:18px 22px;margin:22px 0}
-  .verdict h3{color:#7fd4d1;margin:0 0 8px}
-  .verdict p{margin:6px 0;font-size:14.5px;color:#e6ecf2}
-  a.src{color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted var(--accent-ink);font-size:12.5px}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>SLN — Silence Therapeutics plc · Deep-Dive Dossier · 2026-10-10</title>
+  <style>
+:root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
 
-  /* ---- audit enhancements: theme, collapsible, mobile, back-to-top ---- */
-  section{scroll-margin-top:64px}
-  body{overflow-x:hidden}
-  .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
-  .tblwrap table{margin:0;min-width:640px}
-  .collapse-btn{float:right;background:var(--wash);border:1px solid var(--line);color:var(--muted);
-    border-radius:8px;min-width:44px;min-height:44px;font-size:18px;line-height:1;cursor:pointer;margin-left:10px;transition:transform .15s}
-  .collapse-btn:hover{color:var(--ink);border-color:var(--accent)}
-  section.collapsed .secbody{display:none}
-  section.collapsed .collapse-btn{transform:rotate(-90deg)}
-  #themeToggle{position:fixed;left:14px;bottom:14px;z-index:60;background:var(--ink);color:#fff;border:1px solid var(--line);
-    border-radius:24px;min-height:44px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-  #toTop{position:fixed;right:14px;bottom:14px;z-index:60;background:var(--accent);color:#fff;border:none;border-radius:24px;
-    min-height:44px;padding:0 18px;font-size:13px;font-weight:700;cursor:pointer;display:none;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-  #toTop.show{display:block}
-  html[data-theme="dark"]{--ink:#e9eef4;--muted:#a8b4c1;--paper:#12181f;--wash:#1a222b;--line:#2c3641;
-    --accent:#63d3d0;--accent-ink:#8fe3e1;--fact:#7aa2f7;--interp:#b39ddb;--gap:#e8a04c;--unver:#f08080;
-    --hard:#4ade80;--guid:#e8a04c;--inf:#9aa7b4}
-  html[data-theme="dark"] header.top{background:#0a0f15}
-  html[data-theme="dark"] header.top h1 .tick{color:#63d3d0}
-  html[data-theme="dark"] .verdict{background:#0a0f15}
-  html[data-theme="dark"] nav.toc{background:#12181f}
-  html[data-theme="dark"] nav.toc a{color:#a8b4c1}
-  html[data-theme="dark"] nav.toc a:hover{background:#1a222b;color:#fff}
-  html[data-theme="dark"] .card,html[data-theme="dark"] .flag{background:#161e27}
-  html[data-theme="dark"] tr:nth-child(even) td{background:#151c25}
-  html[data-theme="dark"] .pricebar .pill{background:#1a222b;border-color:#2c3641;color:#dbe2ea}
-  html[data-theme="dark"] .timeline:before{background:#2c3641}
-  @media(max-width:760px){
-    nav.toc .wrap{gap:4px;padding:6px 10px}
-    nav.toc a{min-height:44px;display:inline-flex;align-items:center;padding:10px 12px;font-size:13px}
-    header.top{padding:24px 16px 20px}
-    header.top h1{font-size:23px}
-    main{padding:8px 16px 90px}
-    section{padding:22px 0}
-    h2{font-size:19px}
-    table{font-size:13px}
-    .refs{overflow-wrap:anywhere}
-    .pricebar .pill{font-size:12.5px}
-    #themeToggle{left:10px;bottom:10px}
-    #toTop{right:10px;bottom:10px}
-  }
+    /* ---- compat: retained component styles mapped to PEPG tokens ---- */
+    .tblwrap,.tbl-wrap,.tablewrap{overflow-x:auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+    table{border-collapse:collapse;width:100%;font-size:13.5px}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font:700 10.5px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    h4{font-size:16px;margin:0 0 8px}
+    ul.tight li,ol.tight li{margin:4px 0}
 
-</style>
 
+    .callout{background:var(--mint);border-left:5px solid var(--teal);padding:14px 18px;margin:18px 0}
+    .callout.warn{border-left-color:var(--orange);background:var(--orange-soft)}
+    .card{background:var(--raised);border:1px solid var(--line);padding:16px 18px;margin:16px 0;box-shadow:var(--shadow)}
+    .flag{background:var(--raised);border:1px solid var(--line);padding:14px 18px;margin:12px 0}
+    .note,.fine{font-size:12.5px;color:var(--muted)}
+    .kicker{color:var(--muted);font-size:14px;margin:0 0 16px}
+    .tl{margin:18px 0}
+    .tl-item{position:relative;margin:0 0 18px;padding-left:24px}
+    .tl-item:before{content:"";position:absolute;left:7px;top:8px;bottom:0;width:2px;background:var(--line)}
+    .verdict{background:var(--panel-dark);color:var(--panel-text);padding:18px 22px;margin:22px 0}
+    .rank{display:inline-block;background:var(--ink);color:var(--paper);font-weight:700;font-size:12px;padding:3px 10px;margin-right:8px;border-radius:3px}
+    .dt{font-weight:700;font-size:13.5px}
+    .src{font-size:12.5px;color:var(--muted)}
+    .refs{font-size:13px;color:var(--muted)}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+    .tl-item.past:before{background:var(--muted)}
+
+  </style>
 </head>
 <body>
-<header class="top">
-<div class="wrap">
-<h1><span class="tick">SLN</span> — Silence Therapeutics plc</h1>
-<p class="sub">Deep-dive investment dossier · UK public limited company trading as Nasdaq American Depositary Shares (1 ADS = 3 ordinary shares) · GalNAc-siRNA (mRNAi GOLD™) platform · Lead: divesiran (SLN124) in polycythemia vera · Zerlasiran (SLN360) in elevated Lp(a), Phase 3-ready but partner-dependent</p>
-<div class="pricebar">
-<div class="pill">Last price (ADS) <b>~$9.86</b> <span style="color:#9aa7b4">· Oct 9, 2026 close</span></div>
-<div class="pill">Basic mcap (filing-derived) <b>~$466M</b> <span style="color:#9aa7b4">· 47.25M ADS</span></div>
-<div class="pill">Fully-diluted mcap <b>~$542M</b></div>
-<div class="pill">Enterprise value (FD) <b>~$470M</b> <span style="color:#9aa7b4">· cash $72.1M, no debt</span></div>
-<div class="pill">Next major binary <b>divesiran Ph3 PV start — 1H 2027 (guidance)</b></div>
-</div>
-</div>
-</header>
-<nav class="toc"><div class="wrap">
-<a href="#identity">1 · Identity &amp; Thesis</a><a href="#science">2 · Science</a><a href="#pipeline">3 · Pipeline</a><a href="#trials">4 · Trial Design</a><a href="#status">5 · Clinical/Regulatory</a><a href="#competition">6 · Competition</a><a href="#financials">7 · Financials</a><a href="#fdmc">8 · FDMC/EV</a><a href="#catalysts">9 · Catalyst Map</a><a href="#redflags">10 · Red Flags</a><a href="#scenarios">11 · Bear/Base/Bull</a><a href="#management">12 · Management</a><a href="#refs">13 · References</a>
-</div></nav>
+<div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · SLN</span><span class="stamp">Deep-dive dossier · October 10, 2026</span></div>
+        <h1>Silence Therapeutics plc</h1>
+        <p class="hero-dek">GalNAc-siRNA (mRNAi GOLD™) platform · Lead: divesiran (SLN124) in polycythemia vera — Phase 2 met, Phase 3 planned 1H 2027 · Zerlasiran (SLN360) in elevated Lp(a): Phase 3-ready but partner-dependent</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">~$9.86</div>
+        <div class="quote-label">Fixed market snapshot · Oct 9, 2026 close (ADS)</div>
+        <div class="quote-meta"><strong>~$466M</strong> basic mcap · <strong>~$542M</strong> fully-diluted · <strong>~$470M</strong> FD enterprise value<br>Cash $72.1M (Jun 30, 2026), no debt · Next major binary: divesiran Ph3 PV start — 1H 2027 (guidance)</div>
+      </div>
+    </div>
+  </header>
+
+<div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#identity">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Clinical</a><a href="#status">Regulatory</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#fdmc">Valuation</a><a href="#catalysts">Catalysts</a><a href="#redflags">Risks</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#refs">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+    </nav>
+  </div>
+
 <main>
 <section id="identity">
-<h2><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
-<p class="kicker">What the company is, how the listing works, and the one-paragraph investment thesis — with the honest caveat first.</p>
-
-<div class="legend"><span><b>Evidence key:</b></span>
-<span class="tag fact">FACT</span> sourced to filing/registry/paper
-<span class="tag interp">INTERPRETATION</span> reasoned inference
-<span class="tag gap">GAP</span> could not verify from available sources
-<span class="tag unver">UNVERIFIED</span> single weak source or secondary claim
-</div>
-
-<table>
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A platform with a Phase 2 winner and a stranded asset</h2><p class="lede">What the company is, how the listing works, and the one-paragraph investment thesis — with the honest caveat first.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <table>
 <tr><th style="width:26%">Item</th><th>Detail</th></tr>
-<tr><td><b>Company</b></td><td>Silence Therapeutics plc, a clinical-stage biotechnology company headquartered in London, UK, developing siRNA therapeutics via its proprietary mRNAi GOLD™ platform. <span class="tag fact">FACT</span> <a class="src" href="#r-bw">company PRs</a></td></tr>
-<tr><td><b>Listing / structure</b></td><td>Nasdaq: SLN — American Depositary Shares. Each ADS represents <b>three ordinary shares</b> of the UK plc. Ordinary shares trade in London/Europe under SLN tickers (e.g., LSE: SLN). <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
-<tr><td><b>Headcount / footprint</b></td><td>Operations in the US, UK and Germany; non-current assets primarily in the UK. A non-recurring workforce reduction in Q2 2025 (restructuring charge $1.3M). <span class="tag fact">FACT</span> <a class="src" href="#r-10q1">Q2 2025 10-Q</a></td></tr>
-<tr><td><b>Price (ADS)</b></td><td>~$9.86 at Oct 9, 2026 close; 52-week range <b>$4.19 (Feb 12, 2026) – $17.58 (Aug 10, 2026, the SANRECO readout day)</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-indmoney">indmoney</a> <a class="src" href="#r-hellostake">hellostake</a> (secondary quote aggregators, cross-checked)</td></tr>
-<tr><td><b>Share base</b></td><td>141,739,180 ordinary shares outstanding at Jun 30, 2026 (including ADS form) = ~47.25M ADS. <span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td><b>Cash</b></td><td>$72.1M cash &amp; equivalents at Jun 30, 2026; no long-term debt disclosed. <span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td><b>Lead asset</b></td><td>Divesiran (SLN124), GalNAc-siRNA targeting TMPRSS6, for polycythemia vera (PV): Phase 2 SANRECO met primary endpoint Aug 10, 2026 (n=48; 88% vs 19% placebo, p&lt;0.0001). Phase 3 Q12W vs placebo anticipated to start 1H 2027. FDA Fast Track + orphan drug (US), orphan (EC). <span class="tag fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a></td></tr>
-<tr><td><b>Second asset</b></td><td>Zerlasiran (SLN360), LPA-targeting GalNAc-siRNA for elevated Lp(a): Phase 2 ALPACAR-360 complete (≥90% median Lp(a) reduction; JAMA 2024 publication). Core Phase 3 readiness complete in 2025 (FDA/EMA feedback positive on CV-outcomes design); the company will <b>not</b> initiate Phase 3 without a third-party partner. <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
+<tr><td><b>Company</b></td><td>Silence Therapeutics plc, a clinical-stage biotechnology company headquartered in London, UK, developing siRNA therapeutics via its proprietary mRNAi GOLD™ platform. <span class="ev fact">FACT</span> <a class="src" href="#r-bw">company PRs</a></td></tr>
+<tr><td><b>Listing / structure</b></td><td>Nasdaq: SLN — American Depositary Shares. Each ADS represents <b>three ordinary shares</b> of the UK plc. Ordinary shares trade in London/Europe under SLN tickers (e.g., LSE: SLN). <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
+<tr><td><b>Headcount / footprint</b></td><td>Operations in the US, UK and Germany; non-current assets primarily in the UK. A non-recurring workforce reduction in Q2 2025 (restructuring charge $1.3M). <span class="ev fact">FACT</span> <a class="src" href="#r-10q1">Q2 2025 10-Q</a></td></tr>
+<tr><td><b>Price (ADS)</b></td><td>~$9.86 at Oct 9, 2026 close; 52-week range <b>$4.19 (Feb 12, 2026) – $17.58 (Aug 10, 2026, the SANRECO readout day)</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-indmoney">indmoney</a> <a class="src" href="#r-hellostake">hellostake</a> (secondary quote aggregators, cross-checked)</td></tr>
+<tr><td><b>Share base</b></td><td>141,739,180 ordinary shares outstanding at Jun 30, 2026 (including ADS form) = ~47.25M ADS. <span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td><b>Cash</b></td><td>$72.1M cash &amp; equivalents at Jun 30, 2026; no long-term debt disclosed. <span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td><b>Lead asset</b></td><td>Divesiran (SLN124), GalNAc-siRNA targeting TMPRSS6, for polycythemia vera (PV): Phase 2 SANRECO met primary endpoint Aug 10, 2026 (n=48; 88% vs 19% placebo, p&lt;0.0001). Phase 3 Q12W vs placebo anticipated to start 1H 2027. FDA Fast Track + orphan drug (US), orphan (EC). <span class="ev fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a></td></tr>
+<tr><td><b>Second asset</b></td><td>Zerlasiran (SLN360), LPA-targeting GalNAc-siRNA for elevated Lp(a): Phase 2 ALPACAR-360 complete (≥90% median Lp(a) reduction; JAMA 2024 publication). Core Phase 3 readiness complete in 2025 (FDA/EMA feedback positive on CV-outcomes design); the company will <b>not</b> initiate Phase 3 without a third-party partner. <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
 </table>
 
 <div class="verdict">
@@ -163,175 +306,162 @@
 <p>SLN is a two-asset siRNA company whose value rests on divesiran, a first-in-class TMPRSS6-silencing siRNA that posted a strong placebo-controlled Phase 2 readout in phlebotomy-dependent polycythemia vera (88% vs 19% responder rate, p&lt;0.0001) with infrequent subcutaneous dosing (Q6W/Q12W) — a genuine binary event with a Phase 3 start guided for 1H 2027. The second leg, zerlasiran, is scientifically Phase 3-ready but commercially stranded: no partner, no self-funded Phase 3, and the entire Lp(a)-lowering class was repriced by pelacarsen's Phase 3 failure (Sep 4, 2026). Cash (~$72M) funds the current burn into roughly 2027 but not a PV Phase 3, so a financing or partnership is the near-term question, not just a clinical one.</p>
 <p style="margin-top:10px"><b>The swing factor:</b> whether divesiran's Phase 2 PV effect (small n=48, 36 weeks, surrogate of phlebotomy avoidance/HCT control) reproduces in a larger Phase 3 — and whether that Phase 3 gets funded without heavy dilution.</p>
 </div>
-</section>
+    </section>
 <section id="science">
-<h2><span class="num">2</span>Science: Plain-Language Mechanism + Why It Could Fail</h2>
-<p class="kicker">The platform, the two lead biologies, and the failure modes — with academic literature, not just company slides.</p>
-
-<h3>2.1 The platform: GalNAc-conjugated siRNA (mRNAi GOLD™)</h3>
-<p>Silence's drugs are <b>short interfering RNAs</b>: synthetic double-stranded RNA molecules designed so that one strand (the "guide") loads into the RNA-induced silencing complex (RISC) inside a cell and directs it to cut up the matching messenger RNA — destroying the message before the disease protein is made. The drug does not change the genome; the effect is durable but reversible. <span class="tag interp">INTERPRETATION</span> (standard RNAi mechanism)</p>
-<p>Delivery is the whole game for siRNA. Silence conjugates each siRNA to <b>GalNAc</b> (N-acetylgalactosamine), a sugar that binds the asialoglycoprotein receptor (ASGPR), which is highly expressed on liver hepatocytes and negligible elsewhere. The conjugate is taken up by receptor-mediated endocytosis, and chemical stabilization of the siRNA (2′-modifications, phosphorothioate linkages) keeps it active for months after a single subcutaneous dose — hence the quarterly or twice-yearly dosing schedules. <span class="tag fact">FACT</span> <a class="src" href="#r-nature-gal">Nature Signal Transduction review 2026</a> <a class="src" href="#r-expmed">Exp Mol Med review</a></p>
+      <div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Silencing the disease message: how GalNAc-siRNA works — and where it breaks</h2><p class="lede">The platform, the two lead biologies, and the failure modes — with academic literature, not just company slides.</p></div></div>
+      <h3>2.1 The platform: GalNAc-conjugated siRNA (mRNAi GOLD™)</h3>
+<p>Silence's drugs are <b>short interfering RNAs</b>: synthetic double-stranded RNA molecules designed so that one strand (the "guide") loads into the RNA-induced silencing complex (RISC) inside a cell and directs it to cut up the matching messenger RNA — destroying the message before the disease protein is made. The drug does not change the genome; the effect is durable but reversible. <span class="ev interp">INTERPRETATION</span> (standard RNAi mechanism)</p>
+<p>Delivery is the whole game for siRNA. Silence conjugates each siRNA to <b>GalNAc</b> (N-acetylgalactosamine), a sugar that binds the asialoglycoprotein receptor (ASGPR), which is highly expressed on liver hepatocytes and negligible elsewhere. The conjugate is taken up by receptor-mediated endocytosis, and chemical stabilization of the siRNA (2′-modifications, phosphorothioate linkages) keeps it active for months after a single subcutaneous dose — hence the quarterly or twice-yearly dosing schedules. <span class="ev fact">FACT</span> <a class="src" href="#r-nature-gal">Nature Signal Transduction review 2026</a> <a class="src" href="#r-expmed">Exp Mol Med review</a></p>
 <p>Academic anchors for the delivery science:</p>
 <ul>
-<li>GalNAc–ASGPR liver targeting: triantennary GalNAc conjugation improved hepatic delivery of oligonucleotides 7- to 10-fold in early ASO work; seven currently approved siRNA drugs use GalNAc conjugates for liver-specific treatment, mostly for hepatic metabolic targets (patisiran excepted, which uses an IV lipid nanoparticle). <span class="tag fact">FACT</span> <a class="src" href="#r-nature-gal">Nature Sig Transd review</a></li>
-<li>A 2026 npj Drug Discovery review summarizes the central translational lesson: patisiran (IV LNP) established liver siRNA in hATTR; subsequent GalNAc conjugates (givosiran, inclisiran) showed receptor-mediated subcutaneous dosing gives potent, durable hepatic silencing — but <b>matching delivery modality to target-organ biology is what separates failures from approvals</b>. Silence's targets are all hepatocyte-expressed (LPA, TMPRSS6, ANGPTL3, GPR146, INHBE), i.e., inside the delivery comfort zone. <span class="tag fact">FACT</span> <a class="src" href="#r-npj">npj Drug Discovery 2026</a></li>
+<li>GalNAc–ASGPR liver targeting: triantennary GalNAc conjugation improved hepatic delivery of oligonucleotides 7- to 10-fold in early ASO work; seven currently approved siRNA drugs use GalNAc conjugates for liver-specific treatment, mostly for hepatic metabolic targets (patisiran excepted, which uses an IV lipid nanoparticle). <span class="ev fact">FACT</span> <a class="src" href="#r-nature-gal">Nature Sig Transd review</a></li>
+<li>A 2026 npj Drug Discovery review summarizes the central translational lesson: patisiran (IV LNP) established liver siRNA in hATTR; subsequent GalNAc conjugates (givosiran, inclisiran) showed receptor-mediated subcutaneous dosing gives potent, durable hepatic silencing — but <b>matching delivery modality to target-organ biology is what separates failures from approvals</b>. Silence's targets are all hepatocyte-expressed (LPA, TMPRSS6, ANGPTL3, GPR146, INHBE), i.e., inside the delivery comfort zone. <span class="ev fact">FACT</span> <a class="src" href="#r-npj">npj Drug Discovery 2026</a></li>
 </ul>
 
 <h3>2.2 Divesiran biology: TMPRSS6 → hepcidin → iron restriction</h3>
-<p>Polycythemia vera (PV) is a myeloproliferative neoplasm (usually JAK2-mutated) in which the bone marrow overproduces red blood cells, driving hematocrit (HCT) up. Guidelines target HCT &lt;45% because higher levels raise thrombosis risk; the standard workhorse to control it is <b>therapeutic phlebotomy</b> — literally drawing blood — which is burdensome and induces iron deficiency. <span class="tag fact">FACT</span> (established PV care)</p>
-<p>Divesiran silences <b>TMPRSS6</b>, the gene encoding matriptase-2, a liver protease that normally <i>suppresses</i> hepcidin. Removing the brake raises hepcidin, the master iron hormone; hepcidin degrades ferroportin, trapping iron in macrophages/hepatocytes and starving the bone marrow of the iron it needs to make excess red cells. Net effect: fewer red cells, lower HCT, fewer phlebotomies — while iron stores (ferritin) actually <i>improve</i> because iron is redistributed rather than removed. <span class="tag interp">INTERPRETATION</span> of company-reported mechanism, consistent with: <a class="src" href="#r-tmprss6">Silvestri et al., Cell Metab 2008 (PMID 18976966)</a> — matriptase-2 inhibits hepcidin activation by cleaving membrane hemojuvelin; mutational inactivation causes iron-deficient anemia in mice and humans.</p>
-<p>Biology validation in the literature: germline TMPRSS6 loss-of-function causes iron-refractory iron deficiency anemia (IRIDA) in humans — the mirror image of what divesiran is doing pharmacologically, which is strong human-genetic support that TMPRSS6 suppression restricts erythropoiesis. <span class="tag interp">INTERPRETATION</span> (IRIDA genetics are established; the PV therapeutic inference is the company's)</p>
+<p>Polycythemia vera (PV) is a myeloproliferative neoplasm (usually JAK2-mutated) in which the bone marrow overproduces red blood cells, driving hematocrit (HCT) up. Guidelines target HCT &lt;45% because higher levels raise thrombosis risk; the standard workhorse to control it is <b>therapeutic phlebotomy</b> — literally drawing blood — which is burdensome and induces iron deficiency. <span class="ev fact">FACT</span> (established PV care)</p>
+<p>Divesiran silences <b>TMPRSS6</b>, the gene encoding matriptase-2, a liver protease that normally <i>suppresses</i> hepcidin. Removing the brake raises hepcidin, the master iron hormone; hepcidin degrades ferroportin, trapping iron in macrophages/hepatocytes and starving the bone marrow of the iron it needs to make excess red cells. Net effect: fewer red cells, lower HCT, fewer phlebotomies — while iron stores (ferritin) actually <i>improve</i> because iron is redistributed rather than removed. <span class="ev interp">INTERPRETATION</span> of company-reported mechanism, consistent with: <a class="src" href="#r-tmprss6">Silvestri et al., Cell Metab 2008 (PMID 18976966)</a> — matriptase-2 inhibits hepcidin activation by cleaving membrane hemojuvelin; mutational inactivation causes iron-deficient anemia in mice and humans.</p>
+<p>Biology validation in the literature: germline TMPRSS6 loss-of-function causes iron-refractory iron deficiency anemia (IRIDA) in humans — the mirror image of what divesiran is doing pharmacologically, which is strong human-genetic support that TMPRSS6 suppression restricts erythropoiesis. <span class="ev interp">INTERPRETATION</span> (IRIDA genetics are established; the PV therapeutic inference is the company's)</p>
 
 <h3>2.3 Zerlasiran biology: LPA silencing → Lp(a) lowering</h3>
-<p>Lipoprotein(a) [Lp(a)] is an LDL-like particle with an extra apolipoprotein(a) attached, encoded by the <b>LPA</b> gene. Levels are ~90% genetically determined, set by early childhood, and largely unmoved by diet, exercise, or statins. Elevated Lp(a) (≥125 nmol/L per Silence's trial definition) is carried by ~20% of the global population and is epidemiologically and Mendelian-randomization-linked to ASCVD, aortic stenosis, and thrombosis. There is <b>no approved medicine that selectively lowers Lp(a)</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a> (company disease framing; epidemiology widely published)</p>
-<p>Zerlasiran is a GalNAc-siRNA that silences LPA mRNA in hepatocytes, cutting hepatic apo(a) production and hence circulating Lp(a). Phase 2 ALPACAR-360 (n=178, baseline Lp(a) ≥125 nmol/L, median ~215 nmol/L, high ASCVD risk): 300 mg q16w/q24w and 450 mg q24w produced <b>median maximum Lp(a) reductions ≥90%</b> from baseline, highly significant vs placebo to 48 weeks; reductions persisted to the week-60 final visit; well tolerated with no serious safety concerns. Published in JAMA (AHA 2024 presentation). <span class="tag fact">FACT</span> <a class="src" href="#r-jama">JAMA 2024 / ALPACAR-360</a> <a class="src" href="#r-zer48">48-week PR</a></p>
+<p>Lipoprotein(a) [Lp(a)] is an LDL-like particle with an extra apolipoprotein(a) attached, encoded by the <b>LPA</b> gene. Levels are ~90% genetically determined, set by early childhood, and largely unmoved by diet, exercise, or statins. Elevated Lp(a) (≥125 nmol/L per Silence's trial definition) is carried by ~20% of the global population and is epidemiologically and Mendelian-randomization-linked to ASCVD, aortic stenosis, and thrombosis. There is <b>no approved medicine that selectively lowers Lp(a)</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a> (company disease framing; epidemiology widely published)</p>
+<p>Zerlasiran is a GalNAc-siRNA that silences LPA mRNA in hepatocytes, cutting hepatic apo(a) production and hence circulating Lp(a). Phase 2 ALPACAR-360 (n=178, baseline Lp(a) ≥125 nmol/L, median ~215 nmol/L, high ASCVD risk): 300 mg q16w/q24w and 450 mg q24w produced <b>median maximum Lp(a) reductions ≥90%</b> from baseline, highly significant vs placebo to 48 weeks; reductions persisted to the week-60 final visit; well tolerated with no serious safety concerns. Published in JAMA (AHA 2024 presentation). <span class="ev fact">FACT</span> <a class="src" href="#r-jama">JAMA 2024 / ALPACAR-360</a> <a class="src" href="#r-zer48">48-week PR</a></p>
 
 <h3>2.4 Why it could fail — the honest biology risks</h3>
-<div class="flag"><span class="rank">R-A</span><b>The Lp(a) hypothesis is now empirically in doubt.</b> On Sep 4, 2026, Novartis's pelacarsen (antisense, ~72–80% Lp(a) lowering) <b>failed its Phase 3 Lp(a)HORIZON cardiovascular-outcomes trial</b> (n=8,323): biomarker lowered as designed, but no reduction in CV death/MI/stroke/urgent revascularization vs placebo. This is the first-ever Phase 3 outcomes test of the Lp(a) hypothesis — and it failed. The counterargument (deeper suppression needed; olpasiran/leopdisiran are siRNAs with &gt;93–97% lowering and different trial designs) is legitimate but unproven; the readouts arrive in 2028–2029. Until then, any Lp(a)-lowering program — including zerlasiran — carries <b>target-class risk that no amount of biomarker data can remove</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-horizon">HORIZON reports</a> <a class="src" href="#r-biospace-lpa">BioSpace</a> <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">R-B</span><b>Biomarker ≠ outcome, twice over.</b> Zerlasiran has only ever shown Lp(a) lowering — never a cardiovascular event reduction. Divesiran has only ever shown phlebotomy avoidance and HCT control — never a reduction in thrombotic events, which is the actual morbidity driver in PV. Both programs' clinical value is <b>assumed by surrogate</b>. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">R-C</span><b>Divesiran's biology has a thalassemia-shaped caution flag.</b> The same TMPRSS6-silencing approach was tested in non-transfusion-dependent β-thalassemia (GEMINI II, NCT04718844); a recent peer-reviewed hematology review notes that divesiran "has not progressed further, with no announced plans for continued development" in that indication after preliminary results did not show clear clinically meaningful benefit on hemoglobin or transfusion burden — the same pattern seen with Ionis's TMPRSS6 antisense sapablursen. Iron restriction can control red-cell <i>quantity</i> (PV) without fixing red-cell <i>quality</i> (thalassemia) — but it also means divesiran's benefit is confined to a narrow physiologic trick. <span class="tag fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></div>
-<div class="flag"><span class="rank">R-D</span><b>Iron restriction is a double-edged sword.</b> Pharmacologic TMPRSS6 suppression mimics a state (high hepcidin / low iron availability) that in germline form causes iron-refractory iron deficiency anemia. In PV the goal is to restrain overproduction — but overshoot risks anemia: the Phase 2 readout already included two grade-1 anemia events. Chronic iron restriction's long-term consequences in a PV population (fatigue, restless legs, cognition) are unknown beyond 36–60 weeks of observation. <span class="tag interp">INTERPRETATION</span> <a class="src" href="#r-pvr">PV Reporter (anemia events)</a></div>
-<div class="flag"><span class="rank">R-E</span><b>Platform-class risks of siRNA.</b> GalNAc-siRNA is now a validated modality for hepatic targets, but class concerns remain: off-target RISC loading, long pharmacodynamic tails that complicate safety management (a bad effect can't be quickly "washed out" when dosing is quarterly), and immunogenicity/injection-site burden. Silence's datasets are small (n=178 largest) and short; none is powered to detect rare safety signals. <span class="tag interp">INTERPRETATION</span></div>
-</section>
+<div class="flag"><span class="rank">R-A</span><b>The Lp(a) hypothesis is now empirically in doubt.</b> On Sep 4, 2026, Novartis's pelacarsen (antisense, ~72–80% Lp(a) lowering) <b>failed its Phase 3 Lp(a)HORIZON cardiovascular-outcomes trial</b> (n=8,323): biomarker lowered as designed, but no reduction in CV death/MI/stroke/urgent revascularization vs placebo. This is the first-ever Phase 3 outcomes test of the Lp(a) hypothesis — and it failed. The counterargument (deeper suppression needed; olpasiran/leopdisiran are siRNAs with &gt;93–97% lowering and different trial designs) is legitimate but unproven; the readouts arrive in 2028–2029. Until then, any Lp(a)-lowering program — including zerlasiran — carries <b>target-class risk that no amount of biomarker data can remove</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-horizon">HORIZON reports</a> <a class="src" href="#r-biospace-lpa">BioSpace</a> <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">R-B</span><b>Biomarker ≠ outcome, twice over.</b> Zerlasiran has only ever shown Lp(a) lowering — never a cardiovascular event reduction. Divesiran has only ever shown phlebotomy avoidance and HCT control — never a reduction in thrombotic events, which is the actual morbidity driver in PV. Both programs' clinical value is <b>assumed by surrogate</b>. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">R-C</span><b>Divesiran's biology has a thalassemia-shaped caution flag.</b> The same TMPRSS6-silencing approach was tested in non-transfusion-dependent β-thalassemia (GEMINI II, NCT04718844); a recent peer-reviewed hematology review notes that divesiran "has not progressed further, with no announced plans for continued development" in that indication after preliminary results did not show clear clinically meaningful benefit on hemoglobin or transfusion burden — the same pattern seen with Ionis's TMPRSS6 antisense sapablursen. Iron restriction can control red-cell <i>quantity</i> (PV) without fixing red-cell <i>quality</i> (thalassemia) — but it also means divesiran's benefit is confined to a narrow physiologic trick. <span class="ev fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></div>
+<div class="flag"><span class="rank">R-D</span><b>Iron restriction is a double-edged sword.</b> Pharmacologic TMPRSS6 suppression mimics a state (high hepcidin / low iron availability) that in germline form causes iron-refractory iron deficiency anemia. In PV the goal is to restrain overproduction — but overshoot risks anemia: the Phase 2 readout already included two grade-1 anemia events. Chronic iron restriction's long-term consequences in a PV population (fatigue, restless legs, cognition) are unknown beyond 36–60 weeks of observation. <span class="ev interp">INTERPRETATION</span> <a class="src" href="#r-pvr">PV Reporter (anemia events)</a></div>
+<div class="flag"><span class="rank">R-E</span><b>Platform-class risks of siRNA.</b> GalNAc-siRNA is now a validated modality for hepatic targets, but class concerns remain: off-target RISC loading, long pharmacodynamic tails that complicate safety management (a bad effect can't be quickly "washed out" when dosing is quarterly), and immunogenicity/injection-site burden. Silence's datasets are small (n=178 largest) and short; none is powered to detect rare safety signals. <span class="ev interp">INTERPRETATION</span></div>
+    </section>
 <section id="pipeline">
-<h2><span class="num">3</span>Pipeline Overview</h2>
-<p class="kicker">Every disclosed program, its stage, and who pays for it. As of Q2 2026 reporting (Aug 10, 2026).</p>
-<table>
+      <div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>Every program, ranked by stage — and who pays for it</h2><p class="lede">Every disclosed program, its stage, and who pays for it. As of Q2 2026 reporting (Aug 10, 2026).</p></div></div>
+      <table>
 <tr><th>Program</th><th>Target / Indication</th><th>Stage</th><th>Status &amp; notes</th></tr>
-<tr><td><b>Divesiran (SLN124)</b></td><td>TMPRSS6 · polycythemia vera (+ other hematologic conditions)</td><td><b>Phase 2 complete</b></td><td>SANRECO Ph2 met primary + secondary endpoints (Aug 10, 2026). Ph3 (Q12W vs placebo) anticipated 1H 2027. Fast Track + orphan (FDA); orphan (EC). Wholly owned. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Zerlasiran (SLN360)</b></td><td>LPA · elevated Lp(a) / ASCVD</td><td><b>Phase 3-ready</b></td><td>ALPACAR-360 Ph2 complete; core Ph3 readiness (mfg scale-up, FDA/EMA design feedback) done 2025. <b>No Ph3 without a third-party partner</b>; partner search ongoing. Wholly owned. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>SLN312 (AZD1705)</b></td><td>ANGPTL3 · dyslipidemia</td><td><b>Phase 1</b></td><td>AstraZeneca completed interim Ph1 analysis showing "competitive profile"; AZ will <b>not</b> pursue beyond Ph1. Silence regains exclusive global rights at end of Ph1. Ph1 data presented as EAS 2026 late-breaker (May 26, 2026). <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>SLN365</b></td><td>GPR146 · dyslipidemia</td><td>Preclinical</td><td>Statin/ezetimibe-independent lipid effects reproduced preclinically. Potential IND 2027. <span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td><b>SLN098</b></td><td>INHBE · obesity / body composition</td><td>Preclinical</td><td>Diet-induced-obesity mouse data: reduced visceral fat with lean-mass preservation. Potential IND 2027. <span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td><b>SLN548</b></td><td>Undisclosed · complement-mediated diseases</td><td>Preclinical</td><td>"Positive preclinical results"; company <b>seeking a third-party partner</b> to initiate clinical development. <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
-<tr><td><b>AstraZeneca collaboration</b></td><td>siRNA targets in cardiovascular, renal, metabolic &amp; respiratory disease</td><td>Research → Ph1</td><td>Ongoing; SLN312 was the lead. AZ retains options on other targets; collaboration revenue was $0.4M in H1 2026. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Hansoh collaboration</b></td><td>3 undisclosed targets (China)</td><td><b>Terminated</b></td><td>Hansoh notified Dec 2024 it will not pursue further development; Silence retains exclusive global rights to all three targets. <span class="tag fact">FACT</span> <a class="src" href="#r-ar2025">2025 Annual Report</a></td></tr>
-<tr><td><b>Mallinckrodt (SLN501)</b></td><td>Undisclosed</td><td><b>Concluded</b></td><td>Collaboration concluded; no further development. <span class="tag fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summaries</a></td></tr>
-<tr><td><b>Divesiran in thalassemia / MDS</b></td><td>TMPRSS6 · NTDT thalassemia</td><td><b>Discontinued</b></td><td>GEMINI II single/multiple-dose Ph1 done; no announced plans for continued development in thalassemia after lacking clear clinically meaningful benefit. <span class="tag fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></td></tr>
+<tr><td><b>Divesiran (SLN124)</b></td><td>TMPRSS6 · polycythemia vera (+ other hematologic conditions)</td><td><b>Phase 2 complete</b></td><td>SANRECO Ph2 met primary + secondary endpoints (Aug 10, 2026). Ph3 (Q12W vs placebo) anticipated 1H 2027. Fast Track + orphan (FDA); orphan (EC). Wholly owned. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Zerlasiran (SLN360)</b></td><td>LPA · elevated Lp(a) / ASCVD</td><td><b>Phase 3-ready</b></td><td>ALPACAR-360 Ph2 complete; core Ph3 readiness (mfg scale-up, FDA/EMA design feedback) done 2025. <b>No Ph3 without a third-party partner</b>; partner search ongoing. Wholly owned. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>SLN312 (AZD1705)</b></td><td>ANGPTL3 · dyslipidemia</td><td><b>Phase 1</b></td><td>AstraZeneca completed interim Ph1 analysis showing "competitive profile"; AZ will <b>not</b> pursue beyond Ph1. Silence regains exclusive global rights at end of Ph1. Ph1 data presented as EAS 2026 late-breaker (May 26, 2026). <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>SLN365</b></td><td>GPR146 · dyslipidemia</td><td>Preclinical</td><td>Statin/ezetimibe-independent lipid effects reproduced preclinically. Potential IND 2027. <span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td><b>SLN098</b></td><td>INHBE · obesity / body composition</td><td>Preclinical</td><td>Diet-induced-obesity mouse data: reduced visceral fat with lean-mass preservation. Potential IND 2027. <span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td><b>SLN548</b></td><td>Undisclosed · complement-mediated diseases</td><td>Preclinical</td><td>"Positive preclinical results"; company <b>seeking a third-party partner</b> to initiate clinical development. <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
+<tr><td><b>AstraZeneca collaboration</b></td><td>siRNA targets in cardiovascular, renal, metabolic &amp; respiratory disease</td><td>Research → Ph1</td><td>Ongoing; SLN312 was the lead. AZ retains options on other targets; collaboration revenue was $0.4M in H1 2026. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Hansoh collaboration</b></td><td>3 undisclosed targets (China)</td><td><b>Terminated</b></td><td>Hansoh notified Dec 2024 it will not pursue further development; Silence retains exclusive global rights to all three targets. <span class="ev fact">FACT</span> <a class="src" href="#r-ar2025">2025 Annual Report</a></td></tr>
+<tr><td><b>Mallinckrodt (SLN501)</b></td><td>Undisclosed</td><td><b>Concluded</b></td><td>Collaboration concluded; no further development. <span class="ev fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summaries</a></td></tr>
+<tr><td><b>Divesiran in thalassemia / MDS</b></td><td>TMPRSS6 · NTDT thalassemia</td><td><b>Discontinued</b></td><td>GEMINI II single/multiple-dose Ph1 done; no announced plans for continued development in thalassemia after lacking clear clinically meaningful benefit. <span class="ev fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></td></tr>
 </table>
-<p class="fine">Note the pattern: two of three historical pharma collaborations (Hansoh, Mallinckrodt) ended without licensed products, and AstraZeneca declined to carry SLN312 past Phase 1. The platform's clinical validation currently rests entirely on Silence-funded data. <span class="tag interp">INTERPRETATION</span></p>
+<p class="fine">Note the pattern: two of three historical pharma collaborations (Hansoh, Mallinckrodt) ended without licensed products, and AstraZeneca declined to carry SLN312 past Phase 1. The platform's clinical validation currently rests entirely on Silence-funded data. <span class="ev interp">INTERPRETATION</span></p>
 <h3>3.1 Pipeline ranked by value (most → least)</h3>
 <p class="kicker">Value = probability-weighted contribution to enterprise value as this dossier sees it — clinical proof, funding status, and partnerability — not program order.</p>
 <table>
 <tr><th>#</th><th>Program</th><th>Why it ranks here</th></tr>
-<tr><td><b>1</b></td><td><b>Divesiran (SLN124) — PV</b></td><td>The only asset with positive placebo-controlled Phase 2 data (88% vs 19%, p&lt;0.0001), wholly owned, FDA Fast Track + orphan designations, Phase 3 guided 1H 2027. Carries the large majority of the company's risk-adjusted value — and its binary. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>2</b></td><td><b>Zerlasiran (SLN360) — Lp(a)</b></td><td>Phase 3-ready with ≥90% median Lp(a) lowering, but Phase 3 is partner-contingent and the class was repriced by the pelacarsen failure (Sep 2026). A deep out-of-the-money call option: large if the Lp(a) hypothesis is rescued (Amgen OCEAN(a), 2028), near-zero if not. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>3</b></td><td><b>SLN312 (ANGPTL3)</b></td><td>Phase 1 human data exists and AstraZeneca called the profile "competitive"; exclusive global rights reverting to Silence. Re-partnerable in a validated target class (evinacumab approved; zodasiran Ph2-positive) — modest option value, but human data beats preclinical. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>4</b></td><td><b>AstraZeneca collaboration</b></td><td>Live research collaboration ($0.4M revenue in H1 2026) with options on additional siRNA targets across CV/renal/metabolic/respiratory disease. Small, steady, and the only current pharma validation of the platform. <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
-<tr><td><b>5</b></td><td><b>SLN365 (GPR146) / SLN098 (INHBE)</b></td><td>Preclinical, IND-2027 guidance. Interesting biology — statin/ezetimibe-independent lipid effects; visceral-fat reduction with lean-mass preservation — but no human data. Pure platform option value; tied. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>6</b></td><td><b>SLN548 (complement)</b></td><td>Preclinical with "positive" results, but the company is seeking a third-party partner to initiate clinical development — value only materializes if someone else pays. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>7</b></td><td><b>Hansoh / Mallinckrodt / divesiran-thalassemia</b></td><td>Terminated, concluded, discontinued — zero forward value; retained only as track-record evidence (see red flags #6–7). <span class="tag fact">FACT</span></td></tr>
+<tr><td><b>1</b></td><td><b>Divesiran (SLN124) — PV</b></td><td>The only asset with positive placebo-controlled Phase 2 data (88% vs 19%, p&lt;0.0001), wholly owned, FDA Fast Track + orphan designations, Phase 3 guided 1H 2027. Carries the large majority of the company's risk-adjusted value — and its binary. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>2</b></td><td><b>Zerlasiran (SLN360) — Lp(a)</b></td><td>Phase 3-ready with ≥90% median Lp(a) lowering, but Phase 3 is partner-contingent and the class was repriced by the pelacarsen failure (Sep 2026). A deep out-of-the-money call option: large if the Lp(a) hypothesis is rescued (Amgen OCEAN(a), 2028), near-zero if not. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>3</b></td><td><b>SLN312 (ANGPTL3)</b></td><td>Phase 1 human data exists and AstraZeneca called the profile "competitive"; exclusive global rights reverting to Silence. Re-partnerable in a validated target class (evinacumab approved; zodasiran Ph2-positive) — modest option value, but human data beats preclinical. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>4</b></td><td><b>AstraZeneca collaboration</b></td><td>Live research collaboration ($0.4M revenue in H1 2026) with options on additional siRNA targets across CV/renal/metabolic/respiratory disease. Small, steady, and the only current pharma validation of the platform. <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
+<tr><td><b>5</b></td><td><b>SLN365 (GPR146) / SLN098 (INHBE)</b></td><td>Preclinical, IND-2027 guidance. Interesting biology — statin/ezetimibe-independent lipid effects; visceral-fat reduction with lean-mass preservation — but no human data. Pure platform option value; tied. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>6</b></td><td><b>SLN548 (complement)</b></td><td>Preclinical with "positive" results, but the company is seeking a third-party partner to initiate clinical development — value only materializes if someone else pays. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>7</b></td><td><b>Hansoh / Mallinckrodt / divesiran-thalassemia</b></td><td>Terminated, concluded, discontinued — zero forward value; retained only as track-record evidence (see red flags #6–7). <span class="ev fact">FACT</span></td></tr>
 </table>
-</section>
-
+    </section>
 <section id="trials">
-<h2><span class="num">4</span>Trial Design Deep Dive</h2>
-<p class="kicker">Endpoints, statistical plans, powering, and what was actually reported — for the two trials that matter.</p>
-
-<h3>4.1 SANRECO — divesiran Phase 2 in polycythemia vera (the key binary, already read out)</h3>
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>SANRECO read positive; the trial details that decide the Phase 3</h2><p class="lede">Endpoints, statistical plans, powering, and what was actually reported — for the two trials that matter.</p></div></div>
+      <h3>4.1 SANRECO — divesiran Phase 2 in polycythemia vera (the key binary, already read out)</h3>
 <table>
 <tr><th style="width:26%">Design element</th><th>Detail</th></tr>
-<tr><td>Design</td><td>36-week, randomized, double-blind, placebo-controlled Phase 2; 48 phlebotomy-dependent PV patients. <span class="tag fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a></td></tr>
-<tr><td>Dosing</td><td>Divesiran 6 mg/kg subcutaneous every 6 weeks (Q6W) or every 12 weeks (Q12W) vs placebo. <span class="tag fact">FACT</span></td></tr>
-<tr><td>Primary endpoint</td><td>Proportion of patients achieving <b>clinical response = absence of phlebotomy AND maintenance of hematocrit &lt;45% during weeks 18–36</b>. <span class="tag fact">FACT</span></td></tr>
-<tr><td>Key secondary</td><td>Phlebotomy rate during weeks 0–36; plus HCT control, iron markers (ferritin), and MPN-SAF Total Symptom Score. <span class="tag fact">FACT</span></td></tr>
-<tr><td>Result (primary)</td><td><b>88% divesiran vs 19% placebo; p&lt;0.0001</b>. Placebo-adjusted response ≈ 69 percentage points. By regimen: 93.8% (Q6W) and 81.3% (Q12W). <span class="tag fact">FACT</span></td></tr>
-<tr><td>Sensitivity analysis</td><td>In the 40-patient subset meeting the stricter Phase 1 phlebotomy criterion (≥3 phlebotomies in the prior 3 months or ≥5 in the prior 12 months): <b>89% divesiran vs 8% placebo</b> met the response definition (HCT &lt;45% without phlebotomy, weeks 18–36), p&lt;0.0001. Directionally consistent with the primary analysis — a subset, not a replacement for it. <span class="tag fact">FACT</span> <a class="src" href="#r-8kash">8-K summary</a></td></tr>
-<tr><td>Result (secondary)</td><td>Mean phlebotomies per patient weeks 0–36: <b>0.2 (divesiran) vs 2.1 (placebo); p&lt;0.0001</b>. Improvements reported in HCT control, ferritin, and MPN-SAF TSS (detailed data not yet released). <span class="tag fact">FACT</span> (detail-level data <span class="tag gap">GAP</span>)</td></tr>
-<tr><td>Safety</td><td>"Well tolerated with no new safety findings." Independent reporting: injection-site reactions infrequent and self-resolving; <b>two grade-1 (mild) anemia events</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-pvr">PV Reporter</a> <a class="src" href="#r-bw">company PR</a></td></tr>
-<tr><td>Extension</td><td>All 48 patients completed the placebo-controlled portion and are now in <b>3-year double-blind and open-label extension periods</b>; company plans to present full results at an upcoming medical congress (abstract submitted to ASH). <span class="tag fact">FACT</span> <a class="src" href="#r-bw">company PR</a> <a class="src" href="#r-8kash">8-K</a></td></tr>
+<tr><td>Design</td><td>36-week, randomized, double-blind, placebo-controlled Phase 2; 48 phlebotomy-dependent PV patients. <span class="ev fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a></td></tr>
+<tr><td>Dosing</td><td>Divesiran 6 mg/kg subcutaneous every 6 weeks (Q6W) or every 12 weeks (Q12W) vs placebo. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Primary endpoint</td><td>Proportion of patients achieving <b>clinical response = absence of phlebotomy AND maintenance of hematocrit &lt;45% during weeks 18–36</b>. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Key secondary</td><td>Phlebotomy rate during weeks 0–36; plus HCT control, iron markers (ferritin), and MPN-SAF Total Symptom Score. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Result (primary)</td><td><b>88% divesiran vs 19% placebo; p&lt;0.0001</b>. Placebo-adjusted response ≈ 69 percentage points. By regimen: 93.8% (Q6W) and 81.3% (Q12W). <span class="ev fact">FACT</span></td></tr>
+<tr><td>Sensitivity analysis</td><td>In the 40-patient subset meeting the stricter Phase 1 phlebotomy criterion (≥3 phlebotomies in the prior 3 months or ≥5 in the prior 12 months): <b>89% divesiran vs 8% placebo</b> met the response definition (HCT &lt;45% without phlebotomy, weeks 18–36), p&lt;0.0001. Directionally consistent with the primary analysis — a subset, not a replacement for it. <span class="ev fact">FACT</span> <a class="src" href="#r-8kash">8-K summary</a></td></tr>
+<tr><td>Result (secondary)</td><td>Mean phlebotomies per patient weeks 0–36: <b>0.2 (divesiran) vs 2.1 (placebo); p&lt;0.0001</b>. Improvements reported in HCT control, ferritin, and MPN-SAF TSS (detailed data not yet released). <span class="ev fact">FACT</span> (detail-level data <span class="ev gap">GAP</span>)</td></tr>
+<tr><td>Safety</td><td>"Well tolerated with no new safety findings." Independent reporting: injection-site reactions infrequent and self-resolving; <b>two grade-1 (mild) anemia events</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-pvr">PV Reporter</a> <a class="src" href="#r-bw">company PR</a></td></tr>
+<tr><td>Extension</td><td>All 48 patients completed the placebo-controlled portion and are now in <b>3-year double-blind and open-label extension periods</b>; company plans to present full results at an upcoming medical congress (abstract submitted to ASH). <span class="ev fact">FACT</span> <a class="src" href="#r-bw">company PR</a> <a class="src" href="#r-8kash">8-K</a></td></tr>
 </table>
 <div class="callout">
-<p><b>Statistical/powering read (honest version):</b> The company has not published the trial's formal power calculation or the pre-specified hierarchical testing sequence beyond the primary + key secondary <span class="tag gap">GAP</span>. What is visible is encouraging but small: n=48 total (≈16/arm), a 36-week double-blind window, and an endpoint (phlebotomy avoidance over weeks 18–36) that is clinically meaningful to patients but is <b>not</b> the hard thrombotic-event endpoint that ultimately defines PV therapy value. A 69-point placebo-adjusted delta is large enough to be robust to the small n — but small trials overestimate effect sizes, and the Q6W-vs-Q12W gap (93.8% vs 81.3%) hints at a dose-frequency response the Phase 3 (planned Q12W) must confirm. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Statistical/powering read (honest version):</b> The company has not published the trial's formal power calculation or the pre-specified hierarchical testing sequence beyond the primary + key secondary <span class="ev gap">GAP</span>. What is visible is encouraging but small: n=48 total (≈16/arm), a 36-week double-blind window, and an endpoint (phlebotomy avoidance over weeks 18–36) that is clinically meaningful to patients but is <b>not</b> the hard thrombotic-event endpoint that ultimately defines PV therapy value. A 69-point placebo-adjusted delta is large enough to be robust to the small n — but small trials overestimate effect sizes, and the Q6W-vs-Q12W gap (93.8% vs 81.3%) hints at a dose-frequency response the Phase 3 (planned Q12W) must confirm. <span class="ev interp">INTERPRETATION</span></p>
 </div>
-<p><b>Phase 1 context (EHA 2026, abstract PF886, n=21):</b> 80 phlebotomies in the 6 months before treatment vs 5 during dosing and 4 in the 16-week follow-up; ferritin rose 28.1 → 48.0 μg/L at week 34 (P=.035) while serum iron/TSAT fell (iron redistribution, not removal); no treatment-related SAEs or discontinuations at doses up to 9 mg/kg; majority improved on MPN-10 symptom score. Open-label, uncontrolled — directional only. <span class="tag fact">FACT</span> <a class="src" href="#r-eha">OncLive / EHA 2026</a></p>
+<p><b>Phase 1 context (EHA 2026, abstract PF886, n=21):</b> 80 phlebotomies in the 6 months before treatment vs 5 during dosing and 4 in the 16-week follow-up; ferritin rose 28.1 → 48.0 μg/L at week 34 (P=.035) while serum iron/TSAT fell (iron redistribution, not removal); no treatment-related SAEs or discontinuations at doses up to 9 mg/kg; majority improved on MPN-10 symptom score. Open-label, uncontrolled — directional only. <span class="ev fact">FACT</span> <a class="src" href="#r-eha">OncLive / EHA 2026</a></p>
 
 <h3>4.2 ALPACAR-360 — zerlasiran Phase 2 in elevated Lp(a) (complete; published)</h3>
 <table>
 <tr><th style="width:26%">Design element</th><th>Detail</th></tr>
-<tr><td>Design</td><td>Double-blind, placebo-controlled, 60-week Phase 2; 178 patients with Lp(a) ≥125 nmol/L (median baseline ~215 nmol/L) at high ASCVD risk. <span class="tag fact">FACT</span> <a class="src" href="#r-mdedge">MDedge</a></td></tr>
-<tr><td>Dosing</td><td>Zerlasiran 300 mg SC every 16 weeks, 300 mg every 24 weeks, or 450 mg every 24 weeks. <span class="tag fact">FACT</span></td></tr>
-<tr><td>Primary endpoint</td><td>Percent change in Lp(a) from baseline to <b>week 36</b> vs placebo. <span class="tag fact">FACT</span></td></tr>
-<tr><td>Result</td><td>Highly significant reduction vs placebo at 36 weeks; <b>median maximum Lp(a) reduction ≥90%</b> for both doses; mean time-averaged placebo-adjusted reductions &gt;80% over 36 weeks; reductions sustained to week 48 (end of treatment) and persisted at the week-60 final visit. <span class="tag fact">FACT</span> <a class="src" href="#r-jama">JAMA 2024</a></td></tr>
-<tr><td>Safety</td><td>Well tolerated; 20 serious adverse events in 17 patients, none considered drug-related; generally mild injection-site reactions. <span class="tag fact">FACT</span> <a class="src" href="#r-merlin">JAMA-paper summary</a></td></tr>
+<tr><td>Design</td><td>Double-blind, placebo-controlled, 60-week Phase 2; 178 patients with Lp(a) ≥125 nmol/L (median baseline ~215 nmol/L) at high ASCVD risk. <span class="ev fact">FACT</span> <a class="src" href="#r-mdedge">MDedge</a></td></tr>
+<tr><td>Dosing</td><td>Zerlasiran 300 mg SC every 16 weeks, 300 mg every 24 weeks, or 450 mg every 24 weeks. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Primary endpoint</td><td>Percent change in Lp(a) from baseline to <b>week 36</b> vs placebo. <span class="ev fact">FACT</span></td></tr>
+<tr><td>Result</td><td>Highly significant reduction vs placebo at 36 weeks; <b>median maximum Lp(a) reduction ≥90%</b> for both doses; mean time-averaged placebo-adjusted reductions &gt;80% over 36 weeks; reductions sustained to week 48 (end of treatment) and persisted at the week-60 final visit. <span class="ev fact">FACT</span> <a class="src" href="#r-jama">JAMA 2024</a></td></tr>
+<tr><td>Safety</td><td>Well tolerated; 20 serious adverse events in 17 patients, none considered drug-related; generally mild injection-site reactions. <span class="ev fact">FACT</span> <a class="src" href="#r-merlin">JAMA-paper summary</a></td></tr>
 </table>
 <div class="callout warn">
-<p><b>The competitive wrinkle (William Blair, post-AHA 2024):</b> with Q24W dosing, Lp(a) lowering <b>waned between doses</b> — a profile the analyst called incrementally negative vs Amgen's olpasiran at once-quarterly dosing, which had not shown that waning. Silence's answer is the 300 mg dose at Q16W-or-better cadence; the peer-reviewed framing is that ALPACAR-360 was the first trial to use time-averaged Lp(a) analysis, which smooths exactly this issue. Do not compare the ≥90% maximum reduction to competitors' time-averaged numbers — they are different statistics. <span class="tag interp">INTERPRETATION</span> <a class="src" href="#r-blair">William Blair via Benzinga</a></p>
+<p><b>The competitive wrinkle (William Blair, post-AHA 2024):</b> with Q24W dosing, Lp(a) lowering <b>waned between doses</b> — a profile the analyst called incrementally negative vs Amgen's olpasiran at once-quarterly dosing, which had not shown that waning. Silence's answer is the 300 mg dose at Q16W-or-better cadence; the peer-reviewed framing is that ALPACAR-360 was the first trial to use time-averaged Lp(a) analysis, which smooths exactly this issue. Do not compare the ≥90% maximum reduction to competitors' time-averaged numbers — they are different statistics. <span class="ev interp">INTERPRETATION</span> <a class="src" href="#r-blair">William Blair via Benzinga</a></p>
 </div>
-</section>
+    </section>
 <section id="status">
-<h2><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
-<p class="kicker">Where each program stands with regulators and what has to happen next.</p>
-<ul>
-<li><b>Divesiran (PV):</b> FDA Fast Track + orphan drug designation for PV; orphan drug designation from the European Commission. <span class="tag fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summary</a> The company anticipates initiating a Phase 3 PV trial (divesiran Q12W vs placebo) in <b>1H 2027</b> <span class="tag fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a>. Phase 3 design details, size, and primary endpoint have not been disclosed <span class="tag gap">GAP</span>.</li>
-<li><b>Zerlasiran:</b> "Positive regulatory feedback from the FDA and EMA on the Phase 3 cardiovascular outcomes study design" per the company; core Phase 3 readiness (manufacturing/supply scale-up) completed in 2025. But: <b>Phase 3 initiation is explicitly conditional on securing a third-party partner</b> — "we will only initiate the Phase III cardiovascular outcomes study once a partner is secured." No partner announced as of Oct 2026. <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a> <a class="src" href="#r-fw">FirstWord</a></li>
-<li><b>SLN312 (ANGPTL3):</b> AstraZeneca completed a Phase 1 interim analysis and decided not to advance; Silence regains exclusive global rights at end of Phase 1 and is reassessing development options. <span class="tag fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summary</a></li>
-<li><b>SLN365 (GPR146) / SLN098 (INHBE):</b> preclinical; potential IND filings in 2027 (company guidance). <span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></li>
-<li><b>ASH abstract + end-of-Phase 2 meeting:</b> the company has <b>submitted the full SANRECO Phase 2 results abstract to the ASH Congress</b> and expects an <b>end-of-Phase 2 meeting with the FDA by year-end 2026</b> (both per the Aug 10, 2026 8-K). <span class="tag fact">FACT</span> <a class="src" href="#r-8kash">8-K</a></li>
-<li><b>Regulatory designations inventory:</b> divesiran holds Fast Track (FDA, PV), orphan drug (FDA, PV; also beta-thalassemia + rare pediatric disease per 2022 PR), and EC orphan (PV). No disclosed breakthrough designations. Zerlasiran designations, if any, not disclosed <span class="tag gap">GAP</span>.</li>
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Regulatory standing: designations in hand, Phase 3 not yet started</h2><p class="lede">Where each program stands with regulators and what has to happen next.</p></div></div>
+      <ul>
+<li><b>Divesiran (PV):</b> FDA Fast Track + orphan drug designation for PV; orphan drug designation from the European Commission. <span class="ev fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summary</a> The company anticipates initiating a Phase 3 PV trial (divesiran Q12W vs placebo) in <b>1H 2027</b> <span class="ev fact">FACT</span> <a class="src" href="#r-sanreco">SANRECO PR</a>. Phase 3 design details, size, and primary endpoint have not been disclosed <span class="ev gap">GAP</span>.</li>
+<li><b>Zerlasiran:</b> "Positive regulatory feedback from the FDA and EMA on the Phase 3 cardiovascular outcomes study design" per the company; core Phase 3 readiness (manufacturing/supply scale-up) completed in 2025. But: <b>Phase 3 initiation is explicitly conditional on securing a third-party partner</b> — "we will only initiate the Phase III cardiovascular outcomes study once a partner is secured." No partner announced as of Oct 2026. <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a> <a class="src" href="#r-fw">FirstWord</a></li>
+<li><b>SLN312 (ANGPTL3):</b> AstraZeneca completed a Phase 1 interim analysis and decided not to advance; Silence regains exclusive global rights at end of Phase 1 and is reassessing development options. <span class="ev fact">FACT</span> <a class="src" href="#r-tvsumm">10-Q summary</a></li>
+<li><b>SLN365 (GPR146) / SLN098 (INHBE):</b> preclinical; potential IND filings in 2027 (company guidance). <span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></li>
+<li><b>ASH abstract + end-of-Phase 2 meeting:</b> the company has <b>submitted the full SANRECO Phase 2 results abstract to the ASH Congress</b> and expects an <b>end-of-Phase 2 meeting with the FDA by year-end 2026</b> (both per the Aug 10, 2026 8-K). <span class="ev fact">FACT</span> <a class="src" href="#r-8kash">8-K</a></li>
+<li><b>Regulatory designations inventory:</b> divesiran holds Fast Track (FDA, PV), orphan drug (FDA, PV; also beta-thalassemia + rare pediatric disease per 2022 PR), and EC orphan (PV). No disclosed breakthrough designations. Zerlasiran designations, if any, not disclosed <span class="ev gap">GAP</span>.</li>
 </ul>
 <div class="callout">
-<p><b>Outlook framing:</b> the regulatory path for divesiran in PV is the conventional one — a single adequate Phase 3 on a phlebotomy/HCT-based endpoint could support approval given Fast Track + orphan status, but the FDA will want durability and a clean anemia/thrombosis picture, and the trial must be sized for that. The zerlasiran path requires a cardiovascular-outcomes trial (thousands of patients, multi-year, nine-figure cost) — which is precisely why it needs a deep-pocketed partner, and precisely why the pelacarsen failure makes that partner harder to find. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Outlook framing:</b> the regulatory path for divesiran in PV is the conventional one — a single adequate Phase 3 on a phlebotomy/HCT-based endpoint could support approval given Fast Track + orphan status, but the FDA will want durability and a clean anemia/thrombosis picture, and the trial must be sized for that. The zerlasiran path requires a cardiovascular-outcomes trial (thousands of patients, multi-year, nine-figure cost) — which is precisely why it needs a deep-pocketed partner, and precisely why the pelacarsen failure makes that partner harder to find. <span class="ev interp">INTERPRETATION</span></p>
 </div>
-</section>
-
+    </section>
 <section id="competition">
-<h2><span class="num">6</span>Competition — Clinical Differentiation Only</h2>
-<p class="kicker">What the rivals' trials actually show. No marketing language; no cross-trial efficacy rankings.</p>
-
-<h3>6.1 Lp(a) lowering — the field zerlasiran would enter</h3>
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Rivals on trial facts, not marketing claims</h2><p class="lede">What the rivals' trials actually show. No marketing language; no cross-trial efficacy rankings.</p></div></div>
+      <h3>6.1 Lp(a) lowering — the field zerlasiran would enter</h3>
 <table>
 <tr><th>Program</th><th>Modality / sponsor</th><th>Trial facts (not comparisons)</th></tr>
-<tr><td><b>Pelacarsen</b></td><td>Antisense oligonucleotide · Novartis/Ionis</td><td><b>FAILED Phase 3 Lp(a)HORIZON</b> (announced Sep 4, 2026): n=8,323 with elevated Lp(a) + established CVD; ~72–80% Lp(a) lowering but <b>primary composite CV endpoint not met</b> vs placebo. Full data pending at a medical congress. <span class="tag fact">FACT</span> <a class="src" href="#r-horizon">Novartis/HORIZON reports</a></td></tr>
-<tr><td><b>Olpasiran</b></td><td>GalNAc-siRNA · Amgen</td><td>Phase 2: &gt;95–97% Lp(a) reduction at higher doses. Phase 3 <b>OCEAN(a)-Outcomes</b>: ~7,300 patients with established CVD + Lp(a) ≥200 nmol/L; primary endpoint = coronary heart disease death, MI, urgent coronary revascularization (stroke excluded by design). Registry-listed completion <b>March 2028</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a> <a class="src" href="#r-ainvest">analyses</a></td></tr>
-<tr><td><b>Lepodisiran</b></td><td>GalNAc-siRNA · Eli Lilly</td><td>Phase 2 ALPACA (n=320): 400 mg → 93.9% placebo-adjusted time-averaged Lp(a) reduction (days 60–180); effect persisted ~1.5 years. Phase 3 <b>ACCLAIM-Lp(a)</b>: ~16,700–17,300 patients incl. primary-prevention population; completion listed <b>March 2029</b>. <span class="tag fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a> <a class="src" href="#r-pharmashots">PharmaShots/ALPACA</a></td></tr>
-<tr><td><b>Muvalaplin</b></td><td>Oral small molecule · Eli Lilly</td><td>Phase 2 KRAKEN; Phase 1 showed up to ~65% Lp(a) reduction over 14 days. Oral convenience is its differentiation axis; outcomes data none. <span class="tag fact">FACT</span> <a class="src" href="#r-cta">Clinical Trials Arena</a></td></tr>
-<tr><td><b>HRS-5346</b></td><td>Lp(a) inhibitor · Merck / Jiangsu Hengrui</td><td>Merck partnered (~$2B in biobucks, 2025) to advance; early-stage. <span class="tag fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a></td></tr>
+<tr><td><b>Pelacarsen</b></td><td>Antisense oligonucleotide · Novartis/Ionis</td><td><b>FAILED Phase 3 Lp(a)HORIZON</b> (announced Sep 4, 2026): n=8,323 with elevated Lp(a) + established CVD; ~72–80% Lp(a) lowering but <b>primary composite CV endpoint not met</b> vs placebo. Full data pending at a medical congress. <span class="ev fact">FACT</span> <a class="src" href="#r-horizon">Novartis/HORIZON reports</a></td></tr>
+<tr><td><b>Olpasiran</b></td><td>GalNAc-siRNA · Amgen</td><td>Phase 2: &gt;95–97% Lp(a) reduction at higher doses. Phase 3 <b>OCEAN(a)-Outcomes</b>: ~7,300 patients with established CVD + Lp(a) ≥200 nmol/L; primary endpoint = coronary heart disease death, MI, urgent coronary revascularization (stroke excluded by design). Registry-listed completion <b>March 2028</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a> <a class="src" href="#r-ainvest">analyses</a></td></tr>
+<tr><td><b>Lepodisiran</b></td><td>GalNAc-siRNA · Eli Lilly</td><td>Phase 2 ALPACA (n=320): 400 mg → 93.9% placebo-adjusted time-averaged Lp(a) reduction (days 60–180); effect persisted ~1.5 years. Phase 3 <b>ACCLAIM-Lp(a)</b>: ~16,700–17,300 patients incl. primary-prevention population; completion listed <b>March 2029</b>. <span class="ev fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a> <a class="src" href="#r-pharmashots">PharmaShots/ALPACA</a></td></tr>
+<tr><td><b>Muvalaplin</b></td><td>Oral small molecule · Eli Lilly</td><td>Phase 2 KRAKEN; Phase 1 showed up to ~65% Lp(a) reduction over 14 days. Oral convenience is its differentiation axis; outcomes data none. <span class="ev fact">FACT</span> <a class="src" href="#r-cta">Clinical Trials Arena</a></td></tr>
+<tr><td><b>HRS-5346</b></td><td>Lp(a) inhibitor · Merck / Jiangsu Hengrui</td><td>Merck partnered (~$2B in biobucks, 2025) to advance; early-stage. <span class="ev fact">FACT</span> <a class="src" href="#r-biospace-lpa">BioSpace</a></td></tr>
 </table>
-<p><b>What this means for zerlasiran (clinical, not commercial):</b> even if Silence finds a partner tomorrow, zerlasiran would be the <b>third or fourth siRNA/antisense</b> into an outcomes-trial field where the hypothesis itself just failed its first test — behind Amgen (2028 readout) and Lilly (2029). A partner would be buying an asset whose registrational path now requires belief that deeper/longer Lp(a) suppression succeeds where 80% suppression failed. That is a harder sell than it was a year ago. Zerlasiran's genuine differentiation — ≥90% maximum reduction with infrequent dosing and Phase 3-ready manufacturing — is real but <b>does not address the hypothesis risk</b>. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>What this means for zerlasiran (clinical, not commercial):</b> even if Silence finds a partner tomorrow, zerlasiran would be the <b>third or fourth siRNA/antisense</b> into an outcomes-trial field where the hypothesis itself just failed its first test — behind Amgen (2028 readout) and Lilly (2029). A partner would be buying an asset whose registrational path now requires belief that deeper/longer Lp(a) suppression succeeds where 80% suppression failed. That is a harder sell than it was a year ago. Zerlasiran's genuine differentiation — ≥90% maximum reduction with infrequent dosing and Phase 3-ready manufacturing — is real but <b>does not address the hypothesis risk</b>. <span class="ev interp">INTERPRETATION</span></p>
 
 <h3>6.2 Polycythemia vera — divesiran's field</h3>
 <table>
 <tr><th>Program</th><th>Modality / sponsor</th><th>Trial facts</th></tr>
-<tr><td><b>Rusfertide (PTG-300)</b></td><td>Hepcidin mimetic peptide · Protagonist Therapeutics</td><td>Phase 3 VERIFY reported positive topline (2024) in PV; regulatory path/filing status not verified for this dossier. Same iron-restriction biology via a different node (hepcidin mimetic vs TMPRSS6 silencing). <span class="tag unver">UNVERIFIED</span> on current regulatory status</td></tr>
-<tr><td><b>Ropeginterferon alfa-2b (Besremi)</b></td><td>Interferon · PharmaEssentia</td><td>Approved for PV (including low-risk). Cytoreductive, disease-modifying claims; different tolerability profile (flu-like, psychiatric monitoring). Established standard for patients needing cytoreduction. <span class="tag fact">FACT</span> (label-established)</td></tr>
-<tr><td><b>Hydroxyurea / phlebotomy</b></td><td>Standard of care</td><td>Cheap, generic, effective cytoreduction; phlebotomy is the burden divesiran aims to replace. Any new PV drug must justify itself against this low bar on convenience/tolerability, not just efficacy. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Rusfertide (PTG-300)</b></td><td>Hepcidin mimetic peptide · Protagonist Therapeutics</td><td>Phase 3 VERIFY reported positive topline (2024) in PV; regulatory path/filing status not verified for this dossier. Same iron-restriction biology via a different node (hepcidin mimetic vs TMPRSS6 silencing). <span class="ev unverified">UNVERIFIED</span> on current regulatory status</td></tr>
+<tr><td><b>Ropeginterferon alfa-2b (Besremi)</b></td><td>Interferon · PharmaEssentia</td><td>Approved for PV (including low-risk). Cytoreductive, disease-modifying claims; different tolerability profile (flu-like, psychiatric monitoring). Established standard for patients needing cytoreduction. <span class="ev fact">FACT</span> (label-established)</td></tr>
+<tr><td><b>Hydroxyurea / phlebotomy</b></td><td>Standard of care</td><td>Cheap, generic, effective cytoreduction; phlebotomy is the burden divesiran aims to replace. Any new PV drug must justify itself against this low bar on convenience/tolerability, not just efficacy. <span class="ev interp">INTERPRETATION</span></td></tr>
 </table>
-<p><b>Divesiran's clinical differentiation, narrowly stated:</b> it is the only <b>siRNA</b> in PV and the only TMPRSS6-targeting agent in the clinic for PV; its Q12W subcutaneous schedule would be the least frequent dosing among PV options; and it <i>raises</i> ferritin (iron redistribution) whereas phlebotomy <i>depletes</i> iron — a mechanistic distinction patients feel. What it has <b>not</b> shown: any effect on the JAK2 clone, thrombotic events, or progression to myelofibrosis/AML — and PV drugs are ultimately judged on those. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Divesiran's clinical differentiation, narrowly stated:</b> it is the only <b>siRNA</b> in PV and the only TMPRSS6-targeting agent in the clinic for PV; its Q12W subcutaneous schedule would be the least frequent dosing among PV options; and it <i>raises</i> ferritin (iron redistribution) whereas phlebotomy <i>depletes</i> iron — a mechanistic distinction patients feel. What it has <b>not</b> shown: any effect on the JAK2 clone, thrombotic events, or progression to myelofibrosis/AML — and PV drugs are ultimately judged on those. <span class="ev interp">INTERPRETATION</span></p>
 
 <h3>6.3 ANGPTL3 (SLN312 context)</h3>
-<p>ANGPTL3 inhibition is a validated lipid target: evinacumab (monoclonal antibody) is approved for HoFH, and Arrowhead's zodasiran (GalNAc-siRNA) has reported positive Phase 2 data in mixed dyslipidemia. AZ's decision not to carry SLN312 past Phase 1 — while calling its profile "competitive" — suggests the issue was portfolio prioritization rather than a scientific failure, but the fact remains that Silence now holds a Phase 1 ANGPTL3 asset in a field with approved and later-stage competitors and has disclosed no development plan for it. <span class="tag interp">INTERPRETATION</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></p>
-</section>
+<p>ANGPTL3 inhibition is a validated lipid target: evinacumab (monoclonal antibody) is approved for HoFH, and Arrowhead's zodasiran (GalNAc-siRNA) has reported positive Phase 2 data in mixed dyslipidemia. AZ's decision not to carry SLN312 past Phase 1 — while calling its profile "competitive" — suggests the issue was portfolio prioritization rather than a scientific failure, but the fact remains that Silence now holds a Phase 1 ANGPTL3 asset in a field with approved and later-stage competitors and has disclosed no development plan for it. <span class="ev interp">INTERPRETATION</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></p>
+    </section>
 <section id="financials">
-<h2><span class="num">7</span>Financials</h2>
-<p class="kicker">From SEC filings (foreign private issuer; 10-Q / 10-K / 20-F framework). All figures in USD.</p>
-<table>
+      <div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Pre-revenue, with cash to the divesiran decision</h2><p class="lede">From SEC filings (foreign private issuer; 10-Q / 10-K / 20-F framework). All figures in USD.</p></div></div>
+      <table>
 <tr><th style="width:34%">Metric</th><th>Value</th><th>Source</th></tr>
-<tr><td>Cash &amp; equivalents, Jun 30, 2026</td><td><b>$72.1M</b> (Mar 31, 2026: $70.1M incl. $64.4M short-term investments)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td>Q2 2026 net loss</td><td><b>$12.3M</b> ($0.09/share), vs $27.4M in Q2 2025</td><td><span class="tag fact">FACT</span></td></tr>
-<tr><td>H1 2026 net loss</td><td><b>$27.2M</b> ($0.19/share), vs $55.9M in H1 2025</td><td><span class="tag fact">FACT</span></td></tr>
-<tr><td>Q2 2026 R&amp;D / G&amp;A</td><td>$9.1M / $4.7M (vs $17.6M / $5.1M in Q2 2025). R&amp;D decline "mainly due to zerlasiran Phase 3 readiness being completed in 2025 as well as reduced personnel costs."</td><td><span class="tag fact">FACT</span></td></tr>
-<tr><td>Collaboration revenue</td><td>$0.4M in H1 2026 (AstraZeneca); effectively zero product revenue — pre-revenue company</td><td><span class="tag fact">FACT</span></td></tr>
-<tr><td>Total assets / liabilities, Jun 30, 2026</td><td>$106.4M / $67.9M</td><td><span class="tag fact">FACT</span> <a class="src" href="#r-stocktitan-q2">StockTitan 10-Q summary</a></td></tr>
-<tr><td>Accumulated deficit, Jun 30, 2026</td><td><b>$589.6M</b></td><td><span class="tag fact">FACT</span></td></tr>
-<tr><td>FY2025 revenue / net loss</td><td>$0.6M / <b>$88.6M</b> (2024: $43.3M revenue — the Hansoh/AZ milestone year)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r-tvsumm">10-K summary</a></td></tr>
-<tr><td>Debt</td><td>None disclosed; no long-term debt reported</td><td><span class="tag unver">UNVERIFIED</span> (secondary summaries; balance sheet not line-checked)</td></tr>
-<tr><td>Dilution history</td><td>Shares ~flat: 141.70M ordinary (Sep 30, 2025) → 141.74M (Jun 30, 2026); no major raise in the last four quarters visible in reporting</td><td><span class="tag interp">INTERPRETATION</span> from quarterly share counts</td></tr>
+<tr><td>Cash &amp; equivalents, Jun 30, 2026</td><td><b>$72.1M</b> (Mar 31, 2026: $70.1M incl. $64.4M short-term investments)</td><td><span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td>Q2 2026 net loss</td><td><b>$12.3M</b> ($0.09/share), vs $27.4M in Q2 2025</td><td><span class="ev fact">FACT</span></td></tr>
+<tr><td>H1 2026 net loss</td><td><b>$27.2M</b> ($0.19/share), vs $55.9M in H1 2025</td><td><span class="ev fact">FACT</span></td></tr>
+<tr><td>Q2 2026 R&amp;D / G&amp;A</td><td>$9.1M / $4.7M (vs $17.6M / $5.1M in Q2 2025). R&amp;D decline "mainly due to zerlasiran Phase 3 readiness being completed in 2025 as well as reduced personnel costs."</td><td><span class="ev fact">FACT</span></td></tr>
+<tr><td>Collaboration revenue</td><td>$0.4M in H1 2026 (AstraZeneca); effectively zero product revenue — pre-revenue company</td><td><span class="ev fact">FACT</span></td></tr>
+<tr><td>Total assets / liabilities, Jun 30, 2026</td><td>$106.4M / $67.9M</td><td><span class="ev fact">FACT</span> <a class="src" href="#r-stocktitan-q2">StockTitan 10-Q summary</a></td></tr>
+<tr><td>Accumulated deficit, Jun 30, 2026</td><td><b>$589.6M</b></td><td><span class="ev fact">FACT</span></td></tr>
+<tr><td>FY2025 revenue / net loss</td><td>$0.6M / <b>$88.6M</b> (2024: $43.3M revenue — the Hansoh/AZ milestone year)</td><td><span class="ev fact">FACT</span> <a class="src" href="#r-tvsumm">10-K summary</a></td></tr>
+<tr><td>Debt</td><td>None disclosed; no long-term debt reported</td><td><span class="ev unverified">UNVERIFIED</span> (secondary summaries; balance sheet not line-checked)</td></tr>
+<tr><td>Dilution history</td><td>Shares ~flat: 141.70M ordinary (Sep 30, 2025) → 141.74M (Jun 30, 2026); no major raise in the last four quarters visible in reporting</td><td><span class="ev interp">INTERPRETATION</span> from quarterly share counts</td></tr>
 </table>
 <div class="callout">
-<p><b>Burn &amp; runway:</b> H1 2026 net loss of $27.2M implies ~$13.6M/quarter cash burn at current operating tempo. Against $72.1M cash, that is ~5 quarters of runway — roughly through mid-2027 — <b>before</b> any Phase 3 spend. The company guided (Q1 2026) that cash funds operations "into 2028" <span class="tag unver">UNVERIFIED</span> <a class="src" href="#r-tvsumm">secondary summary of 8-K</a> — a claim that assumes continued cost discipline and no Phase 3 initiation on its own dime. Initiating the divesiran Phase 3 in 1H 2027 as guided will materially raise R&amp;D spend; the math says <b>a financing or a funded partnership is needed within ~2–3 quarters</b> unless burn drops further. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Burn &amp; runway:</b> H1 2026 net loss of $27.2M implies ~$13.6M/quarter cash burn at current operating tempo. Against $72.1M cash, that is ~5 quarters of runway — roughly through mid-2027 — <b>before</b> any Phase 3 spend. The company guided (Q1 2026) that cash funds operations "into 2028" <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#r-tvsumm">secondary summary of 8-K</a> — a claim that assumes continued cost discipline and no Phase 3 initiation on its own dime. Initiating the divesiran Phase 3 in 1H 2027 as guided will materially raise R&amp;D spend; the math says <b>a financing or a funded partnership is needed within ~2–3 quarters</b> unless burn drops further. <span class="ev interp">INTERPRETATION</span></p>
 </div>
-</section>
-
+    </section>
 <section id="fdmc">
-<h2><span class="num">8</span>FDMC / Enterprise Value — Dilution-Honest</h2>
-<p class="kicker">Using the latest filing's share counts. ADS math: 1 ADS = 3 ordinary shares.</p>
-<table>
+      <div class="section-head"><div class="section-num">08 / VALUATION</div><div><h2>The dilution-honest share count and enterprise value</h2><p class="lede">Using the latest filing's share counts. ADS math: 1 ADS = 3 ordinary shares.</p></div></div>
+      <table>
 <tr><th>Component</th><th>Count</th><th>Notes</th></tr>
-<tr><td>Ordinary shares outstanding (Jun 30, 2026)</td><td><b>141,739,180</b></td><td><span class="tag fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
-<tr><td>ADS-equivalent basic</td><td><b>~47,246,000</b></td><td>÷3 per ADS <span class="tag fact">FACT</span> <a class="src" href="#r-10q2">10-Q</a></td></tr>
-<tr><td>Options outstanding (ADS-equivalent)</td><td><b>7,688,089</b> @ $12.61 weighted-average exercise; 4,794,137 exercisable</td><td><span class="tag fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
-<tr><td>Warrants / convertibles</td><td>None disclosed in reviewed filings</td><td><span class="tag gap">GAP</span> (2025 20-F/annual report not line-checked for convertibles)</td></tr>
+<tr><td>Ordinary shares outstanding (Jun 30, 2026)</td><td><b>141,739,180</b></td><td><span class="ev fact">FACT</span> <a class="src" href="#r-q2pr">Q2 2026 PR</a></td></tr>
+<tr><td>ADS-equivalent basic</td><td><b>~47,246,000</b></td><td>÷3 per ADS <span class="ev fact">FACT</span> <a class="src" href="#r-10q2">10-Q</a></td></tr>
+<tr><td>Options outstanding (ADS-equivalent)</td><td><b>7,688,089</b> @ $12.61 weighted-average exercise; 4,794,137 exercisable</td><td><span class="ev fact">FACT</span> <a class="src" href="#r-10q2">Q2 2026 10-Q</a></td></tr>
+<tr><td>Warrants / convertibles</td><td>None disclosed in reviewed filings</td><td><span class="ev gap">GAP</span> (2025 20-F/annual report not line-checked for convertibles)</td></tr>
 <tr><td><b>Fully-diluted ADS count</b></td><td><b>~54,934,000</b></td><td>basic + options (treasury-stock method not applied; conservative)</td></tr>
 </table>
 <table>
@@ -343,47 +473,42 @@
 <tr><td><b>Enterprise value (basic / FD)</b></td><td><b>~$394M / ~$470M</b></td></tr>
 </table>
 <div class="callout warn">
-<p><b>Data-quality flag:</b> third-party quote pages (Finnhub) show a ~$665.67M market cap at $9.82, which implies ~67.8M ADS — <b>inconsistent with the 47.25M ADS-equivalent in the Q2 2026 10-Q</b>. The discrepancy is unresolved (possible stale share count or ordinary-share/ADS confusion in the data vendor). This dossier uses the <b>filing-derived</b> numbers above. <span class="tag unver">UNVERIFIED</span> (vendor figure) <a class="src" href="#r-finnhub">Finnhub</a></p>
-<p><b>Dilution overhang:</b> 7.69M option ADS-equivalents = ~16% over basic share count, with a $12.61 average strike <b>above</b> the current ~$9.82 price — currently out-of-the-money, so limited near-term exercise dilution, but a real overhang on any rally. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Data-quality flag:</b> third-party quote pages (Finnhub) show a ~$665.67M market cap at $9.82, which implies ~67.8M ADS — <b>inconsistent with the 47.25M ADS-equivalent in the Q2 2026 10-Q</b>. The discrepancy is unresolved (possible stale share count or ordinary-share/ADS confusion in the data vendor). This dossier uses the <b>filing-derived</b> numbers above. <span class="ev unverified">UNVERIFIED</span> (vendor figure) <a class="src" href="#r-finnhub">Finnhub</a></p>
+<p><b>Dilution overhang:</b> 7.69M option ADS-equivalents = ~16% over basic share count, with a $12.61 average strike <b>above</b> the current ~$9.82 price — currently out-of-the-money, so limited near-term exercise dilution, but a real overhang on any rally. <span class="ev interp">INTERPRETATION</span></p>
 </div>
-</section>
+    </section>
 <section id="catalysts">
-<h2><span class="num">9</span>Catalyst / Event Map</h2>
-<p class="kicker">Every known upcoming event for SLN, tagged by date quality. Cross-checked against the internal 2027 catalyst calendar (2 SLN rows: SLN098, SLN365 — preclinical, guidance, no dated events) and the Q4 2026 dossier (0 SLN rows).</p>
-<div class="timeline">
-<div class="tl-item past"><div class="dt">May 24–27, 2026 <span class="pill-dq hard">HARD</span> <span class="fine">· landed</span></div><div class="ev"><b>SLN312 (AZD1705) Phase 1 data</b> — late-breaker oral at EAS Congress (Abstract #1610): liver-targeted ANGPTL3 silencing, preclinical + Phase 1 results.</div><div class="note">Fact: presentation occurred per company PR. Strategic read: AZ declined to advance — rights revert to Silence.</div></div>
-<div class="tl-item past"><div class="dt">June 11–14, 2026 <span class="pill-dq hard">HARD</span> <span class="fine">· landed</span></div><div class="ev"><b>Divesiran Phase 1 follow-up data at EHA 2026</b> (Abstract PF886): durable efficacy in PV, n=21 open-label.</div><div class="note">Fact: presented; 80→5 phlebotomies, ferritin improvement, no treatment-related SAEs.</div></div>
-<div class="tl-item past"><div class="dt">August 10, 2026 <span class="pill-dq hard">HARD</span> <span class="fine">· landed — the key binary</span></div><div class="ev"><b>SANRECO Phase 2 topline (divesiran in PV)</b>: 88% vs 19% placebo, p&lt;0.0001; mean phlebotomies 0.2 vs 2.1. Stock context: 1-year return ~+91% into the readout window (Finnhub, unverified).</div><div class="note">Phase 3 (Q12W vs placebo) anticipated 1H 2027 — the next real binary.</div></div>
-<div class="tl-item"><div class="dt">November 2026 (est. Nov 5) <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Q3 2026 earnings / business update</b> — watch for: cash position, Phase 3 PV trial design disclosure, zerlasiran partner commentary, CEO search update.</div><div class="note">Date estimated Nov 5, 2026 by MarketBeat (vendor estimate, not company-announced) <a class="src" href="#r-mbeat-cal">MarketBeat</a>. <b>Good looks like:</b> cash ≥$55M, Phase 3 design disclosed, concrete partner/CEO progress. <b>Bad looks like:</b> cash below ~$45M with no financing plan, Phase 3 pushed to 2H 2027, "no comment" on the partner search.</div></div>
-<div class="tl-item"><div class="dt">December 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>ASH 2026 — full SANRECO Phase 2 data.</b> The company has <b>submitted the full Phase 2 results abstract</b> to the ASH Congress (per the Aug 10, 2026 8-K) <span class="tag fact">FACT</span> <a class="src" href="#r-8kash">8-K</a>; abstract acceptance typically announced early November.</div><div class="note"><b>Good looks like:</b> detailed secondary endpoints (HCT durability, ferritin trajectory, MPN-SAF symptom scores) consistent with the topline; anemia detail stays at the two grade-1 events; Q12W durability holds. <b>Bad looks like:</b> a new safety signal at scale, or Q12W waning that undermines the planned Phase 3 regimen. Acceptance not yet confirmed — do not treat as certain.</div></div>
-<div class="tl-item"><div class="dt">By year-end 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>End-of-Phase 2 meeting with the FDA</b> on divesiran in PV (company expects it by year-end, per the Aug 10, 2026 8-K) <span class="tag fact">FACT</span> <a class="src" href="#r-8kash">8-K</a>.</div><div class="note"><b>Good looks like:</b> agreement on Phase 3 design and a phlebotomy/HCT-based primary endpoint. <b>Bad looks like:</b> FDA demands a harder endpoint or a much larger trial — raising cost and sharpening the funding question.</div></div>
-<div class="tl-item"><div class="dt">1H 2027 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Divesiran Phase 3 in PV — anticipated initiation</b> (Q12W vs placebo). <i>This is the stock's next binary-adjacent catalyst and its main funding question.</i></div><div class="note">Company guidance (Aug 2026 PR). Trial size/design undisclosed — a key GAP. <b>Good looks like:</b> initiation on schedule <i>with</i> disclosed design and a funding path (raise or partner) that doesn't crater the stock. <b>Bad looks like:</b> delay into 2H 2027, or a heavily dilutive raise with no partner validation.</div></div>
-<div class="tl-item"><div class="dt">2027 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>SLN098 (INHBE, obesity) — potential IND filing.</b></div><div class="note">Preclinical; from Q2 2026 PR + 2027 catalyst calendar row.</div></div>
-<div class="tl-item"><div class="dt">2027 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>SLN365 (GPR146, dyslipidemia) — potential IND filing.</b></div><div class="note">Preclinical; from Q2 2026 PR + 2027 catalyst calendar row.</div></div>
-<div class="tl-item"><div class="dt">Timing unknown <span class="pill-dq inferred">INFERRED</span></div><div class="ev"><b>Zerlasiran Phase 3 partnership decision</b> — upfront economics, who funds the CV-outcomes trial, retained rights. No partner as of Oct 2026; pelacarsen's failure (Sep 2026) likely lengthened the search.</div><div class="note">Binary for the asset's value; not a clinical readout. <b>Good looks like:</b> meaningful upfront + partner-funded CV-outcomes trial with retained economics. <b>Bad looks like:</b> a low-upfront, back-end-heavy deal — or no deal at all, leaving the asset stranded into the 2028 olpasiran readout.</div></div>
-<div class="tl-item"><div class="dt">Timing unknown <span class="pill-dq inferred">INFERRED</span></div><div class="ev"><b>Permanent CEO appointment</b> — Chairman Iain Ross has been interim PEO since Dec 14, 2025; a US-based board member was also anticipated.</div><div class="note">Governance catalyst. <b>Watch the hire's background:</b> a commercial-operations CEO signals intent to build toward launch; a BD/corporate-development profile signals the company is positioning assets (or itself) for deals.</div></div>
-<div class="tl-item"><div class="dt">March 2028 <span class="pill-dq inferred">INFERRED</span></div><div class="ev"><b>External read-through: Amgen OCEAN(a)-Outcomes (olpasiran)</b> — the next verdict on the Lp(a) hypothesis. Material to zerlasiran's partnerability and to any residual Lp(a) option value in SLN.</div><div class="note">Competitor trial; registry-listed completion date. Not an SLN event.</div></div>
+      <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The event sequence that will resolve the thesis</h2><p class="lede">Every known upcoming event for SLN, tagged by date quality. Cross-checked against the internal 2027 catalyst calendar (2 SLN rows: SLN098, SLN365 — preclinical, guidance, no dated events) and the Q4 2026 dossier (0 SLN rows).</p></div></div>
+      <div class="timeline">
+<div class="tl-item past"><div class="dt">May 24–27, 2026 <span class="date-tag hard">HARD</span> <span class="fine">· landed</span></div><div class="ev"><b>SLN312 (AZD1705) Phase 1 data</b> — late-breaker oral at EAS Congress (Abstract #1610): liver-targeted ANGPTL3 silencing, preclinical + Phase 1 results.</div><div class="note">Fact: presentation occurred per company PR. Strategic read: AZ declined to advance — rights revert to Silence.</div></div>
+<div class="tl-item past"><div class="dt">June 11–14, 2026 <span class="date-tag hard">HARD</span> <span class="fine">· landed</span></div><div class="ev"><b>Divesiran Phase 1 follow-up data at EHA 2026</b> (Abstract PF886): durable efficacy in PV, n=21 open-label.</div><div class="note">Fact: presented; 80→5 phlebotomies, ferritin improvement, no treatment-related SAEs.</div></div>
+<div class="tl-item past"><div class="dt">August 10, 2026 <span class="date-tag hard">HARD</span> <span class="fine">· landed — the key binary</span></div><div class="ev"><b>SANRECO Phase 2 topline (divesiran in PV)</b>: 88% vs 19% placebo, p&lt;0.0001; mean phlebotomies 0.2 vs 2.1. Stock context: 1-year return ~+91% into the readout window (Finnhub, unverified).</div><div class="note">Phase 3 (Q12W vs placebo) anticipated 1H 2027 — the next real binary.</div></div>
+<div class="tl-item"><div class="dt">November 2026 (est. Nov 5) <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>Q3 2026 earnings / business update</b> — watch for: cash position, Phase 3 PV trial design disclosure, zerlasiran partner commentary, CEO search update.</div><div class="note">Date estimated Nov 5, 2026 by MarketBeat (vendor estimate, not company-announced) <a class="src" href="#r-mbeat-cal">MarketBeat</a>. <b>Good looks like:</b> cash ≥$55M, Phase 3 design disclosed, concrete partner/CEO progress. <b>Bad looks like:</b> cash below ~$45M with no financing plan, Phase 3 pushed to 2H 2027, "no comment" on the partner search.</div></div>
+<div class="tl-item"><div class="dt">December 2026 <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>ASH 2026 — full SANRECO Phase 2 data.</b> The company has <b>submitted the full Phase 2 results abstract</b> to the ASH Congress (per the Aug 10, 2026 8-K) <span class="ev fact">FACT</span> <a class="src" href="#r-8kash">8-K</a>; abstract acceptance typically announced early November.</div><div class="note"><b>Good looks like:</b> detailed secondary endpoints (HCT durability, ferritin trajectory, MPN-SAF symptom scores) consistent with the topline; anemia detail stays at the two grade-1 events; Q12W durability holds. <b>Bad looks like:</b> a new safety signal at scale, or Q12W waning that undermines the planned Phase 3 regimen. Acceptance not yet confirmed — do not treat as certain.</div></div>
+<div class="tl-item"><div class="dt">By year-end 2026 <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>End-of-Phase 2 meeting with the FDA</b> on divesiran in PV (company expects it by year-end, per the Aug 10, 2026 8-K) <span class="ev fact">FACT</span> <a class="src" href="#r-8kash">8-K</a>.</div><div class="note"><b>Good looks like:</b> agreement on Phase 3 design and a phlebotomy/HCT-based primary endpoint. <b>Bad looks like:</b> FDA demands a harder endpoint or a much larger trial — raising cost and sharpening the funding question.</div></div>
+<div class="tl-item"><div class="dt">1H 2027 <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>Divesiran Phase 3 in PV — anticipated initiation</b> (Q12W vs placebo). <i>This is the stock's next binary-adjacent catalyst and its main funding question.</i></div><div class="note">Company guidance (Aug 2026 PR). Trial size/design undisclosed — a key GAP. <b>Good looks like:</b> initiation on schedule <i>with</i> disclosed design and a funding path (raise or partner) that doesn't crater the stock. <b>Bad looks like:</b> delay into 2H 2027, or a heavily dilutive raise with no partner validation.</div></div>
+<div class="tl-item"><div class="dt">2027 <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>SLN098 (INHBE, obesity) — potential IND filing.</b></div><div class="note">Preclinical; from Q2 2026 PR + 2027 catalyst calendar row.</div></div>
+<div class="tl-item"><div class="dt">2027 <span class="date-tag guidance">GUIDANCE</span></div><div class="ev"><b>SLN365 (GPR146, dyslipidemia) — potential IND filing.</b></div><div class="note">Preclinical; from Q2 2026 PR + 2027 catalyst calendar row.</div></div>
+<div class="tl-item"><div class="dt">Timing unknown <span class="date-tag inferred">INFERRED</span></div><div class="ev"><b>Zerlasiran Phase 3 partnership decision</b> — upfront economics, who funds the CV-outcomes trial, retained rights. No partner as of Oct 2026; pelacarsen's failure (Sep 2026) likely lengthened the search.</div><div class="note">Binary for the asset's value; not a clinical readout. <b>Good looks like:</b> meaningful upfront + partner-funded CV-outcomes trial with retained economics. <b>Bad looks like:</b> a low-upfront, back-end-heavy deal — or no deal at all, leaving the asset stranded into the 2028 olpasiran readout.</div></div>
+<div class="tl-item"><div class="dt">Timing unknown <span class="date-tag inferred">INFERRED</span></div><div class="ev"><b>Permanent CEO appointment</b> — Chairman Iain Ross has been interim PEO since Dec 14, 2025; a US-based board member was also anticipated.</div><div class="note">Governance catalyst. <b>Watch the hire's background:</b> a commercial-operations CEO signals intent to build toward launch; a BD/corporate-development profile signals the company is positioning assets (or itself) for deals.</div></div>
+<div class="tl-item"><div class="dt">March 2028 <span class="date-tag inferred">INFERRED</span></div><div class="ev"><b>External read-through: Amgen OCEAN(a)-Outcomes (olpasiran)</b> — the next verdict on the Lp(a) hypothesis. Material to zerlasiran's partnerability and to any residual Lp(a) option value in SLN.</div><div class="note">Competitor trial; registry-listed completion date. Not an SLN event.</div></div>
 </div>
-<p class="fine">Financing overhang (not a dated event): at ~$13.6M/quarter burn, cash reaches the low-$40Ms by the guided 1H-2027 Phase 3 start. Expect a raise, a funded partnership, or a delayed trial — one of the three must give. <span class="tag interp">INTERPRETATION</span></p>
-</section>
-
+<p class="fine">Financing overhang (not a dated event): at ~$13.6M/quarter burn, cash reaches the low-$40Ms by the guided 1H-2027 Phase 3 start. Expect a raise, a funded partnership, or a delayed trial — one of the three must give. <span class="ev interp">INTERPRETATION</span></p>
+    </section>
 <section id="redflags">
-<h2><span class="num">10</span>Ranked Red Flags</h2>
-<p class="kicker">Ordered by potential damage to the thesis, not by recency.</p>
-<div class="flag"><span class="rank">#1</span><b>The Lp(a) hypothesis failed its first Phase 3 — zerlasiran's reason to exist is now a question mark.</b> Pelacarsen lowered Lp(a) ~72–80% and still missed its CV-outcomes primary (Sep 4, 2026). Zerlasiran lowers the same biomarker deeper, but no Lp(a) drug has ever reduced CV events. The asset is Phase 3-ready with no partner — and the partner search is happening in the worst possible news environment for the class. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">#2</span><b>Zerlasiran is stranded capital.</b> Years of R&amp;D and manufacturing scale-up sit idle while the company explicitly refuses to self-fund Phase 3. Every quarter without a partner is option value decaying — and a weak deal (low upfront, heavy rights give-up) may be worse than none for the stock. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">#3</span><b>CEO ousted; interim chair-led leadership for ~10 months.</b> Craig Tooman departed by "mutual consent" Dec 14, 2025; Chairman Iain Ross is interim PEO with no permanent CEO named as of Oct 2026. Leadership vacuums at binary-stage biotechs correlate with strategic drift and weak negotiating posture on partnerships. <span class="tag fact">FACT</span> on the change; <span class="tag interp">INTERPRETATION</span> on the implication</div>
-<div class="flag"><span class="rank">#4</span><b>Phase 3 PV trial needs funding the balance sheet doesn't have.</b> ~$72M cash vs a Phase 3 that will cost multiples of that; guided start 1H 2027. The financing will likely come via dilution (16% option overhang already) or a divesiran partnership that caps upside. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">#5</span><b>SANRECO was small and surrogate-based.</b> n=48, 36 weeks, endpoint = phlebotomy avoidance + HCT &lt;45%. No thrombosis data, no clonal data, no long-term iron-restriction safety. Phase 3 could confirm — or could show the effect attenuates, anemia accumulates, or regulators demand harder endpoints. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">#6</span><b>Partners keep walking away.</b> Hansoh terminated (Dec 2024); Mallinckrodt concluded; AstraZeneca declined to carry SLN312 past Phase 1. Three data points of pharma diligence ending in "no" is a pattern worth more than any single press release's optimism. <span class="tag interp">INTERPRETATION</span></div>
-<div class="flag"><span class="rank">#7</span><b>Thalassemia was the same drug failing on a related biology.</b> Divesiran/SLN124 showed no clear clinically meaningful benefit in NTDT thalassemia and the program was quietly dropped — a reminder that TMPRSS6 iron restriction is not a general hematology fix. <span class="tag fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></div>
-<div class="flag"><span class="rank">#8</span><b>Vendor market-cap data is unreliable for this ticker.</b> Finnhub's $665.67M mcap contradicts filing-derived ~$464M basic / ~$539M FD. Anyone screening on vendor data is mispricing the stock by ~40%. Verify share counts from the 10-Q, not the quote page. <span class="tag interp">INTERPRETATION</span></div>
-</section>
+      <div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by potential damage to the thesis, not by recency.</p></div></div>
+      <div class="flag"><span class="rank">#1</span><b>The Lp(a) hypothesis failed its first Phase 3 — zerlasiran's reason to exist is now a question mark.</b> Pelacarsen lowered Lp(a) ~72–80% and still missed its CV-outcomes primary (Sep 4, 2026). Zerlasiran lowers the same biomarker deeper, but no Lp(a) drug has ever reduced CV events. The asset is Phase 3-ready with no partner — and the partner search is happening in the worst possible news environment for the class. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#2</span><b>Zerlasiran is stranded capital.</b> Years of R&amp;D and manufacturing scale-up sit idle while the company explicitly refuses to self-fund Phase 3. Every quarter without a partner is option value decaying — and a weak deal (low upfront, heavy rights give-up) may be worse than none for the stock. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#3</span><b>CEO ousted; interim chair-led leadership for ~10 months.</b> Craig Tooman departed by "mutual consent" Dec 14, 2025; Chairman Iain Ross is interim PEO with no permanent CEO named as of Oct 2026. Leadership vacuums at binary-stage biotechs correlate with strategic drift and weak negotiating posture on partnerships. <span class="ev fact">FACT</span> on the change; <span class="ev interp">INTERPRETATION</span> on the implication</div>
+<div class="flag"><span class="rank">#4</span><b>Phase 3 PV trial needs funding the balance sheet doesn't have.</b> ~$72M cash vs a Phase 3 that will cost multiples of that; guided start 1H 2027. The financing will likely come via dilution (16% option overhang already) or a divesiran partnership that caps upside. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#5</span><b>SANRECO was small and surrogate-based.</b> n=48, 36 weeks, endpoint = phlebotomy avoidance + HCT &lt;45%. No thrombosis data, no clonal data, no long-term iron-restriction safety. Phase 3 could confirm — or could show the effect attenuates, anemia accumulates, or regulators demand harder endpoints. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#6</span><b>Partners keep walking away.</b> Hansoh terminated (Dec 2024); Mallinckrodt concluded; AstraZeneca declined to carry SLN312 past Phase 1. Three data points of pharma diligence ending in "no" is a pattern worth more than any single press release's optimism. <span class="ev interp">INTERPRETATION</span></div>
+<div class="flag"><span class="rank">#7</span><b>Thalassemia was the same drug failing on a related biology.</b> Divesiran/SLN124 showed no clear clinically meaningful benefit in NTDT thalassemia and the program was quietly dropped — a reminder that TMPRSS6 iron restriction is not a general hematology fix. <span class="ev fact">FACT</span> <a class="src" href="#r-ajh">Am J Hematol review</a></div>
+<div class="flag"><span class="rank">#8</span><b>Vendor market-cap data is unreliable for this ticker.</b> Finnhub's $665.67M mcap contradicts filing-derived ~$464M basic / ~$539M FD. Anyone screening on vendor data is mispricing the stock by ~40%. Verify share counts from the 10-Q, not the quote page. <span class="ev interp">INTERPRETATION</span></div>
+    </section>
 <section id="scenarios">
-<h2><span class="num">11</span>Bear / Base / Bull + Scenarios</h2>
-<p class="kicker">Scenario framing with <b>soft scenario-implied price levels</b> (illustrative arithmetic from this dossier's own numbers — not a price target, not a recommendation). Sell-side reference points (all dated, pre- or peri-pelacarsen failure): HC Wainwright Buy / $75 (Jun 2026), Morgan Stanley Overweight / $32 (Aug 11, 2026), Cantor Fitzgerald Overweight; MarketBeat average $53.50 ("Moderate Buy"). Any takeout/max-value thinking is capped at these published targets. <span class="tag fact">FACT</span> <a class="src" href="#r-marketbeat">MarketBeat</a></p>
-
-<div class="grid2">
+      <div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Bear, base, bull — with soft scenario levels</h2><p class="lede">Scenario framing with <b>soft scenario-implied price levels</b> (illustrative arithmetic from this dossier's own numbers — not a price target, not a recommendation). Sell-side reference points (all dated, pre- or peri-pelacarsen failure): HC Wainwright Buy / $75 (Jun 2026), Morgan Stanley Overweight / $32 (Aug 11, 2026), Cantor Fitzgerald Overweight; MarketBeat average $53.50 ("Moderate Buy"). Any takeout/max-value thinking is capped at these published targets. <span class="ev fact">FACT</span> <a class="src" href="#r-marketbeat">MarketBeat</a></p></div></div>
+      <div class="grid2">
 <div class="card"><h4>Bear case</h4>
 <ul>
 <li>Zerlasiran never finds a Phase 3 partner at acceptable economics; the asset is written down to option value near zero.</li>
@@ -412,45 +537,42 @@
 <p class="kicker">Built from this dossier's own numbers: ~54.93M fully-diluted ADS, $72.1M cash (Jun 30, 2026), reference price $9.86. Labeled <b>SOFT</b>: scenario arithmetic, not a price target and not a recommendation. Equity value = assumed enterprise value + cash, divided by fully-diluted ADS.</p>
 <table>
 <tr><th>Scenario</th><th>Assumed EV</th><th>Implied FD equity</th><th>Soft level (ADS)</th><th>Core assumptions</th></tr>
-<tr><td><b>Bear</b></td><td>~$120M</td><td>~$192M</td><td><b>~$3.50</b> (range $3–5)</td><td>Divesiran Phase 3 delayed or fails at scale; zerlasiran partnerless → ~$0; platform + preclinical pipeline option value ≈ 1.6× net cash. Downside is balance-sheet and dilution arithmetic. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Base</b></td><td>~$950M</td><td>~$1.02B</td><td><b>~$19</b> (range $15–25)</td><td>Phase 3 starts 1H 2027, funded via raise and/or regional partnership (dilution priced in); modest zerlasiran deal (tens of $M upfront + milestones); SLN098/SLN365 reach IND 2027; no takeout premium. Sanity check: below Morgan Stanley's $32, well below the $53.50 street average. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Bull</b></td><td>~$3.2B</td><td>~$3.3B</td><td><b>~$60</b> (range $50–70)</td><td>Phase 3 succeeds on Q12W with clean long-term safety, or a takeout at a premium — <b>capped below the $75 sell-side high</b> per the standing max-value rule. Requires the Lp(a) leg to recover via a strong partnership or 2028 competitor data. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bear</b></td><td>~$120M</td><td>~$192M</td><td><b>~$3.50</b> (range $3–5)</td><td>Divesiran Phase 3 delayed or fails at scale; zerlasiran partnerless → ~$0; platform + preclinical pipeline option value ≈ 1.6× net cash. Downside is balance-sheet and dilution arithmetic. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Base</b></td><td>~$950M</td><td>~$1.02B</td><td><b>~$19</b> (range $15–25)</td><td>Phase 3 starts 1H 2027, funded via raise and/or regional partnership (dilution priced in); modest zerlasiran deal (tens of $M upfront + milestones); SLN098/SLN365 reach IND 2027; no takeout premium. Sanity check: below Morgan Stanley's $32, well below the $53.50 street average. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bull</b></td><td>~$3.2B</td><td>~$3.3B</td><td><b>~$60</b> (range $50–70)</td><td>Phase 3 succeeds on Q12W with clean long-term safety, or a takeout at a premium — <b>capped below the $75 sell-side high</b> per the standing max-value rule. Requires the Lp(a) leg to recover via a strong partnership or 2028 competitor data. <span class="ev interp">INTERPRETATION</span></td></tr>
 </table>
 <div class="callout">
-<p><b>How to read these:</b> they translate the three scenarios into per-share arithmetic so position sizing can be reasoned about — they are not forecasts. The bear case is anchored to tangible book + cash; the base case prices divesiran as a funded Phase 3 orphan asset with a discounted zerlasiran call option; the bull case requires genuine de-risking (Phase 3 success or a bid), not just multiple expansion. The current ~$9.86 price sits between bear and base — i.e., the market is pricing partial but not full credit for the SANRECO readout. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>How to read these:</b> they translate the three scenarios into per-share arithmetic so position sizing can be reasoned about — they are not forecasts. The bear case is anchored to tangible book + cash; the base case prices divesiran as a funded Phase 3 orphan asset with a discounted zerlasiran call option; the bull case requires genuine de-risking (Phase 3 success or a bid), not just multiple expansion. The current ~$9.86 price sits between bear and base — i.e., the market is pricing partial but not full credit for the SANRECO readout. <span class="ev interp">INTERPRETATION</span></p>
 </div>
 
 <h3>Scenario analyses (binary-weighted)</h3>
 <table>
 <tr><th>Scenario</th><th>Trigger</th><th>What it would mean</th></tr>
-<tr><td><b>A. Divesiran Ph3 funded cleanly</b></td><td>Partnership with upfront covering Ph3, or a raise from strength post-ASH data</td><td>Removes red flag #4; the binary becomes purely clinical. Watch the trial design disclosure (n, endpoint, duration) — the single most informative near-term event after the readout itself. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>B. Zerlasiran partnered (weak)</b></td><td>Low-upfront, back-end-heavy deal</td><td>Validates the asset's existence but not its value; compare retained economics vs rights surrendered, not the headline biobucks number. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>C. Zerlasiran partnered (strong)</b></td><td>Meaningful upfront + partner-funded CVOT</td><td>Re-opens the Lp(a) leg; still hypothesis-risky until OCEAN(a) 2028. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>D. OCEAN(a) fails (2028)</b></td><td>Olpasiran misses CV-outcomes primary</td><td>Lp(a) hypothesis likely dead as a drug target; zerlasiran value → ~0; SLN becomes a pure divesiran story. The key external hedge to monitor. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>E. Divesiran Ph3 fails</b></td><td>Effect attenuates or safety signal at scale</td><td>Core thesis breaks; remaining value = cash + preclinical platform + stranded zerlasiran. This is the binary the position is held through. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>A. Divesiran Ph3 funded cleanly</b></td><td>Partnership with upfront covering Ph3, or a raise from strength post-ASH data</td><td>Removes red flag #4; the binary becomes purely clinical. Watch the trial design disclosure (n, endpoint, duration) — the single most informative near-term event after the readout itself. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>B. Zerlasiran partnered (weak)</b></td><td>Low-upfront, back-end-heavy deal</td><td>Validates the asset's existence but not its value; compare retained economics vs rights surrendered, not the headline biobucks number. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>C. Zerlasiran partnered (strong)</b></td><td>Meaningful upfront + partner-funded CVOT</td><td>Re-opens the Lp(a) leg; still hypothesis-risky until OCEAN(a) 2028. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>D. OCEAN(a) fails (2028)</b></td><td>Olpasiran misses CV-outcomes primary</td><td>Lp(a) hypothesis likely dead as a drug target; zerlasiran value → ~0; SLN becomes a pure divesiran story. The key external hedge to monitor. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>E. Divesiran Ph3 fails</b></td><td>Effect attenuates or safety signal at scale</td><td>Core thesis breaks; remaining value = cash + preclinical platform + stranded zerlasiran. This is the binary the position is held through. <span class="ev interp">INTERPRETATION</span></td></tr>
 </table>
-<p class="fine"><b>Positioning note for a buy-and-hold-through-the-binary style:</b> the tradable binary here is the divesiran Phase 3 (initiation 1H 2027; readout likely 2028+). The commercial phase is explicitly not the game — PV is a chronic market where divesiran would compete on convenience against cheap generics and entrenched interferon. Weight the dossier's clinical-trial-design section, not any revenue fantasy. <span class="tag interp">INTERPRETATION</span></p>
-</section>
-
+<p class="fine"><b>Positioning note for a buy-and-hold-through-the-binary style:</b> the tradable binary here is the divesiran Phase 3 (initiation 1H 2027; readout likely 2028+). The commercial phase is explicitly not the game — PV is a chronic market where divesiran would compete on convenience against cheap generics and entrenched interferon. Weight the dossier's clinical-trial-design section, not any revenue fantasy. <span class="ev interp">INTERPRETATION</span></p>
+    </section>
 <section id="management">
-<h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
-<p class="kicker">Who runs the company now, and what the record shows.</p>
-<ul>
-<li><b>Craig Tooman</b> — President, CEO &amp; director since 2022; departed by "mutual consent" effective <b>December 14, 2025</b>. Separation terms not detailed in reviewed materials. <span class="tag fact">FACT</span> <a class="src" href="#r-leadership">Leadership PR / 8-K</a></li>
-<li><b>Iain Ross</b> — Chairman of the Board; appointed <b>interim principal executive officer</b> effective Dec 14, 2025, concentrating chair + CEO roles on an interim basis. Additional compensation TBD. Still interim as of the Aug 2026 filings. <span class="tag fact">FACT</span></li>
-<li><b>James Ede-Golightly</b> — former non-executive director, re-appointed to the Board (term through the 2026 AGM); a US-based board member was "anticipated in due course." <span class="tag fact">FACT</span></li>
-<li><b>Steven Romano, MD</b> — Head of R&amp;D (quoted on zerlasiran Ph2 data and pipeline). <span class="tag fact">FACT</span> <a class="src" href="#r-zer48">48-week PR</a></li>
-<li><b>Track record notes:</b> under Tooman, Silence completed zerlasiran Phase 3 readiness and delivered the positive SANRECO readout — genuine execution. The same tenure also saw the Hansoh termination, the Mallinckrodt conclusion, AZ's SLN312 pass, and the decision to make zerlasiran Phase 3 partner-contingent. Mixed record; the CEO departure's "mutual consent" framing with no successor named after ~10 months is the governance item to watch, not the past. <span class="tag interp">INTERPRETATION</span></li>
-<li><b>Insider signals:</b> secondary press (2025) reported insider buying (director Griffiths) as a bullish signal <span class="tag unver">UNVERIFIED</span> <a class="src" href="#r-ainvest-insider">ainvest</a>. Vendor-reported ownership: ~3.0% insider, ~98.7% institutional; short interest ~3.7% of float <span class="tag unver">UNVERIFIED</span> <a class="src" href="#r-abmn">American Banking News</a> <a class="src" href="#r-mbeat-cal">MarketBeat</a> — not verified against 13F/Form 4 filings <span class="tag gap">GAP</span>.</li>
-<li><b>Extended leadership roster:</b> <b>Rhonda L. Hellums</b> — EVP, CFO, Secretary &amp; Executive Director; <b>Dr. Marie Wikstrom Lindholm</b> — Chief Scientific Officer; <b>Dr. Curtis Rambaran</b> — Chief Medical Officer; <b>Gem Gokmen Hopkins</b> — Head of IR &amp; Corporate Communications; <b>Jaimin B. Shah</b> — SVP &amp; General Counsel. <span class="tag unver">UNVERIFIED</span> <a class="src" href="#r-indmoney">indmoney</a> (secondary aggregator; not cross-checked against proxy/10-K).</li>
-<li><b>Scale:</b> 88 employees; headquarters 72 Hammersmith Road, London. <span class="tag unver">UNVERIFIED</span> <a class="src" href="#r-mbeat-cal">MarketBeat</a> <a class="src" href="#r-indmoney">indmoney</a>.</li>
-<li><b>Cost discipline signal:</b> Q2 2025 workforce reduction ($1.3M restructuring) + R&amp;D falling from $20.8M (Q1 2025) to $9.1M (Q2 2026) shows management is actively managing burn — a modest positive, though partly forced by the zerlasiran pause. <span class="tag interp">INTERPRETATION</span></li>
+      <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management and insider signals</h2><p class="lede">Who runs the company now, and what the record shows.</p></div></div>
+      <ul>
+<li><b>Craig Tooman</b> — President, CEO &amp; director since 2022; departed by "mutual consent" effective <b>December 14, 2025</b>. Separation terms not detailed in reviewed materials. <span class="ev fact">FACT</span> <a class="src" href="#r-leadership">Leadership PR / 8-K</a></li>
+<li><b>Iain Ross</b> — Chairman of the Board; appointed <b>interim principal executive officer</b> effective Dec 14, 2025, concentrating chair + CEO roles on an interim basis. Additional compensation TBD. Still interim as of the Aug 2026 filings. <span class="ev fact">FACT</span></li>
+<li><b>James Ede-Golightly</b> — former non-executive director, re-appointed to the Board (term through the 2026 AGM); a US-based board member was "anticipated in due course." <span class="ev fact">FACT</span></li>
+<li><b>Steven Romano, MD</b> — Head of R&amp;D (quoted on zerlasiran Ph2 data and pipeline). <span class="ev fact">FACT</span> <a class="src" href="#r-zer48">48-week PR</a></li>
+<li><b>Track record notes:</b> under Tooman, Silence completed zerlasiran Phase 3 readiness and delivered the positive SANRECO readout — genuine execution. The same tenure also saw the Hansoh termination, the Mallinckrodt conclusion, AZ's SLN312 pass, and the decision to make zerlasiran Phase 3 partner-contingent. Mixed record; the CEO departure's "mutual consent" framing with no successor named after ~10 months is the governance item to watch, not the past. <span class="ev interp">INTERPRETATION</span></li>
+<li><b>Insider signals:</b> secondary press (2025) reported insider buying (director Griffiths) as a bullish signal <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#r-ainvest-insider">ainvest</a>. Vendor-reported ownership: ~3.0% insider, ~98.7% institutional; short interest ~3.7% of float <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#r-abmn">American Banking News</a> <a class="src" href="#r-mbeat-cal">MarketBeat</a> — not verified against 13F/Form 4 filings <span class="ev gap">GAP</span>.</li>
+<li><b>Extended leadership roster:</b> <b>Rhonda L. Hellums</b> — EVP, CFO, Secretary &amp; Executive Director; <b>Dr. Marie Wikstrom Lindholm</b> — Chief Scientific Officer; <b>Dr. Curtis Rambaran</b> — Chief Medical Officer; <b>Gem Gokmen Hopkins</b> — Head of IR &amp; Corporate Communications; <b>Jaimin B. Shah</b> — SVP &amp; General Counsel. <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#r-indmoney">indmoney</a> (secondary aggregator; not cross-checked against proxy/10-K).</li>
+<li><b>Scale:</b> 88 employees; headquarters 72 Hammersmith Road, London. <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#r-mbeat-cal">MarketBeat</a> <a class="src" href="#r-indmoney">indmoney</a>.</li>
+<li><b>Cost discipline signal:</b> Q2 2025 workforce reduction ($1.3M restructuring) + R&amp;D falling from $20.8M (Q1 2025) to $9.1M (Q2 2026) shows management is actively managing burn — a modest positive, though partly forced by the zerlasiran pause. <span class="ev interp">INTERPRETATION</span></li>
 </ul>
-</section>
+    </section>
 <section id="refs">
-<h2><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
-<p class="kicker"><b>As-of date: October 10, 2026</b> (refreshed from Oct 7; price and catalyst checks re-run). Filings used: Silence Therapeutics plc Q2 2026 10-Q (filed Aug 10, 2026) and Q2 2026 earnings PR (Aug 10, 2026); Q1 2026 10-Q / 8-K (May 2026); Q2 2025 &amp; Q3 2025 10-Qs; FY2025 10-K / annual report; Dec 15, 2025 leadership-change 8-K/PR. Price ~$9.86/ADS (Finnhub snapshot, Oct 9, 2026). No DCF or recommendation is offered; §11 carries clearly-labeled soft scenario-implied levels only.</p>
-<ol class="refs">
+      <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede"><b>As-of date: October 10, 2026</b> (refreshed from Oct 7; price and catalyst checks re-run). Filings used: Silence Therapeutics plc Q2 2026 10-Q (filed Aug 10, 2026) and Q2 2026 earnings PR (Aug 10, 2026); Q1 2026 10-Q / 8-K (May 2026); Q2 2025 &amp; Q3 2025 10-Qs; FY2025 10-K / annual report; Dec 15, 2025 leadership-change 8-K/PR. Price ~$9.86/ADS (Finnhub snapshot, Oct 9, 2026). No DCF or recommendation is offered; §11 carries clearly-labeled soft scenario-implied levels only.</p></div></div>
+      <ol class="refs">
 <li id="r-bw">Silence Therapeutics, company press releases / corporate site — corporate boilerplate (global clinical-stage siRNA company; mRNAi GOLD™ platform; pipeline); SANRECO topline PR (Aug 10, 2026): all 48 patients completed the placebo-controlled portion and are now in 3-year double-blind/open-label extension periods; full results planned for an upcoming medical congress. <a href="https://www.silence-therapeutics.com/">link</a> / <a href="https://silence-therapeutics.com/investors/press-releases/press-releases-details/2026/Silence-Therapeutics-Announces-Positive-Topline-Results-from-Phase-2-SANRECO-Trial-of-Divesiran-in-Polycythemia-Vera-Supporting-its-Potential-Best-in-Class-Profile/default.aspx">SANRECO PR</a>.</li>
 <li id="r-10q2">Silence Therapeutics plc, Q2 2026 10-Q (quarter ended Jun 30, 2026) — ADS ratio (1 ADS = 3 ordinary shares), 7,688,089 ADS-equivalent options @ $12.61, SLN548 partner-seeking, zerlasiran Phase 3 partner-contingent. Via <a href="https://www.stocktitan.net/sec-filings/SLN/10-q-silence-therapeutics-plc-quarterly-earnings-report-e07a9b3c50be.html">StockTitan</a>.</li>
 <li id="r-q2pr">Silence Therapeutics, "Reports Second Quarter 2026 Financial and Business Results" (Aug 10, 2026) — $72.1M cash, 141,739,180 ordinary shares, SLN098/SLN365 IND-2027 guidance. Via <a href="https://www.morningstar.com/news/business-wire/20260810075814/silence-therapeutics-reports-second-quarter-2026-financial-and-business-results">Morningstar/Business Wire</a>.</li>
@@ -490,55 +612,53 @@
 </ol>
 <p class="fine"><b>Method note:</b> internal catalyst datasets checked — 2027 Biotech Catalyst Calendar (data.json): 2 SLN rows (SLN098 obesity, SLN365 dyslipidemia; preclinical, guidance, undated). Q4 2026 dossier (dossier-v4.json): 0 SLN rows. No SLN events were added or removed by this dossier.</p>
 <p class="fine"><b>Distribution notice:</b> this document contains no personal information about any individual investor. It is a neutral third-party research document. No buy/sell recommendation is expressed or implied; the soft scenario levels in §11 are illustrative arithmetic, not price targets.</p>
-</section>
+    </section>
 </main>
-<footer>
-SLN deep-dive dossier · as of October 10, 2026 · All figures carry units, population/timepoint, and source per the evidence discipline. Claims labeled FACT / INTERPRETATION / GAP / UNVERIFIED throughout. Verify filing-derived share counts against the latest 10-Q before acting — vendor quote pages disagree (see §8).
-</footer>
+
+<footer><strong>SLN deep-dive dossier</strong> · as of October 10, 2026 · All figures carry units, population/timepoint, and source per the evidence discipline. Claims labeled FACT / INTERPRETATION / GAP / UNVERIFIED throughout. Verify filing-derived share counts against the latest 10-Q before acting — vendor quote pages disagree (see §8).</footer>
+
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
 
 <script>
 (function(){
-  var root=document.documentElement;
-  /* --- dark/light theme --- */
-  try{var saved=localStorage.getItem('sln-theme');if(saved){root.setAttribute('data-theme',saved);}}catch(e){}
-  var tb=document.createElement('button');tb.id='themeToggle';
-  function label(){tb.textContent=(root.getAttribute('data-theme')==='dark')?'\u2600 Light':'\u25D0 Dark';}
-  label();tb.setAttribute('aria-label','Toggle dark mode');
-  tb.onclick=function(){var d=(root.getAttribute('data-theme')==='dark')?'light':'dark';
-    root.setAttribute('data-theme',d);label();try{localStorage.setItem('sln-theme',d);}catch(e){}};
-  document.body.appendChild(tb);
-  /* --- collapsible sections --- */
-  document.querySelectorAll('main section').forEach(function(s){
-    var h2=s.querySelector('h2');if(!h2)return;
-    var body=document.createElement('div');body.className='secbody';
-    var n=h2.nextElementSibling;
-    while(n){var nx=n.nextElementSibling;body.appendChild(n);n=nx;}
-    s.appendChild(body);
-    var b=document.createElement('button');b.className='collapse-btn';
-    b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse or expand section');
-    b.textContent='\u25BE';
-    b.onclick=function(){var c=s.classList.toggle('collapsed');b.setAttribute('aria-expanded',c?'false':'true');};
-    h2.appendChild(b);
+  /* Theme toggle (shared key across all dossiers) */
+  const themeBtn=document.getElementById('themeToggle');
+  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'\u2600 Light mode':'\u25D0 Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+  let startTheme='light';
+  try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+  applyTheme(startTheme);
+  themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  /* Collapsible sections */
+  document.querySelectorAll('main > section').forEach(function(sec){
+    const head=sec.querySelector('.section-head'); if(!head)return;
+    const body=document.createElement('div'); body.className='section-body';
+    let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+    sec.appendChild(body);
+    const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+    btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+    btn.addEventListener('click',function(){
+      const c=sec.classList.toggle('collapsed');
+      btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+      btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+    });
+    head.appendChild(btn);
   });
+
+  /* Expand a collapsed section when navigated to via jump nav */
   function expandForHash(){var id=location.hash.replace('#','');if(!id)return;
     var s=document.getElementById(id);
     if(s&&s.tagName==='SECTION'&&s.classList.contains('collapsed')){
       s.classList.remove('collapsed');
-      var b=s.querySelector('.collapse-btn');if(b)b.setAttribute('aria-expanded','true');}}
+      var b=s.querySelector('.collapse-btn');if(b){b.textContent='\u2212';b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse section');}}}
   window.addEventListener('hashchange',expandForHash);expandForHash();
-  /* --- horizontal-scroll wrappers for tables (mobile) --- */
-  document.querySelectorAll('main table').forEach(function(t){
-    if(t.parentNode.classList&&t.parentNode.classList.contains('tblwrap'))return;
-    var w=document.createElement('div');w.className='tblwrap';
-    t.parentNode.insertBefore(w,t);w.appendChild(t);});
-  /* --- back to top --- */
-  var tt=document.createElement('button');tt.id='toTop';tt.textContent='\u2191 Top';
-  tt.setAttribute('aria-label','Back to top');
-  tt.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
-  document.body.appendChild(tt);
-  window.addEventListener('scroll',function(){tt.classList.toggle('show',window.scrollY>600);},{passive:true});
+
+  /* Back to top */
+  const toTop=document.getElementById('toTop');
+  function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
 })();
 </script>
-
 </body>
 </html>
