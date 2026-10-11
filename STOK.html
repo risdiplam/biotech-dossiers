@@ -1,447 +1,511 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOK — Stoke Therapeutics · Deep-Dive Investment Dossier · 10 Oct 2026</title>
-<style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>STOK — Stoke Therapeutics · Deep-Dive Investment Dossier · 10 Oct 2026</title>
+  <style>
 :root{
-  --ink:#1c2330; --muted:#5b6575; --faint:#8b95a7;
-  --bg:#f7f8fa; --card:#ffffff; --line:#e3e8ef;
-  --accent:#123f7b; --accent2:#0e6b4f;
-  --fact:#1f6fd6; --interp:#b45309; --gap:#6b7280; --unver:#b91c1c;
-  --pill-hard:#0e6b4f; --pill-guid:#8a5a00; --pill-inf:#5b6575; --pill-landed:#4a5568;
-  --callout-bg:#f2f6fc; --th-bg:#f0f3f8; --p:#2b3546;
-  --side-bg:#0f2745; --side-ink:#dbe4f0;
-}
-[data-theme="dark"]{
-  --ink:#e6ebf2; --muted:#a7b1c2; --faint:#7d8798;
-  --bg:#0d1420; --card:#141d2c; --line:#26334a;
-  --accent:#7db3f5; --accent2:#4ecb96;
-  --fact:#7db3f5; --interp:#e8a04c; --gap:#9aa4b5; --unver:#f08a8a;
-  --pill-hard:#4ecb96; --pill-guid:#e8b84c; --pill-inf:#9aa4b5; --pill-landed:#9aa4b5;
-  --callout-bg:#182539; --th-bg:#182539; --p:#c6cfdb;
-  --side-bg:#0a1626; --side-ink:#c6cfdb;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:"Inter","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.62;font-size:15.5px}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.layout{display:flex;max-width:1280px;margin:0 auto}
-/* ---------- sidebar nav ---------- */
-nav.side{width:250px;flex:0 0 250px;position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--side-bg);color:var(--side-ink);padding:26px 0}
-nav.side .brand{padding:0 22px 18px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
-nav.side .brand .t{font-size:13px;letter-spacing:2px;color:#9fb4cf;text-transform:uppercase}
-nav.side .brand h2{margin:4px 0 2px;font-size:21px;color:#fff}
-nav.side .brand .asof{font-size:12px;color:#9fb4cf}
-nav.side ul{list-style:none;margin:0;padding:0}
-nav.side li a{display:flex;align-items:center;min-height:44px;padding:6px 22px;color:#c6d4e6;font-size:13.5px;border-left:3px solid transparent}
-nav.side li a:hover{background:rgba(255,255,255,.06);color:#fff;text-decoration:none}
-nav.side li a.active{border-left-color:#5aa2f0;background:rgba(255,255,255,.08);color:#fff}
-/* ---------- mobile topbar ---------- */
-.mobilebar{display:none;position:fixed;top:0;left:0;right:0;z-index:60;background:var(--side-bg);color:#fff;align-items:center;gap:8px;padding:6px 10px}
-.mobilebar .ttl{font-size:15px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.iconbtn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;font-size:20px;cursor:pointer}
-.mobilemenu{display:none;position:fixed;top:56px;left:0;right:0;z-index:59;background:var(--side-bg);max-height:60vh;overflow-y:auto;border-bottom:2px solid rgba(255,255,255,.15)}
-.mobilemenu.open{display:block}
-.mobilemenu a{display:flex;align-items:center;min-height:44px;padding:8px 20px;color:#c6d4e6;font-size:14.5px;border-bottom:1px solid rgba(255,255,255,.07)}
-.mobilemenu a:hover{background:rgba(255,255,255,.06);color:#fff;text-decoration:none}
-/* ---------- main ---------- */
-main{flex:1;min-width:0;padding:0}
-.wrap{max-width:940px;margin:0 auto;padding:34px 40px 90px}
-header.hero{background:#0f2745;color:#fff;padding:46px 40px 40px}
-[data-theme="dark"] header.hero{background:#0a1626}
-header.hero .kick{font-size:12px;letter-spacing:2.5px;color:#8fb0d6;text-transform:uppercase}
-header.hero h1{margin:8px 0 4px;font-size:34px;letter-spacing:.5px}
-header.hero .sub{color:#b9c9de;font-size:16px;max-width:760px}
-.statstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:24px}
-.stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px 14px}
-.stat .k{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#9fb4cf}
-.stat .v{font-size:20px;font-weight:700;color:#fff;margin-top:2px}
-.stat .n{font-size:11.5px;color:#9fb4cf}
-section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0;margin:26px 0;scroll-margin-top:76px;overflow:hidden}
-.sec-head{width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;color:inherit;text-align:left;padding:24px 30px 18px;cursor:pointer;min-height:56px;font-family:inherit}
-.sec-head:hover{background:rgba(127,179,245,.06)}
-.sec-head .ttl{flex:1;min-width:0}
-.sec-head .eyebrow{font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
-.sec-head h2{margin:0;font-size:22px;color:var(--accent)}
-.sec-head .chev{font-size:20px;color:var(--faint);transition:transform .2s;flex:0 0 44px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
-section.card.collapsed .chev{transform:rotate(-90deg)}
-.sec-body{padding:0 30px 30px}
-section.card.collapsed .sec-body{display:none}
-.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px -30px;padding:0 30px}
-p,li{color:var(--p)}
-ul.tight li{margin-bottom:7px}
-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;min-width:560px}
-th{text-align:left;background:var(--th-bg);color:var(--accent);padding:9px 12px;border-bottom:2px solid var(--line);font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-tr:last-child td{border-bottom:none}
-/* evidence pills */
-.ev{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-right:6px;vertical-align:middle;white-space:nowrap}
-.ev-f{background:#e3eefc;color:var(--fact);border:1px solid #bcd6f5}
-.ev-i{background:#fdf0dc;color:var(--interp);border:1px solid #f0d6a8}
-.ev-g{background:#eef1f4;color:var(--gap);border:1px solid #d3d9e0}
-.ev-u{background:#fbe7e7;color:var(--unver);border:1px solid #f3b8b8}
-[data-theme="dark"] .ev-f{background:#1c2c47;border-color:#33507e}
-[data-theme="dark"] .ev-i{background:#3a2c14;border-color:#7a5a24}
-[data-theme="dark"] .ev-g{background:#232b38;border-color:#3d4a5f}
-[data-theme="dark"] .ev-u{background:#3a1d1d;border-color:#7a2e2e}
-.src{font-size:12.5px;color:var(--faint)}
-.src::before{content:"Source: "}
-.callout{border-left:4px solid var(--accent);background:var(--callout-bg);padding:14px 18px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14.5px}
-.callout.warn{border-left-color:var(--interp);background:#fdf6e9}
-.callout.bad{border-left-color:var(--unver);background:#fdeeee}
-.callout.good{border-left-color:var(--accent2);background:#eef7f2}
-[data-theme="dark"] .callout.warn{background:#332915}
-[data-theme="dark"] .callout.bad{background:#331a1a}
-[data-theme="dark"] .callout.good{background:#123026}
-/* timeline */
-.tl{position:relative;margin:20px 0 8px;padding-left:30px}
-.tl::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line)}
-.tl-item{position:relative;padding:10px 0 18px}
-.tl-item::before{content:"";position:absolute;left:-27px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--card);border:3px solid var(--faint)}
-.tl-item.q-hard::before{border-color:var(--pill-hard)}
-.tl-item.q-guid::before{border-color:var(--pill-guid)}
-.tl-item.q-inf::before{border-color:var(--pill-inf)}
-.tl-item.q-landed::before{border-color:var(--pill-landed);background:var(--pill-landed)}
-.tl-date{font-weight:700;font-size:14px}
-.tl-item.q-landed .tl-date{color:var(--faint)}
-.goodwatch{margin:8px 0 0;font-size:13.5px}
-.goodwatch b{color:var(--ink)}
-.qtag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:10px;padding:2px 10px;margin-left:8px;vertical-align:middle}
-.q-hard .qtag{background:#e2f3ec;color:var(--pill-hard)}
-.q-guid .qtag{background:#fbf0d9;color:var(--pill-guid)}
-.q-inf .qtag{background:#edf0f3;color:var(--pill-inf)}
-.q-landed .qtag{background:#e5e9ee;color:var(--pill-landed)}
-[data-theme="dark"] .q-hard .qtag{background:#123026}
-[data-theme="dark"] .q-guid .qtag{background:#332915}
-[data-theme="dark"] .q-inf .qtag{background:#232b38}
-[data-theme="dark"] .q-landed .qtag{background:#232b38}
-.imp{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-left:8px}
-.imp-high{background:#0e6b4f;color:#fff}
-.imp-med{background:#8a5a00;color:#fff}
-.imp-low{background:#5b6575;color:#fff}
-.foot{font-size:12.5px;color:var(--faint);border-top:1px solid var(--line);padding-top:16px;margin-top:30px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
-.scen{border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin:12px 0}
-.scen h4{margin:0 0 6px;font-size:15.5px}
-.scen.bear h4{color:#b91c1c}.scen.base h4{color:var(--accent)}.scen.bull h4{color:#0e6b4f}
-[data-theme="dark"] .scen.bear h4{color:#f08a8a}
-ol.flags li{margin-bottom:14px}
-ol.flags li b{color:#8a1f1f}
-[data-theme="dark"] ol.flags li b{color:#f08a8a}
-.refs li{font-size:13.5px;margin-bottom:8px;color:var(--p)}
-.refs a{word-break:break-all}
-.kv{display:grid;grid-template-columns:230px 1fr;gap:6px 14px;font-size:14.5px;margin:10px 0}
-.kv dt{font-weight:600;color:var(--muted)}
-.kv dd{margin:0}
-/* theme + back-to-top */
-#themeToggle{position:fixed;bottom:76px;right:18px;z-index:70;min-width:48px;min-height:48px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-#toTop{position:fixed;bottom:20px;right:18px;z-index:70;min-width:48px;min-height:48px;border-radius:50%;border:1px solid var(--line);background:var(--accent);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center}
-#toTop.show{display:inline-flex}
-.collapse-all-bar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 0}
-.plainbtn{min-height:44px;padding:10px 18px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--accent);font-size:14px;font-weight:600;cursor:pointer}
-@media(max-width:900px){
-  nav.side{display:none}
-  .mobilebar{display:flex}
-  body{padding-top:56px}
-  .wrap{padding:22px 16px 70px}
-  header.hero{padding:34px 20px 30px}
-  header.hero h1{font-size:28px}
-  .sec-head{padding:18px 16px 14px}
-  .sec-body{padding:0 16px 22px}
-  .tablewrap{margin:14px -16px;padding:0 16px}
-  .kv{grid-template-columns:1fr}
-  .kv dt{margin-top:6px}
-}
-</style>
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+
+    /* ---- compat: retained component styles mapped to PEPG tokens ---- */
+    .tblwrap,.tbl-wrap,.tablewrap{overflow-x:auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+    table{border-collapse:collapse;width:100%;font-size:13.5px}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{font:700 10.5px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    h4{font-size:16px;margin:0 0 8px}
+    ul.tight li,ol.tight li{margin:4px 0}
+
+
+    .callout{border-left:4px solid var(--teal);background:var(--mint);padding:14px 18px;margin:16px 0;font-size:14.5px}
+    .callout.good{border-left-color:var(--teal)}
+    .scen{background:var(--raised);border:1px solid var(--line);padding:16px 18px;margin:12px 0;box-shadow:var(--shadow)}
+    .statstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:24px}
+    .stat{background:var(--raised);border:1px solid var(--line);padding:12px 14px}
+    .k{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+    .v{font-size:20px;font-weight:700;margin-top:2px}
+    .n{font-size:11.5px;color:var(--muted)}
+    .imp{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:3px;padding:2px 8px;margin-left:8px}
+    .imp-high{background:var(--mint);color:var(--teal-dark)}
+    .imp-med{background:var(--orange-soft);color:#8e351d}
+    .imp-low{background:var(--pill-bg);color:var(--muted)}
+    html[data-theme="dark"] .imp-med{color:var(--orange)}
+    .goodwatch{margin:8px 0 0;font-size:13.5px}
+    .kv{display:grid;grid-template-columns:230px minmax(0,1fr);gap:6px 14px;font-size:14.5px;margin:10px 0}
+    @media(max-width:620px){.kv{grid-template-columns:1fr}}
+    .tl{position:relative;margin:20px 0 8px;padding-left:30px}
+    .tl:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .tl-item{position:relative;padding:10px 0 18px}
+    .tl-item:before{content:"";position:absolute;left:-27px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--teal)}
+    .tl-date{font-weight:700;font-size:14px}
+    .tight{font-size:13.5px}
+    .src{font-size:12.5px;color:var(--muted)}
+    .refs{margin:12px 0;padding-left:20px}
+    .refs li{font-size:13.5px;margin-bottom:8px;color:var(--ink-2)}
+    .flags{margin:12px 0;padding-left:20px}
+    .flags li{margin-bottom:14px}
+    .foot{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;margin-top:30px}
+    .callout.bad{border-left-color:var(--red);background:var(--orange-soft)}
+    .callout.good{border-left-color:var(--teal)}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+
+  </style>
 </head>
 <body>
-<div class="mobilebar">
-  <button class="iconbtn" id="menuBtn" aria-label="Open table of contents" aria-expanded="false">&#9776;</button>
-  <div class="ttl">STOK · Deep-Dive Dossier</div>
-  <button class="iconbtn" id="themeToggleM" aria-label="Toggle dark mode">&#9790;</button>
-</div>
-<nav class="mobilemenu" id="mobilemenu" aria-label="Table of contents"></nav>
-<div class="layout">
-<nav class="side">
-  <div class="brand">
-    <div class="t">Deep-Dive Dossier</div>
-    <h2>STOK</h2>
-    <div class="asof">As of 10 October 2026</div>
+<div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · STOK</span><span class="stamp">Deep-dive dossier · October 10, 2026</span></div>
+        <h1>Stoke Therapeutics, Inc.</h1>
+        <p class="hero-dek">Antisense oligonucleotides (TANGO — Targeted Augmentation of Nuclear Gene Output) to restore protein expression in haploinsufficient diseases of the CNS and the eye · Lead: zorevunersen (STK-001) in Dravet syndrome, in the registrational Phase 3 EMPEROR study.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$24.74</div>
+        <div class="quote-label">Fixed market snapshot · Oct 9, 2026 close (MarketBeat)</div>
+        <div class="quote-meta"><strong>~$1.6B</strong> FD enterprise value · <strong>$420M</strong> pro-forma cash (Aug 3, 2026 PR)<br>Next decisive readout: <strong>EMPEROR Phase 3, Q3 2027</strong> (guidance)</div>
+      </div>
+    </div>
+  </header>
+
+<div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#thesis">Frame</a><a href="#identity">Snapshot</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Clinical</a><a href="#reg">Regulatory</a><a href="#comp">Landscape</a><a href="#fin">Financials</a><a href="#fdev">Valuation</a><a href="#cat">Catalysts</a><a href="#flags">Risks</a><a href="#scen">Scenarios</a><a href="#mgmt">People</a><a href="#comm">Market</a><a href="#refs">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+    </nav>
   </div>
-  <ul id="sidenav">
-    <li><a href="#thesis">1 · Thesis snapshot</a></li>
-    <li><a href="#identity">2 · Identity</a></li>
-    <li><a href="#science">3 · Science</a></li>
-    <li><a href="#pipeline">4 · Pipeline (value-ranked)</a></li>
-    <li><a href="#trials">5 · Trial design deep dive</a></li>
-    <li><a href="#reg">6 · Clinical / regulatory</a></li>
-    <li><a href="#comp">7 · Competition</a></li>
-    <li><a href="#fin">8 · Financials</a></li>
-    <li><a href="#fdev">9 · FDMC / EV</a></li>
-    <li><a href="#cat">10 · Catalyst map</a></li>
-    <li><a href="#flags">11 · Red flags</a></li>
-    <li><a href="#scen">12 · Scenarios &amp; soft targets</a></li>
-    <li><a href="#mgmt">13 · Management / insiders</a></li>
-    <li><a href="#comm">14 · Commercial (lean)</a></li>
-    <li><a href="#refs">15 · References</a></li>
-  </ul>
-</nav>
+
 <main>
-<header class="hero">
-  <div class="wrap" style="padding:0">
-    <div class="kick">Biotech deep-dive · Nasdaq: STOK</div>
-    <h1>Stoke Therapeutics</h1>
-    <div class="sub">An antisense-oligonucleotide company built on the TANGO protein-upregulation platform. Lead asset zorevunersen (STK-001) for Dravet syndrome is in a single global Phase 3 study (EMPEROR) with topline data guided for Q3 2027 — a clean, single-asset clinical binary, partnered ex-US with Biogen. <b>Update 10 Oct 2026:</b> the FDA pre-NDA meeting completed 5 Oct 2026 with alignment on the NDA path and the Vineland-3 cognition analysis; Q3 2026 earnings confirmed for 3 Nov 2026; AAO 2026 STK-002 presentations are underway (9–12 Oct, New Orleans).</div>
-    <div class="statstrip">
-      <div class="stat"><div class="k">Share price</div><div class="v">$24.74</div><div class="n">9 Oct 2026 close (MarketBeat)</div></div>
-      <div class="stat"><div class="k">FD market cap</div><div class="v">~$2.03B</div><div class="n">81.9M FD shares × $24.74</div></div>
-      <div class="stat"><div class="k">Pro-forma cash</div><div class="v">$420M</div><div class="n">per 3 Aug 2026 PR</div></div>
-      <div class="stat"><div class="k">Next big binary</div><div class="v">Q3 2027</div><div class="n">EMPEROR topline (guidance)</div></div>
-    </div>
-    <div class="collapse-all-bar">
-      <button class="plainbtn" id="expandAll">Expand all sections</button>
-      <button class="plainbtn" id="collapseAll">Collapse all sections</button>
-    </div>
-  </div>
-</header>
-<div class="wrap">
-
-<section class="card" id="thesis">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 1</span><h2>Thesis snapshot</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <div class="callout good"><b>What changed 7 → 10 Oct 2026 (stale-data audit):</b> (1) The guided "Q4 2026 pre-NDA meeting" <b>already happened</b> — Stoke announced 5 Oct 2026 that the FDA meeting completed with alignment on the NDA path and a prespecified multicomponent Vineland-3 analysis for EMPEROR's cognition/behavior secondary; (2) Q3 2026 earnings date <b>resolved to 3 Nov 2026</b> (was inconsistently reported); (3) AAO 2026 (9–12 Oct) STK-002 presentations are <b>underway now</b>; (4) share price updated $24.29 (7 Oct close) → <b>$24.74</b> (9 Oct close); stock touched $25.77 intraday on the FDA-meeting news.</div>
+<section id="thesis">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The thesis — and what the October 10 audit changed</h2></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="callout good"><b>What changed 7 → 10 Oct 2026 (stale-data audit):</b> (1) The guided "Q4 2026 pre-NDA meeting" <b>already happened</b> — Stoke announced 5 Oct 2026 that the FDA meeting completed with alignment on the NDA path and a prespecified multicomponent Vineland-3 analysis for EMPEROR's cognition/behavior secondary; (2) Q3 2026 earnings date <b>resolved to 3 Nov 2026</b> (was inconsistently reported); (3) AAO 2026 (9–12 Oct) STK-002 presentations are <b>underway now</b>; (4) share price updated $24.29 (7 Oct close) → <b>$24.74</b> (9 Oct close); stock touched $25.77 intraday on the FDA-meeting news.</div>
   <div class="callout"><b>The key swing factor:</b> whether the sham-controlled Phase 3 EMPEROR study replicates the open-label 59–91% seizure-reduction signal at the week-28 primary endpoint in Q3 2027. The entire valuation rests on this single readout.</div>
-  <p><span class="ev ev-i">INTERPRETATION</span> <b>Bull case logic.</b> Zorevunersen is a first-in-class disease-modifying candidate for a severe genetic epilepsy: it upregulates the patient's own <i>SCN1A</i> gene rather than suppressing seizures symptomatically. The open-label dataset (81 patients in Phase 1/2a; 75 in extension; some treated &gt;5 years; NEJM publication March 2026) shows durable major-motor seizure reductions plus cognition/behavior gains versus natural history — a profile no approved Dravet therapy offers. Biogen's $165M-upfront partnership (Feb 2025) validates the asset and funds 30% of development costs, and pro-forma cash of $420M funds operations through a potential early-2028 US launch without a forced raise. The completed FDA meeting (Oct 2026) de-risks the regulatory path incrementally: the agency agreed to the multicomponent Vineland-3 analysis plan for the cognition secondary.</p>
-  <p><span class="ev ev-i">INTERPRETATION</span> <b>Bear case logic.</b> This is a single-asset binary with a fully-diluted valuation near $2B already pricing in substantial Phase 3 success. All efficacy data to date are open-label with no placebo control; caregiver-reported cognition/behavior endpoints are vulnerable to expectation bias. The direct competitor Encoded Therapeutics (ETX101, one-time AAV gene therapy, $275M Series F, pivotal data end 2027) could reset the standard of care even if EMPEROR hits. And the precedent of soticlestat — which narrowly missed its Dravet Phase 3 primary (p=0.06) — shows how thin the margin is in this indication.</p>
-  <p><span class="ev ev-g">GAP</span> EMPEROR's formal powering assumptions and any interim-analysis provisions remain undisclosed in accessible sources; the exact statistical bar for "success" at week 28 beyond the log-transformed primary endpoint definition is not verifiable publicly.</p>
-  </div>
-</section>
-
-<section class="card" id="identity">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 2</span><h2>Identity &amp; corporate snapshot</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <dl class="kv">
-    <dt>Company</dt><dd>Stoke Therapeutics, Inc. <span class="ev ev-f">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
-    <dt>Ticker / exchange</dt><dd>Nasdaq: STOK, Nasdaq Global Select Market <span class="ev ev-f">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
-    <dt>Headquarters</dt><dd>45 Wiggins Ave, Bedford, Massachusetts 01730 <span class="ev ev-f">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
-    <dt>Founded</dt><dd>2017 <span class="ev ev-f">FACT</span> <span class="src">Company PR (Sep 2026)</span></dd>
-    <dt>Business</dt><dd>Biotechnology company developing antisense oligonucleotides (ASOs) to restore protein expression via its proprietary TANGO (Targeted Augmentation of Nuclear Gene Output) approach, initially in haploinsufficient diseases of the central nervous system and the eye <span class="ev ev-f">FACT</span> <span class="src">Company PR (Oct 2026)</span></dd>
-    <dt>Employees</dt><dd>~200–500 <span class="ev ev-u">UNVERIFIED</span> <span class="src">LinkedIn company page (range only)</span></dd>
-    <dt>52-week range</dt><dd>$20.32 – $40.22 <span class="ev ev-f">FACT</span> <span class="src">Market data, Oct 2026</span></dd>
-    <dt>Analyst coverage</dt><dd>10 Buy / 1 Sell; consensus PT $44.25 ("Moderate Buy"); range $35 (Chardan) – $60 (Guggenheim); Canaccord $58; JPM $40 <span class="ev ev-f">FACT</span> <span class="src">MarketBeat, Oct 2026 (corroborated by American Banking News, 6 Oct 2026)</span></dd>
+  <p><span class="ev interp">INTERPRETATION</span> <b>Bull case logic.</b> Zorevunersen is a first-in-class disease-modifying candidate for a severe genetic epilepsy: it upregulates the patient's own <i>SCN1A</i> gene rather than suppressing seizures symptomatically. The open-label dataset (81 patients in Phase 1/2a; 75 in extension; some treated &gt;5 years; NEJM publication March 2026) shows durable major-motor seizure reductions plus cognition/behavior gains versus natural history — a profile no approved Dravet therapy offers. Biogen's $165M-upfront partnership (Feb 2025) validates the asset and funds 30% of development costs, and pro-forma cash of $420M funds operations through a potential early-2028 US launch without a forced raise. The completed FDA meeting (Oct 2026) de-risks the regulatory path incrementally: the agency agreed to the multicomponent Vineland-3 analysis plan for the cognition secondary.</p>
+  <p><span class="ev interp">INTERPRETATION</span> <b>Bear case logic.</b> This is a single-asset binary with a fully-diluted valuation near $2B already pricing in substantial Phase 3 success. All efficacy data to date are open-label with no placebo control; caregiver-reported cognition/behavior endpoints are vulnerable to expectation bias. The direct competitor Encoded Therapeutics (ETX101, one-time AAV gene therapy, $275M Series F, pivotal data end 2027) could reset the standard of care even if EMPEROR hits. And the precedent of soticlestat — which narrowly missed its Dravet Phase 3 primary (p=0.06) — shows how thin the margin is in this indication.</p>
+  <p><span class="ev gap">GAP</span> EMPEROR's formal powering assumptions and any interim-analysis provisions remain undisclosed in accessible sources; the exact statistical bar for "success" at week 28 beyond the log-transformed primary endpoint definition is not verifiable publicly.</p>
+    </section>
+<section id="identity">
+      <div class="section-head"><div class="section-num">02 / SNAPSHOT</div><div><h2>The corporate facts in one table</h2></div></div>
+      <dl class="kv">
+    <dt>Company</dt><dd>Stoke Therapeutics, Inc. <span class="ev fact">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
+    <dt>Ticker / exchange</dt><dd>Nasdaq: STOK, Nasdaq Global Select Market <span class="ev fact">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
+    <dt>Headquarters</dt><dd>45 Wiggins Ave, Bedford, Massachusetts 01730 <span class="ev fact">FACT</span> <span class="src">SEC 10-Q (Q2 2026)</span></dd>
+    <dt>Founded</dt><dd>2017 <span class="ev fact">FACT</span> <span class="src">Company PR (Sep 2026)</span></dd>
+    <dt>Business</dt><dd>Biotechnology company developing antisense oligonucleotides (ASOs) to restore protein expression via its proprietary TANGO (Targeted Augmentation of Nuclear Gene Output) approach, initially in haploinsufficient diseases of the central nervous system and the eye <span class="ev fact">FACT</span> <span class="src">Company PR (Oct 2026)</span></dd>
+    <dt>Employees</dt><dd>~200–500 <span class="ev unverified">UNVERIFIED</span> <span class="src">LinkedIn company page (range only)</span></dd>
+    <dt>52-week range</dt><dd>$20.32 – $40.22 <span class="ev fact">FACT</span> <span class="src">Market data, Oct 2026</span></dd>
+    <dt>Analyst coverage</dt><dd>10 Buy / 1 Sell; consensus PT $44.25 ("Moderate Buy"); range $35 (Chardan) – $60 (Guggenheim); Canaccord $58; JPM $40 <span class="ev fact">FACT</span> <span class="src">MarketBeat, Oct 2026 (corroborated by American Banking News, 6 Oct 2026)</span></dd>
   </dl>
-  </div>
-</section>
-<section class="card" id="science">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 3</span><h2>Science: mechanism of action &amp; why it could fail</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <h3>Plain-language mechanism</h3>
-  <p><span class="ev ev-f">FACT</span> Most human genes waste a fraction of their RNA output: during splicing, cells sometimes include a "poison exon" (also called an NMD exon) that carries a premature stop signal, sending that transcript to nonsense-mediated decay instead of making protein. TANGO uses a short synthetic antisense oligonucleotide that binds the pre-mRNA and blocks inclusion of the poison exon, so more transcripts become productive — raising protein output from the patient's healthy gene copy. Because it only boosts the normal allele, the approach is restricted to <b>haploinsufficiency</b> diseases where ~50% of normal protein is lost. <span class="src">Company disclosures; Han et al., <i>Sci Transl Med</i> 2020 (see references)</span></p>
-  <p><span class="ev ev-f">FACT</span> In Dravet syndrome, ~85% of cases are caused by de novo heterozygous variants in <i>SCN1A</i>, which encodes the Na<sub>V</sub>1.1 sodium-channel subunit. Na<sub>V</sub>1.1 is concentrated in GABAergic inhibitory interneurons — the brain's "brakes." Losing half the channels disinhibits cortical networks, producing frequent prolonged seizures in infancy, developmental stagnation, cognitive/behavioral impairment, ataxia, and elevated risk of sudden unexpected death in epilepsy (SUDEP). <span class="src">Company PR; insideprecisionmedicine summary of the field</span></p>
-  <p><span class="ev ev-f">FACT</span> Zorevunersen is an intrathecally delivered ASO designed to silence the conserved <i>SCN1A</i> poison exon, increasing <i>SCN1A</i> mRNA and Na<sub>V</sub>1.1 protein in the brain. STK-002 applies the same TANGO logic to <i>OPA1</i> in autosomal dominant optic atrophy (intravitreal delivery), upregulating OPA1 from the wild-type allele to improve mitochondrial function in retinal ganglion cells. <span class="src">Company PRs; UVA/Stoke AES 2020 poster</span></p>
+    </section>
+<section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Raising protein from the healthy copy — and why it could fail</h2></div></div>
+      <h3>Plain-language mechanism</h3>
+  <p><span class="ev fact">FACT</span> Most human genes waste a fraction of their RNA output: during splicing, cells sometimes include a "poison exon" (also called an NMD exon) that carries a premature stop signal, sending that transcript to nonsense-mediated decay instead of making protein. TANGO uses a short synthetic antisense oligonucleotide that binds the pre-mRNA and blocks inclusion of the poison exon, so more transcripts become productive — raising protein output from the patient's healthy gene copy. Because it only boosts the normal allele, the approach is restricted to <b>haploinsufficiency</b> diseases where ~50% of normal protein is lost. <span class="src">Company disclosures; Han et al., <i>Sci Transl Med</i> 2020 (see references)</span></p>
+  <p><span class="ev fact">FACT</span> In Dravet syndrome, ~85% of cases are caused by de novo heterozygous variants in <i>SCN1A</i>, which encodes the Na<sub>V</sub>1.1 sodium-channel subunit. Na<sub>V</sub>1.1 is concentrated in GABAergic inhibitory interneurons — the brain's "brakes." Losing half the channels disinhibits cortical networks, producing frequent prolonged seizures in infancy, developmental stagnation, cognitive/behavioral impairment, ataxia, and elevated risk of sudden unexpected death in epilepsy (SUDEP). <span class="src">Company PR; insideprecisionmedicine summary of the field</span></p>
+  <p><span class="ev fact">FACT</span> Zorevunersen is an intrathecally delivered ASO designed to silence the conserved <i>SCN1A</i> poison exon, increasing <i>SCN1A</i> mRNA and Na<sub>V</sub>1.1 protein in the brain. STK-002 applies the same TANGO logic to <i>OPA1</i> in autosomal dominant optic atrophy (intravitreal delivery), upregulating OPA1 from the wild-type allele to improve mitochondrial function in retinal ganglion cells. <span class="src">Company PRs; UVA/Stoke AES 2020 poster</span></p>
   <h3>Technical depth — the TANGO pharmacology</h3>
   <ul class="tight">
-    <li><span class="ev ev-i">INTERPRETATION</span> TANGO ASOs are steric-blocking oligonucleotides (non-RNase-H-recruiting by design intent): they hybridize to sequences flanking the poison exon in the pre-mRNA and redirect spliceosome choice toward productive splicing, rather than degrading a target transcript the way gapmer ASOs do. The effect is <b>protein upregulation from the endogenous wild-type allele</b> — no gene transfer, no viral vector, no editing machinery.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> The pharmacology is inherently <b>dose-titratable and reversible</b> (repeat dosing maintains effect; stopping dosing washes it out), contrasting with AAV gene-therapy competitors (ETX101) that are irreversible and non-re-dosable. The trade-off is chronic re-dosing: intrathecal administration every few months for zorevunersen, with post-lumbar-puncture syndrome reported in ~25% of Phase 1/2a patients.</li>
-    <li><span class="ev ev-f">FACT</span> The <i>SCN1A</i> poison exon is conserved across human, monkey, mouse and rat (Han et al. 2020) — the conserved target sequence is what made the translatable mouse pharmacology package possible and is the basis for the cross-species dosing rationale. <span class="src">Han et al., <i>Sci Transl Med</i> 2020</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> A subtle but important design feature: because TANGO boosts only the healthy allele, it cannot help the ~15% of Dravet patients whose disease is not <i>SCN1A</i>-driven, and patients carrying <i>SCN1A</i> <b>gain-of-function</b> variants are excluded from EMPEROR (per the Oct 2026 study-details disclosure) — a loss-of-function enhancer could theoretically worsen a gain-of-function phenotype.</li>
+    <li><span class="ev interp">INTERPRETATION</span> TANGO ASOs are steric-blocking oligonucleotides (non-RNase-H-recruiting by design intent): they hybridize to sequences flanking the poison exon in the pre-mRNA and redirect spliceosome choice toward productive splicing, rather than degrading a target transcript the way gapmer ASOs do. The effect is <b>protein upregulation from the endogenous wild-type allele</b> — no gene transfer, no viral vector, no editing machinery.</li>
+    <li><span class="ev interp">INTERPRETATION</span> The pharmacology is inherently <b>dose-titratable and reversible</b> (repeat dosing maintains effect; stopping dosing washes it out), contrasting with AAV gene-therapy competitors (ETX101) that are irreversible and non-re-dosable. The trade-off is chronic re-dosing: intrathecal administration every few months for zorevunersen, with post-lumbar-puncture syndrome reported in ~25% of Phase 1/2a patients.</li>
+    <li><span class="ev fact">FACT</span> The <i>SCN1A</i> poison exon is conserved across human, monkey, mouse and rat (Han et al. 2020) — the conserved target sequence is what made the translatable mouse pharmacology package possible and is the basis for the cross-species dosing rationale. <span class="src">Han et al., <i>Sci Transl Med</i> 2020</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> A subtle but important design feature: because TANGO boosts only the healthy allele, it cannot help the ~15% of Dravet patients whose disease is not <i>SCN1A</i>-driven, and patients carrying <i>SCN1A</i> <b>gain-of-function</b> variants are excluded from EMPEROR (per the Oct 2026 study-details disclosure) — a loss-of-function enhancer could theoretically worsen a gain-of-function phenotype.</li>
   </ul>
   <h3>Academic literature (beyond company materials)</h3>
   <ul class="tight">
-    <li><b>Han et al., <i>Science Translational Medicine</i>, August 2020</b> (Zhou Han, Stoke, with Lori Isom, Univ. of Michigan). <span class="ev ev-f">FACT</span> Identified a poison exon in <i>SCN1A</i> conserved across human, monkey, mouse and rat; screened 47 ASOs in human neural progenitor cells; lead compound STK-001 selectively raised Na<sub>V</sub>1.1 without affecting other sodium-channel genes. In <i>Scn1a</i><sup>+/−</sup> Dravet mice dosed by intracerebroventricular injection: treatment at postnatal day 2 → 97% (33/34) survival to day 90 vs 23% (14/62) with placebo (p&lt;0.0001); treatment at day 14 → 85% (45/53) vs 64% (47/74) (p&lt;0.005); EEG monitoring days 22–46 → 76% (16/21) seizure-free vs 48% (10/21) with placebo. <span class="src">BusinessWire summary of the publication; The Transmitter coverage</span></li>
-    <li><b>Wengert et al. (Univ. of Virginia / Manoj Patel lab; Stoke collaborators), presented AES 2020.</b> <span class="ev ev-f">FACT</span> Showed STK-001 rescues the reduced intrinsic excitability of parvalbumin-positive (PV) inhibitory interneurons in <i>Scn1a</i><sup>+/−</sup> mice to wild-type levels — the first direct evidence that TANGO rescues the core cellular disease mechanism, not just seizures. A single infant-mouse treatment prevented seizures and premature death. <span class="src">Inside Precision Medicine; Stoke AES 2020 poster</span></li>
-    <li><b>Cross et al., <i>New England Journal of Medicine</i>, March 2026</b> (J. Helen Cross, co-lead author). <span class="ev ev-f">FACT</span> Peer-reviewed publication of the Phase 1/2a MONARCH/ADMIRAL and OLE data (see §5), concluding the safety profile and initial clinical improvement support continued development as a potential disease-modifying therapy — while explicitly noting the studies were open-label without placebo controls. <span class="src">Neurology Today; Practical Neurology</span></li>
+    <li><b>Han et al., <i>Science Translational Medicine</i>, August 2020</b> (Zhou Han, Stoke, with Lori Isom, Univ. of Michigan). <span class="ev fact">FACT</span> Identified a poison exon in <i>SCN1A</i> conserved across human, monkey, mouse and rat; screened 47 ASOs in human neural progenitor cells; lead compound STK-001 selectively raised Na<sub>V</sub>1.1 without affecting other sodium-channel genes. In <i>Scn1a</i><sup>+/−</sup> Dravet mice dosed by intracerebroventricular injection: treatment at postnatal day 2 → 97% (33/34) survival to day 90 vs 23% (14/62) with placebo (p&lt;0.0001); treatment at day 14 → 85% (45/53) vs 64% (47/74) (p&lt;0.005); EEG monitoring days 22–46 → 76% (16/21) seizure-free vs 48% (10/21) with placebo. <span class="src">BusinessWire summary of the publication; The Transmitter coverage</span></li>
+    <li><b>Wengert et al. (Univ. of Virginia / Manoj Patel lab; Stoke collaborators), presented AES 2020.</b> <span class="ev fact">FACT</span> Showed STK-001 rescues the reduced intrinsic excitability of parvalbumin-positive (PV) inhibitory interneurons in <i>Scn1a</i><sup>+/−</sup> mice to wild-type levels — the first direct evidence that TANGO rescues the core cellular disease mechanism, not just seizures. A single infant-mouse treatment prevented seizures and premature death. <span class="src">Inside Precision Medicine; Stoke AES 2020 poster</span></li>
+    <li><b>Cross et al., <i>New England Journal of Medicine</i>, March 2026</b> (J. Helen Cross, co-lead author). <span class="ev fact">FACT</span> Peer-reviewed publication of the Phase 1/2a MONARCH/ADMIRAL and OLE data (see §5), concluding the safety profile and initial clinical improvement support continued development as a potential disease-modifying therapy — while explicitly noting the studies were open-label without placebo controls. <span class="src">Neurology Today; Practical Neurology</span></li>
   </ul>
   <h3>Why it could fail — scientific risks</h3>
   <ol class="tight">
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Therapeutic window narrows with age.</b> The mouse data show dramatically larger effects with earlier treatment (P2 vs P14). EMPEROR enrolls children and adolescents — years past the early-developmental window where interneuron circuitry is most plastic. Human benefit on cognition may be smaller than the mouse data imply.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Delivery to the right cells.</b> Intrathecal ASO must reach deep cortical and hippocampal PV interneurons at sufficient concentration. The 45% rate of CSF protein elevation in the OLE suggests meaningful compartmental pharmacology whose long-term significance is unknown.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Open-label inflation.</b> Every human efficacy data point is open-label. Caregiver- and clinician-reported global impression and Vineland-3 scores are susceptible to expectation bias; EMPEROR is the first placebo-controlled test.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Genetic heterogeneity.</b> TANGO boosts the healthy allele. Patients carry diverse <i>SCN1A</i> variants (truncations vs missense); whether missense-variant carriers respond equally is unproven in humans. Trial eligibility requires a confirmed mutation; variant-type breakdowns are not public. <span class="ev ev-g">GAP</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Lifelong invasive dosing vs one-time alternatives.</b> Zorevunersen requires repeat lumbar-puncture dosing every few months for life. If Encoded's one-time AAV (ETX101) proves durable, the dosing-burden comparison becomes a commercial and adherence headwind — though ASOs are re-dosable and reversible, which AAV is not.</li>
-    <li><span class="ev ev-f">FACT</span> <b>~15% of Dravet cases are not <i>SCN1A</i>-driven</b> and are mechanistically unaddressable by zorevunersen. <span class="src">Company/field disclosures</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Therapeutic window narrows with age.</b> The mouse data show dramatically larger effects with earlier treatment (P2 vs P14). EMPEROR enrolls children and adolescents — years past the early-developmental window where interneuron circuitry is most plastic. Human benefit on cognition may be smaller than the mouse data imply.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Delivery to the right cells.</b> Intrathecal ASO must reach deep cortical and hippocampal PV interneurons at sufficient concentration. The 45% rate of CSF protein elevation in the OLE suggests meaningful compartmental pharmacology whose long-term significance is unknown.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Open-label inflation.</b> Every human efficacy data point is open-label. Caregiver- and clinician-reported global impression and Vineland-3 scores are susceptible to expectation bias; EMPEROR is the first placebo-controlled test.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Genetic heterogeneity.</b> TANGO boosts the healthy allele. Patients carry diverse <i>SCN1A</i> variants (truncations vs missense); whether missense-variant carriers respond equally is unproven in humans. Trial eligibility requires a confirmed mutation; variant-type breakdowns are not public. <span class="ev gap">GAP</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Lifelong invasive dosing vs one-time alternatives.</b> Zorevunersen requires repeat lumbar-puncture dosing every few months for life. If Encoded's one-time AAV (ETX101) proves durable, the dosing-burden comparison becomes a commercial and adherence headwind — though ASOs are re-dosable and reversible, which AAV is not.</li>
+    <li><span class="ev fact">FACT</span> <b>~15% of Dravet cases are not <i>SCN1A</i>-driven</b> and are mechanistically unaddressable by zorevunersen. <span class="src">Company/field disclosures</span></li>
   </ol>
-  </div>
-</section>
-
-<section class="card" id="pipeline">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 4</span><h2>Pipeline — ranked by value, most to least</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <div class="callout"><b>Ranking basis:</b> probability-weighted contribution to fully-diluted enterprise value (~$1.6B at $24.74). Zorevunersen's US rights dominate; everything else is option value.</div>
+    </section>
+<section id="pipeline">
+      <div class="section-head"><div class="section-num">04 / PIPELINE</div><div><h2>Zorevunersen carries the enterprise value; the rest is option value</h2></div></div>
+      <div class="callout"><b>Ranking basis:</b> probability-weighted contribution to fully-diluted enterprise value (~$1.6B at $24.74). Zorevunersen's US rights dominate; everything else is option value.</div>
   <div class="tablewrap"><table>
     <tr><th>Rank</th><th>Program</th><th>Modality / route</th><th>Indication</th><th>Stage</th><th>Rights &amp; economics</th><th>Why this rank</th></tr>
     <tr><td><b>1</b></td><td><b>Zorevunersen</b> (STK-001) — US</td><td>ASO (TANGO) / intrathecal</td><td>Dravet syndrome (<i>SCN1A</i> haploinsufficiency)</td><td>Phase 3 (EMPEROR)</td><td>Stoke: US/Canada/Mexico; Biogen: rest of world</td><td>Single global Phase 3, Breakthrough designation, first-in-class disease-modifying thesis; carries the overwhelming majority of EV. The binary.</td></tr>
-    <tr><td><b>2</b></td><td><b>Zorevunersen — ex-US economics</b></td><td>same</td><td>same</td><td>Phase 3</td><td>Tiered low-double-digit to high-teen royalties + up to $385M in development/regulatory/commercial milestones; Biogen funds 30% of development costs <span class="ev ev-f">FACT</span> <span class="src">Biogen/Stoke deal, Feb 2025; 10-Q (Q2 2026)</span></td><td>A royalty/milestone stream with zero additional Stoke cost — meaningful but capped; Biogen's follow-on SCN1A-ASO option also caps the standalone SCN1A franchise.</td></tr>
+    <tr><td><b>2</b></td><td><b>Zorevunersen — ex-US economics</b></td><td>same</td><td>same</td><td>Phase 3</td><td>Tiered low-double-digit to high-teen royalties + up to $385M in development/regulatory/commercial milestones; Biogen funds 30% of development costs <span class="ev fact">FACT</span> <span class="src">Biogen/Stoke deal, Feb 2025; 10-Q (Q2 2026)</span></td><td>A royalty/milestone stream with zero additional Stoke cost — meaningful but capped; Biogen's follow-on SCN1A-ASO option also caps the standalone SCN1A franchise.</td></tr>
     <tr><td><b>3</b></td><td><b>STK-002</b></td><td>ASO (TANGO) / intravitreal</td><td>Autosomal dominant optic atrophy (<i>OPA1</i>)</td><td>Phase 1 (OSPREY)</td><td>Stoke (wholly owned); FDA orphan drug designation</td><td>First human TANGO readout outside the CNS (H1 2027) — the platform-validation option; ADOA is a smaller commercial opportunity than Dravet, so value is mostly scientific de-risking of the pipeline.</td></tr>
     <tr><td><b>4</b></td><td><b>SYNGAP1 program</b></td><td>ASO (TANGO)</td><td>SYNGAP1 syndrome</td><td>Preclinical</td><td>Co-developed / co-commercialized with Acadia, 50/50 cost &amp; profit share</td><td>Shared economics halves the upside; still preclinical, so near-zero probability weight today, but SYNGAP1 is a credible TANGO target.</td></tr>
-    <tr><td><b>5</b></td><td><b>Rett syndrome (<i>MECP2</i>) + undisclosed neurodevelopmental target</b></td><td>ASO (TANGO)</td><td>Rett / undisclosed</td><td>Preclinical (research)</td><td>Acadia holds exclusive worldwide licenses; Acadia funds research/preclinical and leads clinical/commercial <span class="ev ev-f">FACT</span> <span class="src">Acadia/Stoke PR, 10 Jan 2022</span></td><td>Stoke is essentially a carried option here: $60M upfront received (2022), up to $907M total milestones, tiered mid-single-digit to mid-teen royalties — pure call optionality with no Stoke spend.</td></tr>
-    <tr><td><b>6</b></td><td><b>TANGO platform (residual)</b></td><td>—</td><td>Undisclosed haploinsufficiencies</td><td>Research</td><td>Stoke-owned; Thomas McCauley, Ph.D. joined as CSO July 2026 to expand the pipeline <span class="ev ev-f">FACT</span> <span class="src">Company PR, 3 Aug 2026</span></td><td>Residual platform value that only monetizes if zorevunersen and/or STK-002 de-risk the mechanism in humans.</td></tr>
+    <tr><td><b>5</b></td><td><b>Rett syndrome (<i>MECP2</i>) + undisclosed neurodevelopmental target</b></td><td>ASO (TANGO)</td><td>Rett / undisclosed</td><td>Preclinical (research)</td><td>Acadia holds exclusive worldwide licenses; Acadia funds research/preclinical and leads clinical/commercial <span class="ev fact">FACT</span> <span class="src">Acadia/Stoke PR, 10 Jan 2022</span></td><td>Stoke is essentially a carried option here: $60M upfront received (2022), up to $907M total milestones, tiered mid-single-digit to mid-teen royalties — pure call optionality with no Stoke spend.</td></tr>
+    <tr><td><b>6</b></td><td><b>TANGO platform (residual)</b></td><td>—</td><td>Undisclosed haploinsufficiencies</td><td>Research</td><td>Stoke-owned; Thomas McCauley, Ph.D. joined as CSO July 2026 to expand the pipeline <span class="ev fact">FACT</span> <span class="src">Company PR, 3 Aug 2026</span></td><td>Residual platform value that only monetizes if zorevunersen and/or STK-002 de-risk the mechanism in humans.</td></tr>
   </table></div>
-  <p><span class="ev ev-f">FACT</span> <b>STK-002/OSPREY:</b> Phase 1 first-in-human study in people with ADOA; dose escalation ongoing with cohorts 1–2 complete and cohort 3 expected to complete by year-end 2026; cohorts 3–4 expected to reach therapeutic dosing levels; initial safety and efficacy data anticipated H1 2027. STK-002 has FDA orphan drug designation. The FALCON natural-history study (2-year data, Oct 2025) is the largest prospective ADOA natural-history dataset and will contextualize OSPREY readouts. ADOA causes progressive irreversible vision loss in both eyes, with ~80% of patients symptomatic by age 10 and ~50% progressing to legal blindness; no approved treatments. <span class="src">Company PR, 1 Oct 2026 (via BusinessWire; eyewire.news)</span></p>
-  <p><span class="ev ev-f">FACT</span> <b>Acadia collaboration (Jan 10, 2022):</b> $60M upfront to Stoke; up to $907M in milestones; tiered royalties mid-single-digit to mid-teens on the Rett/undisclosed programs; SYNGAP1 co-developed 50/50. <span class="src">Acadia/Stoke PR; WSGR summary</span></p>
-  </div>
-</section>
-<section class="card" id="trials">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 5</span><h2>Trial design deep dive</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <h3>EMPEROR — global registrational Phase 3 (NCT06872125)</h3>
+  <p><span class="ev fact">FACT</span> <b>STK-002/OSPREY:</b> Phase 1 first-in-human study in people with ADOA; dose escalation ongoing with cohorts 1–2 complete and cohort 3 expected to complete by year-end 2026; cohorts 3–4 expected to reach therapeutic dosing levels; initial safety and efficacy data anticipated H1 2027. STK-002 has FDA orphan drug designation. The FALCON natural-history study (2-year data, Oct 2025) is the largest prospective ADOA natural-history dataset and will contextualize OSPREY readouts. ADOA causes progressive irreversible vision loss in both eyes, with ~80% of patients symptomatic by age 10 and ~50% progressing to legal blindness; no approved treatments. <span class="src">Company PR, 1 Oct 2026 (via BusinessWire; eyewire.news)</span></p>
+  <p><span class="ev fact">FACT</span> <b>Acadia collaboration (Jan 10, 2022):</b> $60M upfront to Stoke; up to $907M in milestones; tiered royalties mid-single-digit to mid-teens on the Rett/undisclosed programs; SYNGAP1 co-developed 50/50. <span class="src">Acadia/Stoke PR; WSGR summary</span></p>
+    </section>
+<section id="trials">
+      <div class="section-head"><div class="section-num">05 / CLINICAL</div><div><h2>EMPEROR: the registrational Phase 3 design</h2></div></div>
+      <h3>EMPEROR — global registrational Phase 3 (NCT06872125)</h3>
   <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> <b>Population:</b> children aged 2 to &lt;18 years with Dravet syndrome and a confirmed <i>SCN1A</i> variant <b>not associated with gain of function</b>, on stable background anti-seizure medications. <span class="src">Company PR, 30 Jun 2026; Practical Neurology, Oct 2026 (from 5 Oct 2026 company release)</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Randomization:</b> 1:1 zorevunersen (intrathecal) vs sham comparator for a 52-week treatment period following baseline; double-blind. <span class="src">Company PR, 5 Oct 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Enrollment:</b> 162 patients randomized (target was 150); enrollment completed June 2026; <b>zero discontinuations</b> reported to date. The design had assumed ~15% discontinuation, partly because the control arm undergoes a sham lumbar-puncture procedure. Company remains blinded. <span class="src">Company PR, 30 Jun 2026; CEO remarks at Canaccord, Aug 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Dosing:</b> two 70 mg intrathecal loading doses by week 8, followed by two 45 mg doses over the 52-week study period. <span class="src">CEO remarks at Canaccord, Aug 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Primary endpoint (clarified Oct 2026):</b> estimated change from baseline in <b>log-transformed major motor seizure frequency</b> at week 28. <b>Key secondaries:</b> durability of seizure-frequency response at week 52, and change in adaptive functioning (cognition/behavior) at week 52. <span class="src">Company PR, 5 Oct 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Cognition analysis plan (new, post-FDA meeting):</b> multicomponent assessment of four prespecified Vineland-3 subdomains — expressive communication, receptive communication, interpersonal relationships, personal skills — selected with clinician/caregiver input for their potential to show meaningful effects within the one-year treatment period; analyzed using a <b>multivariate mixed model for repeated measures (MMRM)</b> for the US NDA. <span class="src">Company PR, 5 Oct 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Development economics:</b> Stoke leads with Biogen cost-sharing 70/30. <span class="src">Company PRs; Biogen agreement (10-Q)</span></li>
-    <li><span class="ev ev-g">GAP</span> Formal powering assumptions and any interim-analysis provisions remain undisclosed in accessible sources.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> Zero dropouts in a sham-LP pediatric trial is operationally exceptional and modestly de-risks the tolerability question — but it also raises expectations, making the binary sharper: the market will read a clean, fully-enrolled, well-retained trial as having removed execution excuses.</li>
+    <li><span class="ev fact">FACT</span> <b>Population:</b> children aged 2 to &lt;18 years with Dravet syndrome and a confirmed <i>SCN1A</i> variant <b>not associated with gain of function</b>, on stable background anti-seizure medications. <span class="src">Company PR, 30 Jun 2026; Practical Neurology, Oct 2026 (from 5 Oct 2026 company release)</span></li>
+    <li><span class="ev fact">FACT</span> <b>Randomization:</b> 1:1 zorevunersen (intrathecal) vs sham comparator for a 52-week treatment period following baseline; double-blind. <span class="src">Company PR, 5 Oct 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Enrollment:</b> 162 patients randomized (target was 150); enrollment completed June 2026; <b>zero discontinuations</b> reported to date. The design had assumed ~15% discontinuation, partly because the control arm undergoes a sham lumbar-puncture procedure. Company remains blinded. <span class="src">Company PR, 30 Jun 2026; CEO remarks at Canaccord, Aug 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Dosing:</b> two 70 mg intrathecal loading doses by week 8, followed by two 45 mg doses over the 52-week study period. <span class="src">CEO remarks at Canaccord, Aug 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Primary endpoint (clarified Oct 2026):</b> estimated change from baseline in <b>log-transformed major motor seizure frequency</b> at week 28. <b>Key secondaries:</b> durability of seizure-frequency response at week 52, and change in adaptive functioning (cognition/behavior) at week 52. <span class="src">Company PR, 5 Oct 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Cognition analysis plan (new, post-FDA meeting):</b> multicomponent assessment of four prespecified Vineland-3 subdomains — expressive communication, receptive communication, interpersonal relationships, personal skills — selected with clinician/caregiver input for their potential to show meaningful effects within the one-year treatment period; analyzed using a <b>multivariate mixed model for repeated measures (MMRM)</b> for the US NDA. <span class="src">Company PR, 5 Oct 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Development economics:</b> Stoke leads with Biogen cost-sharing 70/30. <span class="src">Company PRs; Biogen agreement (10-Q)</span></li>
+    <li><span class="ev gap">GAP</span> Formal powering assumptions and any interim-analysis provisions remain undisclosed in accessible sources.</li>
+    <li><span class="ev interp">INTERPRETATION</span> Zero dropouts in a sham-LP pediatric trial is operationally exceptional and modestly de-risks the tolerability question — but it also raises expectations, making the binary sharper: the market will read a clean, fully-enrolled, well-retained trial as having removed execution excuses.</li>
   </ul>
   <h3>Readouts to date — MONARCH / ADMIRAL (Phase 1/2a) and OLEs</h3>
   <div class="tablewrap"><table>
     <tr><th>Study</th><th>Design</th><th>Key results</th></tr>
-    <tr><td><b>MONARCH</b> (NCT04442295, US) + <b>ADMIRAL</b> (ISRCTN99651026, UK)</td><td>Open-label, 81 patients aged 2–18 with confirmed <i>SCN1A</i> variants and ≥4 convulsive seizures per 28 days on background meds; single- and multiple-ascending intrathecal doses 10–70 mg; primary endpoints safety + PK</td><td><span class="ev ev-f">FACT</span> Patients receiving 70 mg showed ~85% reduction in motor seizures at 3 months and 73% at 6 months (Northwestern summary of the NEJM dataset). <span class="src">NEJM Mar 2026; Northwestern Feinberg</span></td></tr>
-    <tr><td><b>SWALLOWTAIL</b> (NCT04740476) + <b>LONGWING</b> (ISRCTN12811235) — OLEs</td><td>75 rollover patients; ≤45 mg every 4 months up to 36 months; exploratory seizure, CGI-C/CaGI-C, EQ-VAS, Vineland-3 endpoints</td><td><span class="ev ev-f">FACT</span> Median convulsive-seizure-frequency reductions of 58.82–90.91% across one-month intervals over the first 20 months in 70 mg-treated patients; 95% of patients (n=19 at 3 years) rated improved on CGI-C/CaGI-C; continuing Vineland-3 cognition/behavior gains at 2 years vs minimal change in the BUTTERFLY natural-history cohort; propensity-score-weighted analysis showed statistically significant major-motor seizure reduction at 6 months vs natural history. <span class="src">NEJM Mar 2026; CNS Oct 2025; AES Dec 2025 PRs</span></td></tr>
-    <tr><td><b>EEC Sep 2026 update</b></td><td>4-year OLE analyses</td><td><span class="ev ev-f">FACT</span> Substantial durable seizure reductions; reductions in the most severe seizure types (a leading SUDEP risk factor); QoL improvements through 28 months; some patients treated &gt;5 years; generally well tolerated. <span class="src">Company/Biogen PR, 3 Sep 2026</span></td></tr>
+    <tr><td><b>MONARCH</b> (NCT04442295, US) + <b>ADMIRAL</b> (ISRCTN99651026, UK)</td><td>Open-label, 81 patients aged 2–18 with confirmed <i>SCN1A</i> variants and ≥4 convulsive seizures per 28 days on background meds; single- and multiple-ascending intrathecal doses 10–70 mg; primary endpoints safety + PK</td><td><span class="ev fact">FACT</span> Patients receiving 70 mg showed ~85% reduction in motor seizures at 3 months and 73% at 6 months (Northwestern summary of the NEJM dataset). <span class="src">NEJM Mar 2026; Northwestern Feinberg</span></td></tr>
+    <tr><td><b>SWALLOWTAIL</b> (NCT04740476) + <b>LONGWING</b> (ISRCTN12811235) — OLEs</td><td>75 rollover patients; ≤45 mg every 4 months up to 36 months; exploratory seizure, CGI-C/CaGI-C, EQ-VAS, Vineland-3 endpoints</td><td><span class="ev fact">FACT</span> Median convulsive-seizure-frequency reductions of 58.82–90.91% across one-month intervals over the first 20 months in 70 mg-treated patients; 95% of patients (n=19 at 3 years) rated improved on CGI-C/CaGI-C; continuing Vineland-3 cognition/behavior gains at 2 years vs minimal change in the BUTTERFLY natural-history cohort; propensity-score-weighted analysis showed statistically significant major-motor seizure reduction at 6 months vs natural history. <span class="src">NEJM Mar 2026; CNS Oct 2025; AES Dec 2025 PRs</span></td></tr>
+    <tr><td><b>EEC Sep 2026 update</b></td><td>4-year OLE analyses</td><td><span class="ev fact">FACT</span> Substantial durable seizure reductions; reductions in the most severe seizure types (a leading SUDEP risk factor); QoL improvements through 28 months; some patients treated &gt;5 years; generally well tolerated. <span class="src">Company/Biogen PR, 3 Sep 2026</span></td></tr>
   </table></div>
   <h3>Safety signals to date</h3>
   <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> Most common TEAEs: post-lumbar-puncture syndrome (~25% in Phase 1/2a); CSF protein increase (45% in OLE) — with no cases of increased intracranial pressure or hydrocephalus. Of serious TEAEs, one was considered treatment-related. One suspected serious adverse reaction led to study withdrawal. <span class="ev ev-f">FACT</span> Two deaths from SUDEP and one from malnutrition were reported in the study population. <span class="src">NEJM Mar 2026 (via Northwestern/Practical Neurology summaries)</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> The SUDEP deaths occurred in a population with high baseline SUDEP risk and the program's thesis is SUDEP-risk reduction via fewer severe seizures; causality cannot be assessed from open-label data. The CSF-protein signal warrants watching in EMPEROR but has not produced clinical sequelae to date.</li>
+    <li><span class="ev fact">FACT</span> Most common TEAEs: post-lumbar-puncture syndrome (~25% in Phase 1/2a); CSF protein increase (45% in OLE) — with no cases of increased intracranial pressure or hydrocephalus. Of serious TEAEs, one was considered treatment-related. One suspected serious adverse reaction led to study withdrawal. <span class="ev fact">FACT</span> Two deaths from SUDEP and one from malnutrition were reported in the study population. <span class="src">NEJM Mar 2026 (via Northwestern/Practical Neurology summaries)</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> The SUDEP deaths occurred in a population with high baseline SUDEP risk and the program's thesis is SUDEP-risk reduction via fewer severe seizures; causality cannot be assessed from open-label data. The CSF-protein signal warrants watching in EMPEROR but has not produced clinical sequelae to date.</li>
   </ul>
   <div class="callout warn"><b>Design caveat for the binary:</b> every efficacy figure above is open-label with no concurrent placebo. EMPEROR's sham control is the first randomized test — effect sizes typically compress under blinding, and the week-52 cognition/behavior secondaries rely on observer-reported scales (though the FDA has now signed off on the multicomponent Vineland-3 MMRM analysis plan).</div>
-  </div>
-</section>
-
-<section class="card" id="reg">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 6</span><h2>Clinical / regulatory status &amp; outlook</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> Zorevunersen has FDA <b>Breakthrough Therapy Designation</b>, granted on preliminary clinical evidence of potential substantial improvement over available therapy on clinically significant endpoints. <span class="src">Biogen/Stoke deal PR, Feb 2025</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Pre-NDA meeting COMPLETED 5 Oct 2026</b> (this catalyst has landed since the 7 Oct build): Stoke announced successful completion of the FDA meeting to align on the planned US NDA. The agency aligned on the multicomponent Vineland-3 analysis (four subdomains, multivariate MMRM) for the EMPEROR cognition/behavior key secondary. Stoke plans to continue engaging FDA and submit rolling data throughout H1 2027 to support rapid completion of the NDA after the Phase 3 readout. <span class="src">Company PR, 5 Oct 2026 (BusinessWire)</span></li>
-    <li><span class="ev ev-f">FACT</span> Company plans <b>rolling NDA data submission throughout H1 2027</b>, completing the rolling submission in <b>H2 2027</b>, with the data package to include week-52 results. <span class="src">Company PR, 5 Oct 2026 (updated from 3 Aug 2026 guidance)</span></li>
-    <li><span class="ev ev-f">FACT</span> Company guides <b>potential US approval and commercialization in early 2028</b> and states current funds support operations through that point. <span class="src">Company PRs, 3 Aug / 5 Oct 2026</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> Rolling NDA + Breakthrough designation + a completed, constructive FDA meeting signal an FDA relationship that is genuinely cooperative — the Vineland-3 sign-off materially de-risks the cognition-secondary path. But neither guarantees approval speed nor lowers the efficacy bar: a single Phase 3 must be persuasive on its own.</li>
-    <li><span class="ev ev-g">GAP</span> EMA regulatory path and PRIME-designation status for zorevunersen were not confirmed in sources reviewed; Biogen holds ex-US rights and would lead ex-US filings.</li>
+    </section>
+<section id="reg">
+      <div class="section-head"><div class="section-num">06 / REGULATORY</div><div><h2>Breakthrough-designated; the pre-NDA meeting just landed</h2></div></div>
+      <ul class="tight">
+    <li><span class="ev fact">FACT</span> Zorevunersen has FDA <b>Breakthrough Therapy Designation</b>, granted on preliminary clinical evidence of potential substantial improvement over available therapy on clinically significant endpoints. <span class="src">Biogen/Stoke deal PR, Feb 2025</span></li>
+    <li><span class="ev fact">FACT</span> <b>Pre-NDA meeting COMPLETED 5 Oct 2026</b> (this catalyst has landed since the 7 Oct build): Stoke announced successful completion of the FDA meeting to align on the planned US NDA. The agency aligned on the multicomponent Vineland-3 analysis (four subdomains, multivariate MMRM) for the EMPEROR cognition/behavior key secondary. Stoke plans to continue engaging FDA and submit rolling data throughout H1 2027 to support rapid completion of the NDA after the Phase 3 readout. <span class="src">Company PR, 5 Oct 2026 (BusinessWire)</span></li>
+    <li><span class="ev fact">FACT</span> Company plans <b>rolling NDA data submission throughout H1 2027</b>, completing the rolling submission in <b>H2 2027</b>, with the data package to include week-52 results. <span class="src">Company PR, 5 Oct 2026 (updated from 3 Aug 2026 guidance)</span></li>
+    <li><span class="ev fact">FACT</span> Company guides <b>potential US approval and commercialization in early 2028</b> and states current funds support operations through that point. <span class="src">Company PRs, 3 Aug / 5 Oct 2026</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> Rolling NDA + Breakthrough designation + a completed, constructive FDA meeting signal an FDA relationship that is genuinely cooperative — the Vineland-3 sign-off materially de-risks the cognition-secondary path. But neither guarantees approval speed nor lowers the efficacy bar: a single Phase 3 must be persuasive on its own.</li>
+    <li><span class="ev gap">GAP</span> EMA regulatory path and PRIME-designation status for zorevunersen were not confirmed in sources reviewed; Biogen holds ex-US rights and would lead ex-US filings.</li>
   </ul>
-  </div>
-</section>
-
-<section class="card" id="comp">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 7</span><h2>Competition — clinical differentiation only</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <div class="tablewrap"><table>
+    </section>
+<section id="comp">
+      <div class="section-head"><div class="section-num">07 / LANDSCAPE</div><div><h2>Same indication, different mechanisms</h2></div></div>
+      <div class="tablewrap"><table>
     <tr><th>Approach</th><th>Agent / sponsor</th><th>Clinical profile &amp; differentiation vs zorevunersen</th></tr>
-    <tr><td>Approved symptomatic therapy</td><td><b>Cannabidiol</b> (Epidiolex, Jazz); <b>fenfluramine</b> (Fintepla, UCB); <b>stiripentol</b> (Biocodex); clobazam/valproate backbone</td><td><span class="ev ev-f">FACT</span> All are chronic symptomatic anti-seizure regimens; none addresses the <i>SCN1A</i> haploinsufficiency. Cognitive/behavioral impairment generally persists on standard of care (per the BUTTERFLY natural-history contrast presented at CNS 2025). Zorevunersen is tested <i>on top of</i> these agents, so its commercial framing is add-on disease modification, not replacement — at least initially. <span class="src">Company PRs; CNS 2025</span></td></tr>
-    <tr><td>Failed late-stage small molecule</td><td><b>Soticlestat</b> (TAK-935, Takeda; CH24H inhibitor)</td><td><span class="ev ev-f">FACT</span> Phase 3 SKYLINE in Dravet narrowly missed its primary endpoint (convulsive-seizure reduction vs placebo, p=0.06) in June 2024; SKYWAY in LGS also missed. Takeda took a full impairment on the asset; a 2026 revival effort (Perceptive Advisors) argues the trial design, not the drug, failed. <span class="ev ev-i">INTERPRETATION</span> Relevant precedent, not a direct comparator: it demonstrates how tight Dravet Phase 3 outcomes can be and that secondary-endpoint wins do not salvage a missed primary. <span class="src">Takeda PR Jun 2024; pharmaphorum; TechTimes Aug 2026</span></td></tr>
-    <tr><td>One-time AAV gene regulation</td><td><b>ETX101</b> (Encoded Therapeutics; private)</td><td><span class="ev ev-f">FACT</span> AAV9-based gene-regulation therapy delivered by single intracerebroventricular injection to raise the patient's own <i>SCN1A</i> expression in inhibitory neurons. POLARIS Phase 1/2 (open-label): dose level 3 (n=5) median monthly-countable-seizure reduction ~76% and DL4 (n=9) ~60% cumulative weeks 5–52; favorable safety with no treatment-related SAEs through 117 weeks. Pivotal <b>ENDEAVOR Part 2</b> (randomized, n=30, ages 6 months–4 years, seizure + neurodevelopmental endpoints): first patient dosed May 2026, enrollment guided complete by end 2026, initial data anticipated end 2027. $275M Series F closed Sep 2026. Holds FDA Breakthrough, RMAT, Fast Track, Rare Pediatric Disease and Orphan designations. <span class="src">Encoded PRs May/Sep 2026; BioCentury Sep 2026</span><br><span class="ev ev-i">INTERPRETATION</span> The closest mechanistic rival: same target biology, one-time dosing. Key contrasts — ETX101 is irreversible and non-re-dosable with AAV immunogenicity/immunosuppression considerations and an infant-only pivotal population; zorevunersen is re-dosable/reversible with a multi-year safety dataset in older children but requires lifelong repeat lumbar punctures. <b>No cross-trial efficacy comparison is valid</b> (different populations, endpoints, open-label designs, tiny n's).</td></tr>
+    <tr><td>Approved symptomatic therapy</td><td><b>Cannabidiol</b> (Epidiolex, Jazz); <b>fenfluramine</b> (Fintepla, UCB); <b>stiripentol</b> (Biocodex); clobazam/valproate backbone</td><td><span class="ev fact">FACT</span> All are chronic symptomatic anti-seizure regimens; none addresses the <i>SCN1A</i> haploinsufficiency. Cognitive/behavioral impairment generally persists on standard of care (per the BUTTERFLY natural-history contrast presented at CNS 2025). Zorevunersen is tested <i>on top of</i> these agents, so its commercial framing is add-on disease modification, not replacement — at least initially. <span class="src">Company PRs; CNS 2025</span></td></tr>
+    <tr><td>Failed late-stage small molecule</td><td><b>Soticlestat</b> (TAK-935, Takeda; CH24H inhibitor)</td><td><span class="ev fact">FACT</span> Phase 3 SKYLINE in Dravet narrowly missed its primary endpoint (convulsive-seizure reduction vs placebo, p=0.06) in June 2024; SKYWAY in LGS also missed. Takeda took a full impairment on the asset; a 2026 revival effort (Perceptive Advisors) argues the trial design, not the drug, failed. <span class="ev interp">INTERPRETATION</span> Relevant precedent, not a direct comparator: it demonstrates how tight Dravet Phase 3 outcomes can be and that secondary-endpoint wins do not salvage a missed primary. <span class="src">Takeda PR Jun 2024; pharmaphorum; TechTimes Aug 2026</span></td></tr>
+    <tr><td>One-time AAV gene regulation</td><td><b>ETX101</b> (Encoded Therapeutics; private)</td><td><span class="ev fact">FACT</span> AAV9-based gene-regulation therapy delivered by single intracerebroventricular injection to raise the patient's own <i>SCN1A</i> expression in inhibitory neurons. POLARIS Phase 1/2 (open-label): dose level 3 (n=5) median monthly-countable-seizure reduction ~76% and DL4 (n=9) ~60% cumulative weeks 5–52; favorable safety with no treatment-related SAEs through 117 weeks. Pivotal <b>ENDEAVOR Part 2</b> (randomized, n=30, ages 6 months–4 years, seizure + neurodevelopmental endpoints): first patient dosed May 2026, enrollment guided complete by end 2026, initial data anticipated end 2027. $275M Series F closed Sep 2026. Holds FDA Breakthrough, RMAT, Fast Track, Rare Pediatric Disease and Orphan designations. <span class="src">Encoded PRs May/Sep 2026; BioCentury Sep 2026</span><br><span class="ev interp">INTERPRETATION</span> The closest mechanistic rival: same target biology, one-time dosing. Key contrasts — ETX101 is irreversible and non-re-dosable with AAV immunogenicity/immunosuppression considerations and an infant-only pivotal population; zorevunersen is re-dosable/reversible with a multi-year safety dataset in older children but requires lifelong repeat lumbar punctures. <b>No cross-trial efficacy comparison is valid</b> (different populations, endpoints, open-label designs, tiny n's).</td></tr>
   </table></div>
   <div class="callout"><b>Net clinical positioning:</b> if EMPEROR succeeds, zorevunersen would be the first therapy addressing the genetic cause of Dravet with registrational data, entering against symptomatic incumbents and ~6–12 months ahead of the first pivotal gene-therapy readout — a window, not a moat.</div>
-  </div>
-</section>
-<section class="card" id="fin">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 8</span><h2>Financials</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <p class="src" style="margin-top:0">Filings used: 10-Q for quarter ended 30 Jun 2026 (filed 3 Aug 2026); 10-Q for quarter ended 31 Mar 2026; 10-K for year ended 31 Dec 2025. Company PR 3 Aug 2026 for pro-forma cash and guidance.</p>
+    </section>
+<section id="fin">
+      <div class="section-head"><div class="section-num">08 / FINANCIALS</div><div><h2>Cash guided through potential US commercialization</h2></div></div>
+      <p class="src" style="margin-top:0">Filings used: 10-Q for quarter ended 30 Jun 2026 (filed 3 Aug 2026); 10-Q for quarter ended 31 Mar 2026; 10-K for year ended 31 Dec 2025. Company PR 3 Aug 2026 for pro-forma cash and guidance.</p>
   <div class="tablewrap"><table>
     <tr><th>Item</th><th>Figure</th><th>Period / as-of</th></tr>
-    <tr><td>Cash, cash equivalents + marketable securities</td><td><b>$354.3M</b> <span class="ev ev-f">FACT</span></td><td>30 Jun 2026 (balance sheet)</td></tr>
-    <tr><td>Pro-forma cash incl. post-quarter ATM</td><td><b>$420.0M</b> <span class="ev ev-f">FACT</span></td><td>3 Aug 2026 PR ($65.7M net ATM proceeds to a single investor after quarter-end)</td></tr>
-    <tr><td>Company runway guidance</td><td>Through potential US commercialization, <b>early 2028</b> <span class="ev ev-f">FACT</span></td><td>Company guidance, 3 Aug 2026 PR (reiterated 5 Oct 2026)</td></tr>
-    <tr><td>Q2 2026 revenue (collaboration)</td><td>$9.3M (vs $13.8M Q2 2025) <span class="ev ev-f">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
-    <tr><td>Q2 2026 net loss</td><td>$61.6M / ($0.93)/share (vs $23.5M / ($0.40) Q2 2025) <span class="ev ev-f">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
-    <tr><td>Q2 2026 R&amp;D / SG&amp;A</td><td>$49.5M / $25.3M (incl. $10.8M stock comp) <span class="ev ev-f">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
-    <tr><td>H1 2026 operating cash use (derived)</td><td>~$117M (≈$58–59M/quarter) <span class="ev ev-i">INTERPRETATION</span></td><td>Derived from H1 2026 cash-flow statement: net loss $111.6M; net change in cash +$28.8M after +$59.7M investing / +$86.2M financing</td></tr>
-    <tr><td>Q1 2026 net loss</td><td>$50.0M <span class="ev ev-f">FACT</span></td><td>3 months ended 31 Mar 2026</td></tr>
+    <tr><td>Cash, cash equivalents + marketable securities</td><td><b>$354.3M</b> <span class="ev fact">FACT</span></td><td>30 Jun 2026 (balance sheet)</td></tr>
+    <tr><td>Pro-forma cash incl. post-quarter ATM</td><td><b>$420.0M</b> <span class="ev fact">FACT</span></td><td>3 Aug 2026 PR ($65.7M net ATM proceeds to a single investor after quarter-end)</td></tr>
+    <tr><td>Company runway guidance</td><td>Through potential US commercialization, <b>early 2028</b> <span class="ev fact">FACT</span></td><td>Company guidance, 3 Aug 2026 PR (reiterated 5 Oct 2026)</td></tr>
+    <tr><td>Q2 2026 revenue (collaboration)</td><td>$9.3M (vs $13.8M Q2 2025) <span class="ev fact">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
+    <tr><td>Q2 2026 net loss</td><td>$61.6M / ($0.93)/share (vs $23.5M / ($0.40) Q2 2025) <span class="ev fact">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
+    <tr><td>Q2 2026 R&amp;D / SG&amp;A</td><td>$49.5M / $25.3M (incl. $10.8M stock comp) <span class="ev fact">FACT</span></td><td>3 months ended 30 Jun 2026</td></tr>
+    <tr><td>H1 2026 operating cash use (derived)</td><td>~$117M (≈$58–59M/quarter) <span class="ev interp">INTERPRETATION</span></td><td>Derived from H1 2026 cash-flow statement: net loss $111.6M; net change in cash +$28.8M after +$59.7M investing / +$86.2M financing</td></tr>
+    <tr><td>Q1 2026 net loss</td><td>$50.0M <span class="ev fact">FACT</span></td><td>3 months ended 31 Mar 2026</td></tr>
   </table></div>
   <h3>Dilution history</h3>
   <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> <b>April 2024:</b> underwritten public offering — 5,555,557 common shares at $13.50 plus 3,703,730 pre-funded warrants at $13.499 (exercise $0.0001); net proceeds $119.9M. None of the pre-funded warrants had been exercised as of 30 Jun 2026. <span class="src">10-Q (Q2 2026)</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>2025 – early 2026:</b> at-the-market (Controlled Equity Offering Sales Agreement) sales raised ~$168.5M net, including 2,567,014 shares for $80.657M net in Q1 2026 alone. <span class="src">10-Q (Q1 2026); 10-Q (Q2 2026)</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>July 2026:</b> $65.7M net ATM sale to a single investor after quarter-end (included in $420M pro-forma cash). <span class="src">Company PR, 3 Aug 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Shelf capacity:</b> March 2026 automatic universal S-3 shelf (base prospectus, uncapped amount) plus a $150M ATM sales-agreement prospectus; a $400M 2025 shelf remains effective. Financing flexibility is high — and so is the overhang. <span class="src">10-Q (Q2 2026)</span></li>
-    <li><span class="ev ev-f">FACT</span> Non-dilutive funding since inception includes $1.0B total raised (per MD&amp;A) plus the Acadia $60M (2022) and Biogen $165M (Feb 2025) upfronts. <span class="src">10-Q (Q2 2026)</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> The ATM-heavy financing pattern means the share count has grown steadily into strength; a negative EMPEROR readout would likely force the next raise at distressed prices, while a positive readout funds the launch without dilution pressure.</li>
+    <li><span class="ev fact">FACT</span> <b>April 2024:</b> underwritten public offering — 5,555,557 common shares at $13.50 plus 3,703,730 pre-funded warrants at $13.499 (exercise $0.0001); net proceeds $119.9M. None of the pre-funded warrants had been exercised as of 30 Jun 2026. <span class="src">10-Q (Q2 2026)</span></li>
+    <li><span class="ev fact">FACT</span> <b>2025 – early 2026:</b> at-the-market (Controlled Equity Offering Sales Agreement) sales raised ~$168.5M net, including 2,567,014 shares for $80.657M net in Q1 2026 alone. <span class="src">10-Q (Q1 2026); 10-Q (Q2 2026)</span></li>
+    <li><span class="ev fact">FACT</span> <b>July 2026:</b> $65.7M net ATM sale to a single investor after quarter-end (included in $420M pro-forma cash). <span class="src">Company PR, 3 Aug 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Shelf capacity:</b> March 2026 automatic universal S-3 shelf (base prospectus, uncapped amount) plus a $150M ATM sales-agreement prospectus; a $400M 2025 shelf remains effective. Financing flexibility is high — and so is the overhang. <span class="src">10-Q (Q2 2026)</span></li>
+    <li><span class="ev fact">FACT</span> Non-dilutive funding since inception includes $1.0B total raised (per MD&amp;A) plus the Acadia $60M (2022) and Biogen $165M (Feb 2025) upfronts. <span class="src">10-Q (Q2 2026)</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> The ATM-heavy financing pattern means the share count has grown steadily into strength; a negative EMPEROR readout would likely force the next raise at distressed prices, while a positive readout funds the launch without dilution pressure.</li>
   </ul>
-  </div>
-</section>
-
-<section class="card" id="fdev">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 9</span><h2>Fully-diluted market cap &amp; enterprise value</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <p class="src" style="margin-top:0">Share data: 10-Q (Q2 2026), as of 30 Jun 2026 / 30 Jul 2026. Price: $24.74 (9 Oct 2026 close, MarketBeat). Cash: $420.0M pro-forma (3 Aug 2026 PR).</p>
+    </section>
+<section id="fdev">
+      <div class="section-head"><div class="section-num">09 / VALUATION</div><div><h2>The dilution-honest share count and enterprise value</h2></div></div>
+      <p class="src" style="margin-top:0">Share data: 10-Q (Q2 2026), as of 30 Jun 2026 / 30 Jul 2026. Price: $24.74 (9 Oct 2026 close, MarketBeat). Cash: $420.0M pro-forma (3 Aug 2026 PR).</p>
   <div class="tablewrap"><table>
     <tr><th>Component</th><th>Shares</th><th>Status</th></tr>
-    <tr><td>Common stock outstanding</td><td>64,526,242</td><td><span class="ev ev-f">FACT</span> as of 30 Jul 2026</td></tr>
-    <tr><td>Stock options outstanding</td><td>11,532,638</td><td><span class="ev ev-f">FACT</span> as of 30 Jun 2026 (anti-dilutive)</td></tr>
-    <tr><td>Restricted stock units (RSUs)</td><td>1,938,698</td><td><span class="ev ev-f">FACT</span> as of 30 Jun 2026</td></tr>
-    <tr><td>Performance stock units (PSUs)</td><td>219,000</td><td><span class="ev ev-f">FACT</span> as of 30 Jun 2026</td></tr>
-    <tr><td>Pre-funded warrants (Apr 2024 offering)</td><td>3,703,730</td><td><span class="ev ev-f">FACT</span> none exercised as of 30 Jun 2026</td></tr>
-    <tr><td><b>Fully-diluted share count</b></td><td><b>≈ 81,920,000</b></td><td><span class="ev ev-i">INTERPRETATION</span> sum of the above (no convertibles disclosed)</td></tr>
+    <tr><td>Common stock outstanding</td><td>64,526,242</td><td><span class="ev fact">FACT</span> as of 30 Jul 2026</td></tr>
+    <tr><td>Stock options outstanding</td><td>11,532,638</td><td><span class="ev fact">FACT</span> as of 30 Jun 2026 (anti-dilutive)</td></tr>
+    <tr><td>Restricted stock units (RSUs)</td><td>1,938,698</td><td><span class="ev fact">FACT</span> as of 30 Jun 2026</td></tr>
+    <tr><td>Performance stock units (PSUs)</td><td>219,000</td><td><span class="ev fact">FACT</span> as of 30 Jun 2026</td></tr>
+    <tr><td>Pre-funded warrants (Apr 2024 offering)</td><td>3,703,730</td><td><span class="ev fact">FACT</span> none exercised as of 30 Jun 2026</td></tr>
+    <tr><td><b>Fully-diluted share count</b></td><td><b>≈ 81,920,000</b></td><td><span class="ev interp">INTERPRETATION</span> sum of the above (no convertibles disclosed)</td></tr>
   </table></div>
   <div class="grid2">
     <div class="scen base"><h4>Fully-diluted market cap</h4><p style="font-size:22px;font-weight:700;margin:6px 0">≈ $2.03 billion</p><p class="src">81.92M FD shares × $24.74 (9 Oct 2026 close)</p></div>
     <div class="scen base"><h4>Enterprise value</h4><p style="font-size:22px;font-weight:700;margin:6px 0">≈ $1.61 billion</p><p class="src">$2.03B FDMC − $420M pro-forma cash; no debt disclosed in filings reviewed</p></div>
   </div>
   <ul class="tight">
-    <li><span class="ev ev-i">INTERPRETATION</span> Cash is ~$5.13 per fully-diluted share (~21% of FDMC) — a meaningful cushion, but the remaining ~$1.61B of enterprise value is essentially a call option on EMPEROR.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> Dilution overhang is real: FD shares exceed basic by ~27%. Any post-readout financing math must use the ~81.9M figure, not the 64.5M headline.</li>
+    <li><span class="ev interp">INTERPRETATION</span> Cash is ~$5.13 per fully-diluted share (~21% of FDMC) — a meaningful cushion, but the remaining ~$1.61B of enterprise value is essentially a call option on EMPEROR.</li>
+    <li><span class="ev interp">INTERPRETATION</span> Dilution overhang is real: FD shares exceed basic by ~27%. Any post-readout financing math must use the ~81.9M figure, not the 64.5M headline.</li>
   </ul>
-  </div>
-</section>
-
-<section class="card" id="cat">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 10</span><h2>Catalyst / event map — with what "good" looks like</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <p class="src" style="margin-top:0">Date-quality tags: <span class="qtag" style="background:#e2f3ec;color:#0e6b4f">hard</span> = confirmed calendar date · <span class="qtag" style="background:#fbf0d9;color:#8a5a00">guidance</span> = company-guided window · <span class="qtag" style="background:#edf0f3;color:#5b6575">inferred</span> = inferred from guidance · <span class="qtag" style="background:#e5e9ee;color:#5b6575">landed</span> = already happened (stale-data audit 10 Oct 2026).</p>
+    </section>
+<section id="cat">
+      <div class="section-head"><div class="section-num">10 / CATALYSTS</div><div><h2>The catalyst map — with what “good” looks like</h2></div></div>
+      <p class="src" style="margin-top:0">Date-quality tags: <span class="date-tag hard">hard</span> = confirmed calendar date · <span class="date-tag guidance">guidance</span> = company-guided window · <span class="date-tag inferred">inferred</span> = inferred from guidance · <span class="date-tag landed">landed</span> = already happened (stale-data audit 10 Oct 2026).</p>
   <div class="tl">
-    <div class="tl-item q-landed"><span class="tl-date">5 Oct 2026</span><span class="qtag">landed</span><span class="imp imp-med">medium</span><br><b>Pre-NDA meeting with FDA COMPLETED.</b> Stoke announced alignment on the NDA path, including FDA sign-off on the multicomponent Vineland-3 analysis (four subdomains, multivariate MMRM) for the EMPEROR cognition/behavior secondary. Stock traded up to $25.77 intraday on the news. <span class="src">Company PR, 5 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">5 Oct 2026</span><span class="date-tag landed">landed</span><span class="imp imp-med">medium</span><br><b>Pre-NDA meeting with FDA COMPLETED.</b> Stoke announced alignment on the NDA path, including FDA sign-off on the multicomponent Vineland-3 analysis (four subdomains, multivariate MMRM) for the EMPEROR cognition/behavior secondary. Stock traded up to $25.77 intraday on the news. <span class="src">Company PR, 5 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looked like:</b> constructive tone + an agreed cognition-analysis plan (achieved). <b>What to watch now:</b> follow-through — rolling data submissions through H1 2027; any subsequent FDA commentary on the single-study package.</p></div>
-    <div class="tl-item q-hard"><span class="tl-date">9–12 Oct 2026 — underway now</span><span class="qtag">hard</span><span class="imp imp-low">low</span><br><b>AAO 2026 (New Orleans): two STK-002 presentations</b> — (1) OSPREY Phase 1 podium poster (poster PO055, Sun 11 Oct, 10:30–10:40 AM CT, presenter Patrick Yu-Wai-Man, Cambridge/UCL); (2) translational/preclinical ADOA data supporting OPA1 upregulation as disease-modifying. <span class="src">Company PR, 1 Oct 2026; eyewire.news</span>
+    <div class="tl-item"><span class="tl-date">9–12 Oct 2026 — underway now</span><span class="date-tag hard">hard</span><span class="imp imp-low">low</span><br><b>AAO 2026 (New Orleans): two STK-002 presentations</b> — (1) OSPREY Phase 1 podium poster (poster PO055, Sun 11 Oct, 10:30–10:40 AM CT, presenter Patrick Yu-Wai-Man, Cambridge/UCL); (2) translational/preclinical ADOA data supporting OPA1 upregulation as disease-modifying. <span class="src">Company PR, 1 Oct 2026; eyewire.news</span>
       <p class="goodwatch"><b>What "good" looks like:</b> clean early dose-escalation safety narrative, no unexpected ocular signal; translational data that strengthens the H1 2027 readout setup. <b>What to watch:</b> any disclosed cohort-3 dosing detail or hints of biological signal in higher-dose cohorts.</p></div>
-    <div class="tl-item q-hard"><span class="tl-date">3 Nov 2026</span><span class="qtag">hard</span><span class="imp imp-low">low</span><br><b>Q3 2026 earnings call.</b> Date confirmed (was inconsistently reported Nov 3 vs Nov 10 — now resolved). Expect: cash position vs $420M pro-forma baseline, quarterly burn, EMPEROR blinded-progress color (likely limited), OSPREY/STK-002 update, pre-NDA-meeting commentary. <span class="src">ad-hoc-news.de, 4 Oct 2026 (per earnings-calendar reporting)</span>
+    <div class="tl-item"><span class="tl-date">3 Nov 2026</span><span class="date-tag hard">hard</span><span class="imp imp-low">low</span><br><b>Q3 2026 earnings call.</b> Date confirmed (was inconsistently reported Nov 3 vs Nov 10 — now resolved). Expect: cash position vs $420M pro-forma baseline, quarterly burn, EMPEROR blinded-progress color (likely limited), OSPREY/STK-002 update, pre-NDA-meeting commentary. <span class="src">ad-hoc-news.de, 4 Oct 2026 (per earnings-calendar reporting)</span>
       <p class="goodwatch"><b>What "good" looks like:</b> burn tracking ~$55–60M/quarter, no new disclosure of trial-conduct issues, runway reaffirmed through early 2028. <b>What to watch:</b> any language shift on EMPEROR timelines or FDA interactions.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">Year-end 2026</span><span class="qtag">guidance</span><span class="imp imp-low">low</span><br><b>OSPREY cohort 3 dosing completion (STK-002)</b> — stepping into therapeutic-dose territory. <span class="src">Company PR, 1 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">Year-end 2026</span><span class="date-tag guidance">guidance</span><span class="imp imp-low">low</span><br><b>OSPREY cohort 3 dosing completion (STK-002)</b> — stepping into therapeutic-dose territory. <span class="src">Company PR, 1 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> completion on schedule with no safety flags. <b>What to watch:</b> slippage into 2027 would push the H1 2027 readout window.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">H1 2027</span><span class="qtag">guidance</span><span class="imp imp-med">medium</span><br><b>STK-002 OSPREY initial safety + efficacy data</b> (therapeutic-dose cohorts 3–4). First human proof-of-concept for TANGO outside the CNS. <span class="src">Company PR, 1 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">H1 2027</span><span class="date-tag guidance">guidance</span><span class="imp imp-med">medium</span><br><b>STK-002 OSPREY initial safety + efficacy data</b> (therapeutic-dose cohorts 3–4). First human proof-of-concept for TANGO outside the CNS. <span class="src">Company PR, 1 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> evidence of OPA1 upregulation and early visual-function signal in higher-dose cohorts, clean ocular safety. <b>What to watch:</b> magnitude of biological signal vs natural history (FALCON dataset is the benchmark); whether data support a Phase 2/3 path in ADOA.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">H1 2027</span><span class="qtag">guidance</span><span class="imp imp-med">medium</span><br><b>Rolling NDA data submissions for zorevunersen</b> continue through the half (non-clinical/CMC/clinical modules ahead of topline). <span class="src">Company PR, 5 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">H1 2027</span><span class="date-tag guidance">guidance</span><span class="imp imp-med">medium</span><br><b>Rolling NDA data submissions for zorevunersen</b> continue through the half (non-clinical/CMC/clinical modules ahead of topline). <span class="src">Company PR, 5 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> steady cadence, no FDA requests that hint at filing risk. <b>What to watch:</b> silence is neutral here; only negative signals would move the story.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">Q3 2027</span><span class="qtag">guidance</span><span class="imp imp-high">high</span><br><b>EMPEROR Phase 3 topline data</b> — week-28 primary endpoint (change from baseline in log-transformed major motor seizure frequency; n=162, sham-controlled, 1:1). THE BINARY. <span class="src">Company PR, 30 Jun 2026 / 5 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">Q3 2027</span><span class="date-tag guidance">guidance</span><span class="imp imp-high">high</span><br><b>EMPEROR Phase 3 topline data</b> — week-28 primary endpoint (change from baseline in log-transformed major motor seizure frequency; n=162, sham-controlled, 1:1). THE BINARY. <span class="src">Company PR, 30 Jun 2026 / 5 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> statistically significant seizure reduction vs sham at week 28 with a clean safety profile (no new CSF-protein sequelae, tolerability consistent with open-label); supportive week-52 cognition/behavior trajectory. <b>What to watch:</b> magnitude of placebo-adjusted effect vs the open-label 59–91% range (compression is expected — the question is how much); dropout asymmetry between arms; whether the log-transformed analysis behaves well at low seizure counts.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">H2 2027</span><span class="qtag">guidance</span><span class="imp imp-high">high</span><br><b>Completion of rolling NDA submission</b> (contingent on EMPEROR outcome), including week-52 data. <span class="src">Company PR, 5 Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">H2 2027</span><span class="date-tag guidance">guidance</span><span class="imp imp-high">high</span><br><b>Completion of rolling NDA submission</b> (contingent on EMPEROR outcome), including week-52 data. <span class="src">Company PR, 5 Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> on-time completion with week-52 durability + cognition data included. <b>What to watch:</b> whether week-52 Vineland-3 (multicomponent MMRM) replicates open-label gains — this is the labeling-expansion leg.</p></div>
-    <div class="tl-item q-guid"><span class="tl-date">End 2027</span><span class="qtag">guidance</span><span class="imp imp-med">medium</span><br><b>Competitor read-through:</b> Encoded Therapeutics ENDEAVOR Part 2 (ETX101 pivotal) initial data anticipated. Could reframe the Dravet standard of care either way. <span class="src">Encoded PR, May 2026</span>
+    <div class="tl-item"><span class="tl-date">End 2027</span><span class="date-tag guidance">guidance</span><span class="imp imp-med">medium</span><br><b>Competitor read-through:</b> Encoded Therapeutics ENDEAVOR Part 2 (ETX101 pivotal) initial data anticipated. Could reframe the Dravet standard of care either way. <span class="src">Encoded PR, May 2026</span>
       <p class="goodwatch"><b>What "good" (for STOK) looks like:</b> a slip, a safety flag, or modest efficacy — any of which extends zorevunersen's window. <b>What to watch:</b> neurodevelopmental endpoints in the infant population — the dimension where a one-time therapy could leapfrog chronic dosing.</p></div>
-    <div class="tl-item q-inf"><span class="tl-date">Early 2028</span><span class="qtag">inferred</span><span class="imp imp-high">high</span><br><b>Potential FDA approval / US commercialization of zorevunersen</b> (company guides "potential U.S. commercialization in early 2028"). Stoke retains US/Canada/Mexico; Biogen commercializes ex-US. <span class="src">Company PRs, Aug/Oct 2026</span>
+    <div class="tl-item"><span class="tl-date">Early 2028</span><span class="date-tag inferred">inferred</span><span class="imp imp-high">high</span><br><b>Potential FDA approval / US commercialization of zorevunersen</b> (company guides "potential U.S. commercialization in early 2028"). Stoke retains US/Canada/Mexico; Biogen commercializes ex-US. <span class="src">Company PRs, Aug/Oct 2026</span>
       <p class="goodwatch"><b>What "good" looks like:</b> approval on the single-study + Breakthrough package with disease-modifying labeling language. <b>What to watch:</b> label breadth (seizure-only vs cognition inclusion), payer stance on intrathecal chronic dosing, launch-hiring progress (Bo Cumbo board appointment Sep 2026 signals commercial staffing has begun).</p></div>
   </div>
-  <p><span class="ev ev-g">GAP</span> No AdCom scheduling or PDUFA date has been disclosed; no AES 2026 (Dec 2026) zorevunersen presentation confirmed in sources reviewed — a natural venue for EMPEROR blinded updates or additional OLE analyses, worth watching as abstracts are released.</p>
-  </div>
-</section>
-<section class="card" id="flags">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 11</span><h2>Ranked red flags</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <ol class="flags">
-    <li><b>Single-asset binary concentration.</b> <span class="ev ev-i">INTERPRETATION</span> ~$1.6B of enterprise value rests on one Phase 3 readout. STK-002 and the Acadia programs are preclinical/Phase 1 and contribute negligible downside protection.</li>
-    <li><b>All human efficacy data are open-label.</b> <span class="ev ev-i">INTERPRETATION</span> The 59–91% seizure reductions and cognition gains come from uncontrolled studies; the NEJM authors themselves flag the absence of placebo control. Effect-size compression under blinding is the base-rate expectation.</li>
-    <li><b>Observer-reported secondaries carry expectation bias.</b> <span class="ev ev-i">INTERPRETATION</span> The week-52 cognition/behavior endpoints (Vineland-3, CGI-C/CaGI-C) are caregiver/clinician-reported in a pediatric population — the exact setting where unblinding-by-efficacy and hope effects inflate scores. The 3-year 95%-improved figure rests on n=19. Partially mitigated by the FDA's agreement (Oct 2026) to the prespecified multicomponent MMRM analysis.</li>
-    <li><b>Soticlestat precedent: p=0.06.</b> <span class="ev ev-f">FACT</span> Takeda's SKYLINE missed its Dravet primary by a whisker despite encouraging secondaries — a reminder that Dravet Phase 3 trials can fail on the primary even when the drug "works" directionally. <span class="src">Takeda PR, Jun 2024</span></li>
-    <li><b>Encoded ETX101 could leapfrog.</b> <span class="ev ev-i">INTERPRETATION</span> A one-time AAV with pivotal data due end 2027 (before any zorevunersen launch) and Breakthrough/RMAT designations is a genuine standard-of-care threat, well-funded ($275M Series F) and enrolling the youngest, most plastic patients.</li>
-    <li><b>Financing overhang.</b> <span class="ev ev-f">FACT</span> FD shares exceed basic by ~27%; two universal shelves + $150M ATM remain live. The company funds through early 2028 <i>only if</i> the plan holds — a negative readout forces a raise into weakness. <span class="src">10-Q (Q2 2026)</span></li>
-    <li><b>CSF protein elevation (45% in OLE).</b> <span class="ev ev-i">INTERPRETATION</span> No clinical sequelae to date, but it is the clearest chronic-safety signal and FDA will examine it in the NDA review; any worsening in EMPEROR would complicate labeling.</li>
-    <li><b>Lifelong intrathecal dosing burden.</b> <span class="ev ev-i">INTERPRETATION</span> Repeat lumbar punctures every few months, forever, in children — adherence, access, and payer dynamics all tilt toward a one-time alternative if one emerges.</li>
-    <li><b>Ex-US economics are royalty-only.</b> <span class="ev ev-f">FACT</span> Biogen holds all rights outside the US/Canada/Mexico; Stoke's ex-US upside is tiered low-double-digit to high-teen royalties, and Biogen's option on follow-on SCN1A ASOs caps Stoke's standalone SCN1A franchise value. <span class="src">10-Q (Q2 2026)</span></li>
-    <li><b>Management transition during pivotal execution.</b> <span class="ev ev-f">FACT</span> Founder-CEO Edward Kaye stepped down March 2025 and retired from the board September 2026; Ian Smith (ex-Vertex COO/CFO) moved from interim to permanent CEO October 2025. <span class="ev ev-i">INTERPRETATION</span> The transition appears orderly (Smith was a director since 2023), but the scientific founder's exit ahead of the binary is worth noting, not alarming. <span class="src">Company PRs, Mar 2025 / Sep 2026</span></li>
+  <p><span class="ev gap">GAP</span> No AdCom scheduling or PDUFA date has been disclosed; no AES 2026 (Dec 2026) zorevunersen presentation confirmed in sources reviewed — a natural venue for EMPEROR blinded updates or additional OLE analyses, worth watching as abstracts are released.</p>
+    </section>
+<section id="flags">
+      <div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2></div></div>
+      <ol class="flags">
+    <li><b>Single-asset binary concentration.</b> <span class="ev interp">INTERPRETATION</span> ~$1.6B of enterprise value rests on one Phase 3 readout. STK-002 and the Acadia programs are preclinical/Phase 1 and contribute negligible downside protection.</li>
+    <li><b>All human efficacy data are open-label.</b> <span class="ev interp">INTERPRETATION</span> The 59–91% seizure reductions and cognition gains come from uncontrolled studies; the NEJM authors themselves flag the absence of placebo control. Effect-size compression under blinding is the base-rate expectation.</li>
+    <li><b>Observer-reported secondaries carry expectation bias.</b> <span class="ev interp">INTERPRETATION</span> The week-52 cognition/behavior endpoints (Vineland-3, CGI-C/CaGI-C) are caregiver/clinician-reported in a pediatric population — the exact setting where unblinding-by-efficacy and hope effects inflate scores. The 3-year 95%-improved figure rests on n=19. Partially mitigated by the FDA's agreement (Oct 2026) to the prespecified multicomponent MMRM analysis.</li>
+    <li><b>Soticlestat precedent: p=0.06.</b> <span class="ev fact">FACT</span> Takeda's SKYLINE missed its Dravet primary by a whisker despite encouraging secondaries — a reminder that Dravet Phase 3 trials can fail on the primary even when the drug "works" directionally. <span class="src">Takeda PR, Jun 2024</span></li>
+    <li><b>Encoded ETX101 could leapfrog.</b> <span class="ev interp">INTERPRETATION</span> A one-time AAV with pivotal data due end 2027 (before any zorevunersen launch) and Breakthrough/RMAT designations is a genuine standard-of-care threat, well-funded ($275M Series F) and enrolling the youngest, most plastic patients.</li>
+    <li><b>Financing overhang.</b> <span class="ev fact">FACT</span> FD shares exceed basic by ~27%; two universal shelves + $150M ATM remain live. The company funds through early 2028 <i>only if</i> the plan holds — a negative readout forces a raise into weakness. <span class="src">10-Q (Q2 2026)</span></li>
+    <li><b>CSF protein elevation (45% in OLE).</b> <span class="ev interp">INTERPRETATION</span> No clinical sequelae to date, but it is the clearest chronic-safety signal and FDA will examine it in the NDA review; any worsening in EMPEROR would complicate labeling.</li>
+    <li><b>Lifelong intrathecal dosing burden.</b> <span class="ev interp">INTERPRETATION</span> Repeat lumbar punctures every few months, forever, in children — adherence, access, and payer dynamics all tilt toward a one-time alternative if one emerges.</li>
+    <li><b>Ex-US economics are royalty-only.</b> <span class="ev fact">FACT</span> Biogen holds all rights outside the US/Canada/Mexico; Stoke's ex-US upside is tiered low-double-digit to high-teen royalties, and Biogen's option on follow-on SCN1A ASOs caps Stoke's standalone SCN1A franchise value. <span class="src">10-Q (Q2 2026)</span></li>
+    <li><b>Management transition during pivotal execution.</b> <span class="ev fact">FACT</span> Founder-CEO Edward Kaye stepped down March 2025 and retired from the board September 2026; Ian Smith (ex-Vertex COO/CFO) moved from interim to permanent CEO October 2025. <span class="ev interp">INTERPRETATION</span> The transition appears orderly (Smith was a director since 2023), but the scientific founder's exit ahead of the binary is worth noting, not alarming. <span class="src">Company PRs, Mar 2025 / Sep 2026</span></li>
   </ol>
-  </div>
-</section>
-
-<section class="card" id="scen">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 12</span><h2>Bear / base / bull &amp; soft scenario price targets</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <div class="callout warn"><b>Methodology — read first.</b> These are <b>soft, scenario-based price targets</b>, not a rating or recommendation. Basis: fully-diluted share count <b>≈81.92M</b>, pro-forma cash <b>$420M</b> ($5.13/share FD), no debt, reference price <b>$24.74</b> (9 Oct 2026 close). Targets are timed to the EMPEROR readout window (Q3 2027) and assume no additional dilution in base/bull, distressed dilution in bear. Per standing policy, no scenario is framed above the top of the published sell-side range (<b>$60, Guggenheim</b>). Street consensus: $44.25 (10 Buy / 1 Sell). <span class="src">10-Q (Q2 2026); MarketBeat, Oct 2026</span></div>
+    </section>
+<section id="scen">
+      <div class="section-head"><div class="section-num">12 / SCENARIOS</div><div><h2>Bear, base, bull — soft scenario targets</h2></div></div>
+      <div class="callout warn"><b>Methodology — read first.</b> These are <b>soft, scenario-based price targets</b>, not a rating or recommendation. Basis: fully-diluted share count <b>≈81.92M</b>, pro-forma cash <b>$420M</b> ($5.13/share FD), no debt, reference price <b>$24.74</b> (9 Oct 2026 close). Targets are timed to the EMPEROR readout window (Q3 2027) and assume no additional dilution in base/bull, distressed dilution in bear. Per standing policy, no scenario is framed above the top of the published sell-side range (<b>$60, Guggenheim</b>). Street consensus: $44.25 (10 Buy / 1 Sell). <span class="src">10-Q (Q2 2026); MarketBeat, Oct 2026</span></div>
   <div class="tablewrap"><table>
     <tr><th>Scenario</th><th>Assumed FD enterprise value</th><th>Implied math</th><th>Soft price target</th></tr>
     <tr><td><b>Bear</b> — EMPEROR misses week-28 primary</td><td>~$150M (platform + STK-002 + Acadia optionality; Biogen milestones/royalties → 0)</td><td>($150M + $420M cash − est. interim burn) / 81.92M</td><td><b>~$7</b> (range $5–10)</td></tr>
@@ -456,48 +520,40 @@ ol.flags li b{color:#8a1f1f}
     <p>EMPEROR delivers a large, highly significant seizure reduction <i>and</i> the week-52 Vineland-3/CGI-C data replicate the open-label cognition gains, supporting differentiated labeling as a disease-modifying therapy. STK-002 OSPREY posts positive H1 2027 proof-of-concept, validating TANGO beyond the CNS. Encoded's ENDEAVOR data disappoint or slip. Strategic interest (Biogen already inside the tent via its ex-US rights and follow-on option) sets a ceiling: <b>any takeout/max-value framing is capped at the top of the published sell-side range (~$60, Guggenheim)</b>, not above it.</p></div>
   <h3>Scenario sensitivities</h3>
   <ul class="tight">
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>Dropout asymmetry:</b> zero discontinuations so far is priced as good news; any late uptick in dropouts (especially in the sham arm) before database lock would be read negatively.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>FDA engagement (resolved positively 5 Oct 2026):</b> the completed pre-NDA meeting and Vineland-3 sign-off de-risk the filing path modestly — one less thing to fear. Future FDA commentary on the single-study package remains a watch item.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> <b>STK-002 (H1 2027):</b> positive OSPREY data would be the first human validation that TANGO generalizes beyond <i>SCN1A</i> — meaningful platform upside independent of EMPEROR; a clean safety signal alone has modest value.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>Dropout asymmetry:</b> zero discontinuations so far is priced as good news; any late uptick in dropouts (especially in the sham arm) before database lock would be read negatively.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>FDA engagement (resolved positively 5 Oct 2026):</b> the completed pre-NDA meeting and Vineland-3 sign-off de-risk the filing path modestly — one less thing to fear. Future FDA commentary on the single-study package remains a watch item.</li>
+    <li><span class="ev interp">INTERPRETATION</span> <b>STK-002 (H1 2027):</b> positive OSPREY data would be the first human validation that TANGO generalizes beyond <i>SCN1A</i> — meaningful platform upside independent of EMPEROR; a clean safety signal alone has modest value.</li>
   </ul>
   <div class="callout bad"><b>What the scenarios do not do:</b> no DCF, no buy/sell recommendation — per standing policy. Commercial-phase modeling is intentionally lean: the holder's edge is the binary, not the launch trajectory. Soft targets are scenario illustrations on a fully-diluted basis, not predictions.</div>
-  </div>
-</section>
-
-<section class="card" id="mgmt">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 13</span><h2>Management track record &amp; insider signals</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> <b>Ian F. Smith, CEO</b> (permanent since 6 Oct 2025; interim from 19 Mar 2025; director since Sep 2023). Previously EVP &amp; COO of Vertex Pharmaceuticals (2017–2019) and CFO (2001–2017); E&amp;Y life-sciences partner before that. Senior advisor to Bain Capital Life Sciences; chair of Rivus Pharmaceuticals; executive chair of Solid Biosciences. Compensation: $715K base, up to 65% bonus, $500K sign-on, $500K performance bonus, and a 950,000-share equity grant (570K options + 380K RSUs). <span class="src">8-K Oct 2025; company PRs</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Edward M. Kaye, M.D.</b> — CEO 2017–Mar 2025, director until retirement announced 23 Sep 2026; remains an advisor. Led the company from founding through the Biogen deal and EMPEROR initiation. <span class="src">Company PRs, Mar 2025 / Sep 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Barry Ticho, M.D., Ph.D., CMO</b> — longtime medical lead; public face of the clinical program at CNS/AES/EEC/AAO. <span class="src">Company PRs</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Board:</b> Arthur Tzianabos (chair; CEO of Lifordi, 5AM venture partner, ex-Homology CEO, ex-chair of Akouos acquired by Lilly); <b>Bo Cumbo</b> joined 23 Sep 2026 (ex-CEO of Solid Biosciences; rare-pediatric commercialization background) as the company staffs for a potential 2028 launch. <span class="src">Company PR, 23 Sep 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> <b>Thomas McCauley, Ph.D.</b> joined as Chief Scientific Officer, July 2026. <span class="src">Company PR, 3 Aug 2026</span></li>
+    </section>
+<section id="mgmt">
+      <div class="section-head"><div class="section-num">13 / PEOPLE</div><div><h2>Management track record and insider signals</h2></div></div>
+      <ul class="tight">
+    <li><span class="ev fact">FACT</span> <b>Ian F. Smith, CEO</b> (permanent since 6 Oct 2025; interim from 19 Mar 2025; director since Sep 2023). Previously EVP &amp; COO of Vertex Pharmaceuticals (2017–2019) and CFO (2001–2017); E&amp;Y life-sciences partner before that. Senior advisor to Bain Capital Life Sciences; chair of Rivus Pharmaceuticals; executive chair of Solid Biosciences. Compensation: $715K base, up to 65% bonus, $500K sign-on, $500K performance bonus, and a 950,000-share equity grant (570K options + 380K RSUs). <span class="src">8-K Oct 2025; company PRs</span></li>
+    <li><span class="ev fact">FACT</span> <b>Edward M. Kaye, M.D.</b> — CEO 2017–Mar 2025, director until retirement announced 23 Sep 2026; remains an advisor. Led the company from founding through the Biogen deal and EMPEROR initiation. <span class="src">Company PRs, Mar 2025 / Sep 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Barry Ticho, M.D., Ph.D., CMO</b> — longtime medical lead; public face of the clinical program at CNS/AES/EEC/AAO. <span class="src">Company PRs</span></li>
+    <li><span class="ev fact">FACT</span> <b>Board:</b> Arthur Tzianabos (chair; CEO of Lifordi, 5AM venture partner, ex-Homology CEO, ex-chair of Akouos acquired by Lilly); <b>Bo Cumbo</b> joined 23 Sep 2026 (ex-CEO of Solid Biosciences; rare-pediatric commercialization background) as the company staffs for a potential 2028 launch. <span class="src">Company PR, 23 Sep 2026</span></li>
+    <li><span class="ev fact">FACT</span> <b>Thomas McCauley, Ph.D.</b> joined as Chief Scientific Officer, July 2026. <span class="src">Company PR, 3 Aug 2026</span></li>
   </ul>
   <h3>Insider transactions (recent)</h3>
   <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> General Counsel <b>Jonathan Allan</b> sold 627 shares (~$16.5K) on 2 Oct 2026 and 2,861 shares (~$91.6K) on 18 Aug 2026 — both under a pre-arranged Rule 10b5-1 plan; holdings reduced ~3% to 20,598 shares. <span class="src">SEC Form 4 filings via American Banking News, Oct 2026</span></li>
-    <li><span class="ev ev-f">FACT</span> CMO <b>Barry Ticho</b> sold 1,051 shares (~$27.5K) on 1 Oct 2026, 5,545 shares (~$170K) on 1 Sep 2026, 4,767 shares (~$152.7K) on 18 Aug 2026, and 7,176 shares (~$208.4K) on 3 Aug 2026 — all under a pre-arranged Rule 10b5-1 plan. <span class="src">SEC Form 4 filings via thestockobserver/thecerbatgem, Oct 2026</span></li>
-    <li><span class="ev ev-i">INTERPRETATION</span> The sales are small, programmatic 10b5-1 executions — not informative directional signals. No open-market insider <i>purchases</i> were identified in sources reviewed. <span class="ev ev-g">GAP</span> A comprehensive Form 4 sweep (all officers/directors, trailing 12 months) was not performed for this dossier.</li>
+    <li><span class="ev fact">FACT</span> General Counsel <b>Jonathan Allan</b> sold 627 shares (~$16.5K) on 2 Oct 2026 and 2,861 shares (~$91.6K) on 18 Aug 2026 — both under a pre-arranged Rule 10b5-1 plan; holdings reduced ~3% to 20,598 shares. <span class="src">SEC Form 4 filings via American Banking News, Oct 2026</span></li>
+    <li><span class="ev fact">FACT</span> CMO <b>Barry Ticho</b> sold 1,051 shares (~$27.5K) on 1 Oct 2026, 5,545 shares (~$170K) on 1 Sep 2026, 4,767 shares (~$152.7K) on 18 Aug 2026, and 7,176 shares (~$208.4K) on 3 Aug 2026 — all under a pre-arranged Rule 10b5-1 plan. <span class="src">SEC Form 4 filings via thestockobserver/thecerbatgem, Oct 2026</span></li>
+    <li><span class="ev interp">INTERPRETATION</span> The sales are small, programmatic 10b5-1 executions — not informative directional signals. No open-market insider <i>purchases</i> were identified in sources reviewed. <span class="ev gap">GAP</span> A comprehensive Form 4 sweep (all officers/directors, trailing 12 months) was not performed for this dossier.</li>
   </ul>
-  </div>
-</section>
-
-<section class="card" id="comm">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 14</span><h2>Commercial snapshot (intentionally lean)</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <ul class="tight">
-    <li><span class="ev ev-f">FACT</span> Company estimates up to ~38,000 people living with Dravet syndrome across the US, UK, EU-4 and Japan. <span class="src">Biogen/Stoke deal PR, Feb 2025</span> <span class="ev ev-u">UNVERIFIED</span> — company estimate, not independently corroborated here.</li>
-    <li><span class="ev ev-f">FACT</span> No disease-modifying therapy is approved for Dravet; current agents are symptomatic. Orphan economics in pediatric neurology support premium pricing, but pricing/reimbursement specifics are pre-launch unknowns.</li>
-    <li><span class="ev ev-i">INTERPRETATION</span> Stoke retains the US (the highest-value market) and Biogen — an experienced rare-neurology commercializer — handles ex-US. The commercial question that matters for the binary holder is not peak sales but whether approval happens at all; launch execution is a post-binary problem.</li>
+    </section>
+<section id="comm">
+      <div class="section-head"><div class="section-num">14 / COMMERCIAL</div><div><h2>Commercial snapshot, intentionally lean</h2></div></div>
+      <ul class="tight">
+    <li><span class="ev fact">FACT</span> Company estimates up to ~38,000 people living with Dravet syndrome across the US, UK, EU-4 and Japan. <span class="src">Biogen/Stoke deal PR, Feb 2025</span> <span class="ev unverified">UNVERIFIED</span> — company estimate, not independently corroborated here.</li>
+    <li><span class="ev fact">FACT</span> No disease-modifying therapy is approved for Dravet; current agents are symptomatic. Orphan economics in pediatric neurology support premium pricing, but pricing/reimbursement specifics are pre-launch unknowns.</li>
+    <li><span class="ev interp">INTERPRETATION</span> Stoke retains the US (the highest-value market) and Biogen — an experienced rare-neurology commercializer — handles ex-US. The commercial question that matters for the binary holder is not peak sales but whether approval happens at all; launch execution is a post-binary problem.</li>
   </ul>
-  </div>
-</section>
-<section class="card" id="refs">
-  <button class="sec-head" aria-expanded="true"><span class="ttl"><span class="eyebrow">Section 15</span><h2>References, as-of date &amp; filings used</h2></span><span class="chev">&#9662;</span></button>
-  <div class="sec-body">
-  <p><b>As-of date: 10 October 2026.</b> Share price $24.74 = 9 Oct 2026 close via MarketBeat (Finnhub current quote $24.74). <b>Filings used:</b> 10-Q for quarter ended 30 Jun 2026 (filed 3 Aug 2026, CIK 0001623526); 10-Q for quarter ended 31 Mar 2026; 10-K for year ended 31 Dec 2025. Audit 10 Oct 2026 added: FDA-meeting completion PR (5 Oct 2026), Q3 2026 earnings date (3 Nov 2026), AAO 2026 presentation details, EMPEROR design clarifications (ages 2–&lt;18, gain-of-function exclusion, log-transformed primary, Vineland-3 MMRM plan).</p>
-  <p><b>Evidence legend:</b> <span class="ev ev-f">FACT</span> sourced to a primary document · <span class="ev ev-i">INTERPRETATION</span> reasoned inference, labeled as such · <span class="ev ev-g">GAP</span> material unknown · <span class="ev ev-u">UNVERIFIED</span> single-source or uncorroborated claim. Scenario price targets in §12 are explicitly labeled soft.</p>
+    </section>
+<section id="refs">
+      <div class="section-head"><div class="section-num">15 / SOURCES</div><div><h2>Sourcebook</h2></div></div>
+      <p><b>As-of date: 10 October 2026.</b> Share price $24.74 = 9 Oct 2026 close via MarketBeat (Finnhub current quote $24.74). <b>Filings used:</b> 10-Q for quarter ended 30 Jun 2026 (filed 3 Aug 2026, CIK 0001623526); 10-Q for quarter ended 31 Mar 2026; 10-K for year ended 31 Dec 2025. Audit 10 Oct 2026 added: FDA-meeting completion PR (5 Oct 2026), Q3 2026 earnings date (3 Nov 2026), AAO 2026 presentation details, EMPEROR design clarifications (ages 2–&lt;18, gain-of-function exclusion, log-transformed primary, Vineland-3 MMRM plan).</p>
+  <p><b>Evidence legend:</b> <span class="ev fact">FACT</span> sourced to a primary document · <span class="ev interp">INTERPRETATION</span> reasoned inference, labeled as such · <span class="ev gap">GAP</span> material unknown · <span class="ev unverified">UNVERIFIED</span> single-source or uncorroborated claim. Scenario price targets in §12 are explicitly labeled soft.</p>
   <ol class="refs">
     <li>Stoke Therapeutics, Form 10-Q, quarter ended 30 Jun 2026 (filed 3 Aug 2026) — cash $354.3M; shares 62.4M (30 Jun) / 64.5M (30 Jul 2026); options 11,532,638; RSUs 1,938,698; PSUs 219,000; pre-funded warrants 3,703,730; Biogen agreement terms; ATM/shelf disclosures. EDGAR CIK 0001623526.</li>
     <li>Stoke Therapeutics, Form 10-Q, quarter ended 31 Mar 2026 — cash $411.0M; ATM proceeds ~$168.5M across 2025–early 2026.</li>
@@ -525,63 +581,52 @@ ol.flags li b{color:#8a1f1f}
     <li>ad-hoc-news.de, "Stoke Therapeutics stock heads into November 3 results below key averages," 4 Oct 2026 — Q3 2026 earnings date 3 Nov 2026; price data (2 Oct: $25.62; 200-day avg $31.17). <a href="https://www.ad-hoc-news.de/boerse/corporate-news/stoke-therapeutics-stock-heads-into-november-3-results-below-key-averages/70231562">ad-hoc-news.de</a></li>
   </ol>
   <div class="foot">Methodology: source order followed SEC filings → company PRs → peer-reviewed papers/conference presentations → trade press. No dates, cash figures, enrollment counts, endpoints, or p-values were invented; every number carries units, population/timepoint, and source. No DCF, price target (beyond explicitly labeled soft scenario targets), or buy/sell recommendation is expressed. Takeout/max-value framing is capped at the top of the published sell-side range. This document contains no personal information and is suitable for distribution.</div>
-  </div>
-</section>
-
-</div>
+    </section>
 </main>
-</div>
-<button id="themeToggle" aria-label="Toggle dark mode">&#9790;</button>
-<button id="toTop" aria-label="Back to top">&#9650;</button>
+
+<footer><strong>STOK deep-dive dossier</strong> · as of October 10, 2026 · Evidence labels: FACT / INTERPRETATION / GAP / UNVERIFIED throughout. Soft scenario targets in §12 are illustrative only.</footer>
+
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
 <script>
 (function(){
-  var root=document.documentElement;
-  function setTheme(t){root.setAttribute('data-theme',t);try{localStorage.setItem('stok-theme',t);}catch(e){}}
-  try{var saved=localStorage.getItem('stok-theme');if(saved){root.setAttribute('data-theme',saved);}}catch(e){}
-  function toggle(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');}
-  document.getElementById('themeToggle').addEventListener('click',toggle);
-  document.getElementById('themeToggleM').addEventListener('click',toggle);
-  // collapsible sections
-  document.querySelectorAll('section.card').forEach(function(sec){
-    var head=sec.querySelector('.sec-head'),body=sec.querySelector('.sec-body');
-    head.addEventListener('click',function(){
-      var collapsed=sec.classList.toggle('collapsed');
-      head.setAttribute('aria-expanded',String(!collapsed));
+  /* Theme toggle (shared key across all dossiers) */
+  const themeBtn=document.getElementById('themeToggle');
+  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'\u2600 Light mode':'\u25D0 Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+  let startTheme='light';
+  try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+  applyTheme(startTheme);
+  themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  /* Collapsible sections */
+  document.querySelectorAll('main > section').forEach(function(sec){
+    const head=sec.querySelector('.section-head'); if(!head)return;
+    const body=document.createElement('div'); body.className='section-body';
+    let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+    sec.appendChild(body);
+    const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+    btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+    btn.addEventListener('click',function(){
+      const c=sec.classList.toggle('collapsed');
+      btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+      btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
     });
+    head.appendChild(btn);
   });
-  document.getElementById('expandAll').addEventListener('click',function(){
-    document.querySelectorAll('section.card').forEach(function(sec){
-      sec.classList.remove('collapsed');sec.querySelector('.sec-head').setAttribute('aria-expanded','true');
-    });
-  });
-  document.getElementById('collapseAll').addEventListener('click',function(){
-    document.querySelectorAll('section.card').forEach(function(sec){
-      sec.classList.add('collapsed');sec.querySelector('.sec-head').setAttribute('aria-expanded','false');
-    });
-  });
-  // mobile menu
-  var menuBtn=document.getElementById('menuBtn'),menu=document.getElementById('mobilemenu');
-  var side=document.getElementById('sidenav');
-  side.querySelectorAll('a').forEach(function(a){
-    var c=a.cloneNode(true);c.addEventListener('click',function(){menu.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');});
-    menu.appendChild(c);
-  });
-  menuBtn.addEventListener('click',function(){
-    var open=menu.classList.toggle('open');menuBtn.setAttribute('aria-expanded',String(open));
-  });
-  // back to top
-  var toTop=document.getElementById('toTop');
-  window.addEventListener('scroll',function(){toTop.classList.toggle('show',window.scrollY>500);},{passive:true});
-  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-  // scrollspy
-  var links=Array.prototype.slice.call(side.querySelectorAll('a'));
-  var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
-  function spy(){
-    var pos=window.scrollY+120,cur=null;
-    secs.forEach(function(s,i){if(s&&s.offsetTop<=pos)cur=i;});
-    links.forEach(function(a,i){a.classList.toggle('active',i===cur);});
-  }
-  window.addEventListener('scroll',spy,{passive:true});spy();
+
+  /* Expand a collapsed section when navigated to via jump nav */
+  function expandForHash(){var id=location.hash.replace('#','');if(!id)return;
+    var s=document.getElementById(id);
+    if(s&&s.tagName==='SECTION'&&s.classList.contains('collapsed')){
+      s.classList.remove('collapsed');
+      var b=s.querySelector('.collapse-btn');if(b){b.textContent='\u2212';b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse section');}}}
+  window.addEventListener('hashchange',expandForHash);expandForHash();
+
+  /* Back to top */
+  const toTop=document.getElementById('toTop');
+  function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
 })();
 </script>
 </body>
