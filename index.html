@@ -23,6 +23,7 @@ header p{color:var(--muted);margin:0}
 .card .company{font-size:15px;margin:4px 0;color:var(--ink)}
 .card .meta{font-size:13px;color:var(--muted);margin-top:8px}
 .card .catalyst{font-size:13px;margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:6px;border-left:3px solid var(--accent)}
+.card .scenarios{font-size:12px;color:var(--muted);margin-top:6px;font-family:monospace}
 footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}
 @media(max-width:600px){header h1{font-size:26px}.grid{grid-template-columns:1fr}}
 </style>
@@ -44,38 +45,38 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;paddi
 </div>
 <script>
 const D=[
-{t:"PEPG",c:"PepGen",d:"2026-10-10",cat:"FREEDOM2 10mg/kg DM1 data — Nov 2026"},
-{t:"CRBP",c:"Corbus Pharmaceuticals",d:"2026-10-10",cat:"TEMPO-1 progress; ObesityWeek Nov 14–17"},
-{t:"SLGL",c:"Sol-Gel Technologies",d:"2026-10-10",cat:"SGT-610 Ph3 Gorlin topline — late Nov 2026"},
-{t:"LTGO",c:"Latigo Biotherapeutics",d:"2026-10-10",cat:"Ph3 bunionectomy topline — 2H 2027"},
-{t:"HELP",c:"Helus Pharma",d:"2026-10-10",cat:"Oct 21 presentation"},
-{t:"IRON",c:"Disc Medicine",d:"2026-10-10",cat:"NDA timeline"},
-{t:"IMUX",c:"Immunic Inc",d:"2026-10-10",cat:"MS disability data"},
-{t:"SPRB",c:"Spruce Biosciences",d:"2026-10-10",cat:"TA-ERT BLA submission — Q4 2026"},
-{t:"HRMY",c:"Harmony Biosciences",d:"2026-10-10",cat:"Q3 earnings — early Nov"},
-{t:"PRAX",c:"Praxis Precision Medicines",d:"2026-10-10",cat:"Pipeline readouts"},
-{t:"AXSM",c:"Axsome Therapeutics",d:"2026-10-10",cat:"Commercial execution"},
-{t:"XENE",c:"Xenon Pharmaceuticals",d:"2026-10-10",cat:"Pipeline catalysts"},
-{t:"STOK",c:"Stoke Therapeutics",d:"2026-10-10",cat:"Regulatory updates"},
-{t:"OVID",c:"Ovid Therapeutics",d:"2026-10-10",cat:"Pipeline progress"},
-{t:"GLUE",c:"Monte Rosa Therapeutics",d:"2026-10-10",cat:"GFORCE-2 updates"},
-{t:"SLN",c:"Silence Therapeutics",d:"2026-10-10",cat:"Pipeline catalysts"},
-{t:"PHVS",c:"Pharvaris",d:"2026-10-10",cat:"RAPIDe-3 follow-through"},
-{t:"NKTR",c:"Nektar Therapeutics",d:"2026-10-10",cat:"Pipeline readouts"},
+{t:"PEPG",c:"PepGen",d:"2026-10-10",cat:"FREEDOM2 10mg/kg DM1 data — Nov 2026 [guidance]",sc:"Bear $0.75–1.25 / Base $3–4 / Bull $8–11"},
+{t:"CRBP",c:"Corbus Pharmaceuticals",d:"2026-10-10",cat:"TEMPO-1 first patient dosed; ObesityWeek late-breaker Nov 14–17 [hard]",sc:"Bear $2.50 / Base $12 / Bull $30"},
+{t:"SLGL",c:"Sol-Gel Technologies",d:"2026-10-10",cat:"SGT-610 Ph3 Gorlin topline — late Nov 2026 [guidance]; Nov 17 shareholder meeting",sc:"Bear $11–14 / Base $50–85 / Bull $150–197"},
+{t:"LTGO",c:"Latigo Biotherapeutics",d:"2026-10-10",cat:"Onzotrigine Ph3 bunionectomy topline — 2H 2027 [guidance]",sc:"Bear $7.50 / Base $25 / Bull $73"},
+{t:"HELP",c:"Helus Pharma",d:"2026-10-10",cat:"HLP003 APPROACH pivotal — Q4 2026 binary; Oct 21 presentation",sc:"Bear $2 / Base $18 / Bull $60–68"},
+{t:"IRON",c:"Disc Medicine",d:"2026-10-10",cat:"Bitopertin NDA timeline",sc:"Bear $25–35 / Base $40–55 / Bull $95–153"},
+{t:"IMUX",c:"Immunic Inc",d:"2026-10-10",cat:"Vidofludimus MS disability data",sc:"Bear $1 / Base $20 / Bull $50"},
+{t:"SPRB",c:"Spruce Biosciences",d:"2026-10-10",cat:"TA-ERT BLA submission — Q4 2026 [guidance]",sc:"Bear $30 / Base $70 / Bull $120"},
+{t:"HRMY",c:"Harmony Biosciences",d:"2026-10-10",cat:"Q3 earnings — early Nov 2026",sc:"Bear $31 / Base $45 / Bull $70"},
+{t:"PRAX",c:"Praxis Precision Medicines",d:"2026-10-10",cat:"Vormatrigine pipeline readouts",sc:"Bear $105 / Base $295 / Bull $610"},
+{t:"AXSM",c:"Axsome Therapeutics",d:"2026-10-10",cat:"AXS-05 / AXS-07 commercial execution",sc:"Bear $95 / Base $195 / Bull $235"},
+{t:"XENE",c:"Xenon Pharmaceuticals",d:"2026-10-10",cat:"Azacitidine pipeline catalysts",sc:"Bear $22 / Base $68 / Bull $90"},
+{t:"STOK",c:"Stoke Therapeutics",d:"2026-10-10",cat:"STK-001 regulatory updates",sc:"Bear $7 / Base $44 / Bull $60"},
+{t:"OVID",c:"Ovid Therapeutics",d:"2026-10-10",cat:"OV101 pipeline progress",sc:"Bear $0.75 / Base $4 / Bull $8"},
+{t:"GLUE",c:"Monte Rosa Therapeutics",d:"2026-10-10",cat:"MRT-6160 GFORCE-2 updates",sc:"Bear $6 / Base $12 / Bull $23"},
+{t:"SLN",c:"Silence Therapeutics",d:"2026-10-10",cat:"Zerlasiran pipeline catalysts",sc:"Bear $3.50 / Base $19 / Bull $60"},
+{t:"PHVS",c:"Pharvaris",d:"2026-10-10",cat:"Deucrictibant RAPIDe-3 follow-through",sc:"Bear $10 / Base $50 / Bull $75"},
+{t:"NKTR",c:"Nektar Therapeutics",d:"2026-10-10",cat:"Rezpegaldesleukin pipeline readouts",sc:"Bear $11 / Base $105 / Bull $185"},
 ];
 const grid=document.getElementById('grid'),q=document.getElementById('q');
 function render(f=""){
 f=f.toLowerCase();
 grid.innerHTML=D.filter(x=>(x.t+x.c).toLowerCase().includes(f)).map(x=>
-`<a class="card" href="${x.t}.html"><div class="ticker">${x.t}</div><div class="company">${x.c}</div><div class="meta">Updated ${x.d}</div><div class="catalyst">${x.cat}</div></a>`).join('')
+`<a class="card" href="${x.t}.html"><div class="ticker">${x.t}</div><div class="company">${x.c}</div><div class="meta">Updated ${x.d}</div><div class="catalyst">${x.cat}</div><div class="scenarios">${x.sc}</div></a>`).join('')
 ||'<p style="color:var(--muted)">No matches.</p>';
 }
 q.addEventListener('input',e=>render(e.target.value));
 render();
 // theme
 const b=document.getElementById('themeBtn');
-function setT(t){document.documentElement.dataset.theme=t;localStorage.setItem('dz-theme',t);b.textContent=t==='dark'?'☀️':'🌙';}
-setT(localStorage.getItem('dz-theme')||'light');
+function setT(t){document.documentElement.dataset.theme=t;localStorage.setItem('biotech-theme',t);b.textContent=t==='dark'?'☀️':'🌙';}
+setT(localStorage.getItem('biotech-theme')||'light');
 b.onclick=()=>setT(document.documentElement.dataset.theme==='dark'?'light':'dark');
 </script>
 </body>
