@@ -186,8 +186,8 @@ html[data-theme="dark"] a{color:#93ded2}
 const progress=document.getElementById('progress');const links=[...document.querySelectorAll('.jump a')];const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);function update(){const d=document.documentElement;progress.style.width=((d.scrollTop/(d.scrollHeight-d.clientHeight))*100||0)+'%';let active=sections[0];for(const s of sections){if(s.getBoundingClientRect().top<150)active=s}links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+active.id))}addEventListener('scroll',update,{passive:true});update();
 // audit refresh: theme toggle
 const root=document.documentElement,themeBtn=document.getElementById('theme-toggle');
-function setTheme(t){if(t){root.setAttribute('data-theme',t)}else{root.removeAttribute('data-theme')}try{localStorage.setItem('crbp-theme',t||'')}catch(e){}}
-try{const s=localStorage.getItem('crbp-theme');if(s)setTheme(s)}catch(e){}
+function setTheme(t){if(t){root.setAttribute('data-theme',t)}else{root.removeAttribute('data-theme')}try{localStorage.setItem('biotech-theme',t||'')}catch(e){}}
+try{const s=localStorage.getItem('biotech-theme');if(s)setTheme(s)}catch(e){}
 themeBtn.addEventListener('click',()=>{setTheme(root.getAttribute('data-theme')==='dark'?null:'dark')});
 // audit refresh: collapsible sections
 document.querySelectorAll('main section').forEach(sec=>{const head=sec.querySelector('.section-head');if(!head)return;const b=document.createElement('button');b.className='collapse-btn';b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse section');b.textContent='\u25BE';b.addEventListener('click',()=>{const c=sec.classList.toggle('collapsed');b.setAttribute('aria-expanded',String(!c));b.textContent=c?'\u25B8':'\u25BE';b.setAttribute('aria-label',c?'Expand section':'Collapse section')});head.appendChild(b)});
