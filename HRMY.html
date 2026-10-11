@@ -1,478 +1,605 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/><meta content="light dark" name="color-scheme"/><link href="data:," rel="icon"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>HRMY — Harmony Biosciences · Deep-Dive Dossier · 2026-10-07 (audited 2026-10-10)</title>
-<style>
-  :root{
-    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
-    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
-    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
-    --hard:#166534; --guid:#b45309; --inf:#6b7280;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
-  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
-  header.top .wrap{max-width:1080px;margin:0 auto}
-  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
-  header.top h1 .tick{color:#7fd4d1}
-  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
-  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
-  .pricebar .pill b{color:#fff;font-size:14px}
-  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
-  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
-  nav.toc a:hover{background:var(--wash);color:var(--ink)}
-  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
-  section{padding:30px 0;border-bottom:1px solid var(--line)}
-  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
-  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  h3{font-size:16.5px;margin:26px 0 8px}
-  h4{font-size:14.5px;margin:20px 0 6px}
-  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
-  p,li{font-size:14.5px}
-  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
-  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
-  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
-  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
-  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
-  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
-  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
-  tr:nth-child(even) td{background:#fbfcfd}
-  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
-  .callout.warn{border-left-color:var(--unver)}
-  .callout p{margin:6px 0}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
-  .card h4{margin:0 0 8px;font-size:15px}
-  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
-  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
-  .tl-item{position:relative;margin:0 0 18px}
-  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
-  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
-  .tl-item .dt{font-weight:700;font-size:13.5px}
-  .tl-item .ev{font-size:14px;margin:2px 0}
-  .tl-item .note{font-size:12.5px;color:var(--muted)}
-  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
-  .flag h4{margin:0 0 6px;font-size:15px}
-  .flag .sev{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#fff;background:var(--unver);border-radius:4px;padding:2px 8px;margin-right:8px}
-  .flag .sev.med{background:var(--guid)} .flag .sev.low{background:var(--muted)}
-  .legend{font-size:12.5px;color:var(--muted);background:var(--wash);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:0 0 18px}
-  .ref{font-size:12.5px;color:var(--muted);word-break:break-all}
-  .ref li{margin-bottom:6px}
-  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
-  a{color:var(--fact)}
+<style>:root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
 
-  /* --- audit enhancements 2026-10-10 --- */
-  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
-  .tablewrap table{margin:0;min-width:640px}
-  .collapse-btn{float:right;background:none;border:1px solid var(--line);border-radius:8px;
-    color:var(--muted);font-size:16px;min-width:44px;min-height:44px;cursor:pointer;line-height:1}
-  .collapse-btn:hover{background:var(--wash);color:var(--ink)}
-  section.collapsed > :not(h2){display:none}
-  #themeToggle{margin-left:auto;font-size:13px;font-weight:700;padding:10px 14px;border-radius:8px;
-    border:1px solid var(--line);background:var(--wash);color:var(--ink);cursor:pointer;min-height:44px}
-  #themeToggle:hover{border-color:var(--accent)}
-  #backTop{position:fixed;right:18px;bottom:18px;z-index:100;display:none;
-    width:48px;height:48px;border-radius:50%;border:1px solid var(--line);
-    background:var(--ink);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-  #backTop.show{display:block}
-  .audit{background:#eef6f5;border:1px solid var(--accent);border-left:4px solid var(--accent);
-    border-radius:0 8px 8px 0;padding:14px 18px;margin:22px 0 6px}
-  .audit p{margin:6px 0;font-size:13.5px}
-  html[data-theme="dark"]{
-    --ink:#e9eef4; --muted:#9fb0c2; --paper:#131a23; --wash:#1b2430;
-    --line:#2b3644; --accent:#4fd1c5; --accent-ink:#8fe0d8;
-    --fact:#8fb3ff; --interp:#b79bff; --gap:#f0a35c; --unver:#ff8f8f;
-  }
-  html[data-theme="dark"] header.top{background:#0b1017}
-  html[data-theme="dark"] nav.toc{background:var(--paper)}
-  html[data-theme="dark"] .card{background:var(--paper)}
-  html[data-theme="dark"] tr:nth-child(even) td{background:#17202b}
-  html[data-theme="dark"] .pricebar .pill{background:#1b2430;border-color:#2b3644;color:#cdd8e4}
-  html[data-theme="dark"] .pricebar .pill b{color:#fff}
-  html[data-theme="dark"] .flag, html[data-theme="dark"] .legend{background:var(--wash)}
-  html[data-theme="dark"] .callout{background:#1a232e}
-  html[data-theme="dark"] .audit{background:#16211f}
-  html[data-theme="dark"] a{color:var(--fact)}
-  @media(max-width:760px){
-    nav.toc .wrap{padding:8px 10px}
-    nav.toc a{font-size:13px;padding:12px 10px}
-    main{padding:8px 16px 80px}
-    header.top h1{font-size:24px}
-    h2{font-size:19px}
-  }
-
+/* ============ legacy component compat (re-skinned on PEPG variables) ============ */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.box{background:var(--raised);box-shadow:var(--shadow);padding:18px;min-width:0}
+.box .v{font:600 26px/1.1 var(--serif);letter-spacing:-.02em;overflow-wrap:break-word}
+.box .l{font-size:12px;color:var(--muted);margin-top:6px}
+.tablewrap,.tscroll,.twrap,.table-wrap{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
+.tablewrap table,.tscroll table,.twrap table,.table-wrap table{margin:0;min-width:560px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+td{vertical-align:top;padding:11px 8px;border-bottom:1px solid var(--line)}
+tr.past td{background:var(--pill-bg);color:var(--muted)}
+.callout{background:var(--mint);padding:22px;margin:16px 0;border-left:5px solid var(--teal);font-size:14.5px}
+.callout.bad{border-left-color:var(--red)}
+.warn{background:var(--orange-soft);padding:22px;margin:16px 0;border-left:5px solid var(--orange);font-size:14.5px}
+.verdict{background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}
+.verdict h3{color:var(--panel-text)}
+.verdict p{color:#d0dedb;margin:0}
+.flag{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--orange);padding:18px 20px;margin:14px 0;box-shadow:var(--shadow)}
+.flag h4{margin:0 0 6px;font-size:15px}
+.flag p{font-size:13.5px;color:var(--ink-2);margin:6px 0 0}
+.flag .rank,.flag .sev{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--orange-soft);color:#8e351d;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+html[data-theme="dark"] .flag .rank,html[data-theme="dark"] .flag .sev{color:var(--orange)}
+.flag .sev.med{background:#f4edcf;color:#67510e}
+html[data-theme="dark"] .flag .sev.med{background:#2e2a17;color:#d8c26a}
+.flag .sev.low{background:var(--mint);color:var(--teal-dark)}
+.risk{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--red);padding:18px 20px;margin:14px 0;font-size:14.5px}
+.risk .rank{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--red);color:#fff;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+.risk.base{background:var(--mint);border-left-color:var(--teal)}
+.risk.base .rank{background:var(--teal)}
+.risk.bull{background:#e8eef0;border-left-color:var(--teal-dark)}
+html[data-theme="dark"] .risk.bull{background:#1e2c29}
+.risk.bull .rank{background:var(--teal-dark)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:16px}
+.card{background:var(--raised);padding:22px;box-shadow:var(--shadow);min-width:0}
+.card h4{margin:0 0 8px;font-size:15px}
+.card p{font-size:13.5px;color:var(--ink-2);margin:0}
+.refs{font-size:13.5px;color:var(--muted);padding-left:20px}
+.refs li{margin:7px 0;word-break:break-word}
+.src{font-size:12px;color:var(--muted)}
+.ref{font-size:12px;color:var(--muted)}
+.fine{font-size:12.5px;color:var(--muted)}
+.small{font-size:13px;color:var(--muted)}
+.audit{background:var(--surface);border:1px solid var(--line);padding:18px 20px;margin-top:18px;font-size:13.5px}
+.keybox{border:1px solid var(--line);padding:14px 18px;background:var(--surface);margin:14px 0;font-size:14.5px}
+.keybox b.t{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:4px}
+.soft{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.softbox{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.tight li{margin:6px 0}
+.gwl{margin:10px 0;padding-left:20px}
+.gwl li{margin:8px 0;font-size:14px}
+.lbl{font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+@media(max-width:620px){.grid2,.kpi{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <h1><span class="tick">HRMY</span> · Harmony Biosciences Holdings, Inc.</h1>
-    <p class="sub">Commercial-stage CNS company · WAKIX (pitolisant) for narcolepsy · Deep-dive investment dossier · As of October 10, 2026 (built Oct 7 · audited &amp; enhanced Oct 10)</p>
-    <div class="pricebar">
-      <div class="pill">Price <b>$40.28</b> <span style="color:#9aa5b3">(Oct 9, 2026 close · Finnhub/Zacks)</span></div>
-      <div class="pill">Mkt cap <b>~$2.35B</b> <span style="color:#9aa5b3">basic</span></div>
-      <div class="pill">EV <b>~$1.54B</b> <span style="color:#9aa5b3">basic</span></div>
-      <div class="pill">2026 rev guide <b>$1.00–1.04B</b></div>
-      <div class="pill">P/E <b>~13.1×</b></div><div class="pill">52-wk <b>$25.52–43.49</b></div>
-      <div class="pill">Street PT <b>$28 / $46.54 / $70</b> <span style="color:#9aa5b3">low/avg/high, 13 analysts</span></div>
-    </div>
-  </div>
-</header>
-<nav class="toc"><div class="wrap">
-<a href="#s1">1 · Identity &amp; Thesis</a>
-<a href="#s2">2 · Science</a>
-<a href="#s3">3 · Pipeline</a>
-<a href="#s4">4 · Trial Design</a>
-<a href="#s5">5 · Clinical/Regulatory</a>
-<a href="#s6">6 · Competition</a>
-<a href="#s7">7 · Financials</a>
-<a href="#s8">8 · FDMC/EV</a>
-<a href="#s9">9 · Catalyst Map</a>
-<a href="#s10">10 · Red Flags</a>
-<a href="#s11">11 · Bear/Base/Bull</a>
-<a href="#s12">12 · Management</a>
-<a href="#s13">13 · References</a>
-<button id="themeToggle" type="button" aria-label="Toggle dark or light mode">◐ Dark</button></div></nav>
-<main>
-
-<div class="legend" style="margin-top:22px">
-<b>Evidence discipline.</b> Every material claim carries one tag:
-<span class="tag fact">FACT</span> = sourced to a filing, label, registry, paper, or company release ·
-<span class="tag interp">INTERPRETATION</span> = reasoned inference, not directly stated by a source ·
-<span class="tag gap">GAP</span> = not located in sources reviewed ·
-<span class="tag unver">UNVERIFIED</span> = single weak source, treat with caution.
-Date-quality pills on catalysts: <span class="pill-dq hard">hard</span> fixed regulatory/legal date ·
-<span class="pill-dq guidance">guidance</span> company-guided window · <span class="pill-dq inferred">inferred</span> derived from registries, not company-guided.
-Soft scenario price targets are included in §11 with explicitly labeled assumptions (not a recommendation). No cross-trial head-to-head efficacy claims.
+<div class="topline"></div>
+<header class="hero">
+<div class="hero-grid">
+<div>
+<div class="ticker-line"><span class="ticker">NASDAQ · HRMY</span><span class="stamp">Deep-dive dossier · Audited October 10, 2026</span></div>
+<h1>A profitable narcolepsy franchise facing a patent cliff.</h1>
+<p class="hero-dek">Commercial-stage CNS company · WAKIX (pitolisant) for narcolepsy · Deep-dive investment dossier · As of October 10, 2026 (built Oct 7 · audited &amp; enhanced Oct 10)</p>
 </div>
+<div aria-label="Market snapshot" class="hero-quote">
+<div class="quote-price">$40.28</div>
+<div class="quote-label">Fixed market snapshot · Oct 9, 2026 close (Finnhub/Zacks)</div>
+<div class="quote-meta">Mkt cap ~$2.35B basic · EV ~$1.54B basic · 2026 rev guide $1.00–1.04B · P/E ~13.1× · 52-wk $25.52–43.49 · Street PT $28 / $46.54 / $70 (low/avg/high, 13 analysts)</div>
+</div>
+</div>
+</header>
+<div class="jump-wrap">
+<nav aria-label="Jump to section" class="jump">
+<a href="#s1">Frame</a><a href="#s2">Science</a><a href="#s3">Pipeline</a><a href="#s4">Trial</a><a href="#s5">Clinical</a><a href="#s6">Landscape</a><a href="#s7">Financials</a><a href="#s8">Value</a><a href="#s9">Catalysts</a><a href="#s10">Risks</a><a href="#s11">Scenarios</a><a href="#s12">People</a><a href="#s13">Sources</a>
+<button aria-pressed="false" class="theme-toggle" id="themeToggle" type="button">◐ Dark mode</button>
+</nav>
+</div>
+<main>
 
 <div class="audit">
 <p><b>Audit &amp; enhancement — October 10, 2026.</b> Built Oct 7; re-audited Oct 10. Changes in this version:</p>
 <ul style="margin:6px 0;font-size:13.5px">
-<li><b>Stale-data sweep:</b> every catalyst dated before 2026-10-10 that already occurred is marked past (none were left pending); the Oct 2&ndash;3 European Narcolepsy Days poster presentation is noted as occurred/non-binary.</li>
+<li><b>Stale-data sweep:</b> every catalyst dated before 2026-10-10 that already occurred is marked past (none were left pending); the Oct 2–3 European Narcolepsy Days poster presentation is noted as occurred/non-binary.</li>
 <li><b>Market data refreshed:</b> price/market-cap/EV/P-E updated to the Oct 9, 2026 close ($40.28; Finnhub/Zacks); street consensus avg updated to $46.54 (13 analysts, stockstotrade).</li>
-<li><b>New catalyst added:</b> Q3 2026 earnings, estimated Nov 3, 2026 (before market; MarketBeat) <span class="pill-dq inferred">inferred</span>.</li>
-<li><b>Soft scenario price targets added</b> in &sect;11 with explicitly labeled assumptions (bear ~$31 / base ~$45 / bull capped at the street high $70) — scenario-based, not a recommendation.</li>
-<li><b>Pipeline ranked by estimated value</b> (&sect;3.1) and <b>catalyst detail table</b> (&sect;9.1: what &ldquo;good&rdquo; looks like / what to watch).</li>
+<li><b>New catalyst added:</b> Q3 2026 earnings, estimated Nov 3, 2026 (before market; MarketBeat) <span class="date-tag inferred">inferred</span>.</li>
+<li><b>Soft scenario price targets added</b> in §11 with explicitly labeled assumptions (bear ~$31 / base ~$45 / bull capped at the street high $70) — scenario-based, not a recommendation.</li>
+<li><b>Pipeline ranked by estimated value</b> (§3.1) and <b>catalyst detail table</b> (§9.1: what “good” looks like / what to watch).</li>
 <li><b>UI/QOL:</b> dark/light toggle, collapsible sections, back-to-top button, horizontal-scroll tables on mobile, larger tap targets.</li>
 </ul>
 <p style="font-size:12.5px;color:var(--muted)">No personal data. No catalyst dates invented — every date carries a hard/guidance/inferred tag.</p>
 </div>
+<section id="s1"><div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A profitable narcolepsy annuity facing a 2030 cliff</h2><p class="lede">Commercial-stage: revenue exists, but the 2027 pipeline cluster is the binary lens that matters.</p></div></div><div aria-label="Evidence legend" class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
 
-<section id="s1">
-<h2><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
-<p class="kicker">Commercial-stage: revenue exists, but the 2027 pipeline cluster is the binary lens that matters.</p>
+
 <div class="callout">
 <p><b>One-line thesis.</b> HRMY is a profitable, single-product narcolepsy company (WAKIX) trading at ~12.7× earnings with a 2027 calendar stacked with six Phase 3 readouts plus a PDUFA — but the franchise faces a hard patent cliff in 2030 and the first disease-targeted orexin-2 agonist (Takeda's Orzeyful, FDA-approved August 2026) has just reset what "good" looks like in narcolepsy type 1.</p>
 </div>
-<table>
+<div class="tablewrap"><table>
 <tr><th style="width:34%">Item</th><th>Detail</th></tr>
-<tr><td>Company</td><td>Harmony Biosciences Holdings, Inc., Plymouth Meeting, PA <span class="tag fact">FACT</span> <span class="ref">(10-Q Q1 2026: 630 W. Germantown Pike, Suite 215)</span></td></tr>
-<tr><td>Founded</td><td>2017, established by Paragon Biosciences, LLC; IPO August 2020 (Nasdaq: HRMY) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Marketed product</td><td><b>WAKIX (pitolisant)</b> — EDS or cataplexy in adults with narcolepsy; the only non-scheduled narcolepsy therapy; sole source of revenue <span class="tag fact">FACT</span></td></tr>
-<tr><td>Commercial scale</td><td>Q2 2026 net revenue $261.3M (+30% YoY); ~8,950 average patients (+450 QoQ, 2nd-highest add in 7-yr history); payer coverage &gt;80% of covered lives; FY2026 guidance $1.0–1.04B <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR, Aug 4 2026)</span></td></tr>
-<tr><td>Profitability</td><td>Net income $75.4M in Q2 2026 ($1.28 diluted EPS); FY2025 net income $158.7M on $868.5M revenue <span class="tag fact">FACT</span></td></tr>
-<tr><td>Balance sheet</td><td>$962.5M cash + investments (6/30/26); $160M JPMorgan senior secured term loan (3/31/26) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Key swing factor</td><td>The 2027 Phase 3 cluster — ONSTRIDE-1/2 (high-dose pitolisant), TEMPO (PWS), ARGUS/LIGHTHOUSE (EPX-100) — plus the April 1, 2027 pitolisant GR PDUFA, must re-rate the name beyond the WAKIX annuity before orexin-2 agonists compress the narcolepsy franchise and generics arrive in 2030. <span class="tag interp">INTERPRETATION</span></td></tr>
-</table>
+<tr><td>Company</td><td>Harmony Biosciences Holdings, Inc., Plymouth Meeting, PA <span class="ev fact">FACT</span> <span class="ref">(10-Q Q1 2026: 630 W. Germantown Pike, Suite 215)</span></td></tr>
+<tr><td>Founded</td><td>2017, established by Paragon Biosciences, LLC; IPO August 2020 (Nasdaq: HRMY) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Marketed product</td><td><b>WAKIX (pitolisant)</b> — EDS or cataplexy in adults with narcolepsy; the only non-scheduled narcolepsy therapy; sole source of revenue <span class="ev fact">FACT</span></td></tr>
+<tr><td>Commercial scale</td><td>Q2 2026 net revenue $261.3M (+30% YoY); ~8,950 average patients (+450 QoQ, 2nd-highest add in 7-yr history); payer coverage &gt;80% of covered lives; FY2026 guidance $1.0–1.04B <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR, Aug 4 2026)</span></td></tr>
+<tr><td>Profitability</td><td>Net income $75.4M in Q2 2026 ($1.28 diluted EPS); FY2025 net income $158.7M on $868.5M revenue <span class="ev fact">FACT</span></td></tr>
+<tr><td>Balance sheet</td><td>$962.5M cash + investments (6/30/26); $160M JPMorgan senior secured term loan (3/31/26) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Key swing factor</td><td>The 2027 Phase 3 cluster — ONSTRIDE-1/2 (high-dose pitolisant), TEMPO (PWS), ARGUS/LIGHTHOUSE (EPX-100) — plus the April 1, 2027 pitolisant GR PDUFA, must re-rate the name beyond the WAKIX annuity before orexin-2 agonists compress the narcolepsy franchise and generics arrive in 2030. <span class="ev interp">INTERPRETATION</span></td></tr>
+</table></div>
 </section>
+<section id="s2"><div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Three pharmacologies: wake-promotion, orexin, serotonin</h2><p class="lede">Three distinct pharmacologies: histamine H3 inverse agonism (pitolisant), orexin-2 agonism (BP-205), serotonin 5-HT2 modulation (EPX-100).</p></div></div>
 
-<section id="s2">
-<h2><span class="num">2</span>Science: Mechanism of Action &amp; Why It Could Fail</h2>
-<p class="kicker">Three distinct pharmacologies: histamine H3 inverse agonism (pitolisant), orexin-2 agonism (BP-205), serotonin 5-HT2 modulation (EPX-100).</p>
 
 <h3>2.1 Pitolisant — selective histamine H3 receptor antagonist / inverse agonist</h3>
-<p><b>Plain language.</b> Histamine neurons in the brain's tuberomammillary nucleus act as a "wakefulness switch." H3 receptors are presynaptic brakes on those neurons. Pitolisant releases the brake: it blocks/inversely agonizes H3 autoreceptors, increasing histamine synthesis and release, which in turn boosts other wake-promoting transmitters — dopamine, norepinephrine, acetylcholine — in cortex. Because the dopamine increase is cortical rather than via the nucleus accumbens reward circuit, pitolisant is <b>not a scheduled controlled substance</b>, unlike stimulants and oxybates. <span class="tag fact">FACT</span> <span class="ref">(Kollb-Sielecka et al., Drug Des Devel Ther 2017, PMC6124464; Dauvilliers et al. pediatric Ph3 write-up)</span></p>
-<p><b>Clinical validation.</b> Approved August 2019 for EDS in adult narcolepsy; cataplexy indication added later. Pivotal trials (HARMONY program) showed ESS reduction and weekly cataplexy-rate reduction vs placebo at 5–40 mg/day; one trial tested non-inferiority vs modafinil 100–400 mg on ESS (not shown non-inferior on ESS, but superior on cataplexy per reviews). Pediatric Ph3 (NCT02611687, ages 6–17, n≈110): Ullanlinna Narcolepsy Scale LS-mean difference −3.7 (95% CI −6.4 to −1.0, p=0.007), TEAEs 31% vs 34% placebo. <span class="tag fact">FACT</span> <span class="ref">(PMID 35774905 / PMC9239364 review; NeurologyLive pediatric Ph3 summary)</span></p>
+<p><b>Plain language.</b> Histamine neurons in the brain's tuberomammillary nucleus act as a "wakefulness switch." H3 receptors are presynaptic brakes on those neurons. Pitolisant releases the brake: it blocks/inversely agonizes H3 autoreceptors, increasing histamine synthesis and release, which in turn boosts other wake-promoting transmitters — dopamine, norepinephrine, acetylcholine — in cortex. Because the dopamine increase is cortical rather than via the nucleus accumbens reward circuit, pitolisant is <b>not a scheduled controlled substance</b>, unlike stimulants and oxybates. <span class="ev fact">FACT</span> <span class="ref">(Kollb-Sielecka et al., Drug Des Devel Ther 2017, PMC6124464; Dauvilliers et al. pediatric Ph3 write-up)</span></p>
+<p><b>Clinical validation.</b> Approved August 2019 for EDS in adult narcolepsy; cataplexy indication added later. Pivotal trials (HARMONY program) showed ESS reduction and weekly cataplexy-rate reduction vs placebo at 5–40 mg/day; one trial tested non-inferiority vs modafinil 100–400 mg on ESS (not shown non-inferior on ESS, but superior on cataplexy per reviews). Pediatric Ph3 (NCT02611687, ages 6–17, n≈110): Ullanlinna Narcolepsy Scale LS-mean difference −3.7 (95% CI −6.4 to −1.0, p=0.007), TEAEs 31% vs 34% placebo. <span class="ev fact">FACT</span> <span class="ref">(PMID 35774905 / PMC9239364 review; NeurologyLive pediatric Ph3 summary)</span></p>
 <div class="callout warn">
-<p><b>Why pitolisant could fail — mechanism-level.</b> (1) It is <b>symptomatic, not disease-targeted</b>: in narcolepsy type 1 the root lesion is loss of orexin (hypocretin) neurons; pitolisant amplifies downstream wake circuitry without replacing orexin signaling. Orexin-2 agonists now address the lesion directly. <span class="tag interp">INTERPRETATION</span> (2) Effect sizes are moderate: ESS deltas of a few points, and the modafinil non-inferiority miss on ESS caps the efficacy narrative. <span class="tag fact">FACT</span> (3) Dose ceiling: the approved max is 35.6 mg/day; higher doses were historically limited by GI tolerability — which is exactly what HBS-301's enteric coating is trying to solve, an unproven formulation bet. <span class="tag interp">INTERPRETATION</span> (4) QT-prolongation interactions flagged in pediatric data warrant arrhythmia-risk monitoring — a label-level overhang for dose escalation. <span class="tag fact">FACT</span> <span class="ref">(NeurologyLive)</span></p>
+<p><b>Why pitolisant could fail — mechanism-level.</b> (1) It is <b>symptomatic, not disease-targeted</b>: in narcolepsy type 1 the root lesion is loss of orexin (hypocretin) neurons; pitolisant amplifies downstream wake circuitry without replacing orexin signaling. Orexin-2 agonists now address the lesion directly. <span class="ev interp">INTERPRETATION</span> (2) Effect sizes are moderate: ESS deltas of a few points, and the modafinil non-inferiority miss on ESS caps the efficacy narrative. <span class="ev fact">FACT</span> (3) Dose ceiling: the approved max is 35.6 mg/day; higher doses were historically limited by GI tolerability — which is exactly what HBS-301's enteric coating is trying to solve, an unproven formulation bet. <span class="ev interp">INTERPRETATION</span> (4) QT-prolongation interactions flagged in pediatric data warrant arrhythmia-risk monitoring — a label-level overhang for dose escalation. <span class="ev fact">FACT</span> <span class="ref">(NeurologyLive)</span></p>
 </div>
-
 <h3>2.2 BP-205 — orexin-2 receptor (OX2R) agonist</h3>
-<p><b>Plain language.</b> In narcolepsy type 1, the brain's orexin neurons die. An OX2R agonist is a chemical substitute for the missing orexin — it directly stimulates the wakefulness receptor instead of working around it. Licensed from Bioprojet (as BP1.15205) for narcolepsy and other CNS indications. <span class="tag fact">FACT</span> <span class="ref">(10-K FY2025, TradingView summary)</span> Phase 1 SAD (n=72 healthy volunteers, 0.2–6 mg): Tmax 30–75 min, ~25-hour half-life supporting once-daily dosing, dose-proportional exposure, no serious/severe TEAEs, no cardiovascular/hepatic/visual signals; most common AEs headache (10%), fatigue (4%), diarrhea (3%). <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR; NeurologyLive)</span> Company claims 0.015 nM potency — ~160× Orzeyful's 2.5 nM — framing it as potentially best-in-class. <span class="tag unver">UNVERIFIED</span> <span class="ref">(company statement via PharmaVoice; in-vitro potency ≠ clinical superiority)</span></p>
+<p><b>Plain language.</b> In narcolepsy type 1, the brain's orexin neurons die. An OX2R agonist is a chemical substitute for the missing orexin — it directly stimulates the wakefulness receptor instead of working around it. Licensed from Bioprojet (as BP1.15205) for narcolepsy and other CNS indications. <span class="ev fact">FACT</span> <span class="ref">(10-K FY2025, TradingView summary)</span> Phase 1 SAD (n=72 healthy volunteers, 0.2–6 mg): Tmax 30–75 min, ~25-hour half-life supporting once-daily dosing, dose-proportional exposure, no serious/severe TEAEs, no cardiovascular/hepatic/visual signals; most common AEs headache (10%), fatigue (4%), diarrhea (3%). <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR; NeurologyLive)</span> Company claims 0.015 nM potency — ~160× Orzeyful's 2.5 nM — framing it as potentially best-in-class. <span class="ev unverified">UNVERIFIED</span> <span class="ref">(company statement via PharmaVoice; in-vitro potency ≠ clinical superiority)</span></p>
 <div class="callout warn">
-<p><b>Why BP-205 could fail.</b> (1) <b>Years behind:</b> Takeda's oveporexton is already FDA-approved; Alkermes' alixorexton is in Phase 3; Lilly paid $6.3B for Centessa's orexin pipeline — BP-205 enters Phase 2 in mid-2027 at best. <span class="tag fact">FACT</span> (2) Class safety is still being written: insomnia and urinary urgency/frequency are the signature on-target AEs of OX2R agonists (seen with oveporexton); BP-205's SAD was in healthy volunteers, not patients. <span class="tag interp">INTERPRETATION</span> (3) The ultra-potency claim cuts both ways — a 0.015 nM agonist has a narrow therapeutic window, and potency says nothing about selectivity, tachyphylaxis, or the visual-safety questions that have shadowed the class. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Why BP-205 could fail.</b> (1) <b>Years behind:</b> Takeda's oveporexton is already FDA-approved; Alkermes' alixorexton is in Phase 3; Lilly paid $6.3B for Centessa's orexin pipeline — BP-205 enters Phase 2 in mid-2027 at best. <span class="ev fact">FACT</span> (2) Class safety is still being written: insomnia and urinary urgency/frequency are the signature on-target AEs of OX2R agonists (seen with oveporexton); BP-205's SAD was in healthy volunteers, not patients. <span class="ev interp">INTERPRETATION</span> (3) The ultra-potency claim cuts both ways — a 0.015 nM agonist has a narrow therapeutic window, and potency says nothing about selectivity, tachyphylaxis, or the visual-safety questions that have shadowed the class. <span class="ev interp">INTERPRETATION</span></p>
 </div>
-
 <h3>2.3 EPX-100 (clemizole HCl) — central 5-HT2 serotonin receptor modulator</h3>
-<p><b>Plain language.</b> Clemizole is a first-generation antihistamine that was shelved decades ago — and rediscovered by accident. Baraban's lab screened 320 compounds in zebrafish carrying the Dravet-causing <i>scn1Lab</i> sodium-channel mutation; clemizole was the <b>only</b> hit that abolished both behavioral and electrographic seizures. Follow-up binding work showed the anti-seizure effect comes not from histamine blockade (49 other antihistamines failed) but from <b>serotonin-2 receptor modulation</b> — the same pathway implicated for fenfluramine (Fintepla) and lorcaserin in Dravet. <span class="tag fact">FACT</span> <span class="ref">(Baraban et al., Nat Commun 2013;4:2410; Griffin et al., Brain 2017;140:669–683; Frontiers in Pharmacol review)</span> Oral liquid, dosed twice daily. FDA orphan + rare pediatric disease designations for both Dravet and LGS. <span class="tag fact">FACT</span></p>
+<p><b>Plain language.</b> Clemizole is a first-generation antihistamine that was shelved decades ago — and rediscovered by accident. Baraban's lab screened 320 compounds in zebrafish carrying the Dravet-causing <i>scn1Lab</i> sodium-channel mutation; clemizole was the <b>only</b> hit that abolished both behavioral and electrographic seizures. Follow-up binding work showed the anti-seizure effect comes not from histamine blockade (49 other antihistamines failed) but from <b>serotonin-2 receptor modulation</b> — the same pathway implicated for fenfluramine (Fintepla) and lorcaserin in Dravet. <span class="ev fact">FACT</span> <span class="ref">(Baraban et al., Nat Commun 2013;4:2410; Griffin et al., Brain 2017;140:669–683; Frontiers in Pharmacol review)</span> Oral liquid, dosed twice daily. FDA orphan + rare pediatric disease designations for both Dravet and LGS. <span class="ev fact">FACT</span></p>
 <div class="callout warn">
-<p><b>Why EPX-100 could fail.</b> (1) The entire human thesis rests on zebrafish + a small open-label extension (n=18 with ≥6 months exposure; median ~50% seizure reduction). Small, uncontrolled, enriched — classic setup for a Phase 3 placebo surprise. <span class="tag interp">INTERPRETATION</span> (2) Dravet/LGS trials have a graveyard of plausible mechanisms; seizure-count endpoints are noisy and concomitant AEDs confound. <span class="tag interp">INTERPRETATION</span> (3) Serotonergic precedent is double-edged: fenfluramine works but carries valvular/pulmonary-hypertension monitoring baggage; investors will demand clean cardiac data. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Why EPX-100 could fail.</b> (1) The entire human thesis rests on zebrafish + a small open-label extension (n=18 with ≥6 months exposure; median ~50% seizure reduction). Small, uncontrolled, enriched — classic setup for a Phase 3 placebo surprise. <span class="ev interp">INTERPRETATION</span> (2) Dravet/LGS trials have a graveyard of plausible mechanisms; seizure-count endpoints are noisy and concomitant AEDs confound. <span class="ev interp">INTERPRETATION</span> (3) Serotonergic precedent is double-edged: fenfluramine works but carries valvular/pulmonary-hypertension monitoring baggage; investors will demand clean cardiac data. <span class="ev interp">INTERPRETATION</span></p>
 </div>
 </section>
+<section id="s3"><div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>One marketed product; four late-stage shots on goal</h2><p class="lede">One marketed product; four late-stage programs; one early orexin bet; one written-off franchise.</p></div></div>
 
-<section id="s3">
-<h2><span class="num">3</span>Pipeline Overview</h2>
-<p class="kicker">One marketed product; four late-stage programs; one early orexin bet; one written-off franchise.</p>
-<table>
+
+<div class="tablewrap"><table>
 <tr><th>Asset</th><th>Indication</th><th>Stage</th><th>Status / next step</th></tr>
-<tr><td><b>WAKIX (pitolisant)</b>, immediate-release</td><td>EDS or cataplexy, adult narcolepsy</td><td>Marketed (US, since 2019)</td><td>~$1.0–1.04B 2026 revenue guide; exclusivity into March 2030 <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Pitolisant GR</b> (gastro-resistant tablets)</td><td>Pediatric narcolepsy</td><td>NDA accepted Jul 2026</td><td>PDUFA <b>April 1, 2027</b>; planned launch H1 2027 <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>HBS-301</b> (high-dose enteric-coated pitolisant, up to 60 mg)</td><td>Adult narcolepsy — <b>ONSTRIDE-1</b></td><td>Phase 3</td><td>Topline 2027; target PDUFA 2028 <span class="tag fact">FACT</span> <span class="ref">(NCT07675135)</span></td></tr>
-<tr><td><b>HBS-301</b></td><td>Adult idiopathic hypersomnia — <b>ONSTRIDE-2</b></td><td>Phase 3</td><td>Topline 2027 <span class="tag fact">FACT</span> <span class="ref">(NCT07500090)</span></td></tr>
-<tr><td><b>Pitolisant</b> (standard)</td><td>EDS + behavior, Prader-Willi syndrome — <b>TEMPO</b></td><td>Phase 3</td><td>Topline mid-2027; registry completion July 2027 <span class="tag fact">FACT</span> <span class="ref">(NCT06366464)</span></td></tr>
-<tr><td><b>EPX-100</b> (clemizole)</td><td>Dravet syndrome — <b>ARGUS</b></td><td>Phase 3</td><td>Topline H1 2027; potential PDUFA 2028 <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>EPX-100</b> (clemizole)</td><td>Lennox-Gastaut syndrome — <b>LIGHTHOUSE</b></td><td>Phase 3</td><td>Topline H1 2027 <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>EPX-200</b> (selective 5-HT2C agonist)</td><td>Developmental &amp; epileptic encephalopathies</td><td>Pre-IND</td><td>ODD (DS, LGS) + RPDD (LGS) <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>BP-205</b> (OX2R agonist)</td><td>Multiple CNS (TBD)</td><td>Phase 1</td><td>MAD data Q4 2026; Ph1b data early 2027; Ph2 starts mid-2027 <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>ZYN002</b> (transdermal cannabidiol)</td><td>Fragile X; 22q11.2 deletion</td><td><b>Discontinued</b></td><td>Ph3 RECONNECT missed primary (Sept 2025); program phased out <span class="tag fact">FACT</span></td></tr>
-</table>
-<h3>3.1 Pipeline ranked by estimated value (most &rarr; least)</h3>
-<p class="kicker">Ranking reflects estimated contribution to enterprise value today: probability-adjusted, time-discounted, and net of the 2030 WAKIX cliff. <span class="tag interp">INTERPRETATION</span></p>
-<table>
+<tr><td><b>WAKIX (pitolisant)</b>, immediate-release</td><td>EDS or cataplexy, adult narcolepsy</td><td>Marketed (US, since 2019)</td><td>~$1.0–1.04B 2026 revenue guide; exclusivity into March 2030 <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Pitolisant GR</b> (gastro-resistant tablets)</td><td>Pediatric narcolepsy</td><td>NDA accepted Jul 2026</td><td>PDUFA <b>April 1, 2027</b>; planned launch H1 2027 <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>HBS-301</b> (high-dose enteric-coated pitolisant, up to 60 mg)</td><td>Adult narcolepsy — <b>ONSTRIDE-1</b></td><td>Phase 3</td><td>Topline 2027; target PDUFA 2028 <span class="ev fact">FACT</span> <span class="ref">(NCT07675135)</span></td></tr>
+<tr><td><b>HBS-301</b></td><td>Adult idiopathic hypersomnia — <b>ONSTRIDE-2</b></td><td>Phase 3</td><td>Topline 2027 <span class="ev fact">FACT</span> <span class="ref">(NCT07500090)</span></td></tr>
+<tr><td><b>Pitolisant</b> (standard)</td><td>EDS + behavior, Prader-Willi syndrome — <b>TEMPO</b></td><td>Phase 3</td><td>Topline mid-2027; registry completion July 2027 <span class="ev fact">FACT</span> <span class="ref">(NCT06366464)</span></td></tr>
+<tr><td><b>EPX-100</b> (clemizole)</td><td>Dravet syndrome — <b>ARGUS</b></td><td>Phase 3</td><td>Topline H1 2027; potential PDUFA 2028 <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>EPX-100</b> (clemizole)</td><td>Lennox-Gastaut syndrome — <b>LIGHTHOUSE</b></td><td>Phase 3</td><td>Topline H1 2027 <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>EPX-200</b> (selective 5-HT2C agonist)</td><td>Developmental &amp; epileptic encephalopathies</td><td>Pre-IND</td><td>ODD (DS, LGS) + RPDD (LGS) <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>BP-205</b> (OX2R agonist)</td><td>Multiple CNS (TBD)</td><td>Phase 1</td><td>MAD data Q4 2026; Ph1b data early 2027; Ph2 starts mid-2027 <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>ZYN002</b> (transdermal cannabidiol)</td><td>Fragile X; 22q11.2 deletion</td><td><b>Discontinued</b></td><td>Ph3 RECONNECT missed primary (Sept 2025); program phased out <span class="ev fact">FACT</span></td></tr>
+</table></div>
+<h3>3.1 Pipeline ranked by estimated value (most → least)</h3>
+<p class="kicker">Ranking reflects estimated contribution to enterprise value today: probability-adjusted, time-discounted, and net of the 2030 WAKIX cliff. <span class="ev interp">INTERPRETATION</span></p>
+<div class="tablewrap"><table>
 <tr><th style="width:5%">#</th><th>Asset</th><th>Indication / trial</th><th>Stage</th><th>Why ranked here</th></tr>
-<tr><td><b>1</b></td><td><b>WAKIX (pitolisant IR)</b></td><td>Adult narcolepsy (EDS/cataplexy)</td><td>Marketed</td><td>Sole revenue source (~$1.0&ndash;1.04B guided 2026); anchors nearly all of current EV. Value decays into the March-2030 generic cliff, but nothing else in the portfolio is within 3 years of this cash flow. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>2</b></td><td><b>Pitolisant GR</b></td><td>Pediatric narcolepsy</td><td>NDA; PDUFA Apr 1, 2027</td><td>Nearest-term, lowest-volatility value: approved drug + published pediatric Ph3 data; lifecycle extension plus the pediatric-exclusivity lever on generic-entry timing (Lupin licensed from Jul 2030 contingent on it). <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>3</b></td><td><b>HBS-301 (narcolepsy)</b></td><td>ONSTRIDE-1</td><td>Phase 3</td><td>High-dose lifecycle extension of the core franchise with a 2028 PDUFA target; extends the narcolepsy annuity past 2030 if dose-response and GI tolerability hold. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>4</b></td><td><b>EPX-100 (ARGUS)</b></td><td>Dravet syndrome</td><td>Phase 3; topline H1 2027</td><td>First novel-mechanism franchise option (ODD + rare pediatric disease designation); biggest pipeline upside if CMS-28 hits, since it validates the whole clemizole platform. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>5</b></td><td><b>EPX-100 (LIGHTHOUSE)</b></td><td>Lennox-Gastaut syndrome</td><td>Phase 3; topline H1 2027</td><td>Shared drug with ARGUS but a mechanistically weaker bet: LGS is etiologically heterogeneous vs the SCN1A-specific zebrafish discovery model. Partially de-risked by an ARGUS win, not by its own data yet. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>6</b></td><td><b>Pitolisant (TEMPO)</b></td><td>Prader-Willi syndrome</td><td>Phase 3; topline mid-2027</td><td>Genuine binary on a new indication, but the Ph2 was a trend (not significant) against a &minus;3.7-point placebo drift; discounted for placebo risk in a behaviorally noisy pediatric population. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>7</b></td><td><b>HBS-301 (ONSTRIDE-2)</b></td><td>Idiopathic hypersomnia</td><td>Phase 3; topline 2027</td><td>Highest-skepticism readout: standard-dose pitolisant already missed its IH primary in INTUNE (&minus;33% stock), and IH is not orexin-deficient. The 60-mg rationale is unproven. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>8</b></td><td><b>BP-205</b></td><td>OX2R agonist; CNS TBD</td><td>Phase 1</td><td>A call option until Ph1b pharmacodynamic data: years behind an approved orexin agonist (Orzeyful) and a Ph3 competitor (alixorexton). Potency claims are in-vitro only. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>9</b></td><td><b>EPX-200</b></td><td>Developmental &amp; epileptic encephalopathies</td><td>Pre-IND</td><td>Too early to value; ODD/RPDD optionality only. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>&mdash;</b></td><td><b>ZYN002</b></td><td>Fragile X / 22q</td><td>Discontinued</td><td>$0 — program phased out after RECONNECT missed its primary; acquisition impaired. <span class="tag fact">FACT</span></td></tr>
-</table>
-
-<p>Deal lineage: pitolisant US rights licensed from Bioprojet (France); Zynerba acquired Oct 2023 for up to $200M (now impaired); Epygenix acquired April 2024 for $35M cash + up to $130M development/regulatory + up to $515M sales milestones; Bioprojet sublicense for BP-205 (BP1.15205); CiRC Biosciences research collaboration (cell-replacement therapies); Novitium + MSN license deals in Q1 2026 ($15M and $17M upfronts) for new pitolisant formulations. <span class="tag fact">FACT</span></p>
-<p>Company-estimated addressable populations (company figures, not independently verified): narcolepsy ~80,000 diagnosed US patients; IH ~40,000 diagnosed; PWS 15,000–20,000 US; Dravet ~5,000 addressable of ~8,600 prevalent; LGS ~35,000 addressable of ~48,000 prevalent. Each franchise pitched as a potential $1–2B US peak-sales opportunity. <span class="tag unver">UNVERIFIED</span> <span class="ref">(company PRs/10-K; TAM framing is company-provided)</span></p>
+<tr><td><b>1</b></td><td><b>WAKIX (pitolisant IR)</b></td><td>Adult narcolepsy (EDS/cataplexy)</td><td>Marketed</td><td>Sole revenue source (~$1.0–1.04B guided 2026); anchors nearly all of current EV. Value decays into the March-2030 generic cliff, but nothing else in the portfolio is within 3 years of this cash flow. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>2</b></td><td><b>Pitolisant GR</b></td><td>Pediatric narcolepsy</td><td>NDA; PDUFA Apr 1, 2027</td><td>Nearest-term, lowest-volatility value: approved drug + published pediatric Ph3 data; lifecycle extension plus the pediatric-exclusivity lever on generic-entry timing (Lupin licensed from Jul 2030 contingent on it). <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>3</b></td><td><b>HBS-301 (narcolepsy)</b></td><td>ONSTRIDE-1</td><td>Phase 3</td><td>High-dose lifecycle extension of the core franchise with a 2028 PDUFA target; extends the narcolepsy annuity past 2030 if dose-response and GI tolerability hold. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>4</b></td><td><b>EPX-100 (ARGUS)</b></td><td>Dravet syndrome</td><td>Phase 3; topline H1 2027</td><td>First novel-mechanism franchise option (ODD + rare pediatric disease designation); biggest pipeline upside if CMS-28 hits, since it validates the whole clemizole platform. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>5</b></td><td><b>EPX-100 (LIGHTHOUSE)</b></td><td>Lennox-Gastaut syndrome</td><td>Phase 3; topline H1 2027</td><td>Shared drug with ARGUS but a mechanistically weaker bet: LGS is etiologically heterogeneous vs the SCN1A-specific zebrafish discovery model. Partially de-risked by an ARGUS win, not by its own data yet. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>6</b></td><td><b>Pitolisant (TEMPO)</b></td><td>Prader-Willi syndrome</td><td>Phase 3; topline mid-2027</td><td>Genuine binary on a new indication, but the Ph2 was a trend (not significant) against a −3.7-point placebo drift; discounted for placebo risk in a behaviorally noisy pediatric population. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>7</b></td><td><b>HBS-301 (ONSTRIDE-2)</b></td><td>Idiopathic hypersomnia</td><td>Phase 3; topline 2027</td><td>Highest-skepticism readout: standard-dose pitolisant already missed its IH primary in INTUNE (−33% stock), and IH is not orexin-deficient. The 60-mg rationale is unproven. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>8</b></td><td><b>BP-205</b></td><td>OX2R agonist; CNS TBD</td><td>Phase 1</td><td>A call option until Ph1b pharmacodynamic data: years behind an approved orexin agonist (Orzeyful) and a Ph3 competitor (alixorexton). Potency claims are in-vitro only. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>9</b></td><td><b>EPX-200</b></td><td>Developmental &amp; epileptic encephalopathies</td><td>Pre-IND</td><td>Too early to value; ODD/RPDD optionality only. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>—</b></td><td><b>ZYN002</b></td><td>Fragile X / 22q</td><td>Discontinued</td><td>$0 — program phased out after RECONNECT missed its primary; acquisition impaired. <span class="ev fact">FACT</span></td></tr>
+</table></div>
+<p>Deal lineage: pitolisant US rights licensed from Bioprojet (France); Zynerba acquired Oct 2023 for up to $200M (now impaired); Epygenix acquired April 2024 for $35M cash + up to $130M development/regulatory + up to $515M sales milestones; Bioprojet sublicense for BP-205 (BP1.15205); CiRC Biosciences research collaboration (cell-replacement therapies); Novitium + MSN license deals in Q1 2026 ($15M and $17M upfronts) for new pitolisant formulations. <span class="ev fact">FACT</span></p>
+<p>Company-estimated addressable populations (company figures, not independently verified): narcolepsy ~80,000 diagnosed US patients; IH ~40,000 diagnosed; PWS 15,000–20,000 US; Dravet ~5,000 addressable of ~8,600 prevalent; LGS ~35,000 addressable of ~48,000 prevalent. Each franchise pitched as a potential $1–2B US peak-sales opportunity. <span class="ev unverified">UNVERIFIED</span> <span class="ref">(company PRs/10-K; TAM framing is company-provided)</span></p>
 </section>
+<section id="s4"><div class="section-head"><div class="section-num">04 / TRIAL DESIGN</div><div><h2>Six Phase 3s and a PDUFA: the 2027 design package</h2><p class="lede">Endpoints, statistical context, and readouts to date for each binary event.</p></div></div>
 
-<section id="s4">
-<h2><span class="num">4</span>Trial Design Deep Dive</h2>
-<p class="kicker">Endpoints, statistical context, and readouts to date for each binary event.</p>
 
-<h3>4.1 ONSTRIDE-1 — HBS-301 (pitolisant up to 60 mg) in adult narcolepsy <span class="pill-dq guidance">guidance</span></h3>
-<p>Phase 3 of high-dose enteric-coated pitolisant tablets (multiple strengths up to 60 mg vs the approved 35.6 mg max) for EDS and other narcolepsy symptoms. <span class="tag fact">FACT</span> <span class="ref">(Oct 1, 2026 company PR; NCT07675135)</span> <b>Design details (randomization, endpoints, powering): not located in sources reviewed.</b> <span class="tag gap">GAP</span> The strategic logic: enteric coating is intended to move the GI-tolerability ceiling so a near-doubling of dose is feasible; efficacy at higher exposure is the open question — pitolisant's approved dose-response was established only to 35.6 mg. <span class="tag interp">INTERPRETATION</span> Topline guided 2027; company targets PDUFA in 2028. <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR)</span></p>
-
-<h3>4.2 ONSTRIDE-2 — HBS-301 in adult idiopathic hypersomnia <span class="pill-dq guidance">guidance</span></h3>
-<p>Phase 3 of high-dose pitolisant in IH, topline 2027. <span class="tag fact">FACT</span> <span class="ref">(NCT07500090)</span> <b>This is the highest-skepticism readout in the portfolio:</b> standard-dose pitolisant already ran a full Phase 3 in IH — <b>INTUNE (NCT05156047)</b> — a placebo-controlled, double-blind randomized-withdrawal study that <b>missed its primary endpoint</b> (ESS during the 4-week double-blind withdrawal; topline Oct 2023; stock fell 33% to $20.23). The open-label period had looked strong (n=213 enrolled; 83% of completers were ESS responders with mean −9.4 points), and later analyses showed significance on prespecified secondaries (IHSS, Sleep Inertia Questionnaire), but the registrational primary failed. <span class="tag fact">FACT</span> <span class="ref">(company PR Oct 2023; NeurologyLive; Sleep 2025 abstract)</span> The bull case for ONSTRIDE-2 is that higher exposure (60 mg) converts the INTUNE "positive trends" into a statistically significant primary. The bear case is that IH pathophysiology (not orexin-deficient, unlike NT1) simply doesn't respond to H3 inverse agonism at any tolerable dose — and a parallel design risks a parallel outcome. <span class="tag interp">INTERPRETATION</span> <b>Design details not located.</b> <span class="tag gap">GAP</span></p>
-
-<h3>4.3 TEMPO — pitolisant in Prader-Willi syndrome (NCT06366464) <span class="pill-dq guidance">guidance</span></h3>
-<p>Phase 3, randomized, double-blind, placebo-controlled, multicenter, global; <b>n=134</b> patients aged ≥6 years with genetically confirmed PWS and EDS; 1:1 pitolisant vs placebo QD; up to 45-day screening/baseline, double-blind period with visits at days 29/57/77, optional open-label extension to day 441. Primary: EDS (ESS for Children and Adolescents). Key secondaries: irritable/disruptive behaviors, hyperphagia (HQ-CT), ABC-2 domains, caregiver global impression. Status: recruiting; registry completion July 2027; company guides mid-2027 topline (timing previously pushed from H2 2026 on enrollment). ODD granted for PWS. <span class="tag fact">FACT</span> <span class="ref">(CT.gov NCT06366464; company PRs)</span></p>
-<p><b>Readout to date — Phase 2 signal-detection (n=65, 1:1:1 low/high dose/placebo, 11 weeks):</b> ESS-CHAD improved −4.9 (high) / −4.1 (low) vs −3.7 placebo — <b>not statistically significant</b>; study was explicitly not powered for significance. Secondary signals favored the higher dose (ABC-2 improvements in ages 6–12, CaGI reductions ≥1.0, modest hyperphagia improvement). AEs: anxiety, headache, irritability. <span class="tag fact">FACT</span> <span class="ref">(BioSpace; NeurologyLive; PatientWorthy)</span> <b>Honest read:</b> the Ph2 was a trend, not a signal — TEMPO is a genuine binary on whether a larger, better-powered study separates from a −3.7-point placebo drift in a behaviorally noisy pediatric population. <span class="tag interp">INTERPRETATION</span></p>
-
-<h3>4.4 ARGUS — EPX-100 in Dravet syndrome <span class="pill-dq guidance">guidance</span></h3>
-<p>Phase 3, global, randomized, double-blind, placebo-controlled, adjunctive therapy in children and adults with SCN1A-positive DS not adequately controlled on prior AEDs (≥4 countable motor seizures per 4-week baseline; stable AED regimen ≥30 days; <b>fenfluramine prohibited</b>). <b>Primary endpoint: mean percent change in 28-day countable motor seizure frequency (CMS-28)</b> across titration + maintenance. Secondaries: ≥50% responder rate, countable-motor-seizure-free days, Clinical Global Impression. <span class="tag fact">FACT</span> <span class="ref">(NeurologyLive; company PRs)</span> <b>Readout to date — open-label extension (Dec 2025 AES):</b> n=18 with ≥6 months exposure; median CMS-28 reduction ~50%; 50% achieved ≥50% reduction; generally well tolerated with up to ~3 years exposure; TEAEs &gt;5%: seizures, pyrexia, URI; no significant GI AEs; no extra lab monitoring. 10 serious AEs in 5 patients (1 possibly related); no deaths; 1 discontinuation. <span class="tag fact">FACT</span> <span class="ref">(company PR via BioSpace, Dec 8 2025)</span> Topline guided H1 2027 (previously 2026); potential PDUFA 2028. <span class="tag fact">FACT</span> <b>Statistical plan / powering / enrollment target: not located.</b> <span class="tag gap">GAP</span></p>
-
-<h3>4.5 LIGHTHOUSE — EPX-100 in Lennox-Gastaut syndrome <span class="pill-dq guidance">guidance</span></h3>
-<p>Phase 3, global, randomized, double-blind, placebo-controlled, adjunctive EPX-100 in LGS; enrolling; topline H1 2027. <span class="tag fact">FACT</span> <b>Endpoint, enrollment target, and statistical plan: not located in sources reviewed.</b> <span class="tag gap">GAP</span> Note the mechanistic stretch: clemizole's discovery model is SCN1A-specific (Dravet); LGS is etiologically heterogeneous, so the zebrafish-to-human translation argument is weaker here than in ARGUS. <span class="tag interp">INTERPRETATION</span></p>
-
-<h3>4.6 Pitolisant GR (pediatric gastro-resistant tablets) — PDUFA April 1, 2027 <span class="pill-dq hard">hard</span></h3>
-<p>NDA accepted July 2026 for a pediatric narcolepsy formulation (gastro-resistant tablets — not granules); target action date <b>April 1, 2027</b>; planned launch H1 2027. <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR)</span> This is the nearest-term, lowest-volatility catalyst: a formulation/age-extension of an approved drug with published pediatric Ph3 data (UNS −3.7, p=0.007). Commercial relevance is lifecycle extension ahead of the 2030 cliff — including the pediatric-exclusivity lever on generic entry timing. <span class="tag interp">INTERPRETATION</span></p>
-
-<h3>4.7 BP-205 — Phase 1 MAD (Q4 2026) → Phase 1b (early 2027) <span class="pill-dq guidance">guidance</span></h3>
-<p>SAD complete (n=72): Tmax 30–75 min, t½ ~25 h, dose-proportional PK, no serious/severe TEAEs. Full MAD dataset expected Q4 2026; Phase 1b in sleep-deprived healthy volunteers (initiated Q3 2026) reads early 2027 — the first pharmacodynamic signal (wake-promotion under sleep deprivation); Phase 2 in multiple CNS indications planned mid-2027. <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR; 2027 catalyst dataset)</span> These are sentiment events, not valuation binaries — but a clean MAD + positive sleep-deprivation PD would be the first human evidence the "most potent OX2R agonist" claim means anything clinically. <span class="tag interp">INTERPRETATION</span></p>
+<h3>4.1 ONSTRIDE-1 — HBS-301 (pitolisant up to 60 mg) in adult narcolepsy <span class="date-tag guidance">guidance</span></h3>
+<p>Phase 3 of high-dose enteric-coated pitolisant tablets (multiple strengths up to 60 mg vs the approved 35.6 mg max) for EDS and other narcolepsy symptoms. <span class="ev fact">FACT</span> <span class="ref">(Oct 1, 2026 company PR; NCT07675135)</span> <b>Design details (randomization, endpoints, powering): not located in sources reviewed.</b> <span class="ev gap">GAP</span> The strategic logic: enteric coating is intended to move the GI-tolerability ceiling so a near-doubling of dose is feasible; efficacy at higher exposure is the open question — pitolisant's approved dose-response was established only to 35.6 mg. <span class="ev interp">INTERPRETATION</span> Topline guided 2027; company targets PDUFA in 2028. <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR)</span></p>
+<h3>4.2 ONSTRIDE-2 — HBS-301 in adult idiopathic hypersomnia <span class="date-tag guidance">guidance</span></h3>
+<p>Phase 3 of high-dose pitolisant in IH, topline 2027. <span class="ev fact">FACT</span> <span class="ref">(NCT07500090)</span> <b>This is the highest-skepticism readout in the portfolio:</b> standard-dose pitolisant already ran a full Phase 3 in IH — <b>INTUNE (NCT05156047)</b> — a placebo-controlled, double-blind randomized-withdrawal study that <b>missed its primary endpoint</b> (ESS during the 4-week double-blind withdrawal; topline Oct 2023; stock fell 33% to $20.23). The open-label period had looked strong (n=213 enrolled; 83% of completers were ESS responders with mean −9.4 points), and later analyses showed significance on prespecified secondaries (IHSS, Sleep Inertia Questionnaire), but the registrational primary failed. <span class="ev fact">FACT</span> <span class="ref">(company PR Oct 2023; NeurologyLive; Sleep 2025 abstract)</span> The bull case for ONSTRIDE-2 is that higher exposure (60 mg) converts the INTUNE "positive trends" into a statistically significant primary. The bear case is that IH pathophysiology (not orexin-deficient, unlike NT1) simply doesn't respond to H3 inverse agonism at any tolerable dose — and a parallel design risks a parallel outcome. <span class="ev interp">INTERPRETATION</span> <b>Design details not located.</b> <span class="ev gap">GAP</span></p>
+<h3>4.3 TEMPO — pitolisant in Prader-Willi syndrome (NCT06366464) <span class="date-tag guidance">guidance</span></h3>
+<p>Phase 3, randomized, double-blind, placebo-controlled, multicenter, global; <b>n=134</b> patients aged ≥6 years with genetically confirmed PWS and EDS; 1:1 pitolisant vs placebo QD; up to 45-day screening/baseline, double-blind period with visits at days 29/57/77, optional open-label extension to day 441. Primary: EDS (ESS for Children and Adolescents). Key secondaries: irritable/disruptive behaviors, hyperphagia (HQ-CT), ABC-2 domains, caregiver global impression. Status: recruiting; registry completion July 2027; company guides mid-2027 topline (timing previously pushed from H2 2026 on enrollment). ODD granted for PWS. <span class="ev fact">FACT</span> <span class="ref">(CT.gov NCT06366464; company PRs)</span></p>
+<p><b>Readout to date — Phase 2 signal-detection (n=65, 1:1:1 low/high dose/placebo, 11 weeks):</b> ESS-CHAD improved −4.9 (high) / −4.1 (low) vs −3.7 placebo — <b>not statistically significant</b>; study was explicitly not powered for significance. Secondary signals favored the higher dose (ABC-2 improvements in ages 6–12, CaGI reductions ≥1.0, modest hyperphagia improvement). AEs: anxiety, headache, irritability. <span class="ev fact">FACT</span> <span class="ref">(BioSpace; NeurologyLive; PatientWorthy)</span> <b>Honest read:</b> the Ph2 was a trend, not a signal — TEMPO is a genuine binary on whether a larger, better-powered study separates from a −3.7-point placebo drift in a behaviorally noisy pediatric population. <span class="ev interp">INTERPRETATION</span></p>
+<h3>4.4 ARGUS — EPX-100 in Dravet syndrome <span class="date-tag guidance">guidance</span></h3>
+<p>Phase 3, global, randomized, double-blind, placebo-controlled, adjunctive therapy in children and adults with SCN1A-positive DS not adequately controlled on prior AEDs (≥4 countable motor seizures per 4-week baseline; stable AED regimen ≥30 days; <b>fenfluramine prohibited</b>). <b>Primary endpoint: mean percent change in 28-day countable motor seizure frequency (CMS-28)</b> across titration + maintenance. Secondaries: ≥50% responder rate, countable-motor-seizure-free days, Clinical Global Impression. <span class="ev fact">FACT</span> <span class="ref">(NeurologyLive; company PRs)</span> <b>Readout to date — open-label extension (Dec 2025 AES):</b> n=18 with ≥6 months exposure; median CMS-28 reduction ~50%; 50% achieved ≥50% reduction; generally well tolerated with up to ~3 years exposure; TEAEs &gt;5%: seizures, pyrexia, URI; no significant GI AEs; no extra lab monitoring. 10 serious AEs in 5 patients (1 possibly related); no deaths; 1 discontinuation. <span class="ev fact">FACT</span> <span class="ref">(company PR via BioSpace, Dec 8 2025)</span> Topline guided H1 2027 (previously 2026); potential PDUFA 2028. <span class="ev fact">FACT</span> <b>Statistical plan / powering / enrollment target: not located.</b> <span class="ev gap">GAP</span></p>
+<h3>4.5 LIGHTHOUSE — EPX-100 in Lennox-Gastaut syndrome <span class="date-tag guidance">guidance</span></h3>
+<p>Phase 3, global, randomized, double-blind, placebo-controlled, adjunctive EPX-100 in LGS; enrolling; topline H1 2027. <span class="ev fact">FACT</span> <b>Endpoint, enrollment target, and statistical plan: not located in sources reviewed.</b> <span class="ev gap">GAP</span> Note the mechanistic stretch: clemizole's discovery model is SCN1A-specific (Dravet); LGS is etiologically heterogeneous, so the zebrafish-to-human translation argument is weaker here than in ARGUS. <span class="ev interp">INTERPRETATION</span></p>
+<h3>4.6 Pitolisant GR (pediatric gastro-resistant tablets) — PDUFA April 1, 2027 <span class="date-tag hard">hard</span></h3>
+<p>NDA accepted July 2026 for a pediatric narcolepsy formulation (gastro-resistant tablets — not granules); target action date <b>April 1, 2027</b>; planned launch H1 2027. <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR)</span> This is the nearest-term, lowest-volatility catalyst: a formulation/age-extension of an approved drug with published pediatric Ph3 data (UNS −3.7, p=0.007). Commercial relevance is lifecycle extension ahead of the 2030 cliff — including the pediatric-exclusivity lever on generic entry timing. <span class="ev interp">INTERPRETATION</span></p>
+<h3>4.7 BP-205 — Phase 1 MAD (Q4 2026) → Phase 1b (early 2027) <span class="date-tag guidance">guidance</span></h3>
+<p>SAD complete (n=72): Tmax 30–75 min, t½ ~25 h, dose-proportional PK, no serious/severe TEAEs. Full MAD dataset expected Q4 2026; Phase 1b in sleep-deprived healthy volunteers (initiated Q3 2026) reads early 2027 — the first pharmacodynamic signal (wake-promotion under sleep deprivation); Phase 2 in multiple CNS indications planned mid-2027. <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR; 2027 catalyst dataset)</span> These are sentiment events, not valuation binaries — but a clean MAD + positive sleep-deprivation PD would be the first human evidence the "most potent OX2R agonist" claim means anything clinically. <span class="ev interp">INTERPRETATION</span></p>
 </section>
+<section id="s5"><div class="section-head"><div class="section-num">05 / CLINICAL &amp; REGULATORY</div><div><h2>Two readouts failed; the regulatory calendar is the story</h2><p class="lede">Two readouts already failed; the regulatory calendar is now the story.</p></div></div>
 
-<section id="s5">
-<h2><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
-<p class="kicker">Two readouts already failed; the regulatory calendar is now the story.</p>
-<table>
+
+<div class="tablewrap"><table>
 <tr><th>Program</th><th>Regulatory standing</th></tr>
-<tr><td>WAKIX (adult narcolepsy)</td><td>FDA-approved Aug 2019 (EDS); cataplexy indication added subsequently. Orphan drug designation (2010). Not a controlled substance. <span class="tag fact">FACT</span> <span class="ref">(PMC9239364 review; company materials)</span></td></tr>
-<tr><td>Pitolisant GR (pediatric)</td><td>NDA accepted Jul 2026; PDUFA <b>Apr 1, 2027</b> <span class="pill-dq hard">hard</span>; launch planned H1 2027 <span class="tag fact">FACT</span></td></tr>
-<tr><td>HBS-301 (narcolepsy / IH)</td><td>Two Ph3s running; topline 2027; company targets PDUFA 2028 (narcolepsy) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Pitolisant in PWS</td><td>Ph3 TEMPO; ODD granted; End-of-Ph2 meeting completed <span class="tag fact">FACT</span></td></tr>
-<tr><td>Pitolisant in IH (standard dose)</td><td>INTUNE Ph3 missed primary (Oct 2023); company said it would discuss path forward with FDA — no approval filing disclosed since <span class="tag fact">FACT</span></td></tr>
-<tr><td>EPX-100 (DS / LGS)</td><td>Two Ph3s; ODD + rare pediatric disease designation (both indications); topline H1 2027; potential PDUFAs 2028 <span class="tag fact">FACT</span></td></tr>
-<tr><td>BP-205</td><td>US IND open; Ph1 MAD → Ph1b → Ph2 (mid-2027) <span class="tag fact">FACT</span></td></tr>
-<tr><td>ZYN002</td><td>RECONNECT Ph3 missed primary (Sept 2025); program phased out; 22q program dropped <span class="tag fact">FACT</span></td></tr>
-</table>
+<tr><td>WAKIX (adult narcolepsy)</td><td>FDA-approved Aug 2019 (EDS); cataplexy indication added subsequently. Orphan drug designation (2010). Not a controlled substance. <span class="ev fact">FACT</span> <span class="ref">(PMC9239364 review; company materials)</span></td></tr>
+<tr><td>Pitolisant GR (pediatric)</td><td>NDA accepted Jul 2026; PDUFA <b>Apr 1, 2027</b> <span class="date-tag hard">hard</span>; launch planned H1 2027 <span class="ev fact">FACT</span></td></tr>
+<tr><td>HBS-301 (narcolepsy / IH)</td><td>Two Ph3s running; topline 2027; company targets PDUFA 2028 (narcolepsy) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Pitolisant in PWS</td><td>Ph3 TEMPO; ODD granted; End-of-Ph2 meeting completed <span class="ev fact">FACT</span></td></tr>
+<tr><td>Pitolisant in IH (standard dose)</td><td>INTUNE Ph3 missed primary (Oct 2023); company said it would discuss path forward with FDA — no approval filing disclosed since <span class="ev fact">FACT</span></td></tr>
+<tr><td>EPX-100 (DS / LGS)</td><td>Two Ph3s; ODD + rare pediatric disease designation (both indications); topline H1 2027; potential PDUFAs 2028 <span class="ev fact">FACT</span></td></tr>
+<tr><td>BP-205</td><td>US IND open; Ph1 MAD → Ph1b → Ph2 (mid-2027) <span class="ev fact">FACT</span></td></tr>
+<tr><td>ZYN002</td><td>RECONNECT Ph3 missed primary (Sept 2025); program phased out; 22q program dropped <span class="ev fact">FACT</span></td></tr>
+</table></div>
 <div class="callout">
-<p><b>Patent / exclusivity outlook — the 2030 cliff.</b> Management (COO, Q2 2026 call) states confidence in maintaining WAKIX exclusivity <b>into March 2030</b>. Settlements with 6 of 7 ANDA filers license generic entry beginning as early as 2030 — the Lupin settlement specifically licenses entry from <b>July 2030 if pediatric exclusivity is granted</b> (6-month extension). The 7th filer, AET: bench trial on polymorph ('197) and method-of-use ('947) patents concluded; <b>closing arguments October 22, 2026</b> <span class="pill-dq hard">hard</span>; separate April 2026 suit (with Novitium) vs AET + Sandoz alleges infringement of the '920 amorphous-form patent. <span class="tag fact">FACT</span> <span class="ref">(Q2 2026 PR; Q1 2026 10-Q; Q2 earnings call transcript)</span> Net: the exclusivity runway is ~3.4 years, largely contracted — the pipeline must create the post-2030 story. <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Patent / exclusivity outlook — the 2030 cliff.</b> Management (COO, Q2 2026 call) states confidence in maintaining WAKIX exclusivity <b>into March 2030</b>. Settlements with 6 of 7 ANDA filers license generic entry beginning as early as 2030 — the Lupin settlement specifically licenses entry from <b>July 2030 if pediatric exclusivity is granted</b> (6-month extension). The 7th filer, AET: bench trial on polymorph ('197) and method-of-use ('947) patents concluded; <b>closing arguments October 22, 2026</b> <span class="date-tag hard">hard</span>; separate April 2026 suit (with Novitium) vs AET + Sandoz alleges infringement of the '920 amorphous-form patent. <span class="ev fact">FACT</span> <span class="ref">(Q2 2026 PR; Q1 2026 10-Q; Q2 earnings call transcript)</span> Net: the exclusivity runway is ~3.4 years, largely contracted — the pipeline must create the post-2030 story. <span class="ev interp">INTERPRETATION</span></p>
 </div>
 </section>
+<section id="s6"><div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Orexin agonists just reset what ‘good’ looks like</h2><p class="lede">Narcolepsy is no longer a sleepy backwater: an orexin agonist is approved, another is in Phase 3, and a $6.3B acquisition validated the class.</p></div></div>
 
-<section id="s6">
-<h2><span class="num">6</span>Competition: Clinical Differentiation Only</h2>
-<p class="kicker">Narcolepsy is no longer a sleepy backwater: an orexin agonist is approved, another is in Phase 3, and a $6.3B acquisition validated the class.</p>
 
 <h3>6.1 The orexin-2 wave (narcolepsy type 1 — WAKIX's core)</h3>
-<table>
+<div class="tablewrap"><table>
 <tr><th>Drug / sponsor</th><th>Status</th><th>Clinical differentiation vs pitolisant</th></tr>
-<tr><td><b>Oveporexton (Orzeyful) / Takeda</b></td><td>FDA-approved <b>Aug 5, 2026</b> for adult NT1; also approved Japan and China (16+); Ph3 data in <i>NEJM</i> (Sept 9, 2026) <span class="tag fact">FACT</span></td><td>First therapy targeting the underlying orexin deficiency rather than downstream wake circuits. FirstLight + RadiantLight Ph3: met all primary/secondary endpoints, p&lt;0.001 across doses at week 12; no serious treatment-related AEs; most common AEs insomnia, urinary urgency/frequency. Dosed twice daily. <span class="tag fact">FACT</span> <span class="ref">(NEJM 2026, NEJMoa2601598; AJMC)</span> <b>This is the structural threat:</b> a disease-targeted oral agent in the exact NT1 population where WAKIX is symptomatic-only. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Alixorexton / Alkermes</b></td><td>Phase 3 Brilliance (NT1 ×2, NT2); topline H2 2027 <span class="pill-dq inferred">inferred</span> <span class="tag fact">FACT</span></td><td>Oral OX2R agonist designed for once-daily dosing; same mechanistic claim as oveporexton. If Brilliance reads positively, two approved orexin agonists bracket WAKIX in NT1 by 2028. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Cleminorexton / Lilly (ex-Centessa)</b></td><td>Phase 2/3 (NT1, NT2, IH); Lilly acquired Centessa for ~$6.3B upfront (announced March 2026, closed June 2026) <span class="tag fact">FACT</span></td><td>Big-pharma validation of the class and a balance-sheet backer for rapid development. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>TAK-360 / Takeda; ledasorexton / Eisai</b></td><td>Phase 2 (NT2/IH and NT1/NT2 respectively) <span class="tag fact">FACT</span></td><td>Earlier-stage; relevant to ONSTRIDE-2's IH bet — orexin agonists are moving into IH too. <span class="tag interp">INTERPRETATION</span></td></tr>
-</table>
-<p>No head-to-head efficacy comparison between orexin agonists and pitolisant is made here — none exists in randomized trials. The differentiation is mechanistic (lesion-targeted vs symptomatic) and regulatory (approved NT1 indication for oveporexton). <span class="tag interp">INTERPRETATION</span></p>
-
+<tr><td><b>Oveporexton (Orzeyful) / Takeda</b></td><td>FDA-approved <b>Aug 5, 2026</b> for adult NT1; also approved Japan and China (16+); Ph3 data in <i>NEJM</i> (Sept 9, 2026) <span class="ev fact">FACT</span></td><td>First therapy targeting the underlying orexin deficiency rather than downstream wake circuits. FirstLight + RadiantLight Ph3: met all primary/secondary endpoints, p&lt;0.001 across doses at week 12; no serious treatment-related AEs; most common AEs insomnia, urinary urgency/frequency. Dosed twice daily. <span class="ev fact">FACT</span> <span class="ref">(NEJM 2026, NEJMoa2601598; AJMC)</span> <b>This is the structural threat:</b> a disease-targeted oral agent in the exact NT1 population where WAKIX is symptomatic-only. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Alixorexton / Alkermes</b></td><td>Phase 3 Brilliance (NT1 ×2, NT2); topline H2 2027 <span class="date-tag inferred">inferred</span> <span class="ev fact">FACT</span></td><td>Oral OX2R agonist designed for once-daily dosing; same mechanistic claim as oveporexton. If Brilliance reads positively, two approved orexin agonists bracket WAKIX in NT1 by 2028. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Cleminorexton / Lilly (ex-Centessa)</b></td><td>Phase 2/3 (NT1, NT2, IH); Lilly acquired Centessa for ~$6.3B upfront (announced March 2026, closed June 2026) <span class="ev fact">FACT</span></td><td>Big-pharma validation of the class and a balance-sheet backer for rapid development. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>TAK-360 / Takeda; ledasorexton / Eisai</b></td><td>Phase 2 (NT2/IH and NT1/NT2 respectively) <span class="ev fact">FACT</span></td><td>Earlier-stage; relevant to ONSTRIDE-2's IH bet — orexin agonists are moving into IH too. <span class="ev interp">INTERPRETATION</span></td></tr>
+</table></div>
+<p>No head-to-head efficacy comparison between orexin agonists and pitolisant is made here — none exists in randomized trials. The differentiation is mechanistic (lesion-targeted vs symptomatic) and regulatory (approved NT1 indication for oveporexton). <span class="ev interp">INTERPRETATION</span></p>
 <h3>6.2 Oxybates &amp; wake-promoters (the current share fight)</h3>
-<table>
+<div class="tablewrap"><table>
 <tr><th>Drug</th><th>Positioning vs WAKIX</th></tr>
-<tr><td><b>Lumryz (Avadel)</b> — once-nightly sodium oxybate; approved May 2023 (adults), Oct 2024 (pediatric 7+); 7-year orphan exclusivity on clinical-superiority finding; Ph3 REVITALYZ in IH enrollment completed Dec 2025; ODD for IH <span class="tag fact">FACT</span></td><td>Scheduled (boxed warning, REMS) but addresses cataplexy + EDS + disrupted nighttime sleep in one dose; once-nightly dosing removes the middle-of-the-night second dose. Competes on efficacy breadth; WAKIX competes on non-scheduled status and daytime-only dosing. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Xywav/Xyrem (Jazz)</b> — twice-nightly (Xyrem) and low-sodium (Xywav) oxybates; Xywav also approved for IH <span class="tag fact">FACT</span></td><td>Same scheduled-oxybate tradeoffs; Xywav's IH approval makes it the incumbent where ONSTRIDE-2 is trying to enter. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Sunosi (Axsome)</b> — solriamfetol, dopamine/norepinephrine reuptake inhibitor for EDS in narcolepsy/OSA <span class="tag fact">FACT</span></td><td>Scheduled (C-IV); stimulant-class alternative for EDS only, no cataplexy claim. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>AXS-12 (Axsome)</b> — reboxetine (norepinephrine reuptake inhibitor) for cataplexy; NDA accepted, <b>PDUFA May 1, 2027</b>, no AdCom planned <span class="pill-dq hard">hard</span> <span class="tag fact">FACT</span></td><td>If approved, the first non-oxybate, non-pitolisant cataplexy option — direct overlap with WAKIX's cataplexy claim in NT1. Near-term competitive catalyst to watch. <span class="tag interp">INTERPRETATION</span></td></tr>
-</table>
-
+<tr><td><b>Lumryz (Avadel)</b> — once-nightly sodium oxybate; approved May 2023 (adults), Oct 2024 (pediatric 7+); 7-year orphan exclusivity on clinical-superiority finding; Ph3 REVITALYZ in IH enrollment completed Dec 2025; ODD for IH <span class="ev fact">FACT</span></td><td>Scheduled (boxed warning, REMS) but addresses cataplexy + EDS + disrupted nighttime sleep in one dose; once-nightly dosing removes the middle-of-the-night second dose. Competes on efficacy breadth; WAKIX competes on non-scheduled status and daytime-only dosing. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Xywav/Xyrem (Jazz)</b> — twice-nightly (Xyrem) and low-sodium (Xywav) oxybates; Xywav also approved for IH <span class="ev fact">FACT</span></td><td>Same scheduled-oxybate tradeoffs; Xywav's IH approval makes it the incumbent where ONSTRIDE-2 is trying to enter. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Sunosi (Axsome)</b> — solriamfetol, dopamine/norepinephrine reuptake inhibitor for EDS in narcolepsy/OSA <span class="ev fact">FACT</span></td><td>Scheduled (C-IV); stimulant-class alternative for EDS only, no cataplexy claim. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>AXS-12 (Axsome)</b> — reboxetine (norepinephrine reuptake inhibitor) for cataplexy; NDA accepted, <b>PDUFA May 1, 2027</b>, no AdCom planned <span class="date-tag hard">hard</span> <span class="ev fact">FACT</span></td><td>If approved, the first non-oxybate, non-pitolisant cataplexy option — direct overlap with WAKIX's cataplexy claim in NT1. Near-term competitive catalyst to watch. <span class="ev interp">INTERPRETATION</span></td></tr>
+</table></div>
 <h3>6.3 Epilepsy (EPX-100's arena)</h3>
-<p>Dravet: Fintepla (fenfluramine, UCB) and Epidiolex (cannabidiol, Jazz) are approved adjuncts; LGS: Epidiolex, Fintepla, plus clobazam/valproate generics. EPX-100's differentiation would be an oral BID liquid with a non-cannabinoid, non-fenfluramine serotonergic mechanism and — per OLE data — no GI signal and no special monitoring burden. All of that is contingent on ARGUS/LIGHTHOUSE hitting CMS-28-type endpoints against placebo. <span class="tag interp">INTERPRETATION</span></p>
+<p>Dravet: Fintepla (fenfluramine, UCB) and Epidiolex (cannabidiol, Jazz) are approved adjuncts; LGS: Epidiolex, Fintepla, plus clobazam/valproate generics. EPX-100's differentiation would be an oral BID liquid with a non-cannabinoid, non-fenfluramine serotonergic mechanism and — per OLE data — no GI signal and no special monitoring burden. All of that is contingent on ARGUS/LIGHTHOUSE hitting CMS-28-type endpoints against placebo. <span class="ev interp">INTERPRETATION</span></p>
 </section>
+<section id="s7"><div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Profitable and cash-rich — but single-product</h2><p class="lede">Profitable, cash-rich, single-product. Every figure with units, period, and source.</p></div></div>
 
-<section id="s7">
-<h2><span class="num">7</span>Financials</h2>
-<p class="kicker">Profitable, cash-rich, single-product. Every figure with units, period, and source.</p>
-<table>
+
+<div class="tablewrap"><table>
 <tr><th>Metric</th><th>Q2 2026</th><th>Q1 2026</th><th>FY2025</th></tr>
-<tr><td>Net product revenue</td><td><b>$261.3M</b> (+30% YoY) <span class="tag fact">FACT</span></td><td><b>$215.4M</b> (+16.6% YoY) <span class="tag fact">FACT</span></td><td><b>$868.5M</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Net income</td><td><b>$75.4M</b> ($1.28 diluted EPS) <span class="tag fact">FACT</span></td><td><b>$32.5M</b> ($0.55 diluted EPS) <span class="tag fact">FACT</span></td><td><b>$158.7M</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Cost of product sold</td><td>$63.2M = <b>24.2%</b> of revenue (vs 19.0% prior year; Novitium royalties) <span class="tag fact">FACT</span></td><td>$44.5M (20.7% of revenue) <span class="tag fact">FACT</span></td><td>— <span class="tag gap">GAP</span></td></tr>
-<tr><td>Operating expenses</td><td>$108.8M (−5% YoY; Q2'25 had $15M CiRC upfront) <span class="tag fact">FACT</span></td><td>R&amp;D $69.4M (incl. $32M acquired IPR&amp;D); S&amp;M $31.7M; G&amp;A $32.5M <span class="tag fact">FACT</span></td><td>—</td></tr>
-<tr><td>Cash + investments</td><td><b>$962.5M</b> (6/30/26) <span class="tag fact">FACT</span></td><td>$870.5M (3/31/26) <span class="tag fact">FACT</span></td><td>—</td></tr>
-<tr><td>Debt</td><td colspan="2">$160M JPMorgan senior secured term loan outstanding (3/31/26); $20M current portion; repayment through 2028 <span class="tag fact">FACT</span></td><td>—</td></tr>
-<tr><td>Operating cash flow</td><td>— <span class="tag gap">GAP</span></td><td>+$27.8M <span class="tag fact">FACT</span></td><td>—</td></tr>
-</table>
+<tr><td>Net product revenue</td><td><b>$261.3M</b> (+30% YoY) <span class="ev fact">FACT</span></td><td><b>$215.4M</b> (+16.6% YoY) <span class="ev fact">FACT</span></td><td><b>$868.5M</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Net income</td><td><b>$75.4M</b> ($1.28 diluted EPS) <span class="ev fact">FACT</span></td><td><b>$32.5M</b> ($0.55 diluted EPS) <span class="ev fact">FACT</span></td><td><b>$158.7M</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Cost of product sold</td><td>$63.2M = <b>24.2%</b> of revenue (vs 19.0% prior year; Novitium royalties) <span class="ev fact">FACT</span></td><td>$44.5M (20.7% of revenue) <span class="ev fact">FACT</span></td><td>— <span class="ev gap">GAP</span></td></tr>
+<tr><td>Operating expenses</td><td>$108.8M (−5% YoY; Q2'25 had $15M CiRC upfront) <span class="ev fact">FACT</span></td><td>R&amp;D $69.4M (incl. $32M acquired IPR&amp;D); S&amp;M $31.7M; G&amp;A $32.5M <span class="ev fact">FACT</span></td><td>—</td></tr>
+<tr><td>Cash + investments</td><td><b>$962.5M</b> (6/30/26) <span class="ev fact">FACT</span></td><td>$870.5M (3/31/26) <span class="ev fact">FACT</span></td><td>—</td></tr>
+<tr><td>Debt</td><td colspan="2">$160M JPMorgan senior secured term loan outstanding (3/31/26); $20M current portion; repayment through 2028 <span class="ev fact">FACT</span></td><td>—</td></tr>
+<tr><td>Operating cash flow</td><td>— <span class="ev gap">GAP</span></td><td>+$27.8M <span class="ev fact">FACT</span></td><td>—</td></tr>
+</table></div>
 <p><span class="ref">Sources: Q2 2026 PR (GlobeNewswire, Aug 4 2026); Q1 2026 10-Q (stocktitan/SEC); FY2025 revenue/net income via stocktitan financials summary.</span></p>
 <div class="callout">
-<p><b>Revenue trajectory.</b> H1 2026 revenue = $476.7M, i.e. ~46–48% of the $1.0–1.04B full-year guide — the guide requires a seasonally stronger H2, consistent with Q1's disclosed "seasonal market-access headwinds" and Q2's +21% sequential rebound. Average patients +450 QoQ to 8,950 was the second-highest quarterly add in WAKIX's seven-year history. <span class="tag fact">FACT</span> / <span class="tag interp">INTERPRETATION</span></p>
-<p><b>Margin watch.</b> COGS rose from 19.0% to 24.2% of revenue YoY on Novitium license royalties — a structural step-up on the company's only product. With Bioprojet tiered royalties underneath, gross-margin leverage on WAKIX is capped. <span class="tag interp">INTERPRETATION</span></p>
-<p><b>Capital allocation.</b> $200M buyback authorized Oct 2023; $150M remaining at 12/31/25 (i.e., ~$50M executed). No follow-on equity offering located in sources reviewed — dilution has come only via option/RSU exercises. <span class="tag fact">FACT</span> / <span class="tag gap">GAP</span></p>
-<p><b>Dilution history.</b> Shares outstanding: 57.73M (12/31/25) → 57.87M (3/31/26) → 57.89M (5/5/26) → 58.24M (9/4/26, Form 144). Slow, compensation-driven creep (~1%/yr), partially offset by buybacks. <span class="tag fact">FACT</span></p>
+<p><b>Revenue trajectory.</b> H1 2026 revenue = $476.7M, i.e. ~46–48% of the $1.0–1.04B full-year guide — the guide requires a seasonally stronger H2, consistent with Q1's disclosed "seasonal market-access headwinds" and Q2's +21% sequential rebound. Average patients +450 QoQ to 8,950 was the second-highest quarterly add in WAKIX's seven-year history. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></p>
+<p><b>Margin watch.</b> COGS rose from 19.0% to 24.2% of revenue YoY on Novitium license royalties — a structural step-up on the company's only product. With Bioprojet tiered royalties underneath, gross-margin leverage on WAKIX is capped. <span class="ev interp">INTERPRETATION</span></p>
+<p><b>Capital allocation.</b> $200M buyback authorized Oct 2023; $150M remaining at 12/31/25 (i.e., ~$50M executed). No follow-on equity offering located in sources reviewed — dilution has come only via option/RSU exercises. <span class="ev fact">FACT</span> / <span class="ev gap">GAP</span></p>
+<p><b>Dilution history.</b> Shares outstanding: 57.73M (12/31/25) → 57.87M (3/31/26) → 57.89M (5/5/26) → 58.24M (9/4/26, Form 144). Slow, compensation-driven creep (~1%/yr), partially offset by buybacks. <span class="ev fact">FACT</span></p>
 </div>
 </section>
+<section id="s8"><div class="section-head"><div class="section-num">08 / VALUE</div><div><h2>The dilution-honest share count</h2><p class="lede">Price $39.34 (Oct 6, 2026). Share counts from the latest filings; options counted at face.</p></div></div>
 
-<section id="s8">
-<h2><span class="num">8</span>FDMC / EV — Dilution-Honest</h2>
-<p class="kicker">Price $39.34 (Oct 6, 2026). Share counts from the latest filings; options counted at face.</p>
-<table>
+
+<div class="tablewrap"><table>
 <tr><th>Component</th><th>Figure</th><th>Source / as-of</th></tr>
-<tr><td>Basic shares outstanding</td><td><b>58,236,393</b></td><td>Form 144, Sept 4, 2026 <span class="tag fact">FACT</span></td></tr>
-<tr><td>Basic market cap</td><td><b>~$2.291B</b> (58.24M × $39.34)</td><td>Computed <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Stock options outstanding</td><td><b>8,767,554</b> (WAEP $34.00; 6.5 yrs remaining; 5,994,578 exercisable @ $33.43)</td><td>Q1 2026 10-Q (3/31/26) <span class="tag fact">FACT</span></td></tr>
-<tr><td>SARs / RSUs outstanding</td><td>Counts not located in sources reviewed</td><td><span class="tag gap">GAP</span></td></tr>
-<tr><td>Warrants / convertibles</td><td>None located</td><td><span class="tag gap">GAP</span></td></tr>
-<tr><td>2020 Plan evergreen</td><td>Auto-increases 4% of outstanding each Jan 1; 8,704,203 shares available at 12/31/25</td><td>FY2025 10-K <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Fully-diluted share count (used)</b></td><td><b>~67.0M</b> (basic + options; RSUs/SARs uncounted)</td><td>Computed <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Fully-diluted market cap</b></td><td><b>~$2.636B</b></td><td>Computed <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Cash + investments</td><td><b>$962.5M</b> (6/30/26)</td><td>Q2 2026 PR <span class="tag fact">FACT</span></td></tr>
-<tr><td>Debt</td><td><b>$160M</b> JPMorgan senior secured term loan (3/31/26)</td><td>Q1 2026 10-Q <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Enterprise value (basic)</b></td><td><b>~$1.49B</b> (2,291 − 962.5 + 160)</td><td>Computed <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Enterprise value (fully-diluted)</b></td><td><b>~$1.83B</b> (2,636 − 962.5 + 160)</td><td>Computed <span class="tag interp">INTERPRETATION</span></td></tr>
-</table>
+<tr><td>Basic shares outstanding</td><td><b>58,236,393</b></td><td>Form 144, Sept 4, 2026 <span class="ev fact">FACT</span></td></tr>
+<tr><td>Basic market cap</td><td><b>~$2.291B</b> (58.24M × $39.34)</td><td>Computed <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Stock options outstanding</td><td><b>8,767,554</b> (WAEP $34.00; 6.5 yrs remaining; 5,994,578 exercisable @ $33.43)</td><td>Q1 2026 10-Q (3/31/26) <span class="ev fact">FACT</span></td></tr>
+<tr><td>SARs / RSUs outstanding</td><td>Counts not located in sources reviewed</td><td><span class="ev gap">GAP</span></td></tr>
+<tr><td>Warrants / convertibles</td><td>None located</td><td><span class="ev gap">GAP</span></td></tr>
+<tr><td>2020 Plan evergreen</td><td>Auto-increases 4% of outstanding each Jan 1; 8,704,203 shares available at 12/31/25</td><td>FY2025 10-K <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Fully-diluted share count (used)</b></td><td><b>~67.0M</b> (basic + options; RSUs/SARs uncounted)</td><td>Computed <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Fully-diluted market cap</b></td><td><b>~$2.636B</b></td><td>Computed <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Cash + investments</td><td><b>$962.5M</b> (6/30/26)</td><td>Q2 2026 PR <span class="ev fact">FACT</span></td></tr>
+<tr><td>Debt</td><td><b>$160M</b> JPMorgan senior secured term loan (3/31/26)</td><td>Q1 2026 10-Q <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Enterprise value (basic)</b></td><td><b>~$1.49B</b> (2,291 − 962.5 + 160)</td><td>Computed <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Enterprise value (fully-diluted)</b></td><td><b>~$1.83B</b> (2,636 − 962.5 + 160)</td><td>Computed <span class="ev interp">INTERPRETATION</span></td></tr>
+</table></div>
 <div class="callout">
-<p><b>Reading the numbers.</b> On 2026 guided revenue ($1.0–1.04B), basic EV is ~1.4–1.5× sales and the P/E is ~12.7× — a profitable-single-product multiple that prices WAKIX as a decaying annuity into 2030 with modest pipeline optionality. The options overhang is ~15% of basic shares (WAEP $34.00 vs $39.34 price — mostly in the money), so the FD vs basic gap is real but not extreme. <span class="tag interp">INTERPRETATION</span></p>
-<p><b>Caveats.</b> Q2 2026 10-Q detailed share/option counts were not separately reviewed — basic count is from a Sept 2026 Form 144 and options from the Q1 10-Q; RSU/SAR counts are a GAP. Debt is as of 3/31/26. <span class="tag gap">GAP</span></p>
+<p><b>Reading the numbers.</b> On 2026 guided revenue ($1.0–1.04B), basic EV is ~1.4–1.5× sales and the P/E is ~12.7× — a profitable-single-product multiple that prices WAKIX as a decaying annuity into 2030 with modest pipeline optionality. The options overhang is ~15% of basic shares (WAEP $34.00 vs $39.34 price — mostly in the money), so the FD vs basic gap is real but not extreme. <span class="ev interp">INTERPRETATION</span></p>
+<p><b>Caveats.</b> Q2 2026 10-Q detailed share/option counts were not separately reviewed — basic count is from a Sept 2026 Form 144 and options from the Q1 10-Q; RSU/SAR counts are a GAP. Debt is as of 3/31/26. <span class="ev gap">GAP</span></p>
 </div>
 </section>
+<section id="s9"><div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The 2027 cluster, event by event</h2><p class="lede">Every known upcoming event, tagged by date quality. Past binary readouts included for pattern context.</p></div></div>
 
-<section id="s9">
-<h2><span class="num">9</span>Catalyst / Event Map</h2>
-<p class="kicker">Every known upcoming event, tagged by date quality. Past binary readouts included for pattern context.</p>
+
 <div class="timeline">
-<div class="tl-item past"><div class="dt">Oct 2023 <span class="pill-dq hard">hard</span></div><div class="ev"><b>INTUNE Ph3 (IH) — missed primary endpoint</b></div><div class="note">ESS in 4-wk randomized withdrawal not significant; stock −33% to $20.23. Pattern risk for ONSTRIDE-2.</div></div>
-<div class="tl-item past"><div class="dt">Sep 24, 2025 <span class="pill-dq hard">hard</span></div><div class="ev"><b>RECONNECT Ph3 (ZYN002, Fragile X) — missed primary endpoint</b></div><div class="note">ABC-CFXS Social Avoidance at wk 18 (n=215); stock −16.6% ($29.92 → $26.67); program phased out.</div></div>
-<div class="tl-item past"><div class="dt">Oct 2&ndash;3, 2026 <span class="pill-dq hard">hard</span></div><div class="ev"><b>European Narcolepsy Days — HBS-301 Phase 3 poster</b> (Bern)</div><div class="note">Non-binary: design poster for ONSTRIDE-1/2 (per Oct 1, 2026 PR). Occurred; no readout attached.</div></div>
-<div class="tl-item past"><div class="dt">Aug 5, 2026 <span class="pill-dq hard">hard</span></div><div class="ev"><b>Takeda Orzeyful (oveporexton) FDA-approved for NT1</b> — competitive event</div><div class="note">First orexin-2 agonist approved; also approved Japan + China. Reshapes NT1 standard of care.</div></div>
-<div class="tl-item"><div class="dt">Oct 22, 2026 <span class="pill-dq hard">hard</span></div><div class="ev"><b>AET ANDA litigation — closing arguments</b> (polymorph '197 + method-of-use '947 patents)</div><div class="note">Last un-settled generic challenger. Decision determines whether March-2030 exclusivity holds intact.</div></div>
-<div class="tl-item"><div class="dt">~Nov 3, 2026 <span class="pill-dq inferred">inferred</span></div><div class="ev"><b>Q3 2026 earnings</b> (before market; MarketBeat estimate)</div><div class="note">Watch: revenue trajectory vs $1.0&ndash;1.04B guide, patient adds, COGS %, any pipeline-timeline shifts. Consensus EPS $0.96 / revenue $250.8M were the Q2 bars (actual $1.28 / $261.3M).</div></div>
-<div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>BP-205 Phase 1 MAD full dataset</b></div><div class="note">Safety/PK in multiple-ascending doses; first repeat-dose tolerability read on the orexin bet.</div></div>
-<div class="tl-item"><div class="dt">Early 2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>BP-205 Phase 1b data</b> (sleep-deprived healthy volunteers)</div><div class="note">First human pharmacodynamic signal — does wake-promotion show up under sleep deprivation?</div></div>
-<div class="tl-item"><div class="dt">H1 2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>EPX-100 ARGUS Ph3 topline — Dravet syndrome</b></div><div class="note">Primary: % change in 28-day countable motor seizure frequency. Biggest pipeline binary by novelty.</div></div>
-<div class="tl-item"><div class="dt">H1 2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>EPX-100 LIGHTHOUSE Ph3 topline — Lennox-Gastaut syndrome</b></div><div class="note">Design details not disclosed; LGS is etiologically heterogeneous vs the SCN1A-specific discovery model.</div></div>
-<div class="tl-item"><div class="dt">Apr 1, 2027 <span class="pill-dq hard">hard</span></div><div class="ev"><b>Pitolisant GR — FDA PDUFA date</b> (pediatric narcolepsy formulation)</div><div class="note">Planned launch H1 2027. Lowest-volatility catalyst; pediatric-exclusivity lever on generic timing.</div></div>
-<div class="tl-item"><div class="dt">May 1, 2027 <span class="pill-dq hard">hard</span></div><div class="ev"><b>AXS-12 (Axsome, reboxetine) PDUFA — cataplexy</b> — competitive event</div><div class="note">Potential first non-oxybate, non-pitolisant cataplexy option; direct overlap with WAKIX's NT1 claim.</div></div>
-<div class="tl-item"><div class="dt">Mid-2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>Pitolisant TEMPO Ph3 topline — Prader-Willi syndrome</b></div><div class="note">n=134; primary EDS (ESS-CHAD); Ph2 was underpowered with a −4.9/−4.1 vs −3.7 trend. Genuine binary.</div></div>
-<div class="tl-item"><div class="dt">Mid-2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>BP-205 Phase 2 initiation</b> (multiple CNS indications)</div><div class="note">Indication selection will reveal where Harmony thinks an OX2R agonist can differentiate.</div></div>
-<div class="tl-item"><div class="dt">2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>HBS-301 ONSTRIDE-1 Ph3 topline — narcolepsy</b></div><div class="note">High-dose (60 mg) pitolisant; company targets PDUFA 2028. Lifecycle extension for the core franchise.</div></div>
-<div class="tl-item"><div class="dt">2027 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>HBS-301 ONSTRIDE-2 Ph3 topline — idiopathic hypersomnia</b></div><div class="note">Highest-skepticism readout: standard dose already missed its IH primary in INTUNE.</div></div>
-<div class="tl-item"><div class="dt">H2 2027 <span class="pill-dq inferred">inferred</span></div><div class="ev"><b>Alkermes alixorexton Brilliance Ph3 readouts</b> — competitive event</div><div class="note">Registry-derived timing, not company-guided. A positive read puts two orexin agonists on the NT1 map.</div></div>
-<div class="tl-item"><div class="dt">2028 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>Potential PDUFAs: pitolisant HD (narcolepsy), EPX-100 (DS/LGS)</b></div><div class="note">Company-guided target year; filings depend on 2027 readouts.</div></div>
-<div class="tl-item"><div class="dt">Mar 2030 / Jul 2030 <span class="pill-dq guidance">guidance</span></div><div class="ev"><b>WAKIX exclusivity end; licensed generic entry</b></div><div class="note">March 2030 per management; Lupin licensed from July 2030 contingent on pediatric exclusivity.</div></div>
+<div class="event landed"><div class="event-date">Oct 2023 <span class="date-tag hard">hard</span></div><div class="event-body"><b>INTUNE Ph3 (IH) — missed primary endpoint</b><div class="note">ESS in 4-wk randomized withdrawal not significant; stock −33% to $20.23. Pattern risk for ONSTRIDE-2.</div></div></div>
+<div class="event landed"><div class="event-date">Sep 24, 2025 <span class="date-tag hard">hard</span></div><div class="event-body"><b>RECONNECT Ph3 (ZYN002, Fragile X) — missed primary endpoint</b><div class="note">ABC-CFXS Social Avoidance at wk 18 (n=215); stock −16.6% ($29.92 → $26.67); program phased out.</div></div></div>
+<div class="event landed"><div class="event-date">Oct 2–3, 2026 <span class="date-tag hard">hard</span></div><div class="event-body"><b>European Narcolepsy Days — HBS-301 Phase 3 poster</b> (Bern)<div class="note">Non-binary: design poster for ONSTRIDE-1/2 (per Oct 1, 2026 PR). Occurred; no readout attached.</div></div></div>
+<div class="event landed"><div class="event-date">Aug 5, 2026 <span class="date-tag hard">hard</span></div><div class="event-body"><b>Takeda Orzeyful (oveporexton) FDA-approved for NT1</b> — competitive event<div class="note">First orexin-2 agonist approved; also approved Japan + China. Reshapes NT1 standard of care.</div></div></div>
+<div class="event"><div class="event-date">Oct 22, 2026 <span class="date-tag hard">hard</span></div><div class="event-body"><b>AET ANDA litigation — closing arguments</b> (polymorph '197 + method-of-use '947 patents)<div class="note">Last un-settled generic challenger. Decision determines whether March-2030 exclusivity holds intact.</div></div></div>
+<div class="event"><div class="event-date">~Nov 3, 2026 <span class="date-tag inferred">inferred</span></div><div class="event-body"><b>Q3 2026 earnings</b> (before market; MarketBeat estimate)<div class="note">Watch: revenue trajectory vs $1.0–1.04B guide, patient adds, COGS %, any pipeline-timeline shifts. Consensus EPS $0.96 / revenue $250.8M were the Q2 bars (actual $1.28 / $261.3M).</div></div></div>
+<div class="event"><div class="event-date">Q4 2026 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>BP-205 Phase 1 MAD full dataset</b><div class="note">Safety/PK in multiple-ascending doses; first repeat-dose tolerability read on the orexin bet.</div></div></div>
+<div class="event"><div class="event-date">Early 2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>BP-205 Phase 1b data</b> (sleep-deprived healthy volunteers)<div class="note">First human pharmacodynamic signal — does wake-promotion show up under sleep deprivation?</div></div></div>
+<div class="event"><div class="event-date">H1 2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>EPX-100 ARGUS Ph3 topline — Dravet syndrome</b><div class="note">Primary: % change in 28-day countable motor seizure frequency. Biggest pipeline binary by novelty.</div></div></div>
+<div class="event"><div class="event-date">H1 2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>EPX-100 LIGHTHOUSE Ph3 topline — Lennox-Gastaut syndrome</b><div class="note">Design details not disclosed; LGS is etiologically heterogeneous vs the SCN1A-specific discovery model.</div></div></div>
+<div class="event"><div class="event-date">Apr 1, 2027 <span class="date-tag hard">hard</span></div><div class="event-body"><b>Pitolisant GR — FDA PDUFA date</b> (pediatric narcolepsy formulation)<div class="note">Planned launch H1 2027. Lowest-volatility catalyst; pediatric-exclusivity lever on generic timing.</div></div></div>
+<div class="event"><div class="event-date">May 1, 2027 <span class="date-tag hard">hard</span></div><div class="event-body"><b>AXS-12 (Axsome, reboxetine) PDUFA — cataplexy</b> — competitive event<div class="note">Potential first non-oxybate, non-pitolisant cataplexy option; direct overlap with WAKIX's NT1 claim.</div></div></div>
+<div class="event"><div class="event-date">Mid-2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>Pitolisant TEMPO Ph3 topline — Prader-Willi syndrome</b><div class="note">n=134; primary EDS (ESS-CHAD); Ph2 was underpowered with a −4.9/−4.1 vs −3.7 trend. Genuine binary.</div></div></div>
+<div class="event"><div class="event-date">Mid-2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>BP-205 Phase 2 initiation</b> (multiple CNS indications)<div class="note">Indication selection will reveal where Harmony thinks an OX2R agonist can differentiate.</div></div></div>
+<div class="event"><div class="event-date">2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>HBS-301 ONSTRIDE-1 Ph3 topline — narcolepsy</b><div class="note">High-dose (60 mg) pitolisant; company targets PDUFA 2028. Lifecycle extension for the core franchise.</div></div></div>
+<div class="event"><div class="event-date">2027 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>HBS-301 ONSTRIDE-2 Ph3 topline — idiopathic hypersomnia</b><div class="note">Highest-skepticism readout: standard dose already missed its IH primary in INTUNE.</div></div></div>
+<div class="event"><div class="event-date">H2 2027 <span class="date-tag inferred">inferred</span></div><div class="event-body"><b>Alkermes alixorexton Brilliance Ph3 readouts</b> — competitive event<div class="note">Registry-derived timing, not company-guided. A positive read puts two orexin agonists on the NT1 map.</div></div></div>
+<div class="event"><div class="event-date">2028 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>Potential PDUFAs: pitolisant HD (narcolepsy), EPX-100 (DS/LGS)</b><div class="note">Company-guided target year; filings depend on 2027 readouts.</div></div></div>
+<div class="event"><div class="event-date">Mar 2030 / Jul 2030 <span class="date-tag guidance">guidance</span></div><div class="event-body"><b>WAKIX exclusivity end; licensed generic entry</b><div class="note">March 2030 per management; Lupin licensed from July 2030 contingent on pediatric exclusivity.</div></div></div>
 </div>
-<h3>9.1 Catalyst detail: what the event is, what &ldquo;good&rdquo; looks like, what to watch</h3>
+<h3>9.1 Catalyst detail: what the event is, what “good” looks like, what to watch</h3>
 <p class="kicker">Stale-data sweep (Oct 10, 2026): no catalyst dated before today remains pending — all occurred events are marked past above.</p>
-<table>
-<tr><th>Event</th><th>Date</th><th>DQ</th><th>What the event is</th><th>What &ldquo;good&rdquo; looks like</th><th>What to watch</th></tr>
-<tr><td><b>AET ANDA — closing arguments</b></td><td>Oct 22, 2026</td><td><span class="pill-dq hard">hard</span></td><td>Bench-trial close on polymorph ('197) + method-of-use ('947) patents; last un-settled generic filer.</td><td>Ruling upholds both patents; March-2030 exclusivity intact; 6 settlements stand.</td><td>Decision timing (ruling comes after arguments, not same-day); separate Apr-2026 '920 amorphous-form suit vs AET + Sandoz.</td></tr>
-<tr><td><b>Q3 2026 earnings</b></td><td>~Nov 3, 2026 (BMO)</td><td><span class="pill-dq inferred">inferred</span></td><td>Quarterly results; first look at H2 trajectory vs $1.0&ndash;1.04B guide.</td><td>Revenue &ge;~$265M, patient adds sustained, guide maintained or raised, COGS % stable.</td><td>COGS creep (was 24.2% in Q2); OpEx discipline; any pipeline-timeline slips; CFO-transition commentary.</td></tr>
-<tr><td><b>BP-205 Ph1 MAD</b></td><td>Q4 2026</td><td><span class="pill-dq guidance">guidance</span></td><td>Full multiple-ascending-dose safety/PK dataset.</td><td>Clean repeat-dose tolerability; t&frac12; ~25h holds; no CV/hepatic/visual signals.</td><td>AE profile vs oveporexton's insomnia/urinary-urgency signature; dose-proportionality at higher exposures.</td></tr>
-<tr><td><b>BP-205 Ph1b</b></td><td>Early 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>First pharmacodynamic read: wake-promotion in sleep-deprived healthy volunteers.</td><td>Statistically clear wake-promotion signal with dose-response.</td><td>Effect size vs placebo; whether ultra-potency (0.015 nM) translates or just narrows the window.</td></tr>
-<tr><td><b>ARGUS topline (Dravet)</b></td><td>H1 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Ph3 primary: % change in 28-day countable motor seizure frequency.</td><td>Significant CMS-28 reduction, clean cardiac data, no new safety signal.</td><td>Placebo response in seizure-count endpoints; dropout; serious-AE imbalance; enrollment completion.</td></tr>
-<tr><td><b>LIGHTHOUSE topline (LGS)</b></td><td>H1 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Ph3 of EPX-100 in Lennox-Gastaut; design undisclosed.</td><td>Win in a heterogeneous population.</td><td>Design/endpoint still undisclosed — interpret cautiously; ARGUS read-across is partial (different disease biology).</td></tr>
-<tr><td><b>Pitolisant GR PDUFA</b></td><td>Apr 1, 2027</td><td><span class="pill-dq hard">hard</span></td><td>FDA action on pediatric gastro-resistant tablets; planned H1 2027 launch.</td><td>Approval on time; label language supporting pediatric-exclusivity claim.</td><td>Label wording; any review extension; launch uptake vs adult WAKIX.</td></tr>
-<tr><td><b>AXS-12 PDUFA (competitive)</b></td><td>May 1, 2027</td><td><span class="pill-dq hard">hard</span></td><td>Axsome's reboxetine for cataplexy; no AdCom planned.</td><td>For HRMY: CRL, narrow label, or delayed action.</td><td>Approval would create the first non-oxybate, non-pitolisant cataplexy option — direct NT1 overlap.</td></tr>
-<tr><td><b>TEMPO topline (PWS)</b></td><td>Mid-2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Ph3 n=134; primary EDS (ESS-CHAD); secondaries on behavior/hyperphagia.</td><td>Significant ESS-CHAD separation; supportive behavioral secondaries.</td><td>Placebo drift (was &minus;3.7 pts in Ph2); enrollment pace (registry completion Jul 2027); safety in pediatrics.</td></tr>
-<tr><td><b>BP-205 Ph2 start</b></td><td>Mid-2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Indication selection for Ph2 in &ldquo;multiple CNS indications.&rdquo;</td><td>Clear, differentiated indication choices (e.g., NT2/IH where orexin rivals are thinner).</td><td>Whether Harmony chases NT1 head-on vs a flank strategy.</td></tr>
-<tr><td><b>ONSTRIDE-1 topline</b></td><td>2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Ph3 of 60-mg enteric-coated pitolisant in narcolepsy; PDUFA targeted 2028.</td><td>ESS/cataplexy win; GI tolerability acceptable at 60 mg.</td><td>QT signals at higher exposure; dose-response shape; dropout vs approved dose.</td></tr>
-<tr><td><b>ONSTRIDE-2 topline</b></td><td>2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Ph3 of 60-mg pitolisant in IH — the redo of failed INTUNE.</td><td>Primary hit where 35.6 mg failed.</td><td>Highest-skepticism readout; INTUNE precedent was &minus;33%; parallel-design risk.</td></tr>
-<tr><td><b>Alixorexton Brilliance (competitive)</b></td><td>H2 2027</td><td><span class="pill-dq inferred">inferred</span></td><td>Alkermes OX2R agonist Ph3 (NT1 &times;2, NT2); timing registry-derived.</td><td>For HRMY: a miss slows the orexin-share-shift narrative.</td><td>Positive read puts two approved orexin agonists on the NT1 map by ~2028.</td></tr>
-<tr><td><b>2028 PDUFAs</b></td><td>2028</td><td><span class="pill-dq guidance">guidance</span></td><td>Company-targeted filings: HD pitolisant (narcolepsy), EPX-100 (DS/LGS).</td><td>Filings accepted on 2027 wins.</td><td>Entirely contingent on 2027 readouts; treat as placeholder until then.</td></tr>
-<tr><td><b>WAKIX exclusivity end</b></td><td>Mar 2030 / Jul 2030</td><td><span class="pill-dq guidance">guidance</span></td><td>Management-guided exclusivity end; Lupin licensed from Jul 2030 contingent on pediatric exclusivity.</td><td>AET ruling favorable; pediatric exclusivity granted (6-mo extension).</td><td>Generic erosion curve post-2030; pipeline must bridge by then.</td></tr>
-</table>
-
+<div class="tablewrap"><table>
+<tr><th>Event</th><th>Date</th><th>DQ</th><th>What the event is</th><th>What “good” looks like</th><th>What to watch</th></tr>
+<tr><td><b>AET ANDA — closing arguments</b></td><td>Oct 22, 2026</td><td><span class="date-tag hard">hard</span></td><td>Bench-trial close on polymorph ('197) + method-of-use ('947) patents; last un-settled generic filer.</td><td>Ruling upholds both patents; March-2030 exclusivity intact; 6 settlements stand.</td><td>Decision timing (ruling comes after arguments, not same-day); separate Apr-2026 '920 amorphous-form suit vs AET + Sandoz.</td></tr>
+<tr><td><b>Q3 2026 earnings</b></td><td>~Nov 3, 2026 (BMO)</td><td><span class="date-tag inferred">inferred</span></td><td>Quarterly results; first look at H2 trajectory vs $1.0–1.04B guide.</td><td>Revenue ≥~$265M, patient adds sustained, guide maintained or raised, COGS % stable.</td><td>COGS creep (was 24.2% in Q2); OpEx discipline; any pipeline-timeline slips; CFO-transition commentary.</td></tr>
+<tr><td><b>BP-205 Ph1 MAD</b></td><td>Q4 2026</td><td><span class="date-tag guidance">guidance</span></td><td>Full multiple-ascending-dose safety/PK dataset.</td><td>Clean repeat-dose tolerability; t½ ~25h holds; no CV/hepatic/visual signals.</td><td>AE profile vs oveporexton's insomnia/urinary-urgency signature; dose-proportionality at higher exposures.</td></tr>
+<tr><td><b>BP-205 Ph1b</b></td><td>Early 2027</td><td><span class="date-tag guidance">guidance</span></td><td>First pharmacodynamic read: wake-promotion in sleep-deprived healthy volunteers.</td><td>Statistically clear wake-promotion signal with dose-response.</td><td>Effect size vs placebo; whether ultra-potency (0.015 nM) translates or just narrows the window.</td></tr>
+<tr><td><b>ARGUS topline (Dravet)</b></td><td>H1 2027</td><td><span class="date-tag guidance">guidance</span></td><td>Ph3 primary: % change in 28-day countable motor seizure frequency.</td><td>Significant CMS-28 reduction, clean cardiac data, no new safety signal.</td><td>Placebo response in seizure-count endpoints; dropout; serious-AE imbalance; enrollment completion.</td></tr>
+<tr><td><b>LIGHTHOUSE topline (LGS)</b></td><td>H1 2027</td><td><span class="date-tag guidance">guidance</span></td><td>Ph3 of EPX-100 in Lennox-Gastaut; design undisclosed.</td><td>Win in a heterogeneous population.</td><td>Design/endpoint still undisclosed — interpret cautiously; ARGUS read-across is partial (different disease biology).</td></tr>
+<tr><td><b>Pitolisant GR PDUFA</b></td><td>Apr 1, 2027</td><td><span class="date-tag hard">hard</span></td><td>FDA action on pediatric gastro-resistant tablets; planned H1 2027 launch.</td><td>Approval on time; label language supporting pediatric-exclusivity claim.</td><td>Label wording; any review extension; launch uptake vs adult WAKIX.</td></tr>
+<tr><td><b>AXS-12 PDUFA (competitive)</b></td><td>May 1, 2027</td><td><span class="date-tag hard">hard</span></td><td>Axsome's reboxetine for cataplexy; no AdCom planned.</td><td>For HRMY: CRL, narrow label, or delayed action.</td><td>Approval would create the first non-oxybate, non-pitolisant cataplexy option — direct NT1 overlap.</td></tr>
+<tr><td><b>TEMPO topline (PWS)</b></td><td>Mid-2027</td><td><span class="date-tag guidance">guidance</span></td><td>Ph3 n=134; primary EDS (ESS-CHAD); secondaries on behavior/hyperphagia.</td><td>Significant ESS-CHAD separation; supportive behavioral secondaries.</td><td>Placebo drift (was −3.7 pts in Ph2); enrollment pace (registry completion Jul 2027); safety in pediatrics.</td></tr>
+<tr><td><b>BP-205 Ph2 start</b></td><td>Mid-2027</td><td><span class="date-tag guidance">guidance</span></td><td>Indication selection for Ph2 in “multiple CNS indications.”</td><td>Clear, differentiated indication choices (e.g., NT2/IH where orexin rivals are thinner).</td><td>Whether Harmony chases NT1 head-on vs a flank strategy.</td></tr>
+<tr><td><b>ONSTRIDE-1 topline</b></td><td>2027</td><td><span class="date-tag guidance">guidance</span></td><td>Ph3 of 60-mg enteric-coated pitolisant in narcolepsy; PDUFA targeted 2028.</td><td>ESS/cataplexy win; GI tolerability acceptable at 60 mg.</td><td>QT signals at higher exposure; dose-response shape; dropout vs approved dose.</td></tr>
+<tr><td><b>ONSTRIDE-2 topline</b></td><td>2027</td><td><span class="date-tag guidance">guidance</span></td><td>Ph3 of 60-mg pitolisant in IH — the redo of failed INTUNE.</td><td>Primary hit where 35.6 mg failed.</td><td>Highest-skepticism readout; INTUNE precedent was −33%; parallel-design risk.</td></tr>
+<tr><td><b>Alixorexton Brilliance (competitive)</b></td><td>H2 2027</td><td><span class="date-tag inferred">inferred</span></td><td>Alkermes OX2R agonist Ph3 (NT1 ×2, NT2); timing registry-derived.</td><td>For HRMY: a miss slows the orexin-share-shift narrative.</td><td>Positive read puts two approved orexin agonists on the NT1 map by ~2028.</td></tr>
+<tr><td><b>2028 PDUFAs</b></td><td>2028</td><td><span class="date-tag guidance">guidance</span></td><td>Company-targeted filings: HD pitolisant (narcolepsy), EPX-100 (DS/LGS).</td><td>Filings accepted on 2027 wins.</td><td>Entirely contingent on 2027 readouts; treat as placeholder until then.</td></tr>
+<tr><td><b>WAKIX exclusivity end</b></td><td>Mar 2030 / Jul 2030</td><td><span class="date-tag guidance">guidance</span></td><td>Management-guided exclusivity end; Lupin licensed from Jul 2030 contingent on pediatric exclusivity.</td><td>AET ruling favorable; pediatric exclusivity granted (6-mo extension).</td><td>Generic erosion curve post-2030; pipeline must bridge by then.</td></tr>
+</table></div>
 <p><span class="ref">Event set cross-checked against the local 2027 catalyst calendar (data.json) and Q4-2026 dossier (dossier-v4.json) for HRMY rows.</span></p>
 </section>
+<section id="s10"><div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>What could break the annuity</h2><p class="lede">Ordered by potential impact on the investment case.</p></div></div>
 
-<section id="s10">
-<h2><span class="num">10</span>Ranked Red Flags</h2>
-<p class="kicker">Ordered by potential impact on the investment case.</p>
-<div class="flag"><h4><span class="sev">HIGH</span>1 · Orexin-2 agonists obsolete the mechanism story in NT1</h4><p>Orzeyful is approved and treats the underlying orexin deficiency; pitolisant is symptomatic histaminergic amplification. Prescriber and payer preference in NT1 can migrate over 2027–2029 regardless of WAKIX's execution. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="flag"><h4><span class="sev">HIGH</span>2 · Single-product dependence into a 2030 cliff</h4><p>WAKIX is 100% of revenue; contracted exclusivity ends March 2030 (generics licensed from 2030). The entire post-2030 equity story must be built by the 2027 readout cluster. <span class="tag fact">FACT</span></p></div>
-<div class="flag"><h4><span class="sev">HIGH</span>3 · ONSTRIDE-2 repeats an already-failed experiment</h4><p>INTUNE missed its IH primary in Oct 2023 (−33% stock). The high-dose rationale (60 mg succeeds where 35.6 mg failed) is unproven, and IH is not orexin-deficient. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="flag"><h4><span class="sev">HIGH</span>4 · Two Phase 3 failures in two years</h4><p>INTUNE (2023) and RECONNECT (2025) both missed primaries — the latter killing a $200M acquisition's lead asset. Late-stage execution credibility is dented even though both misses had plausible explanations (placebo response). <span class="tag fact">FACT</span></p></div>
-<div class="flag"><h4><span class="sev med">MED</span>5 · COGS creep on the only product</h4><p>Cost of product sold rose to 24.2% of revenue (Novitium royalties) from 19.0% YoY — a structural margin step-up with Bioprojet tiered royalties underneath. <span class="tag fact">FACT</span></p></div>
-<div class="flag"><h4><span class="sev med">MED</span>6 · Capital allocation: Zynerba write-off</h4><p>$200M (Oct 2023) for ZYN002 → phased out after RECONNECT. Epygenix ($35M + milestones) is the next "prove it" deal. M&amp;A has not yet created value. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="flag"><h4><span class="sev med">MED</span>7 · AET litigation tail risk</h4><p>6 of 7 ANDA filers settled; AET's bench trial closes Oct 22, 2026. An adverse ruling could pull generic entry earlier than March 2030 on the polymorph/method-of-use patents. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="flag"><h4><span class="sev med">MED</span>8 · TEMPO's Phase 2 was a trend, not a signal</h4><p>ESS-CHAD −4.9/−4.1 vs −3.7 placebo, not significant, in an underpowered n=65 study. The Ph3 (n=134) must separate from a large placebo drift in a behaviorally noisy pediatric population. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="flag"><h4><span class="sev low">LOW</span>9 · Officer selling into strength</h4><p>CMO sold 33,954 shares (Sept 4/8, 2026) after option exercises; CEO sold via 10b5-1 at $40.00–40.28 (Dec 2025). Routine compensation harvesting, but no open-market insider buying located. <span class="tag fact">FACT</span></p></div>
-<div class="flag"><h4><span class="sev low">LOW</span>10 · Finance leadership in transition</h4><p>Q2 2026 call featured an <i>interim</i> principal financial officer (Stephen Mollichella) alongside a newly granted CFO (Glenn Reicin, April 2026). Watch for a clean handoff. <span class="tag fact">FACT</span></p></div>
+
+<div class="flag"><h4><span class="sev">HIGH</span>1 · Orexin-2 agonists obsolete the mechanism story in NT1</h4><p>Orzeyful is approved and treats the underlying orexin deficiency; pitolisant is symptomatic histaminergic amplification. Prescriber and payer preference in NT1 can migrate over 2027–2029 regardless of WAKIX's execution. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><h4><span class="sev">HIGH</span>2 · Single-product dependence into a 2030 cliff</h4><p>WAKIX is 100% of revenue; contracted exclusivity ends March 2030 (generics licensed from 2030). The entire post-2030 equity story must be built by the 2027 readout cluster. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><h4><span class="sev">HIGH</span>3 · ONSTRIDE-2 repeats an already-failed experiment</h4><p>INTUNE missed its IH primary in Oct 2023 (−33% stock). The high-dose rationale (60 mg succeeds where 35.6 mg failed) is unproven, and IH is not orexin-deficient. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><h4><span class="sev">HIGH</span>4 · Two Phase 3 failures in two years</h4><p>INTUNE (2023) and RECONNECT (2025) both missed primaries — the latter killing a $200M acquisition's lead asset. Late-stage execution credibility is dented even though both misses had plausible explanations (placebo response). <span class="ev fact">FACT</span></p></div>
+<div class="flag"><h4><span class="sev med">MED</span>5 · COGS creep on the only product</h4><p>Cost of product sold rose to 24.2% of revenue (Novitium royalties) from 19.0% YoY — a structural margin step-up with Bioprojet tiered royalties underneath. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><h4><span class="sev med">MED</span>6 · Capital allocation: Zynerba write-off</h4><p>$200M (Oct 2023) for ZYN002 → phased out after RECONNECT. Epygenix ($35M + milestones) is the next "prove it" deal. M&amp;A has not yet created value. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><h4><span class="sev med">MED</span>7 · AET litigation tail risk</h4><p>6 of 7 ANDA filers settled; AET's bench trial closes Oct 22, 2026. An adverse ruling could pull generic entry earlier than March 2030 on the polymorph/method-of-use patents. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><h4><span class="sev med">MED</span>8 · TEMPO's Phase 2 was a trend, not a signal</h4><p>ESS-CHAD −4.9/−4.1 vs −3.7 placebo, not significant, in an underpowered n=65 study. The Ph3 (n=134) must separate from a large placebo drift in a behaviorally noisy pediatric population. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><h4><span class="sev low">LOW</span>9 · Officer selling into strength</h4><p>CMO sold 33,954 shares (Sept 4/8, 2026) after option exercises; CEO sold via 10b5-1 at $40.00–40.28 (Dec 2025). Routine compensation harvesting, but no open-market insider buying located. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><h4><span class="sev low">LOW</span>10 · Finance leadership in transition</h4><p>Q2 2026 call featured an <i>interim</i> principal financial officer (Stephen Mollichella) alongside a newly granted CFO (Glenn Reicin, April 2026). Watch for a clean handoff. <span class="ev fact">FACT</span></p></div>
 </section>
+<section id="s11"><div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Three paths, priced with soft anchors</h2><p class="lede">Framed around the clinical binaries, not commercial trading. Soft scenario price targets below are illustrative (explicitly labeled assumptions), not a recommendation. Takeout/max-value framing is capped at the street high of $70.</p></div></div>
 
-<section id="s11">
-<h2><span class="num">11</span>Bear / Base / Bull &amp; Scenario Analyses</h2>
-<p class="kicker">Framed around the clinical binaries, not commercial trading. Soft scenario price targets below are illustrative (explicitly labeled assumptions), not a recommendation. Takeout/max-value framing is capped at the street high of $70.</p>
+
 <div class="grid2">
-<div class="card"><h4>Bear case</h4><p>ONSTRIDE-2 fails like INTUNE; TEMPO misses on placebo drift; ARGUS/LIGHTHOUSE miss on small-effect/noisy-endpoint dynamics; orexin agonists (Orzeyful now, alixorexton 2027) steadily take NT1 share; AET wins or narrows the patent case. WAKIX becomes a 3.4-year cash cow into a 2030 generic cliff with no replacement franchise. The profitable-multiple compresses toward a declining-annuity multiple. <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="card"><h4>Base case</h4><p>Mixed 2027: pitolisant GR approved (Apr 2027); ONSTRIDE-1 hits (dose-response holds in narcolepsy, PDUFA 2028); one of TEMPO / ARGUS / LIGHTHOUSE hits, giving a second franchise; ONSTRIDE-2 is the miss. WAKIX grows through 2028–2029 on patient adds and the GR/HD lifecycle extensions, then faces 2030 generics with at least one new revenue leg. Valuation stays anchored to earnings with pipeline optionality priced in pieces as readouts land. <span class="tag interp">INTERPRETATION</span></p></div>
+<div class="card"><h4>Bear case</h4><p>ONSTRIDE-2 fails like INTUNE; TEMPO misses on placebo drift; ARGUS/LIGHTHOUSE miss on small-effect/noisy-endpoint dynamics; orexin agonists (Orzeyful now, alixorexton 2027) steadily take NT1 share; AET wins or narrows the patent case. WAKIX becomes a 3.4-year cash cow into a 2030 generic cliff with no replacement franchise. The profitable-multiple compresses toward a declining-annuity multiple. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="card"><h4>Base case</h4><p>Mixed 2027: pitolisant GR approved (Apr 2027); ONSTRIDE-1 hits (dose-response holds in narcolepsy, PDUFA 2028); one of TEMPO / ARGUS / LIGHTHOUSE hits, giving a second franchise; ONSTRIDE-2 is the miss. WAKIX grows through 2028–2029 on patient adds and the GR/HD lifecycle extensions, then faces 2030 generics with at least one new revenue leg. Valuation stays anchored to earnings with pipeline optionality priced in pieces as readouts land. <span class="ev interp">INTERPRETATION</span></p></div>
 </div>
-<div class="card" style="margin-top:16px"><h4>Bull case</h4><p>Multiple 2027 hits: ONSTRIDE-1 + TEMPO + both EPX-100 trials, with clean safety. Two new franchises (PWS pitolisant, rare-epilepsy clemizole with ODD/RPDD and PRV-eligible pediatric designations) plus the HD lifecycle extension reframe Harmony from "WAKIX annuity" to a multi-franchise CNS company; BP-205 Ph1b/Ph2 data keeps an orexin call option alive. The 2030 cliff is bridged by new exclusivity stacks (new formulations, new indications, pediatric extensions). Takeout or max-value scenarios under this path are bounded above by the street high of $70. <span class="tag interp">INTERPRETATION</span></p></div>
-
-<h3>Soft scenario price targets <span class="tag interp">SOFT &mdash; scenario-based, not a recommendation</span></h3>
-<p><b>Method (all assumptions labeled).</b> Equity value = EV + net cash. Net cash = $962.5M cash/investments (6/30/26) &minus; $160M JPM term loan = <b>$802.5M</b> &rarr; <b>$13.78/share</b> on 58.24M basic shares. EV scenarios are anchored to 2026 guided revenue (midpoint <b>$1.02B</b>) plus probability-weighted pipeline value. Computed on basic shares; on ~67.0M fully-diluted shares each target runs ~13% lower (noted below). Bull case is capped at the street high of $70 per this dossier's own rule. <span class="tag interp">INTERPRETATION</span></p>
-<table>
+<div class="card" style="margin-top:16px"><h4>Bull case</h4><p>Multiple 2027 hits: ONSTRIDE-1 + TEMPO + both EPX-100 trials, with clean safety. Two new franchises (PWS pitolisant, rare-epilepsy clemizole with ODD/RPDD and PRV-eligible pediatric designations) plus the HD lifecycle extension reframe Harmony from "WAKIX annuity" to a multi-franchise CNS company; BP-205 Ph1b/Ph2 data keeps an orexin call option alive. The 2030 cliff is bridged by new exclusivity stacks (new formulations, new indications, pediatric extensions). Takeout or max-value scenarios under this path are bounded above by the street high of $70. <span class="ev interp">INTERPRETATION</span></p></div>
+<h3>Soft scenario price targets <span class="ev interp">INTERPRETATION</span></h3>
+<p><b>Method (all assumptions labeled).</b> Equity value = EV + net cash. Net cash = $962.5M cash/investments (6/30/26) − $160M JPM term loan = <b>$802.5M</b> → <b>$13.78/share</b> on 58.24M basic shares. EV scenarios are anchored to 2026 guided revenue (midpoint <b>$1.02B</b>) plus probability-weighted pipeline value. Computed on basic shares; on ~67.0M fully-diluted shares each target runs ~13% lower (noted below). Bull case is capped at the street high of $70 per this dossier's own rule. <span class="ev interp">INTERPRETATION</span></p>
+<div class="tablewrap"><table>
 <tr><th>Scenario</th><th>EV assumption</th><th>Implied equity</th><th>Soft PT (basic sh.)</th><th>FD-adj. (~67M sh.)</th></tr>
-<tr><td><b>Bear</b> — 2027 cluster fails (ONSTRIDE-2, TEMPO, ARGUS/LIGHTHOUSE miss); orexin share-shift; adverse AET ruling</td><td>1.0&times; 2026 sales = $1.02B EV; pipeline value $0</td><td>$1.02B + $0.80B = $1.82B</td><td><b>~$31</b></td><td>~$27</td></tr>
-<tr><td><b>Base</b> — mixed 2027: GR approved, ONSTRIDE-1 hits, one of TEMPO/ARGUS/LIGHTHOUSE hits, ONSTRIDE-2 misses</td><td>1.5&times; 2026 sales ($1.53B) + prob-weighted pipeline ~$0.30B</td><td>$1.83B + $0.80B = $2.63B</td><td><b>~$45</b></td><td>~$39</td></tr>
-<tr><td><b>Bull</b> — multiple 2027 hits (ONSTRIDE-1 + TEMPO + both EPX-100 trials, clean safety)</td><td>2.5&times; 2026 sales ($2.55B) + two new franchises ~$1.20B; computed ~$78, <b>capped at street high $70</b></td><td>&mdash;</td><td><b>$70 (capped)</b></td><td>$70 (capped)</td></tr>
-</table>
-<p style="font-size:12.5px;color:var(--muted)"><b>Sanity check vs street</b> (low $28 / avg $46.54 / high $70, 13 analysts): bear ~$31 sits near the street low, base ~$45 near the street average, bull is the street high by construction. If the pipeline cluster fully fails, the bear math says the market is paying ~$25.5/share for the WAKIX annuity ex-cash ($31 &minus; $13.78 net cash &minus; ~$1.6 pipeline stub &asymp; annuity value) — the downside case is a melting-ice-cube multiple, not a zero. <span class="tag interp">INTERPRETATION</span></p>
-
+<tr><td><b>Bear</b> — 2027 cluster fails (ONSTRIDE-2, TEMPO, ARGUS/LIGHTHOUSE miss); orexin share-shift; adverse AET ruling</td><td>1.0× 2026 sales = $1.02B EV; pipeline value $0</td><td>$1.02B + $0.80B = $1.82B</td><td><b>~$31</b></td><td>~$27</td></tr>
+<tr><td><b>Base</b> — mixed 2027: GR approved, ONSTRIDE-1 hits, one of TEMPO/ARGUS/LIGHTHOUSE hits, ONSTRIDE-2 misses</td><td>1.5× 2026 sales ($1.53B) + prob-weighted pipeline ~$0.30B</td><td>$1.83B + $0.80B = $2.63B</td><td><b>~$45</b></td><td>~$39</td></tr>
+<tr><td><b>Bull</b> — multiple 2027 hits (ONSTRIDE-1 + TEMPO + both EPX-100 trials, clean safety)</td><td>2.5× 2026 sales ($2.55B) + two new franchises ~$1.20B; computed ~$78, <b>capped at street high $70</b></td><td>—</td><td><b>$70 (capped)</b></td><td>$70 (capped)</td></tr>
+</table></div>
+<p style="font-size:12.5px;color:var(--muted)"><b>Sanity check vs street</b> (low $28 / avg $46.54 / high $70, 13 analysts): bear ~$31 sits near the street low, base ~$45 near the street average, bull is the street high by construction. If the pipeline cluster fully fails, the bear math says the market is paying ~$25.5/share for the WAKIX annuity ex-cash ($31 − $13.78 net cash − ~$1.6 pipeline stub ≈ annuity value) — the downside case is a melting-ice-cube multiple, not a zero. <span class="ev interp">INTERPRETATION</span></p>
 <h3>Scenario analyses</h3>
-<table>
+<div class="tablewrap"><table>
 <tr><th>Scenario</th><th>Trigger</th><th>What it would mean</th></tr>
-<tr><td><b>Orexin share-shift (2027–2029)</b></td><td>Orzeyful uptake + positive alixorexton Brilliance (H2 2027)</td><td>NT1 prescriber preference migrates to lesion-targeted therapy; WAKIX growth decelerates even before 2030. Mitigant: WAKIX's non-scheduled status, established payer coverage (&gt;80% lives), and use in NT2 where orexin agonists are not yet approved. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>INTUNE repeat</b></td><td>ONSTRIDE-2 misses primary</td><td>Second IH failure; prior drawdown was −33%. Would raise questions about high-dose pitolisant strategy broadly and dent ONSTRIDE-1's read-across. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Epilepsy franchise validation</b></td><td>ARGUS hits CMS-28 primary in H1 2027</td><td>First novel-mechanism validation for Harmony R&amp;D; de-risks LIGHTHOUSE partially (shared drug, different population); path to 2028 PDUFA and a second commercial franchise. Miss inverts all of this. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Patent-case adverse outcome</b></td><td>AET ruling against Harmony (post Oct 22, 2026 arguments)</td><td>Generic entry could precede March 2030 on the litigated patents; the contracted settlements with 6 filers still bound them, but headline exclusivity shortens. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Takeout</b></td><td>Hypothetical acquirer pays for WAKIX cash flows + pipeline</td><td>Bounded above by the street high price target of $70 (11-analyst consensus per MarketBeat, Oct 6 2026). No takeout premium assumption beyond that level is made. <span class="tag interp">INTERPRETATION</span></td></tr>
-</table>
+<tr><td><b>Orexin share-shift (2027–2029)</b></td><td>Orzeyful uptake + positive alixorexton Brilliance (H2 2027)</td><td>NT1 prescriber preference migrates to lesion-targeted therapy; WAKIX growth decelerates even before 2030. Mitigant: WAKIX's non-scheduled status, established payer coverage (&gt;80% lives), and use in NT2 where orexin agonists are not yet approved. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>INTUNE repeat</b></td><td>ONSTRIDE-2 misses primary</td><td>Second IH failure; prior drawdown was −33%. Would raise questions about high-dose pitolisant strategy broadly and dent ONSTRIDE-1's read-across. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Epilepsy franchise validation</b></td><td>ARGUS hits CMS-28 primary in H1 2027</td><td>First novel-mechanism validation for Harmony R&amp;D; de-risks LIGHTHOUSE partially (shared drug, different population); path to 2028 PDUFA and a second commercial franchise. Miss inverts all of this. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Patent-case adverse outcome</b></td><td>AET ruling against Harmony (post Oct 22, 2026 arguments)</td><td>Generic entry could precede March 2030 on the litigated patents; the contracted settlements with 6 filers still bound them, but headline exclusivity shortens. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Takeout</b></td><td>Hypothetical acquirer pays for WAKIX cash flows + pipeline</td><td>Bounded above by the street high price target of $70 (11-analyst consensus per MarketBeat, Oct 6 2026). No takeout premium assumption beyond that level is made. <span class="ev interp">INTERPRETATION</span></td></tr>
+</table></div>
 </section>
+<section id="s12"><div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Operator-led: the WAKIX launch is the credential</h2><p class="lede">Operator-led; WAKIX launch is the credential, two Phase 3 misses are the debit.</p></div></div>
 
-<section id="s12">
-<h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
-<p class="kicker">Operator-led; WAKIX launch is the credential, two Phase 3 misses are the debit.</p>
-<table>
+
+<div class="tablewrap"><table>
 <tr><th>Person</th><th>Role / background</th></tr>
-<tr><td><b>Jeffrey M. Dayno, M.D.</b></td><td>President &amp; CEO. Led WAKIX from 2019 launch to ~$1B guided revenue; oversaw Zynerba and Epygenix acquisitions and the Bioprojet orexin sublicense. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Peter Anastasiou</b></td><td>COO (appointed April 2026; moved from the board). Previously Chairman of Sage Therapeutics through its acquisition by Supernus (July 2025). <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Kumar Budur, M.D., M.S.</b></td><td>EVP, Chief Medical &amp; Scientific Officer. Clinical face of INTUNE, TEMPO, ARGUS programs. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Glenn Reicin</b></td><td>CFO (option grant April 2026, $29.29 exercise). Q2 2026 call also referenced interim principal financial officer Stephen Mollichella — a transition to monitor. <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Board</b></td><td>Troy Ignelzi and Geno Germano added April 2026; Antonio Gracias departed. Directors hold standard annual option grants (~21.9k shares @ $30.76, May 2026). <span class="tag fact">FACT</span></td></tr>
-</table>
-<p><b>Track record.</b> Commercial execution is strong: seven years of WAKIX growth, record Q2 2026 (+450 patients, second-best add ever), profitability since early in the launch. Clinical execution is mixed: two registrational primary-endpoint misses (INTUNE 2023, RECONNECT 2025) against a portfolio that now asks investors to underwrite five more Phase 3 readouts in one year. M&amp;A: Zynerba ($200M) impaired; Epygenix ($35M + milestones) pending proof. <span class="tag interp">INTERPRETATION</span></p>
-<p><b>Insider signals.</b> CEO Dayno: option exercise + share sales at $40.00–40.28 via 10b5-1 (Dec 2025). CMO Budur: exercised 22,954 options and sold 33,954 shares Sept 4/8, 2026 (plus a 5,500-share Form 144 notice). No open-market insider purchases located in sources reviewed. Institutional ownership ~86%. <span class="tag fact">FACT</span> <span class="ref">(SEC Form 4s via stocktitan; 13F aggregators)</span></p>
+<tr><td><b>Jeffrey M. Dayno, M.D.</b></td><td>President &amp; CEO. Led WAKIX from 2019 launch to ~$1B guided revenue; oversaw Zynerba and Epygenix acquisitions and the Bioprojet orexin sublicense. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Peter Anastasiou</b></td><td>COO (appointed April 2026; moved from the board). Previously Chairman of Sage Therapeutics through its acquisition by Supernus (July 2025). <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Kumar Budur, M.D., M.S.</b></td><td>EVP, Chief Medical &amp; Scientific Officer. Clinical face of INTUNE, TEMPO, ARGUS programs. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Glenn Reicin</b></td><td>CFO (option grant April 2026, $29.29 exercise). Q2 2026 call also referenced interim principal financial officer Stephen Mollichella — a transition to monitor. <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Board</b></td><td>Troy Ignelzi and Geno Germano added April 2026; Antonio Gracias departed. Directors hold standard annual option grants (~21.9k shares @ $30.76, May 2026). <span class="ev fact">FACT</span></td></tr>
+</table></div>
+<p><b>Track record.</b> Commercial execution is strong: seven years of WAKIX growth, record Q2 2026 (+450 patients, second-best add ever), profitability since early in the launch. Clinical execution is mixed: two registrational primary-endpoint misses (INTUNE 2023, RECONNECT 2025) against a portfolio that now asks investors to underwrite five more Phase 3 readouts in one year. M&amp;A: Zynerba ($200M) impaired; Epygenix ($35M + milestones) pending proof. <span class="ev interp">INTERPRETATION</span></p>
+<p><b>Insider signals.</b> CEO Dayno: option exercise + share sales at $40.00–40.28 via 10b5-1 (Dec 2025). CMO Budur: exercised 22,954 options and sold 33,954 shares Sept 4/8, 2026 (plus a 5,500-share Form 144 notice). No open-market insider purchases located in sources reviewed. Institutional ownership ~86%. <span class="ev fact">FACT</span> <span class="ref">(SEC Form 4s via stocktitan; 13F aggregators)</span></p>
 </section>
+<section id="s13"><div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Source order observed: SEC filings → FDA/labels → CT.gov → papers/conferences → company PRs → trade press.</p></div></div>
 
-<section id="s13">
-<h2><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
-<p class="kicker">Source order observed: SEC filings → FDA/labels → CT.gov → papers/conferences → company PRs → trade press.</p>
+
 <h3>Filings &amp; company disclosures</h3>
 <ul class="ref">
 <li>Harmony Biosciences Holdings, Inc. — Form 10-Q for quarter ended March 31, 2026 (shares, options, debt, Novitium/MSN deals, ANDA settlements). Via stocktitan/SEC.</li>
@@ -525,48 +652,35 @@ Soft scenario price targets are included in §11 with explicitly labeled assumpt
 HRMY deep-dive dossier · generated October 7, 2026 · audited &amp; enhanced October 10, 2026 · neutral third-party research document · no personal data included · not investment advice · soft scenario price targets labeled as such; no recommendation.
 </footer>
 
-<button id="backTop" type="button" aria-label="Back to top">↑</button>
-<script>
-(function(){
-  var root=document.documentElement, btn=document.getElementById('themeToggle');
-  function label(){ btn.textContent = root.getAttribute('data-theme')==='dark' ? '\u2600 Light' : '\u25d0 Dark'; }
-  try{ var s=localStorage.getItem('hrmy-theme'); if(s) root.setAttribute('data-theme',s); }catch(e){}
-  label();
-  btn.addEventListener('click',function(){
-    var dark = root.getAttribute('data-theme')!=='dark';
-    if(dark) root.setAttribute('data-theme','dark'); else root.removeAttribute('data-theme');
-    try{ localStorage.setItem('hrmy-theme', dark?'dark':'light'); }catch(e){}
-    label();
-  });
-  var bt=document.getElementById('backTop');
-  window.addEventListener('scroll',function(){ bt.classList.toggle('show', window.scrollY>600); },{passive:true});
-  bt.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
-  document.querySelectorAll('table').forEach(function(t){
-    var w=document.createElement('div'); w.className='tablewrap';
-    t.parentNode.insertBefore(w,t); w.appendChild(t);
-  });
-  function setCollapsed(sec,c){
-    sec.classList.toggle('collapsed',c);
-    var b=sec.querySelector('.collapse-btn');
-    if(b){ b.textContent=c?'\u25b8':'\u25be'; b.setAttribute('aria-expanded',String(!c));
-      b.setAttribute('aria-label',(c?'Expand':'Collapse')+' section'); }
-  }
-  document.querySelectorAll('main > section').forEach(function(sec){
-    var h2=sec.querySelector('h2'); if(!h2) return;
-    var b=document.createElement('button');
-    b.type='button'; b.className='collapse-btn'; b.setAttribute('aria-expanded','true');
-    b.setAttribute('aria-label','Collapse section'); b.textContent='\u25be';
-    b.addEventListener('click',function(ev){ ev.stopPropagation(); setCollapsed(sec,!sec.classList.contains('collapsed')); });
-    h2.appendChild(b);
-  });
-  document.querySelectorAll('nav.toc a[href^="#"]').forEach(function(a){
-    a.addEventListener('click',function(){
-      var t=document.querySelector(a.getAttribute('href'));
-      if(t && t.classList.contains('collapsed')) setCollapsed(t,false);
-    });
-  });
-})();
-</script>
 
-</body>
+<button aria-label="Back to top" class="totop" id="toTop" type="button">↑</button><script>/* Theme toggle */
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀ Light mode':'◐ Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';
+try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+/* Collapsible sections */
+document.querySelectorAll('main > section').forEach(function(sec){
+  const head=sec.querySelector('.section-head'); if(!head)return;
+  const body=document.createElement('div'); body.className='section-body';
+  let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+  sec.appendChild(body);
+  const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+  btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+  btn.addEventListener('click',function(){
+    const c=sec.classList.toggle('collapsed');
+    btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+    btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+  });
+  head.appendChild(btn);
+});
+
+/* Back to top */
+const toTop=document.getElementById('toTop');
+function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script></body>
 </html>
