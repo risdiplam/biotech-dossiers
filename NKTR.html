@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NKTR — Nektar Therapeutics — Deep-Dive Dossier (October 2026)</title>
+<style>
+  :root{
+    --ink:#1b2430; --muted:#5b6b7c; --line:#dde4ec; --bg:#f7f9fb; --card:#ffffff;
+    --navy:#10263f; --accent:#0e6e8c; --accent-soft:#e6f2f6;
+    --fact:#1d7a3a; --interp:#2056a8; --gap:#a36a00; --unver:#6b7280;
+    --hard:#b3261e; --guid:#8a5a00; --infer:#5b6b7c;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg);line-height:1.62;font-size:16px}
+  .topbar{background:var(--navy);color:#fff;padding:34px 28px 30px}
+  .topbar .wrap{max-width:1180px;margin:0 auto}
+  .topbar h1{margin:0;font-size:30px;letter-spacing:.2px}
+  .topbar h1 .tick{font-weight:800}
+  .topbar .sub{margin:10px 0 0;color:#b9c7d6;font-size:14.5px;max-width:880px}
+  .topbar .meta{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+        padding:3px 10px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+  .pill.fact{background:#e5f4ea;color:var(--fact);border-color:#bfe3cb}
+  .pill.interp{background:#e7eefb;color:var(--interp);border-color:#c3d4f0}
+  .pill.gap{background:#fdf3df;color:var(--gap);border-color:#ecd9a8}
+  .pill.unver{background:#eef0f3;color:var(--unver);border-color:#d7dbe0}
+  .pill.hard{background:#fbe7e6;color:var(--hard);border-color:#f0c4c1}
+  .pill.guid{background:#fbf2dc;color:var(--guid);border-color:#ead49b}
+  .pill.infer{background:#eef0f3;color:var(--infer);border-color:#d7dbe0}
+  .pill.asof{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35)}
+  .layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:28px;padding:28px 22px 80px}
+  nav.side{position:sticky;top:20px;align-self:start;background:var(--card);border:1px solid var(--line);
+           border-radius:10px;padding:16px 14px;max-height:calc(100vh - 40px);overflow:auto}
+  nav.side h4{margin:2px 6px 10px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  nav.side a{display:block;color:var(--ink);text-decoration:none;font-size:13.5px;padding:6px 8px;border-radius:6px}
+  nav.side a:hover{background:var(--accent-soft)}
+  main{min-width:0}
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 30px;margin-bottom:26px}
+  section.card h2{margin:0 0 4px;font-size:22px;color:var(--navy);padding-bottom:10px;border-bottom:2px solid var(--navy)}
+  section.card h3{font-size:17px;color:var(--navy);margin:26px 0 8px}
+  section.card h4{font-size:15px;margin:18px 0 6px}
+  p{margin:10px 0}
+  .lede{font-size:17px;color:#2c3a49}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f0f4f8;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:16px 0}
+  .kbox{background:#f4f7fa;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .kbox .k{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700}
+  .kbox .v{font-size:21px;font-weight:750;color:var(--navy);margin-top:4px}
+  .kbox .d{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:14px 18px;border-radius:0 10px 10px 0;margin:16px 0}
+  .callout.warn{border-color:#b3261e;background:#fdf0ef}
+  .callout h4{margin:0 0 6px;font-size:14px}
+  .src{font-size:12.5px;color:var(--muted)}
+  ul.tight li{margin-bottom:6px}
+  .ev{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;border-radius:4px;padding:1px 7px;margin-right:6px;white-space:nowrap}
+  .ev.FACT{background:#e5f4ea;color:var(--fact)}
+  .ev.INT{background:#e7eefb;color:var(--interp)}
+  .ev.GAP{background:#fdf3df;color:var(--gap)}
+  .ev.UNV{background:#eef0f3;color:var(--unver)}
+  .timeline{position:relative;margin:18px 0 6px;padding-left:26px}
+  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .titem{position:relative;margin:0 0 18px}
+  .titem:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+  .titem .tdate{font-weight:750;color:var(--navy);font-size:14.5px}
+  .titem .tbody{font-size:14.5px}
+  .ref{font-size:13px;color:#33404f;margin-bottom:8px;padding-left:26px;text-indent:-22px}
+  .ref a{color:var(--accent)}
+  footer.site{max-width:1180px;margin:0 auto;padding:0 22px 60px;color:var(--muted);font-size:12.5px}
+  .num{font-variant-numeric:tabular-nums}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}nav.side{position:static;max-height:none}}
+  @media print{nav.side{display:none}.layout{grid-template-columns:1fr}body{background:#fff}}
+  /* ---- dark theme ---- */
+  [data-theme="dark"]{--ink:#e4eaf1;--muted:#9fb0c2;--line:#2c3a4a;--bg:#0f1620;--card:#16202d;
+    --navy:#cfe0f2;--accent:#4fc3e8;--accent-soft:#122b38}
+  [data-theme="dark"] .topbar{background:#0a1220}
+  [data-theme="dark"] th{background:#1b2836}
+  [data-theme="dark"] .kbox{background:#141f2c}
+  [data-theme="dark"] .pill.fact{background:#12291a;color:#7fd69a;border-color:#245c36}
+  [data-theme="dark"] .pill.interp{background:#16233c;color:#9db9f2;border-color:#2c4a86}
+  [data-theme="dark"] .pill.gap{background:#2e2410;color:#e0b85c;border-color:#5c4a1c}
+  [data-theme="dark"] .pill.unver{background:#22262c;color:#aab2bd;border-color:#3a4149}
+  [data-theme="dark"] .pill.hard{background:#331413;color:#f09690;border-color:#6b2a27}
+  [data-theme="dark"] .pill.guid{background:#2e2410;color:#e0b85c;border-color:#5c4a1c}
+  [data-theme="dark"] .pill.infer{background:#22262c;color:#aab2bd;border-color:#3a4149}
+  [data-theme="dark"] .ev.FACT{background:#12291a;color:#7fd69a}
+  [data-theme="dark"] .ev.INT{background:#16233c;color:#9db9f2}
+  [data-theme="dark"] .ev.GAP{background:#2e2410;color:#e0b85c}
+  [data-theme="dark"] .ev.UNV{background:#22262c;color:#aab2bd}
+  [data-theme="dark"] .callout{background:#122b38}
+  [data-theme="dark"] .callout.warn{background:#331413}
+  [data-theme="dark"] nav.side a:hover{background:#122b38}
+  [data-theme="dark"] .ref{color:#b9c7d6}
+  .theme-btn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;min-height:44px}
+  .theme-btn:hover{background:rgba(255,255,255,.22)}
+  /* ---- collapsible sections ---- */
+  section.card h2.sechead{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  section.card h2.sechead .chev{font-size:14px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+  section.card.collapsed h2.sechead .chev{transform:rotate(-90deg)}
+  section.card.collapsed .cardbody{display:none}
+  /* ---- table horizontal scroll on small screens ---- */
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+  .tablewrap table{margin:0;min-width:640px}
+  /* ---- back to top ---- */
+  #toTop{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;
+    background:var(--navy);color:var(--bg);border:1px solid var(--line);font-size:20px;cursor:pointer;
+    display:none;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25);z-index:50}
+  [data-theme="dark"] #toTop{background:var(--accent);color:#0a1220}
+  #toTop.show{display:flex}
+  /* ---- mobile ---- */
+  @media(max-width:900px){
+    section.card{padding:20px 16px}
+    .topbar{padding:26px 18px 24px}
+    .topbar h1{font-size:23px}
+    nav.side{padding:10px}
+    nav.side h4{margin:4px 8px 8px}
+    nav.side .navlinks{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px}
+    nav.side a{min-height:44px;display:flex;align-items:center;padding:8px 12px;white-space:nowrap;font-size:14px}
+    #toTop{right:12px;bottom:12px}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}#toTop{transition:none}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <h1><span class="tick">NKTR</span> &nbsp;·&nbsp; Nektar Therapeutics — Deep-Dive Investment Dossier</h1>
+    <p class="sub">Comprehensive clinical, financial, and catalyst review of rezpegaldesleukin, a Treg-stimulating IL-2 conjugate in Phase 3 for atopic dermatitis and entering Phase 3 for alopecia areata. Prepared as a neutral third-party research document.</p>
+    <div class="meta">
+      <span class="pill asof">Built October 7, 2026 · audited &amp; enhanced October 10, 2026</span>
+      <span class="pill asof">Price $41.17 (Oct 9, 2026 close) · Nasdaq Capital Market</span>
+      <span class="pill asof">Evidence tags: FACT / INTERPRETATION / GAP / UNVERIFIED</span>
+      <button class="theme-btn" id="themeToggle" aria-label="Toggle dark or light mode">🌙 Dark mode</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+<nav class="side">
+  <h4>Contents</h4>
+  <a href="#identity">1 · Identity &amp; thesis snapshot</a>
+  <a href="#science">2 · Science &amp; mechanism</a>
+  <a href="#pipeline">3 · Pipeline overview</a>
+  <a href="#trials">4 · Trial design deep dive</a>
+  <a href="#regulatory">5 · Clinical / regulatory status</a>
+  <a href="#competition">6 · Competition</a>
+  <a href="#financials">7 · Financials</a>
+  <a href="#fdmc">8 · FDMC / enterprise value</a>
+  <a href="#catalysts">9 · Catalyst &amp; event map</a>
+  <a href="#redflags">10 · Ranked red flags</a>
+  <a href="#scenarios">11 · Bear / base / bull</a>
+  <a href="#management">12 · Management &amp; insiders</a>
+  <a href="#references">13 · References</a>
+</nav>
+<main>
+
+<section class="card" id="identity">
+<h2>1 · Identity &amp; thesis snapshot</h2>
+<p class="lede"><span class="ev FACT">FACT</span>Nektar Therapeutics (Nasdaq: NKTR, Nasdaq Capital Market) is a clinical-stage biotechnology company headquartered in San Francisco, California, focused on immunology. Its lead and essentially only value-driving asset is <strong>rezpegaldesleukin</strong> (REZPEG; formerly NKTR-358 / LY3471851), a wholly owned, PEGylated IL-2 conjugate engineered to preferentially stimulate regulatory T cells (Tregs), in development for atopic dermatitis (AD), alopecia areata (AA), and type 1 diabetes (T1D). <span class="src">[R1, R2]</span></p>
+
+<div class="kgrid">
+  <div class="kbox"><div class="k">Share price (Oct 9, 2026 close)</div><div class="v num">$41.17</div><div class="d">52-wk range $33.40–$109 · ~$1.41B basic mcap (Finnhub) <span class="src">[R3]</span></div></div>
+  <div class="kbox"><div class="k">Cash + investments (Jun 30, 2026)</div><div class="v num">$1,023.4M</div><div class="d">No debt on balance sheet; YE2026 guide $815–840M <span class="src">[R4]</span></div></div>
+  <div class="kbox"><div class="k">Company runway guide</div><div class="v num">into Q3 2028</div><div class="d">Beyond first Phase 3 AD readout (mid-2028) <span class="src">[R4]</span></div></div>
+  <div class="kbox"><div class="k">Lead catalyst</div><div class="v num">ZENITH-AD Ph3</div><div class="d">First topline mid-2028 (guidance); 3 × ~510 pts <span class="src">[R5]</span></div></div>
+</div>
+
+<h3>Thesis in one paragraph</h3>
+<p><span class="ev INT">INTERPRETATION</span>NKTR is a single-asset, cash-rich binary: ~$1.0B of net cash (≈70% of the fully-diluted market cap) funds a registrational program for a first-in-class Treg mechanism that has already cleared a statistically significant Phase 2b in atopic dermatitis on all primary and key secondary endpoints, with Phase 3 readouts ~20 months out. The alopecia areata program is a free second call option, but its Phase 2b primary endpoint narrowly missed significance in the pre-specified analysis — so the AA leg rests on a post-hoc exclusion and small extension/durability datasets. The swing factor is whether the AD Phase 2b effect size (EASI-75 42% vs 17% placebo at 16 weeks) reproduces on the harder 24-week IGA 0/1 primary in Phase 3, against a placebo response that could drift upward in a registrational setting.</p>
+
+<div class="callout">
+<h4>Evidence-label key</h4>
+<p style="margin:0"><span class="ev FACT">FACT</span> verifiable from a cited source · <span class="ev INT">INTERPRETATION</span> inference or judgment from facts · <span class="ev GAP">GAP</span> material unknown that affects the thesis · <span class="ev UNV">UNVERIFIED</span> single/weak-source claim. Source order: SEC filings → FDA/labels → CT.gov/registries → peer-reviewed papers/conferences → company PR/decks → trade press.</p>
+</div>
+
+<h3>Key facts table</h3>
+<table>
+<tr><th style="width:34%">Item</th><th>Detail</th></tr>
+<tr><td>Company / ticker</td><td><span class="ev FACT">FACT</span> Nektar Therapeutics, Nasdaq: NKTR (Nasdaq Capital Market) <span class="src">[R3, R6]</span></td></tr>
+<tr><td>Headquarters / stage</td><td><span class="ev FACT">FACT</span> San Francisco, CA; clinical-stage, no marketed products <span class="src">[R1]</span></td></tr>
+<tr><td>Lead asset</td><td><span class="ev FACT">FACT</span> Rezpegaldesleukin (REZPEG, NKTR-358), PEGylated Treg-selective IL-2 conjugate; wholly owned <span class="src">[R1]</span></td></tr>
+<tr><td>FDA designations</td><td><span class="ev FACT">FACT</span> Fast Track: AD (Feb 2025, ages 12+); AA (Jul 2025, ages 12+, ≥40 kg) <span class="src">[R1]</span></td></tr>
+<tr><td>Share structure</td><td><span class="ev FACT">FACT</span> 1-for-15 reverse split effective June 9, 2025 <span class="src">[R7]</span></td></tr>
+<tr><td>Analyst stance</td><td><span class="ev FACT">FACT</span> Consensus "Moderate Buy", avg PT $138.50 (MarketBeat, ~Oct 2026); range $50 (Wedbush, Neutral) to $185 (HC Wainwright, Buy) <span class="src">[R8]</span></td></tr>
+<tr><td>Recent price action</td><td><span class="ev FACT">FACT</span> −33% over 5 trading days into Oct 7, 2026 following EADV long-term data (Oct 1, 2026) — sell-the-news into a 52-week low retest; recovered modestly to $41.17 by the Oct 9 close <span class="src">[R3]</span></td></tr>
+</table>
+</section>
+
+<section class="card" id="science">
+<h2>2 · Science: mechanism of action &amp; why it could fail</h2>
+
+<h3>Plain-language mechanism</h3>
+<p><span class="ev FACT">FACT</span>Rezpegaldesleukin is a recombinant human interleukin-2 (IL-2) that has been chemically modified (PEGylated) so that it preferentially signals through the <strong>trimeric high-affinity IL-2 receptor</strong> (IL-2Rα/β/γ, CD25/CD122/CD132) — the receptor form constitutively and densely expressed on <strong>regulatory T cells (Tregs)</strong> — rather than the dimeric intermediate-affinity receptor (IL-2Rβ/γ) found on effector T cells and NK cells. The net pharmacology is selective expansion and activation of Tregs, the immune system's "brakes," which suppress the pathogenic effector T cells driving autoimmune attack. <span class="src">[R1, R9]</span></p>
+<p><span class="ev INT">INTERPRETATION</span>The design solves the two classic problems of native IL-2 therapy: (1) a very short half-life requiring frequent dosing, and (2) at higher doses, stimulation of effector cells that worsens inflammation or causes toxicity. By biasing toward the Treg receptor, rezpeg aims to "restore immune balance" rather than broadly suppress immunity — the company calls it a "resolution therapeutic." <span class="src">[R1]</span></p>
+
+<h3>What the academic literature says (beyond company materials)</h3>
+<p>The Treg/IL-2 hypothesis is not a company invention — it rests on a deep literature:</p>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span><strong>Klatzmann &amp; Abbas, <em>Nature Reviews Immunology</em> 15:283–294 (2015)</strong> — the foundational review arguing that low-dose IL-2 can selectively expand Tregs and treat autoimmune/inflammatory disease, because Tregs constitutively express the high-affinity IL-2Rα chain (CD25) while resting effector cells do not. <span class="src">[R10]</span></li>
+<li><span class="ev FACT">FACT</span><strong>Castela et al., <em>JAMA Dermatology</em> 150:748–751 (2014)</strong> — low-dose recombinant IL-2 promoted Tregs and showed activity in <em>alopecia areata</em> patients, directly supporting the AA indication rationale. <span class="src">[R10]</span></li>
+<li><span class="ev FACT">FACT</span><strong>DILT1D / DILfrequency studies (Hartemann et al., <em>Nature Communications</em> 2022)</strong> — adaptive dose-finding of low-dose aldesleukin in type 1 diabetes established the dosing window (0.2–0.47 × 10⁶ IU/m²) that raises Tregs 20–50% without expanding effector T cells; supports the T1D program's biological premise. <span class="src">[R10]</span></li>
+<li><span class="ev FACT">FACT</span><strong>He et al., <em>Annals of the Rheumatic Diseases</em> 79:141–149 (2020)</strong> — randomized, double-blind, placebo-controlled trial of low-dose IL-2 in systemic lupus erythematosus met its endpoints, showing Treg expansion can translate clinically in autoimmunity. <span class="src">[R10]</span></li>
+<li><span class="ev FACT">FACT</span><strong>Koreth et al., <em>NEJM</em> 365:2055–2066 (2011)</strong> — low-dose IL-2 expanded Tregs and produced responses in steroid-refractory chronic graft-versus-host disease. <span class="src">[R10]</span></li>
+<li><span class="ev FACT">FACT</span><strong>Protein-engineering literature (e.g., <em>Nature Communications</em> 2022, s41467-022-31130-9)</strong> — documents the now-standard strategies rezpeg follows: weakening IL-2Rβ engagement (by mutation or masking, here via PEGylation) to force dependence on IL-2Rα, increasing Treg selectivity and half-life. <span class="src">[R10]</span></li>
+</ul>
+
+<h3>Why it could fail — the honest scientific risks</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span><strong>Treg expansion ≠ clinical efficacy, proven twice.</strong> Rezpeg itself failed the Phase 2 ISLAND trial in SLE (Feb 2023, missed SLEDAI-2K primary) under Lilly. <span class="src">[R11]</span> Independently, the LUPIL-2 trial of low-dose IL-2 in SLE (Humrich et al., <em>Ann Rheum Dis</em> 2022) missed its primary endpoint despite the biological rationale. <span class="src">[R10]</span> <span class="ev INT">INTERPRETATION</span> — The mechanism can be pharmacologically "working" (Tregs expand) while the disease doesn't care.</li>
+<li><span class="ev FACT">FACT</span><strong>Indication-specific biology.</strong> SLE failure does not predict AD/AA outcomes — but it proves the drug's effect is not indication-agnostic. AD and AA are the indications with positive data; the T1D leg has no human efficacy data for rezpeg at all. <span class="src">[R11]</span></li>
+<li><span class="ev INT">INTERPRETATION</span><strong>Responder-rate ceiling.</strong> Phase 2b AD EASI-75 of 42% (vs 17% placebo) leaves a majority of treated patients as non-responders at 16 weeks; the Phase 3 primary is the stricter IGA 0/1 (clear/almost-clear) at 24 weeks, where the Phase 2b hit rate was 20% vs 8%. If placebo IGA 0/1 drifts above ~10–12% in a registrational population, the delta compresses.</li>
+<li><span class="ev INT">INTERPRETATION</span><strong>Tolerability over years.</strong> Injection-site reactions in 69.7% of patients are mostly mild and self-resolving, but chronic q2w→q4w/q12w subcutaneous dosing with persistent ISRs is a real-world adherence question for a maintenance therapy, and eosinophilia (7.8% vs 2.7%) bears watching in longer Phase 3 exposure.</li>
+<li><span class="ev GAP">GAP</span>No published head-to-head data versus any approved AD or AA therapy exists, and the Phase 2b populations were biologic/JAK-naïve — the Phase 3 AD-3 study in treatment-experienced patients will test the mechanism in a harder population with no prior readout.</li>
+</ul>
+</section>
+
+<section class="card" id="pipeline">
+<h2>3 · Pipeline overview — ranked by value (most → least)</h2>
+<p class="lede"><span class="ev INT">INTERPRETATION</span>Economically this is a <strong>single-asset company</strong>: essentially all registrational value sits in rezpegaldesleukin's dermatology programs. Everything below rank 3 is an unvalued option — assigned zero in any disciplined framework.</p>
+<table>
+<tr><th style="width:5%">Rank</th><th>Asset / program</th><th>Stage</th><th>Why this rank</th></tr>
+<tr><td><strong>1</strong></td><td><strong>Rezpegaldesleukin — atopic dermatitis</strong><br>PEGylated Treg-selective IL-2 conjugate, SC</td><td><span class="ev FACT">FACT</span> Phase 3 (ZENITH-AD: 3 studies, ~1,530 pts); first data mid-2028 <span class="src">[R5]</span></td><td><span class="ev INT">INTERPRETATION</span>The only asset with positive, peer-reviewed (<em>Lancet</em>), dose-ordered registrational-grade data. Carries the overwhelming majority of the ~$0.49B FD enterprise value; the AD program alone justifies the cash-funded Phase 3 bet. Largest addressable market of the three indications.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>Rezpegaldesleukin — alopecia areata</strong><br>Same molecule</td><td><span class="ev FACT">FACT</span> Phase 2b complete; Phase 3 ZENITH-AA (n=850) to initiate early 2027 <span class="src">[R2]</span></td><td><span class="ev INT">INTERPRETATION</span>A genuine second call option with a unique durability narrative (off-treatment hair regrowth no JAK has shown) — but built on a Phase 2b whose primary missed in the pre-specified analysis. High variance: worth something, worth far less than AD until ZENITH-AA reads.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Rezpegaldesleukin — new-onset type 1 diabetes</strong><br>Same molecule</td><td><span class="ev FACT">FACT</span> NIH/TrialNet Phase 2 (n=66); initial data expected 2027 (company guidance) <span class="src">[R12]</span></td><td><span class="ev INT">INTERPRETATION</span>A free call option — NIH sponsors and runs the trial; Nektar only supplies drug + PK support, so the cost is negligible. But rezpeg has <em>no</em> human efficacy data in T1D; biology is supported only by the low-dose IL-2 diabetes literature. Assign token value.</td></tr>
+<tr><td><strong>4</strong></td><td><strong>NKTR-0165 / NKTR-0166</strong><br>Bivalent TNFR2 agonist antibody / TNFR2 bispecific</td><td><span class="ev FACT">FACT</span> Preclinical, autoimmune (unspecified) <span class="src">[R1]</span></td><td><span class="ev INT">INTERPRETATION</span>Treg-adjacent biology (TNFR2 agonism expands Tregs) so the platform logic is coherent — but preclinical, undisclosed indications, years from the clinic. Zero value in a disciplined framework.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>NKTR-422</strong><br>Modified hematopoietic colony-stimulating factor (CSF) protein</td><td><span class="ev FACT">FACT</span> Listed in pipeline; stage and indication undisclosed <span class="src">[R1]</span></td><td><span class="ev INT">INTERPRETATION</span>Essentially a pipeline-slide placeholder — no disclosed stage, indication, or data. Zero value.</td></tr>
+</table>
+<p><span class="ev GAP">GAP</span>NKTR-255 (IL-15 receptor agonist, formerly in oncology trials) no longer appears in current company pipeline materials; its status is unconfirmed in the sources reviewed. <span class="ev INT">INTERPRETATION</span> — Economically, the pipeline is rezpeg plus early preclinical options; assign the preclinical programs zero value in any disciplined framework.</p>
+</section>
+<section class="card" id="trials">
+<h2>4 · Trial design deep dive</h2>
+
+<h3>REZOLVE-AD — Phase 2b in moderate-to-severe atopic dermatitis (completed)</h3>
+<p><span class="ev FACT">FACT</span>Global, randomized, double-blind, placebo-controlled; <strong>n=393</strong> biologic/JAK-naïve patients, randomized <strong>3:3:3:2</strong> to rezpeg 24 µg/kg q2w (n=104), 18 µg/kg q2w (n=106), 24 µg/kg q4w (n=110), or placebo q2w (n=73). Primary and key secondaries at <strong>Week 16</strong>. Patients with ≥50% EASI improvement were re-randomized 1:1 to q4w or q12w maintenance through Week 52. NCT06136741. <span class="src">[R13, R1]</span></p>
+<table>
+<tr><th>Week 16 endpoint (24 µg/kg q2w)</th><th>Rezpeg</th><th>Placebo</th><th>p-value</th></tr>
+<tr><td>Mean % EASI reduction (primary)</td><td class="num">61%</td><td class="num">31%</td><td class="num">p&lt;0.0001</td></tr>
+<tr><td>EASI-75</td><td class="num">42%</td><td class="num">17%</td><td>significant <span class="src">[R13]</span></td></tr>
+<tr><td>EASI-90</td><td class="num">25%</td><td class="num">9%</td><td>significant</td></tr>
+<tr><td>vIGA-AD 0/1</td><td class="num">20%</td><td class="num">8%</td><td>significant</td></tr>
+<tr><td>Itch NRS ≥4-pt reduction</td><td class="num">42%</td><td class="num">16%</td><td>significant</td></tr>
+<tr><td>BSA mean % improvement</td><td class="num">−54%</td><td class="num">−17%</td><td>significant</td></tr>
+</table>
+<p><span class="ev FACT">FACT</span>All three dose arms met the primary endpoint (18 µg/kg q2w: 58%, p&lt;0.0001; 24 µg/kg q4w: 53%, p=0.0002). Significant EASI separation appeared by Week 2 (24 µg/kg arms) and Week 4 (all arms), with responses deepening through Week 16. Efficacy was consistent across baseline severity (vIGA-AD 3 vs 4) and geography. Results published in <em>The Lancet</em> (Aug 2026). <span class="src">[R13, R14]</span></p>
+<p><span class="ev FACT">FACT</span><strong>Safety (16-week induction):</strong> ISRs in 69.7% of rezpeg patients (99.6% mild/moderate; 0.2% severe; &lt;1% discontinued for ISR). TEAEs &gt;5% vs placebo (n=320 vs 73): eosinophilia 7.8% vs 2.7%, pyrexia 6.3% vs 2.7%, headache 6.3% vs 4.1%, arthralgia 5.0% vs 1.4%. TEAEs excluding ISRs: 60.3% drug vs 57.5% placebo. Serious AEs: 5 (1.6%) drug vs 0 placebo; discontinuations 5.6% vs 0. No increased conjunctivitis, oral ulcers, or infections (incl. oral herpes). No deaths. <span class="src">[R13]</span></p>
+<p><span class="ev FACT">FACT</span><strong>Maintenance (EADV, Oct 1, 2026):</strong> q4w and q12w regimens sustained EASI-75/90, vIGA-AD, and itch responses through Week 52. EASI-100 conversions: q4w 4%→22%, q12w 9%→18% (all re-randomized, wk16→wk52); among wk16 responders, q4w 6%→30%, q12w 14%→27%. Safety through 52 weeks "favorable and consistent." <span class="src">[R2]</span></p>
+<p><span class="ev INT">INTERPRETATION</span>This is a clean, dose-ordered Phase 2b win with biomarker support (TARC/CCL17, periostin, MDC/CCL22, IL-19 reductions; early biomarker changes correlated with Week 16 EASI, p&lt;0.001, drug arm only). The open statistical question is how much of the 31% placebo EASI response washes into the 24-week IGA 0/1 endpoint in Phase 3.</p>
+
+<h3>REZOLVE-AA — Phase 2b in severe-to-very-severe alopecia areata (completed)</h3>
+<p><span class="ev FACT">FACT</span>Global, n=92, randomized <strong>3:3:2</strong> to rezpeg 24 µg/kg q2w, 18 µg/kg q2w, or placebo q2w. Primary endpoint: <strong>mean % SALT reduction at Week 36</strong>. NCT06340360. <span class="src">[R15, R1]</span></p>
+<div class="callout warn">
+<h4>⚠ Critical nuance — primary endpoint missed in the pre-specified analysis</h4>
+<p><span class="ev FACT">FACT</span>In the modified intent-to-treat population, mean SALT reductions were <strong>28.2%</strong> (24 µg/kg), <strong>30.3%</strong> (18 µg/kg) vs <strong>11.2%</strong> placebo — <strong>p=0.186 and p=0.121, not significant</strong>. Statistical significance (p=0.049 / p=0.042; ~30% vs 6%) was achieved only <strong>after excluding 4 patients with major baseline eligibility violations</strong> — a post-hoc analysis. SALT30 responder rates: 48.9% / 45.7% / 19.1%. Well tolerated; 1.4% discontinuation rate. <span class="src">[R15]</span></p>
+</div>
+<p><span class="ev FACT">FACT</span><strong>52-week extension (reported Aug 2026):</strong> 31 patients with SALT&gt;20 at Week 36 continued blinded treatment to Week 52; new SALT≤20 responses: 29% (18 µg/kg) and 31% (24 µg/kg) vs 0% placebo. <strong>Off-treatment durability (EADV Oct 2026, n=8):</strong> SALT≤20 maintained in 6/8 (75%) at 4 months and 5/8 (63%) at 6 months off treatment; SALT≤10 deepened from 7% (end of treatment) to 19% at 6 months off treatment. <span class="src">[R2]</span></p>
+<p><span class="ev INT">INTERPRETATION</span>The AA dataset is directionally encouraging — consistent separation at all timepoints, dose-ordered responder rates, and durability that no approved AA therapy has demonstrated — but it is <em>thin</em>: a missed primary, a 4-patient post-hoc rescue, and an n=8 durability subset. This is the highest-variance leg of the story.</p>
+
+<h3>ZENITH-AD — Phase 3 program (enrolling)</h3>
+<p><span class="ev FACT">FACT</span>Three registrational studies, ~510 patients each (~1,530 total), ages 12+, across North America, Europe, Asia-Pacific. <strong>AD-1 and AD-2</strong> (biologic/JAK-naïve) initiated July 2026; <strong>AD-3</strong> (prior systemic biologic and/or JAK inhibitor <em>treatment-experienced</em>) initiated October 2026. Dosing: rezpeg 24 µg/kg q2w for a 24-week induction; responders (EASI-75 and/or IGA 0/1 at Week 24) re-randomized 2:2:1 to monthly, quarterly, or placebo for a 28-week maintenance; non-responders enter an open-label escape arm. <span class="src">[R5]</span></p>
+<p><span class="ev FACT">FACT</span><strong>Primary endpoint:</strong> IGA 0/1 response at Week 24 (US); <strong>co-primary</strong> IGA 0/1 + EASI-75 at Week 24 ex-US. Key secondaries: EASI-75, EASI-90, Itch NRS ≥4 reduction; prespecified ACQ-5 asthma assessment (~25% of AD patients have comorbid asthma). Initial topline data expected <strong>mid-2028</strong>; BLA submission targeted <strong>2029</strong>. <span class="src">[R5]</span></p>
+<p><span class="ev INT">INTERPRETATION</span>Design choices to note: (1) a 24-week primary (vs 16-week in most AD registrational trials) gives the slow-building Treg mechanism more time — but also more time for placebo drift; (2) AD-3 tests the drug where no data exists (treatment-experienced), a deliberate regulatory bet that broadens the label if it works; (3) the maintenance re-randomization to placebo will generate the withdrawal/durability data payers want.</p>
+
+<h3>ZENITH-AA — Phase 3 (planned)</h3>
+<p><span class="ev FACT">FACT</span>n=850, severe-to-very-severe AA; primary endpoint <strong>SALT≤20 at Week 52</strong>; initiation expected <strong>early 2027</strong>; company guides potential BLA in 2029 if positive. <span class="src">[R2, R16]</span></p>
+
+<h3>T1D — NIH/TrialNet Phase 2 (RESET T1D)</h3>
+<p><span class="ev FACT">FACT</span>NIH-sponsored, TrialNet-conducted, Nektar supplies drug + PK support; n=66, ages 8–45, new-onset T1D (≤100 days), 2:1 randomized to rezpeg q14d × 26 weeks vs placebo; efficacy = MMTT stimulated C-peptide AUC over 12 months; secondaries: HbA1c, insulin use, PK/PD. Company guidance: initial data in 2027. <span class="src">[R12]</span></p>
+<p><span class="ev GAP">GAP</span>The CTV/registry record lists estimated primary completion in May 2028, which conflicts with the company's 2027 initial-data guidance — the interim-data plan is unconfirmed. Treat 2027 as guidance-quality only. <span class="src">[R12]</span></p>
+</section>
+
+<section class="card" id="regulatory">
+<h2>5 · Clinical / regulatory status &amp; outlook</h2>
+<table>
+<tr><th>Milestone</th><th>Status</th></tr>
+<tr><td>FDA Fast Track — AD (ages 12+)</td><td><span class="ev FACT">FACT</span> Granted Feb 2025 <span class="src">[R1]</span></td></tr>
+<tr><td>FDA Fast Track — AA (ages 12+, ≥40 kg)</td><td><span class="ev FACT">FACT</span> Granted Jul 2025 <span class="src">[R1]</span></td></tr>
+<tr><td>ZENITH-AD Phase 3</td><td><span class="ev FACT">FACT</span> 3 studies enrolling; data mid-2028 (guidance); BLA targeted 2029 <span class="src">[R5]</span></td></tr>
+<tr><td>ZENITH-AA Phase 3</td><td><span class="ev FACT">FACT</span> Starts early 2027 (guidance); BLA 2029 if positive <span class="src">[R2]</span></td></tr>
+<tr><td>T1D Phase 2 (TrialNet)</td><td><span class="ev FACT">FACT</span> Ongoing; initial data 2027 (guidance) <span class="src">[R12]</span></td></tr>
+</table>
+<p><span class="ev INT">INTERPRETATION</span>Regulatory path is conventional: two adequate and well-controlled trials per indication are effectively planned (AD-1/AD-2 + AD-3 for AD; single 850-pt AA study would likely need a second confirmatory trial for AA — <span class="ev GAP">GAP</span> the company has not detailed the full AA registrational package beyond ZENITH-AA). Fast Track helps with rolling review mechanics, not with the efficacy bar. No clinical holds, no FDA disputes, and no safety-driven trial modifications have been disclosed.</p>
+<p><span class="ev FACT">FACT</span>The historical overhang: rezpeg previously failed the Lilly-run Phase 2 ISLAND trial in SLE (Feb 2023, missed SLEDAI-2K), after which Lilly returned rights (Apr 2023) and Nektar sued over mishandled Phase 1b AD/psoriasis data — a California federal jury awarded Nektar <strong>$90M in damages</strong> (~Sept 2026), subject to post-trial proceedings and potential appeal. <span class="src">[R11, R17]</span></p>
+</section>
+<section class="card" id="competition">
+<h2>6 · Competition — clinical differentiation only</h2>
+
+<h3>Atopic dermatitis</h3>
+<table>
+<tr><th>Class / agent</th><th>Mechanistic contrast vs rezpeg</th></tr>
+<tr><td><strong>IL-4Rα / IL-13 blockers:</strong> dupilumab (2017), tralokinumab, lebrikizumab</td><td><span class="ev FACT">FACT</span>Blockade of Type-2 cytokines — downstream suppression of one inflammatory axis. Rezpeg instead expands Tregs to rebalance upstream. Dupilumab carries a well-known conjunctivitis signal; rezpeg showed <em>no increased conjunctivitis</em> in Phase 2b. <span class="src">[R13, R18]</span></td></tr>
+<tr><td><strong>JAK inhibitors:</strong> upadacitinib, abrocitinib (oral, approved 2022)</td><td><span class="ev FACT">FACT</span>Broad intracellular signaling blockade — fast onset, but class boxed warnings (serious infections, thrombosis, malignancy, mortality). Rezpeg showed no increased infection signal through 52 weeks. <span class="src">[R13, R2, R18]</span></td></tr>
+<tr><td><strong>IL-31RA:</strong> nemolizumab (approved 2024, itch-focused)</td><td><span class="ev INT">INTERPRETATION</span>Itch-dominant positioning; rezpeg's Itch NRS ≥4 rate (42% vs 16%) is a comparable symptomatic claim, but via immune rebalancing rather than neuro-immune blockade.</td></tr>
+<tr><td><strong>OX40 / OX40L:</strong> amlitelimab (Sanofi, Phase 3), rocatinlimab (Amgen)</td><td><span class="ev INT">INTERPRETATION</span>The closest conceptual rivals: both target pathogenic T-cell costimulation with durable off-treatment effects claimed. These are big-pharma programs with registrational data expected on a similar horizon — the durability narrative is not rezpeg's alone.</td></tr>
+<tr><td><strong>TSLP:</strong> tezepelumab (Amgen/AstraZeneca, in AD development)</td><td><span class="ev GAP">GAP</span>Earlier-stage in AD; positioning unconfirmed.</td></tr>
+<tr><td><strong>Other Treg-selective IL-2 agents:</strong> Egle Therapeutics EGL-003 (Phase 1 SAD positive Sept 2026; MAD in AD planned Q4 2026), Xencor XmAb564 (Phase 1b in AD/psoriasis)</td><td><span class="ev FACT">FACT</span>Both are IL-2 muteins engineered for Treg selectivity — same mechanistic class, 2–3 years behind rezpeg, privately held / early. Validates the mechanism's commercial interest; not near-term threats. <span class="src">[R19]</span></td></tr>
+</table>
+
+<h3>Alopecia areata</h3>
+<table>
+<tr><th>Class / agent</th><th>Mechanistic contrast vs rezpeg</th></tr>
+<tr><td><strong>JAK inhibitors:</strong> baricitinib (2022), ritlecitinib (2023), deuruxolitinib (2024)</td><td><span class="ev FACT">FACT</span>The only approved systemic AA class — effective but with class safety warnings, continuous dosing required, and high relapse rates on discontinuation (company's characterization of the unmet need). Rezpeg's pitch is durability <em>off</em> treatment (63% SALT≤20 maintenance at 6 months off drug, n=8) — a profile no JAK has demonstrated. <span class="src">[R2, R18]</span></td></tr>
+<tr><td><strong>Low-dose IL-2 (academic):</strong> Castela et al. 2014</td><td><span class="ev FACT">FACT</span>Proof-of-concept that IL-2-driven Treg expansion has activity in AA; rezpeg is the engineered, long-acting, registrational-grade version of that observation. <span class="src">[R10]</span></td></tr>
+</table>
+<p><span class="ev INT">INTERPRETATION</span>Rezpeg's defensible edge, if the data holds: (1) the only Treg mechanism in registrational testing in either indication; (2) no immunosuppression/infection signal, relevant for chronic pediatric-adjacent use (12+); (3) quarterly maintenance dosing with deepening responses — a convenience + durability story neither JAKs nor injectable biologics currently offer. The counter: approved agents have years of real-world safety data; rezpeg has ~500 patient-years at most, and ISRs at ~70% are a tolerability tax competitors don't pay.</p>
+<p style="font-size:13px;color:var(--muted)"><em>No cross-trial efficacy comparisons are made in this dossier. Absolute responder rates from separate trials with different populations, timepoints, and designs are not comparable.</em></p>
+</section>
+
+<section class="card" id="financials">
+<h2>7 · Financials</h2>
+<p><span class="ev FACT">FACT</span>All figures from the Q2 2026 Form 10-Q (filed August 2026) and the Q2 2026 earnings call, unless noted. Units: USD millions. <span class="src">[R4, R20]</span></p>
+<table>
+<tr><th>Item</th><th>Q2 2026</th><th>Notes</th></tr>
+<tr><td>Cash, cash equivalents + investments</td><td class="num"><strong>$1,023.4M</strong></td><td>$39.3M cash + $645.1M short-term + $339.1M long-term investments</td></tr>
+<tr><td>Debt</td><td class="num">$0</td><td>No debt on balance sheet</td></tr>
+<tr><td>Total revenue</td><td class="num">$10.1M</td><td>Non-cash royalty revenue; FY2026 guide $40–45M</td></tr>
+<tr><td>R&amp;D expense</td><td class="num">$39.1M</td><td>FY2026 guide $210–230M; rising quarterly as Phase 3 ramps</td></tr>
+<tr><td>G&amp;A expense</td><td class="num">$12.8M</td><td>Down y/y on lower legal spend</td></tr>
+<tr><td>Net loss / EPS</td><td class="num">−$40.6M / −$1.23</td><td>vs −$41.6M / −$2.95 in Q2 2025 (per-share improvement is dilution arithmetic)</td></tr>
+<tr><td>Operating cash burn (6 mo)</td><td class="num">−$120.1M</td><td>≈ $60M/quarter current run-rate; guided to increase</td></tr>
+<tr><td>YE2026 cash guidance</td><td class="num">$815–840M</td><td>Implies ~$185–210M H2 2026 burn</td></tr>
+<tr><td>Runway guidance</td><td>into Q3 2028</td><td>Company: "beyond initial Phase 3 data readouts"</td></tr>
+</table>
+
+<h3>Dilution history</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span><strong>April 2026:</strong> upsized underwritten offering — 3,532,609 shares at $92.00 + full 529,891-share greenshoe = <strong>4,062,500 shares</strong>; gross $373.75M, net ~$350M. Post-offering basic shares: 33,742,147. Underwriters: Jefferies, TD Cowen, Piper Sandler, Citigroup. <span class="src">[R6]</span></li>
+<li><span class="ev FACT">FACT</span><strong>Sep 2025–Jan 2026:</strong> ATM sales of 673,725 shares at $58.55 weighted-average → ~$39.4M net. <span class="src">[R6]</span></li>
+<li><span class="ev FACT">FACT</span><strong>June 9, 2025:</strong> 1-for-15 reverse split (all per-share figures retrospectively adjusted). <span class="src">[R7]</span></li>
+<li><span class="ev FACT">FACT</span>Weighted-average basic shares: ~14.1M (Q2 2025) → 18.9M (Q3 2025) → ~33M+ (post-April 2026) — roughly a <strong>2.3× share-count expansion in twelve months</strong>, the price of funding Phase 3 without a partner. <span class="src">[R4, R20]</span></li>
+<li><span class="ev FACT">FACT</span>April 2026 prospectus also discloses <strong>293,103 pre-funded warrants</strong> outstanding (exercise $0.0001) as of April 1, 2026 — economically equivalent to common shares. <span class="src">[R6]</span></li>
+</ul>
+<p><span class="ev INT">INTERPRETATION</span>The balance sheet is the bull case's armor: $1.0B net cash funds the AD Phase 3 program to first data with no near-term financing overhang — the April raise was deliberately pre-emptive. But the trajectory matters: at a guided-increasing burn (H2 2026 alone ~$200M), the cash covers the <em>first</em> AD readout (mid-2028), not the full AA Phase 3 (850 pts, 52-week primary, data likely 2028–29) plus a second AA confirmatory trial if required. A financing event between the AD readout and AA data is plausible if timelines slip.</p>
+</section>
+
+<section class="card" id="fdmc">
+<h2>8 · Fully-diluted market cap &amp; enterprise value</h2>
+<p><span class="ev FACT">FACT</span>Dilution-honest share count built from the April 2026 prospectus (as of April 1, 2026) plus disclosed inducement grants through July 2026. Price: $41.17 (Oct 9, 2026 close). Cash: $1,023.4M (Jun 30, 2026). <span class="src">[R6, R3, R4]</span></p>
+<table>
+<tr><th>Component</th><th>Shares</th><th>Source / note</th></tr>
+<tr><td>Basic common outstanding</td><td class="num">~33.80M</td><td>33,742,147 post-April offering + ~65k inducement grants (Jun–Jul 2026) <span class="src">[R6, R21]</span></td></tr>
+<tr><td>Stock options outstanding</td><td class="num">~2.39M</td><td>2,326,369 @ $58.70 WAEP (Apr 1, 2026) + ~61k inducements <span class="src">[R6, R21]</span></td></tr>
+<tr><td>RSUs / performance RSUs</td><td class="num">~0.21M</td><td>198,331 (Apr 1, 2026) + ~9k inducements <span class="src">[R6, R21]</span></td></tr>
+<tr><td>Pre-funded warrants</td><td class="num">0.29M</td><td>293,103 @ $0.0001 — economically common <span class="src">[R6]</span></td></tr>
+<tr><td><strong>Fully-diluted shares</strong></td><td class="num"><strong>~36.7M</strong></td><td>Treasury-stock method not applied (options mostly out-of-the-money); conservative count</td></tr>
+</table>
+<div class="kgrid">
+  <div class="kbox"><div class="k">Basic market cap</div><div class="v num">~$1.39B</div><div class="d">33.8M × $41.17</div></div>
+  <div class="kbox"><div class="k">Fully-diluted market cap</div><div class="v num">~$1.51B</div><div class="d">36.7M × $41.17</div></div>
+  <div class="kbox"><div class="k">Net cash</div><div class="v num">$1,023.4M</div><div class="d">Zero debt (Jun 30, 2026)</div></div>
+  <div class="kbox"><div class="k">Enterprise value (FD)</div><div class="v num">~$0.49B</div><div class="d">$1.51B − $1.02B; basic EV ~$0.37B</div></div>
+</div>
+<p><span class="ev INT">INTERPRETATION</span>On a dilution-honest basis the market ascribes roughly <strong>$490M of enterprise value to rezpegaldesleukin</strong> — i.e., the market prices the AD Phase 3 program, the AA option, and the T1D option at less than half the cash on hand. That is either a distressed-valuation opportunity on a de-risked Phase 2b asset, or the market's verdict that the AA miss, the ISR profile, and the long wait to mid-2028 justify a steep discount. Note the options overhang (WAEP $58.70, ~43% above current price) is a real future dilution vector if the stock re-rates.</p>
+</section>
+<section class="card" id="catalysts">
+<h2>9 · Catalyst &amp; event map</h2>
+<p>Date quality: <span class="pill hard">hard</span> fixed calendar date · <span class="pill guid">guidance</span> company-guided window · <span class="pill infer">inferred</span> estimated from program timelines.</p>
+<div class="callout">
+<h4>Nothing dated before October 10, 2026 remains outstanding</h4>
+<p style="margin:0">The last material events — EADV long-term data (Oct 1, 2026) and Q2 earnings (Aug 13, 2026) — have already occurred and are reflected in this dossier. The next scheduled event is Q3 earnings on <strong>November 5, 2026</strong> <span class="pill guid">guidance</span>. There is <strong>nothing binary before the mid-2028 ZENITH-AD readout</strong>.</p>
+</div>
+<table>
+<tr><th>Event</th><th>Timing</th><th>Date quality</th><th>What "good" looks like</th><th>What to watch</th></tr>
+<tr><td><strong>Q3 2026 earnings</strong></td><td class="num">Nov 5, 2026</td><td><span class="pill guid">guidance</span></td><td>Cash ≥ ~$900M at Sep 30, 2026; YE2026 guide $815–840M reiterated; ZENITH-AD enrollment described as on track <span class="src">[R4, R23]</span></td><td>Quarterly burn acceleration vs the ~$60M Q2 run-rate; any ZENITH-AA start-date firming; consensus EPS est. −$2.10</td></tr>
+<tr><td><strong>ZENITH-AA Phase 3 initiation</strong> — 850-pt registrational AA study, SALT≤20 at Week 52 primary</td><td class="num">Early 2027</td><td><span class="pill guid">guidance</span></td><td>First patient dosed on schedule; design details published (confirms single-study registrational path or discloses a second confirmatory trial) <span class="src">[R2]</span></td><td>Whether FDA requires a second AA trial (would extend burn well past the Q3-2028 runway); trial cost sizing for 2027–29</td></tr>
+<tr><td><strong>T1D Phase 2 (TrialNet) initial data</strong> — n=66, C-peptide AUC at 12 months</td><td class="num">2027</td><td><span class="pill guid">guidance</span></td><td>Any C-peptide preservation signal vs placebo — first human efficacy read for rezpeg outside dermatology <span class="src">[R12]</span></td><td>Registry lists estimated primary completion May 2028 — interim-data mechanics are <span class="ev GAP">GAP</span> unconfirmed; a quiet slip to 2028 is the risk</td></tr>
+<tr><td><strong>ZENITH-AD enrollment updates</strong> — 3 × ~510 pts across NA/EU/APAC</td><td class="num">Through 2027</td><td><span class="pill infer">inferred</span></td><td>Steady enrollment commentary on earnings calls; AD-3 (treatment-experienced) recruiting without difficulty <span class="src">[R5]</span></td><td>No interim efficacy is planned (none disclosed) — do not expect a data leak; enrollment slippage pushes the mid-2028 readout right, into a financing window</td></tr>
+<tr><td><strong>Medical-conference data</strong> (AAD / EADV 2027)</td><td class="num">H1 / H2 2027</td><td><span class="pill infer">inferred</span></td><td>Deeper REZOLVE-AD/AA subgroup or biomarker analyses (e.g., TARC/IL-19 predictors of response) that sharpen the Phase 3 thesis</td><td>Not guided by the company; expect narrative support, not value inflection</td></tr>
+<tr><td><strong>ZENITH-AD first Phase 3 topline</strong> — AD-1/AD-2, IGA 0/1 at Week 24 (US) / IGA 0/1 + EASI-75 ex-US</td><td class="num">Mid-2028</td><td><span class="pill guid">guidance</span></td><td><strong>The binary.</strong> Statistically significant IGA 0/1 delta at Week 24 with a Phase-2b-consistent effect size; maintenance re-randomization supports q4w/q12w dosing <span class="src">[R5, R4]</span></td><td>Placebo IGA 0/1 drift above ~10–12% compresses the delta; AD-3 (treatment-experienced, no prior data) reads alongside — a second, harder binary inside the same readout</td></tr>
+<tr><td><strong>ZENITH-AA topline</strong> — SALT≤20 at Week 52</td><td class="num">2028–2029</td><td><span class="pill guid">guidance</span> / <span class="pill infer">inferred</span></td><td>Significant SALT≤20 separation at Week 52 with durability data confirming the Phase 2b off-treatment thesis <span class="src">[R2]</span></td><td>Data likely lands after AD readout; a miss here after an AD win still leaves a viable single-indication company</td></tr>
+<tr><td><strong>AD BLA submission</strong></td><td class="num">2029</td><td><span class="pill guid">guidance</span></td><td>Accepted filing with Fast Track rolling-review mechanics; AA BLA follows if ZENITH-AA positive <span class="src">[R5, R2]</span></td><td>FDA questions around the AA package (post-hoc primary rescue) if AA BLA is attempted on one study</td></tr>
+<tr><td><strong>Lilly $90M award — collection</strong></td><td class="num">Ongoing</td><td><span class="pill infer">inferred</span></td><td>Cash received in full: ~$2.45 per FD share of non-dilutive capital <span class="src">[R17]</span></td><td>Subject to post-trial proceedings and potential appeal — timing and final amount not fixed; do not model as certain</td></tr>
+<tr><td><strong>Potential financing</strong></td><td class="num">2028–2029</td><td><span class="pill infer">inferred</span></td><td>Not needed before the AD readout (runway into Q3 2028); if AD wins, a raise into strength funds AA completion + BLA prep</td><td>Management's pattern is pre-emptive dilution (April 2026 at $92); any raise between the AD readout and AA data is plausible if timelines slip</td></tr>
+</table>
+<p><span class="ev INT">INTERPRETATION</span>The calendar is back-loaded: nothing binary before mid-2028. The 2027 events are progress markers (AA start, T1D data, enrollment), not value inflections. This is a "buy the cash, wait 20 months" setup — dead money risk is real if sentiment drifts, but the cash floor limits fundamental downside into the readout.</p>
+</section>
+
+<section class="card" id="redflags">
+<h2>10 · Ranked red flags</h2>
+<table>
+<tr><th style="width:6%">#</th><th>Flag</th><th>Why it matters</th></tr>
+<tr><td><strong>1</strong></td><td><strong>AA Phase 2b primary missed in the pre-specified analysis</strong></td><td><span class="ev FACT">FACT</span>p=0.186/0.121 in mITT; significance only post-hoc after excluding 4 ineligible patients. The AA Phase 3 (850 pts, $100M+ program) is being launched on a contested dataset. <span class="src">[R15]</span></td></tr>
+<tr><td><strong>2</strong></td><td><strong>Single-asset dependence</strong></td><td><span class="ev FACT">FACT</span>Rezpeg is the entire registrational pipeline; preclinical TNFR2/CSF programs are unvalued options. An AD Phase 3 failure leaves a cash box and a damaged mechanism. <span class="src">[R1]</span></td></tr>
+<tr><td><strong>3</strong></td><td><strong>Durability claims rest on n=8</strong></td><td><span class="ev FACT">FACT</span>The 6-month off-treatment AA data (75%/63% SALT≤20 maintenance) is 8 patients. Compelling narrative, statistically fragile — one patient's swing moves the rate 12.5 points. <span class="src">[R2]</span></td></tr>
+<tr><td><strong>4</strong></td><td><strong>Phase 3 primary is a harder bar than Phase 2b</strong></td><td><span class="ev INT">INTERPRETATION</span>Phase 2b won on mean EASI % change (61% vs 31%); Phase 3's primary is IGA 0/1 at 24 weeks — a responder endpoint where Phase 2b's absolute rate was 20% vs 8%. Placebo drift is the statistical enemy.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>Tolerability tax: ISRs in 69.7%</strong></td><td><span class="ev FACT">FACT</span>Mostly mild/moderate and self-resolving, &lt;1% discontinued — but chronic injectable therapy with persistent site reactions is an adherence and commercial-acceptance question competitors (oral JAKs, q2w dupilumab) don't face to the same degree. <span class="src">[R13]</span></td></tr>
+<tr><td><strong>6</strong></td><td><strong>Cash covers the first readout, not the full program</strong></td><td><span class="ev INT">INTERPRETATION</span>Runway into Q3 2028 funds AD data (mid-2028) but the AA Phase 3, a likely second AA confirmatory trial, and AD-3 completion extend beyond it. A raise between readouts is plausible — the April 2026 raise shows management dilutes pre-emptively.</td></tr>
+<tr><td><strong>7</strong></td><td><strong>CEO open-market selling; no insider buying</strong></td><td><span class="ev FACT">FACT</span>CEO Howard Robin sold 20,000 shares (~$1.2M, 26.6% of direct holdings) in open-market transactions June 16–17, 2026 at ~$60.75; insiders own 2.5%. No open-market insider purchases surfaced in 2026. <span class="src">[R22]</span></td></tr>
+<tr><td><strong>8</strong></td><td><strong>Management's binary-trial track record</strong></td><td><span class="ev FACT">FACT</span>Bempegaldesleukin (+BMS) failed Phase 3 in 2022; rezpeg failed Lilly's ISLAND lupus Phase 2 in 2023; 60% workforce cut followed. The team has been wrong on pivotal outcomes before — though the Lilly jury award ($90M) shows they were right about the mishandled AD data. <span class="src">[R11, R17]</span></td></tr>
+<tr><td><strong>9</strong></td><td><strong>Heavy, ongoing dilution</strong></td><td><span class="ev FACT">FACT</span>~2.3× share expansion in a year; 2017-plan option pool plus inducement grants continue; options WAEP $58.70 sits above the current price as a future overhang. <span class="src">[R6, R7]</span></td></tr>
+<tr><td><strong>10</strong></td><td><strong>Big-pharma durability rivals in AD</strong></td><td><span class="ev INT">INTERPRETATION</span>Sanofi's amlitelimab and Amgen's rocatinlimab (OX40/OX40L) chase the same "durable, off-treatment" narrative with deeper pockets and parallel timelines — rezpeg's differentiation window could narrow by launch.</td></tr>
+</table>
+</section>
+
+<section class="card" id="scenarios">
+<h2>11 · Bear / base / bull — scenarios with soft price targets</h2>
+<p><em>No recommendation is offered. Targets below are <strong>soft and scenario-based</strong> — arithmetic on this dossier's own figures (36.7M fully-diluted shares; $1,023.4M cash at Jun 30, 2026), not a DCF. The takeout/max-value case is capped at the top published sell-side price target of <strong>$185</strong> (HC Wainwright, Buy, Oct 2026) — it is not exceeded. <span class="src">[R8]</span></em></p>
+
+<div class="callout">
+<h4>Soft scenario targets — summary</h4>
+<table>
+<tr><th>Scenario</th><th>Soft target (per FD share)</th><th>Implied FD equity</th><th>Core assumption</th></tr>
+<tr><td><strong>Bear</strong></td><td class="num"><strong>~$11</strong></td><td class="num">~$0.41B</td><td>AD Phase 3 fails; equity ≈ est. cash at readout (~$300M) + $90M Lilly award (received) + ~$20M AA/T1D salvage value</td></tr>
+<tr><td><strong>Base</strong></td><td class="num"><strong>~$105</strong></td><td class="num">~$3.85B</td><td>AD wins per Phase 2b, AA a coin flip; AD EV $2.6B + AA option $0.3B + T1D $0.1B + est. cash $0.85B</td></tr>
+<tr><td><strong>Bull</strong></td><td class="num"><strong>~$185</strong></td><td class="num">~$6.8B</td><td>AD + AA Phase 3 both win; strategic takeout at the standing-rule cap (top sell-side PT)</td></tr>
+</table>
+<p style="margin:6px 0 0" class="src">Arithmetic: 36.7M FD shares throughout. Bear $410M ÷ 36.7M ≈ $11.2; base $3.85B ÷ 36.7M ≈ $104.9; bull $185 × 36.7M ≈ $6.79B. Assumptions are labeled per scenario below.</p>
+</div>
+
+<h3>Bear — AD Phase 3 fails (or placebo overwhelms) → soft target ~$11</h3>
+<p><span class="ev INT">INTERPRETATION</span><strong>Assumptions:</strong> ZENITH-AD misses (e.g., IGA 0/1 delta collapses on placebo drift, or the Treg mechanism proves indication-limited as in SLE). YE2026 cash ~$827M (midpoint of $815–840M guide); 2027 burn ~$350M (guided-increasing, full AD Phase 3 + AA Phase 3 start); H1 2028 burn ~$180M → est. cash at the mid-2028 readout ≈ <strong>~$300M</strong>. The pipeline's registrational value goes to ~zero and the equity reverts toward that cash plus the $90M Lilly award (if collected: +$2.45/FD share) plus ~$20M of AA/T1D salvage → <strong>~$410M ÷ 36.7M ≈ $11/share</strong>. Key signposts: no interim futility disclosure is planned, so this scenario crystallizes at the mid-2028 readout with no early warning.</p>
+
+<h3>Base — AD Phase 3 succeeds broadly per Phase 2b; AA mixed → soft target ~$105</h3>
+<p><span class="ev INT">INTERPRETATION</span><strong>Assumptions:</strong> AD-1/AD-2 replicate the Phase 2b effect (IGA 0/1 and EASI-75 significant at Week 24; maintenance data supports q4w/q12w labeling); AD-3 in treatment-experienced patients is directionally positive or neutral. BLA 2029 stays on track. Component values: AD program EV <strong>$2.6B</strong> (deliberately below the consensus-PT-implied EV of ~$4B, reflecting single-asset and placebo-drift risk), AA option <strong>$0.3B</strong> (contested Phase 2b, coin-flip Phase 3), T1D option <strong>$0.1B</strong>, plus est. cash <strong>$0.85B</strong> → <strong>~$3.85B ÷ 36.7M ≈ $105/share</strong>. The AA Phase 3 (850 pts, 52-week primary) remains the expensive second binary; commercial-phase value is deliberately not modeled (buy-and-hold-through-the-binary frame).</p>
+
+<h3>Bull — both AD and AA Phase 3 win; takeout → soft target ~$185 (capped)</h3>
+<p><span class="ev INT">INTERPRETATION</span>AD succeeds and ZENITH-AA confirms the durability thesis (SALT≤20 at Week 52 with off-treatment maintenance) — rezpeg becomes the only Treg mechanism with registrational wins in two dermatology indications, wholly owned, with Fast Track designations and a quarterly-maintenance profile. A strategic acquirer (dermatology or immunology franchise) is the natural endgame; <strong>maximum takeout value is capped at the top sell-side target of $185/share on ~36.7M fully-diluted shares (≈$6.8B FD equity value)</strong>, consistent with the standing rule that takeout scenarios must not overshoot published sell-side targets. <span class="src">[R8]</span></p>
+
+<h3>Scenario signposts to watch</h3>
+<ul class="tight">
+<li><strong>Enrollment pace</strong> on ZENITH-AD (earnings calls) — slippage pushes the mid-2028 readout right, into a financing window.</li>
+<li><strong>ZENITH-AA initiation</strong> (early 2027 guided) — confirms the AA bet is real and sizes the 2027–29 burn.</li>
+<li><strong>T1D 2027 data</strong> — first human efficacy signal for rezpeg outside dermatology; positive C-peptide data would validate the "pipeline in a product" claim.</li>
+<li><strong>Lilly $90M collection</strong> — ~$2.45/FD-share of non-dilutive cash if received in full.</li>
+<li><strong>Competitor readouts</strong> — amlitelimab/rocatinlimab Phase 3 data reframes the durability narrative for or against rezpeg.</li>
+</ul>
+</section>
+<section class="card" id="management">
+<h2>12 · Management track record &amp; insider signals</h2>
+<table>
+<tr><th>Person</th><th>Role</th><th>Record</th></tr>
+<tr><td><strong>Howard W. Robin</strong></td><td>President &amp; CEO (since 2007), director</td><td><span class="ev FACT">FACT</span>Led Nektar through the bempegaldesleukin/BMS collapse (2022) and the Lilly split (2023, incl. 60% workforce reduction), then re-centered the company on rezpeg and raised ~$390M (ATM + April 2026 offering) to fund Phase 3 without a partner. Sued Lilly over mishandled rezpeg data — jury awarded $90M (~Sept 2026). <span class="src">[R11, R17, R6]</span> <span class="ev INT">INTERPRETATION</span> — Resilience and capital-raising execution are proven; pivotal-trial picking (bempeg, ISLAND lupus) is not.</td></tr>
+<tr><td><strong>Jonathan Zalevsky, Ph.D.</strong></td><td>Chief R&amp;D Officer</td><td><span class="ev FACT">FACT</span>Scientific lead on the rezpeg program; 16,500 performance-based options vested July 2026 after the compensation committee certified performance conditions met — a milestone-linked insider signal. <span class="src">[R21]</span></td></tr>
+<tr><td><strong>Linda Rubinstein</strong></td><td>CFO</td><td><span class="ev FACT">FACT</span>Oversees the $1.02B cash position; guided runway into Q3 2028 and YE2026 cash of $815–840M. <span class="src">[R4]</span></td></tr>
+</table>
+<h3>Insider &amp; ownership signals</h3>
+<ul class="tight">
+<li><span class="ev FACT">FACT</span>CEO Howard Robin sold 20,000 shares in open-market transactions June 16–17, 2026 (~$1.22M at ~$60.75), reducing direct holdings 26.6% (75,073 → 55,045 shares); a further 418-share sale Aug 18, 2026 was tax-withholding on vesting equity. <span class="src">[R22]</span></li>
+<li><span class="ev FACT">FACT</span>Corporate insiders own ~2.5% of shares; institutional investors own ~75.9%. <span class="src">[R8]</span></li>
+<li><span class="ev GAP">GAP</span>No open-market insider purchases by officers or directors in 2026 were identified in the sources reviewed.</li>
+<li><span class="ev INT">INTERPRETATION</span>The insider tape is net negative at the margin: the CEO trimmed a quarter of his direct stake into strength (~$61, well above today's $40) while no insider bought the subsequent −33% decline. Against that, the Zalevsky performance-vesting certification and the pre-emptive (not desperate) April raise at $92 are genuine positives. Overall: management acts like operators funding a long program, not like owners accumulating.</li>
+</ul>
+</section>
+
+<section class="card" id="references">
+<h2>13 · References, as-of date &amp; filings used</h2>
+<p><strong>As-of date: October 10, 2026</strong> (dossier built October 7, 2026; audited and enhanced October 10, 2026). Share price $41.17 (Finnhub, Oct 9, 2026 close — latest trading day). Financial figures from the Q2 2026 Form 10-Q (quarter ended June 30, 2026) unless otherwise noted.</p>
+<h3>Filings &amp; company disclosures used</h3>
+<ul class="tight">
+<li>Form 10-Q for Q2 2026 (quarter ended June 30, 2026; filed August 2026) — cash, burn, revenue, share counts</li>
+<li>Form 424B5 prospectus supplement dated April 21, 2026 — offering terms, capitalization, options/RSUs/warrants outstanding</li>
+<li>Form 8-K (December 16, 2025) — REZOLVE-AA 36-week topline; Form 8-K (June 24, 2025) — REZOLVE-AD 16-week topline</li>
+<li>DEF 14A proxy (April 24, 2026) — equity plan share pool</li>
+<li>Q2 2026 earnings call (August 13, 2026) — cash guidance, runway, R&amp;D guide</li>
+<li>Company press releases: ZENITH-AD Phase 3 start (July 21, 2026); EADV long-term data (October 1, 2026); REZOLVE-AD <em>Lancet</em> publication (August 2026)</li>
+</ul>
+<h3>References</h3>
+<div class="ref">[R1] Nektar Therapeutics press release via PR Newswire, "New Rezpegaldesleukin Data Supporting Long-term Durability and Disease Improvement in Patients with Alopecia Areata and Atopic Dermatitis at EADV Congress 2026," October 1, 2026. <a href="https://www.prnewswire.com/news-releases/new-rezpegaldesleukin-data-supporting-long-term-durability-and-disease-improvement-in-patients-with-alopecia-areata-and-atopic-dermatitis-at-eadv-congress-2026-302895848.html">prnewswire.com</a></div>
+<div class="ref">[R2] Same as [R1] — REZOLVE-AA 52-week extension, off-treatment durability (n=8), ZENITH-AA design (n=850, SALT≤20 at Week 52, start early 2027), Fast Track designations.</div>
+<div class="ref">[R3] Finnhub market data for NKTR (Nasdaq), retrieved October 9, 2026 — price $41.17 (Oct 9 close), 52-wk $33.40–$109, mcap ~$1.41B. <a href="https://finnhub.io/?q=%22NKTR%22">finnhub.io</a></div>
+<div class="ref">[R4] Nektar Therapeutics Q2 2026 financial results (press release &amp; earnings call, August 13, 2026): $1,023.4M cash + investments, no debt, $10.1M revenue, −$40.6M net loss, YE2026 cash guide $815–840M, runway into Q3 2028. <a href="https://www.stocktitan.net/news/NKTR/nektar-therapeutics-announces-second-quarter-2026-financial-gyn4f7dxemlc.html">stocktitan.net</a></div>
+<div class="ref">[R5] Nektar Therapeutics press release via PR Newswire, "Nektar Therapeutics Announces Start of Phase 3 ZENITH AD Program," July 21, 2026 — 3 × ~510 pts, IGA 0/1 primary at Week 24, data mid-2028, BLA targeted 2029. <a href="https://www.morningstar.com/news/pr-newswire/20260721sf03777/nektar-therapeutics-announces-start-of-phase-3-zenith-ad-program-evaluating-novel-regulatory-t-cell-biologic-rezpegaldesleukin-in-moderate-to-severe-atopic-dermatitis">morningstar.com</a></div>
+<div class="ref">[R6] Nektar Therapeutics Form 424B5 prospectus supplement, filed April 21, 2026 — 4,062,500 shares at $92.00 (incl. greenshoe), 29,679,647 shares outstanding Apr 1, 2026; 2,326,369 options @ $58.70 WAEP; 198,331 RSUs; 293,103 pre-funded warrants; ATM sales 673,725 shares @ $58.55. <a href="https://www.stocktitan.net/sec-filings/NKTR/424b5-nektar-therapeutics-prospectus-supplement-debt-securities-60699d69fee3.html">stocktitan.net</a></div>
+<div class="ref">[R7] MarketBeat — NKTR 1-for-15 reverse split effective June 9, 2025; Q3 2025 weighted-average shares 18,946,559 (split-adjusted). <a href="https://www.marketbeat.com/stocks/NASDAQ/NKTR/">marketbeat.com</a></div>
+<div class="ref">[R8] MarketBeat / American Banking News / Zolmax, October 2026 — consensus "Moderate Buy," avg PT $138.50; HC Wainwright $185 Buy (reaffirmed Oct 4, 2026); BTIG Buy (reaffirmed Oct 9, 2026); Canaccord $153 Buy; JPMorgan $65 Neutral; Wedbush $50 Neutral (cut Sept 23, 2026); insiders 2.50%, institutions 75.88%. <a href="https://www.americanbankingnews.com/2026/10/04/nektar-therapeutics-nktr-buy-rating-reaffirmed-at-hc-wainwright.html">americanbankingnews.com</a> · <a href="https://www.thecerbatgem.com/2026/10/09/nektar-therapeutics-nktr-buy-rating-reaffirmed-at-btig-research.html">thecerbatgem.com (BTIG reaffirm, Oct 9)</a></div>
+<div class="ref">[R9] Nature Communications 15 (2022), s41467-022-31130-9 — IL-2 mutein engineering: weakening IL-2Rβ engagement to force IL-2Rα-dependent Treg selectivity. <a href="https://www.nature.com/articles/s41467-022-31130-9">nature.com</a></div>
+<div class="ref">[R10] Academic literature: Klatzmann D. &amp; Abbas A.K., <em>Nat Rev Immunol</em> 15:283–294 (2015); Castela E. et al., <em>JAMA Dermatol</em> 150:748–751 (2014); Hartemann A. et al. (DILT1D/DILfrequency), <em>Nat Commun</em> (2022); He J. et al., <em>Ann Rheum Dis</em> 79:141–149 (2020); Humrich J.Y. et al. (LUPIL-2), <em>Ann Rheum Dis</em> 81:1685–1694 (2022); Koreth J. et al., <em>NEJM</em> 365:2055–2066 (2011).</div>
+<div class="ref">[R11] Fierce Biotech, April 2023 — Lilly returns rezpeg rights after Phase 2 ISLAND lupus failure (Feb 2023); Pharmaphorum/Techtarget, Aug 2023 — Nektar sues Lilly over mishandled Phase 1b data; 60% workforce reduction. <a href="https://www.fiercebiotech.com/biotech/after-gathering-enough-nektar-lilly-hands-backs-rights-immunology-med-post-lupus-fail">fiercebiotech.com</a></div>
+<div class="ref">[R12] Nektar/TrialNet collaboration (Feb 2025) and CTV registry record — NIH-sponsored Phase 2 RESET T1D, n=66, 2:1, q14d × 26 wks, MMTT C-peptide AUC at 12 months, ages 8–45; company guides initial data 2027; registry est. primary completion May 2028. <a href="https://ctv.veeva.com/study/rezpegaldesleukin-nktr-358-in-new-onset-type-1-diabetes-mellitus">ctv.veeva.com</a></div>
+<div class="ref">[R13] Nektar Therapeutics press release via PR Newswire, "REZOLVE-AD Phase 2b Study of Rezpegaldesleukin Meets Primary and Key Secondary Endpoints," June 24, 2025 — n=393, all endpoints, p-values, full safety table (ISRs 69.7%, eosinophilia 7.8% vs 2.7%, SAEs, discontinuations). <a href="https://marketwirenews.com/stock/nktr/news/rezolve-ad-phase-2b-study-of-rezpegaldesleukin-meets-8921841703105540.html">marketwirenews.com</a></div>
+<div class="ref">[R14] Nektar Therapeutics press release, August 2026 — publication of REZOLVE-AD 16-week induction results in <em>The Lancet</em>; 52-week maintenance summary (EASI-75/90 sustained; EASI-100 conversions). <a href="https://www.stocktitan.net/news/NKTR/nektar-announces-publication-in-the-lancet-of-positive-phase-2b-oims43auhfl9.html">stocktitan.net</a></div>
+<div class="ref">[R15] Nektar Therapeutics Form 8-K / press release, December 16, 2025 — REZOLVE-AA 36-week topline: 28.2%/30.3% vs 11.2% SALT reduction, p=0.186/p=0.121 (mITT); significance only ex-4 ineligible patients (p=0.049/0.042); SALT30 48.9%/45.7%/19.1%. <a href="https://www.stocktitan.net/sec-filings/NKTR/8-k-nektar-therapeutics-reports-material-event-84f7ef010fb4.html">stocktitan.net</a></div>
+<div class="ref">[R16] AInvest NKTR earnings-call summary, Q2 2026 — ZENITH-AA design finalized (850 pts, twice-monthly dosing); 2029 BLA submission if positive; T1D data 2027. <a href="https://www.ainvest.com/stocks/NASDAQ-NKTR/financials/">ainvest.com</a></div>
+<div class="ref">[R17] FirstWord Pharma, ~September 2026 — California federal jury awards Nektar $90M in damages; Lilly breached implied covenant of good faith and fair dealing; subject to post-trial proceedings and appeal. <a href="https://firstwordpharma.com/story/8099224">firstwordpharma.com</a></div>
+<div class="ref">[R18] FDA-approved labeling / standard references — dupilumab, tralokinumab, lebrikizumab, nemolizumab, upadacitinib, abrocitinib (AD); baricitinib, ritlecitinib, deuruxolitinib (AA); class boxed warnings for JAK inhibitors. Mechanism/class facts per FDA labels.</div>
+<div class="ref">[R19] Egle Therapeutics press release via GlobeNewswire, September 30, 2026 — EGL-003 Phase 1 SAD positive; Treg-selective IL-2 mutein; MAD in AD planned Q4 2026. DelveInsight IL-2 pipeline — Xencor XmAb564 Phase 1b in AD/psoriasis. <a href="https://www.globenewswire.com/news-release/2026/09/30/3371508/0/en/egle-therapeutics-announces-positive-phase-1-data-for-egl-003-showing-favorable-safety-and-selective-treg-expansion-in-healthy-volunteer-study.html">globenewswire.com</a></div>
+<div class="ref">[R20] StockTitan NKTR Q3 2025 financial summary — weighted-average shares and net loss figures used for dilution trajectory. <a href="https://www.stocktitan.net/news/NKTR/nektar-therapeutics-reports-third-quarter-2025-financial-kyht5xswbw9j.html">stocktitan.net</a></div>
+<div class="ref">[R21] StockTitan NKTR Form 4 summaries — June 2026 inducement grants (20,500 options @ $60.98 + 3,900 RSUs); July 2026 inducement grants (36,000 options @ $64.84); Zalevsky 16,500 performance-option vesting certified July 23, 2026. <a href="https://www.stocktitan.net/news/NKTR/nektar-therapeutics-reports-inducement-grants-under-nasdaq-listing-b11plyiz8a5n.html">stocktitan.net</a></div>
+<div class="ref">[R22] Motley Fool / SEC Form 4, June 2026 — CEO Howard Robin open-market sale of 20,000 shares (~$1.22M at ~$60.75), 26.6% of direct holdings; Aug 18, 2026 tax-withholding sale of 418 shares. <a href="https://www.fool.com/coverage/filings/2026/06/24/president-ceo-sells-nktr-20000-shares-for-12-million/">fool.com</a></div>
+<div class="ref">[R23] TradingView NKTR earnings calendar — next quarterly earnings report scheduled November 5, 2026 (company-confirmed date). <a href="https://www.tradingview.com/symbols/NASDAQ-NKTR/?offer_id=10&aff_id=2588">tradingview.com</a></div>
+<p class="src" style="margin-top:18px">Local catalyst datasets consulted: <span class="num">~/workspace/research_notes/catalyst-calendar-2027/data.json</span> (1 NKTR event: T1D Phase 2 data expected 2027, guidance) and <span class="num">~/workspace/research_notes/q4-2026-dossier/dossier-v4.json</span> (0 NKTR events). Additional NKTR events in this dossier were derived from company guidance and program timelines as labeled.</p>
+</section>
+
+</main>
+</div>
+
+<footer class="site">
+<p>This document is an independent research summary compiled from public filings, peer-reviewed literature, and company disclosures, audited and enhanced as of October 10, 2026. It contains no buy/sell recommendation. Scenario price targets are explicitly labeled "soft" and scenario-based — simplified arithmetic on the dossier's own figures, not a DCF, and the maximum-value case is capped at the top published sell-side price target ($185, HC Wainwright). Evidence labels (FACT / INTERPRETATION / GAP / UNVERIFIED) reflect the compiler's assessment of source strength at the time of writing.</p>
+</footer>
+<script>
+(function(){
+  "use strict";
+  var root = document.documentElement;
+
+  /* ---- dark / light theme (persisted) ---- */
+  var stored = null;
+  try { stored = localStorage.getItem('nktr-theme'); } catch(e){}
+  function setTheme(t){
+    root.setAttribute('data-theme', t);
+    var b = document.getElementById('themeToggle');
+    if (b) b.textContent = (t === 'dark' ? '\u2600\uFE0F Light mode' : '\uD83C\uDF19 Dark mode');
+    try { localStorage.setItem('nktr-theme', t); } catch(e){}
+  }
+  setTheme(stored === 'dark' ? 'dark' : 'light');
+  var toggleBtn = document.getElementById('themeToggle');
+  if (toggleBtn) toggleBtn.addEventListener('click', function(){
+    setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ---- collapsible sections ---- */
+  document.querySelectorAll('main section.card').forEach(function(sec){
+    var h2 = sec.querySelector(':scope > h2');
+    if (!h2) return;
+    h2.classList.add('sechead');
+    h2.setAttribute('role','button'); h2.setAttribute('tabindex','0');
+    h2.setAttribute('aria-expanded','true');
+    h2.title = 'Click to collapse / expand this section';
+    var chev = document.createElement('span');
+    chev.className = 'chev'; chev.setAttribute('aria-hidden','true');
+    chev.textContent = '\u25BC';
+    h2.appendChild(chev);
+    var body = document.createElement('div'); body.className = 'cardbody';
+    var nodes = [], n = h2.nextSibling;
+    while (n){ nodes.push(n); n = n.nextSibling; }
+    nodes.forEach(function(x){ body.appendChild(x); });
+    sec.appendChild(body);
+    function toggle(){
+      var c = sec.classList.toggle('collapsed');
+      h2.setAttribute('aria-expanded', c ? 'false' : 'true');
+    }
+    h2.addEventListener('click', toggle);
+    h2.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---- nav links: expand target section, then jump ---- */
+  document.querySelectorAll('nav.side a').forEach(function(a){
+    a.addEventListener('click', function(){
+      var id = a.getAttribute('href');
+      if (id && id.charAt(0) === '#'){
+        var sec = document.querySelector(id);
+        if (sec){
+          sec.classList.remove('collapsed');
+          var h = sec.querySelector('h2');
+          if (h) h.setAttribute('aria-expanded','true');
+        }
+      }
+    });
+  });
+
+  /* ---- horizontal scroll wrappers for wide tables ---- */
+  document.querySelectorAll('main table').forEach(function(t){
+    if (t.parentElement && t.parentElement.classList.contains('tablewrap')) return;
+    var w = document.createElement('div'); w.className = 'tablewrap';
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+
+  /* ---- mobile: wrap nav links in a horizontal chip row ---- */
+  var nav = document.querySelector('nav.side');
+  if (nav){
+    var links = Array.prototype.slice.call(nav.querySelectorAll(':scope > a'));
+    if (links.length){
+      var wrap = document.createElement('div'); wrap.className = 'navlinks';
+      links.forEach(function(a){ wrap.appendChild(a); });
+      nav.appendChild(wrap);
+    }
+  }
+
+  /* ---- back to top ---- */
+  var btn = document.createElement('button');
+  btn.id = 'toTop'; btn.textContent = '\u2191';
+  btn.setAttribute('aria-label','Back to top');
+  document.body.appendChild(btn);
+  btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  window.addEventListener('scroll', function(){
+    btn.classList.toggle('show', window.scrollY > 600);
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
