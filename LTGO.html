@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LTGO — Latigo Biotherapeutics · Deep-Dive Dossier · 2026-10-10</title>
+<style>
+  :root{
+    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
+    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
+    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
+    --hard:#166534; --guid:#b45309; --inf:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
+  header.top .wrap{max-width:1080px;margin:0 auto}
+  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
+  header.top h1 .tick{color:#7fd4d1}
+  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
+  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
+  .pricebar .pill b{color:#fff;font-size:14px}
+  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
+  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
+  nav.toc a:hover{background:var(--wash);color:var(--ink)}
+  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
+  section{padding:30px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
+  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
+  h3{font-size:16.5px;margin:26px 0 8px}
+  h4{font-size:14.5px;margin:20px 0 6px}
+  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  p,li{font-size:14.5px}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
+  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
+  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
+  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
+  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fbfcfd}
+  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
+  .callout.warn{border-left-color:var(--unver)}
+  .callout p{margin:6px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
+  .card h4{margin:0 0 8px;font-size:15px}
+  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
+  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl-item{position:relative;margin:0 0 18px}
+  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+  .tl-item .dt{font-weight:700;font-size:13.5px}
+  .tl-item .ev{font-size:14px;margin:2px 0}
+  .tl-item .note{font-size:12.5px;color:var(--muted)}
+  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .flag .rank{display:inline-block;background:var(--ink);color:#fff;font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
+  .refs{font-size:13px;color:var(--muted)}
+  .refs li{margin-bottom:8px}
+  .refs a{color:var(--accent-ink)}
+  .fine{font-size:12.5px;color:var(--muted)}
+  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px;font-size:12px;color:var(--muted)}
+  .verdict{background:var(--ink);color:#fff;border-radius:10px;padding:18px 22px;margin:22px 0}
+  .verdict h3{color:#7fd4d1;margin:0 0 8px}
+  .verdict p{margin:6px 0;font-size:14.5px;color:#e6ecf2}
+  a.src{color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted var(--accent-ink);font-size:12.5px}
+  /* ===== v-final QOL additions (2026-10-10) ===== */
+  html{scroll-behavior:smooth}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+  .table-scroll table{margin:0;min-width:620px}
+  .qolbar{background:var(--wash);border-bottom:1px solid var(--line)}
+  .qolbar .wrap{max-width:1080px;margin:0 auto;display:flex;gap:8px;padding:8px 16px;flex-wrap:wrap;align-items:center}
+  .qolbar .lbl{font-size:12.5px;color:var(--muted);margin-right:auto}
+  .qolbar button{font-size:13px;min-height:44px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+  .qolbar button:hover{border-color:var(--accent)}
+  nav.toc .wrap{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin}
+  nav.toc a{min-height:44px;display:inline-flex;align-items:center;padding:7px 10px}
+  h2 .sec-toggle{background:none;border:none;color:var(--accent);font-size:20px;cursor:pointer;padding:4px 6px 4px 0;margin-right:4px;min-width:44px;min-height:44px;vertical-align:middle}
+  section.collapsed>:not(h2){display:none}
+  #toTop{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:none;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  #toTop.show{display:block}
+  img{max-width:100%;height:auto}
+  @media(max-width:760px){
+    header.top{padding:26px 16px 22px}
+    header.top h1{font-size:24px}
+    main{padding:8px 16px 80px}
+    h2{font-size:19px}
+    p,li{font-size:14px}
+    .flag{padding:12px 14px}
+  }
+  /* dark mode */
+  html[data-theme="dark"]{
+    --ink:#e8edf2; --muted:#9aa6b2; --paper:#12181f; --wash:#1a222b;
+    --line:#2c3844; --accent:#5fd0cc; --accent-ink:#8fdcd8;
+    --fact:#7aa5ff; --interp:#b79aff; --gap:#f0a35e; --unver:#f28b8b;
+  }
+  html[data-theme="dark"] header.top{background:#0b1016}
+  html[data-theme="dark"] header.top .pricebar .pill{background:#1a222b;border-color:#2c3844}
+  html[data-theme="dark"] nav.toc{background:#12181f}
+  html[data-theme="dark"] nav.toc a:hover{background:#1a222b}
+  html[data-theme="dark"] tr:nth-child(even) td{background:#161d25}
+  html[data-theme="dark"] .card{background:#12181f}
+  html[data-theme="dark"] .verdict{background:#0b1016}
+  html[data-theme="dark"] .qolbar button{background:#1a222b;color:#e8edf2;border-color:#2c3844}
+  html[data-theme="dark"] #toTop{background:#5fd0cc;color:#0b1016;border-color:#5fd0cc}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1><span class="tick">LTGO</span> · Latigo Biotherapeutics, Inc.</h1>
+    <p class="sub">Comprehensive deep-dive investment dossier — non-opioid pain (NaV1.8 inhibitors) · As of October 10, 2026</p>
+    <div class="pricebar">
+      <div class="pill">Price <b>$16.00</b> <span style="color:#9fb0c2">(MarketBeat/Finnhub, close 10/09/2026; prior close $14.79)</span></div>
+      <div class="pill">Basic mcap <b>~$1.06B</b></div>
+      <div class="pill">FD mcap <b>~$1.22B</b></div>
+      <div class="pill">Pro-forma cash <b>~$419M</b></div>
+      <div class="pill">IPO <b>$18.00</b> · Aug 7, 2026</div>
+    </div>
+  </div>
+</header>
+
+<div class="qolbar"><div class="wrap">
+  <span class="lbl">Reading controls:</span>
+  <button id="themeBtn" type="button" aria-label="Toggle dark mode">&#127769; Dark mode</button>
+  <button id="expandAll" type="button">Expand all</button>
+  <button id="collapseAll" type="button">Collapse all</button>
+</div></div>
+
+<nav class="toc"><div class="wrap">
+  <a href="#s1">1 · Identity &amp; Thesis</a><a href="#s2">2 · Science</a><a href="#s3">3 · Pipeline</a>
+  <a href="#s4">4 · Trial Design</a><a href="#s5">5 · Clinical/Regulatory</a><a href="#s6">6 · Competition</a>
+  <a href="#s7">7 · Financials</a><a href="#s8">8 · FDMC/EV</a><a href="#s9">9 · Catalyst Map</a>
+  <a href="#s10">10 · Red Flags</a><a href="#s11">11 · Bear/Base/Bull</a><a href="#s12">12 · Management</a>
+  <a href="#s13">13 · References</a>
+</div></nav>
+
+<main>
+
+<div class="legend">
+  <span><b>Evidence labels:</b></span>
+  <span><span class="tag fact">FACT</span> = from a primary/verified source</span>
+  <span><span class="tag interp">INTERPRETATION</span> = analyst inference from facts</span>
+  <span><span class="tag gap">GAP</span> = missing data, not yet disclosed</span>
+  <span><span class="tag unver">UNVERIFIED</span> = single/weak source, not corroborated</span>
+</div>
+
+<section id="s1">
+<h2><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
+<p class="kicker">Who they are, what the binary is, and what the dossier will prove or disprove.</p>
+
+<table>
+<tr><th style="width:32%">Item</th><th>Detail</th></tr>
+<tr><td>Company</td><td>Latigo Biotherapeutics, Inc., Thousand Oaks, CA (1300 Rancho Conejo Blvd, Suite 305) <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Ticker / listing</td><td>LTGO · Nasdaq Global Select Market · CIK 2056611 · Commission file 001-43436 <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Stage</td><td>Clinical-stage, pre-revenue biotech; 66 employees (MarketBeat) / ~59–66 FTEs <span class="tag fact">FACT</span></td></tr>
+<tr><td>Lead asset</td><td><b>Onzotrigine</b> (formerly LTG-001) — oral, selective NaV1.8 inhibitor for moderate-to-severe acute pain; Phase 2b abdominoplasty data published in <i>NEJM</i> July 29, 2026; Phase 3 bunionectomy + open-label safety program planned H2 2026, topline 2H 2027 <span class="tag fact">FACT</span> <a class="src" href="#rnejm">NEJM</a> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Why it matters</td><td>NaV1.8 is a peripherally restricted pain target with human-genetic validation and one approved drug (Vertex's Journavx/suzetrigine, Jan 2025). Onzotrigine is positioned as a potentially faster-onset, cleaner-DDI second-generation inhibitor. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>The binary (hold-through-the-binary frame)</td><td>Buy-and-hold through the clinical binary: <b>Phase 3 bunionectomy topline, 2H 2027</b> — the single pivotal efficacy readout that determines whether an NDA is fileable. Everything else (LTG-321, LTG-418, commercial) is secondary. <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+
+<div class="verdict">
+<h3>Dossier verdict — up front</h3>
+<p>Onzotrigine's Phase 2b is genuinely strong (SPID48 p&lt;.001 at high dose, 52% opioid-free vs 22% placebo, onset ~52 min, NEJM-published) <span class="tag fact">FACT</span>, and the company is funded into 2029 past the 2H 2027 binary <span class="tag fact">FACT</span>. But the dossier's <b>key swing factor</b> is model translation: a prior LTG-001 dental-pain study failed to separate from placebo <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q risk factors</a>, and the Phase 3 moves to a different, bone-injury model (bunionectomy) where even Vertex's suzetrigine showed its smallest effect size. With only one pivotal efficacy trial currently planned, the 2H 2027 readout is a true single-shot binary on ~$801M of FD enterprise value.</p>
+</div>
+
+<div class="callout">
+<p><b>What this dossier does NOT contain:</b> no DCF, no buy/sell recommendation. §11 carries <b>soft, scenario-based price targets</b> — arithmetic illustrations built from the dossier's own EV / share-count / cash data with labeled assumptions, not recommendations. Takeout scenarios are capped at the top published sell-side target ($73, Goldman Sachs) <span class="tag fact">FACT</span>. No cross-trial head-to-head efficacy claims are made; where competitor numbers appear they are presented side-by-side with explicit non-comparability caveats.</p>
+</div>
+</section>
+
+<section id="s2">
+<h2><span class="num">2</span>Science — Mechanism of Action &amp; Why It Could Fail</h2>
+<p class="kicker">Plain-language mechanism first, then the academic literature, then the failure modes.</p>
+
+<h3>2a · Mechanism in plain language</h3>
+<p>Pain starts when specialized nerve endings (nociceptors) in skin, muscle, and joints detect damage and fire electrical signals up to the spinal cord and brain. Those signals are carried by <b>voltage-gated sodium channels</b> — molecular gates that open to let sodium ions rush in, generating the electrical spike. <b>NaV1.8</b> is one of these channels, and it is unusual in two ways that matter for a drug:</p>
+<ul>
+<li><b>It lives almost exclusively in peripheral pain nerves</b> — small-diameter neurons of the dorsal root ganglion (DRG) and trigeminal ganglion — not in the brain, heart, or reward circuitry <span class="tag fact">FACT</span> <a class="src" href="#rf-pharm">Frontiers Pharmacol. 2025</a>. Blocking it should therefore stop pain signals at their source without engaging the brain's opioid/reward pathways — i.e., analgesia without addiction risk or the sedation, respiratory depression, and constipation of opioids.</li>
+<li><b>It shapes the pain spike itself.</b> While the related channel NaV1.7 sets the <i>threshold</i> for a nerve to fire, NaV1.8 drives the rising phase and amplitude of the action potential once firing starts <span class="tag fact">FACT</span> <a class="src" href="#rf-pharm">Frontiers Pharmacol. 2025</a> (citing Cummins et al. 1998; Renganathan et al. 2001). Inhibiting NaV1.8 is therefore conceptually like turning down the volume knob on pain transmission rather than raising the bar for it to start.</li>
+</ul>
+<p>Onzotrigine is a small-molecule, orally bioavailable, selective NaV1.8 inhibitor. Latigo's stated design thesis is <b>potency plus deep penetration into peripheral nerve tissue</b>, producing high levels of target inhibition and therefore rapid onset <span class="tag fact">FACT</span> <a class="src" href="#rgen">GEN Eng. News</a> (company statements). Selectivity matters because earlier NaV1.8 programs (Vertex's VX-150, VX-961) were abandoned in part for hitting other sodium channels and causing side effects <span class="tag fact">FACT</span> <a class="src" href="#rvx150">Pharmaphorum</a>.</p>
+
+<h3>2b · Academic literature — what the independent science says</h3>
+<p>Mandatory literature review beyond company materials. Each entry is an independent academic source:</p>
+<table>
+<tr><th style="width:26%">Paper</th><th>Finding relevant to onzotrigine</th></tr>
+<tr><td>Faber et al., <i>PNAS</i> 2012 — "Gain-of-function Nav1.8 mutations in painful neuropathy" <a class="src" href="#rpnas">PNAS</a></td><td>Human-genetic validation of the target: among 104 patients with idiopathic painful small-fiber neuropathy, 9 carried 7 <i>SCN10A</i> variants; two gain-of-function mutations (in 3 patients, incl. a father–son pair) made DRG neurons hyperexcitable. <span class="tag fact">FACT</span> <b>Relevance:</b> the target is causally linked to human pain — the strongest kind of target validation short of a drug working.</td></tr>
+<tr><td>Biomedicines 2025 review (PMID 40427587) — "Nav1.8 and Chronic Pain: From Laboratory Animals to Clinical Patients" <a class="src" href="#rbiomed">PubMed</a></td><td>Summarizes gain-of-function <i>and</i> loss-of-function <i>SCN10A</i> variants (latter linked to pain insensitivity) and animal-model evidence. <b>Cautionary core:</b> NaV1.7 had equally compelling genetics and animal data, yet <i>no NaV1.7-selective drug has passed clinical trials</i>; the review attributes the gap to human-vs-animal differences and degeneracy among sodium channels governing DRG excitability <span class="tag fact">FACT</span>. <b>Relevance:</b> the exact failure pattern investors must price for NaV1.8 — beautiful biology, unproven translation.</td></tr>
+<tr><td>Frontiers in Pharmacology 2025 review — "Sodium channels as a new target for pain treatment" <a class="src" href="#rf-pharm">Frontiers</a></td><td>Confirms peripheral restriction of NaV1.8, its role in inflammatory and neuropathic pain, and notes loss-of-function human mutations are still poorly characterized <span class="tag fact">FACT</span>. Supports the "no addiction, no motor dysfunction" rationale as a class property, not a drug property.</td></tr>
+<tr><td>Osteen et al., <i>Pain Ther.</i> 2025 — "Pharmacology and mechanism of action of suzetrigine" <a class="src" href="#rosteen">Vertex/Journavx HCP</a></td><td>Vertex's own mechanistic paper: suzetrigine is a potent, selective NaV1.8 inhibitor; establishes the class mechanism in peer-reviewed form. <b>Relevance:</b> sets the mechanistic bar onzotrigine must clear — selectivity and potency are table stakes, and any differentiation (onset, DDI, tissue penetration) must be demonstrated clinically, not claimed preclinically.</td></tr>
+<tr><td>Woolf lab, <i>Cell Reports Medicine</i> Oct 2026 (Boston Children's) <a class="src" href="#rwoolf">MedLink/MedicalXpress</a></td><td>New mechanistic finding: in pathological (neuropathic) pain states, NaV1.8's sustained activity depends on interaction with the scaffolding protein ankyrin-G; disrupting it quiets hyperexcitable neurons. The authors note that <i>classic NaV1.8 pore-blockade strategies succeeded preclinically but have yet to produce similar results in clinical settings</i> for neuropathic pain <span class="tag fact">FACT</span>. <b>Relevance:</b> directly challenges the LTG-321 chronic-pain thesis — if chronic/neuropathic pain is maintained by channel <i>trafficking</i> rather than <i>gating</i>, a conventional inhibitor may underperform. Treat LTG-321 as pure option value (as this dossier does).</td></tr>
+<tr><td>Yale Medicine / Waxman lab overview <a class="src" href="#ryale">Yale</a></td><td>Explains why the field moved from NaV1.7 to NaV1.8: NaV1.7's genetics were compelling but drugging it failed; peripheral restriction is the safety rationale for the whole approach <span class="tag fact">FACT</span>.</td></tr>
+</table>
+
+<h3>2c · Why it could fail — the honest list</h3>
+<div class="flag"><span class="rank">#1</span><b>Model translation has already failed once for this exact molecule.</b> Latigo's 10-Q risk factors disclose that a previously conducted <b>dental-pain study showed no active treatment separating from placebo with statistical significance</b> <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Dental (third-molar) models are notorious for high placebo response and assay noise — but the Phase 3 bunionectomy model is also a <i>different</i> tissue from the successful abdominoplasty model: bone and periosteum vs. soft tissue. The company itself warns that "results from studies in an abdominoplasty model may not predict results in a bunionectomy model" <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Precedent within the class: suzetrigine's own Phase 3 SPID48 treatment difference was 48.4 points in abdominoplasty but only 29.3 in bunionectomy <span class="tag fact">FACT</span> <a class="src" href="#rsuz">Pain Manag. Nurs. 2026</a> — the bone model is the harder one, and it is the one Latigo chose for Phase 3.</div>
+<div class="flag"><span class="rank">#2</span><b>Peripheral blockade may be insufficient where central mechanisms dominate.</b> The 10-Q states that pain involving "central pain components" or "processing mechanisms that are not directly targeted by NaV1.8 inhibition" may limit efficacy, and that chronic dosing could induce compensatory mechanisms or tolerance <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. This is the same biology behind the Woolf ankyrin-G finding and the NaV1.7 clinical graveyard.</div>
+<div class="flag"><span class="rank">#3</span><b>Class attrition is real.</b> Vertex abandoned VX-961 (Phase 1 safety), VX-150 (positive Phase 2 but required high doses; insufficient selectivity), and VX-128 <span class="tag fact">FACT</span> <a class="src" href="#rvx150">Pharmaphorum / Clin. Trials Arena</a> before suzetrigine succeeded — and even Vertex's follow-on VX-993 <b>failed its Phase 2 bunionectomy trial</b> vs. placebo and was terminated as an acute-pain monotherapy <span class="tag fact">FACT</span> <a class="src" href="#rvx993">Pharmaphorum 2026</a>. First-in-class success does not de-risk second-generation molecules; each must re-prove efficacy.</div>
+<div class="flag"><span class="rank">#4</span><b>The safety database is still small.</b> Phase 2b (n=343) showed presyncope 6% vs 1% placebo and pyrexia 7% vs 2% at the high dose <span class="tag fact">FACT</span> <a class="src" href="#rmed">Medscape</a>. These may be noise in 86 patients per arm — or the leading edge of a signal that only a multi-thousand-patient safety database (required for NDA) can resolve. The open-label safety trial exists precisely for this <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#5</span><b>Chronic pain (LTG-321) faces the steepest biology.</b> Vertex's suzetrigine failed in lumbosacral radiculopathy and the FDA "does not see a path to approval" in peripheral neuropathic pain <span class="tag fact">FACT</span> <a class="src" href="#rvx993">Pharmaphorum 2026</a>. Knee OA is nociceptive/mixed rather than neuropathic — arguably a better fit — but no NaV1.8 inhibitor has yet demonstrated efficacy in any chronic pain indication. Zero value in disciplined models until the 2H 2027 POC readout.</div>
+</section>
+
+<section id="s3">
+<h2><span class="num">3</span>Full Pipeline Overview — Ranked by Value</h2>
+<p class="kicker">All disclosed programs, ranked by expected contribution to equity value, most → least valuable.</p>
+<div class="callout">
+<p><b>Ranking logic:</b> onzotrigine oral is the only asset with human efficacy data and a guided readout inside the cash runway — it carries ~100% of near-term value. LTG-321 is <b>pure option value</b> (Phase 2 POC, no efficacy data, class-level chronic-pain headwinds), but it is the only other program with a defined catalyst, so it ranks second. The IV formulation ranks third only as a rider on onzotrigine's proven molecule — ~100% oral bioavailability undercuts its standalone rationale. LTG-418 (preclinical) and discovery carry zero in disciplined models. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<table>
+<tr><th>Rank</th><th>Program</th><th>Description</th><th>Stage</th><th>Next milestone</th><th>Thesis weight</th></tr>
+<tr><td><b>#1</b></td><td><b>Onzotrigine</b> (LTG-001), oral</td><td>Selective NaV1.8 inhibitor; moderate-to-severe acute pain incl. postoperative pain. BID oral dosing (Ph2b: 450 mg loading → 300 mg q12h high dose). ~100% oral bioavailability in completed bioavailability studies <span class="tag fact">FACT</span> <a class="src" href="#r8k">Q2'26 PR</a>.</td><td>Phase 2b complete (NEJM); Phase 3 to initiate H2 2026</td><td>Ph3 bunionectomy topline 2H 2027 <span class="pill-dq guidance">guidance</span></td><td><b>The binary.</b> ~100% of near-term value.</td></tr>
+<tr><td><b>#2</b></td><td><b>LTG-321</b>, oral QD</td><td>Structurally distinct next-gen NaV1.8 inhibitor for chronic musculoskeletal pain, starting with knee osteoarthritis. Designed for lower effective dose + once-daily dosing for chronic use <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Phase 1 (data as of May 15, 2026): PD activity via cold-pressor test (CPT) pain-tolerance threshold, activity persisting 24h post single dose <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>.</td><td>Phase 2 POC: randomized, double-blind, placebo-controlled <b>within-patient crossover</b>, ~120 knee-OA patients, multiple sites in Denmark; primary endpoint WOMAC pain; enrollment underway</td><td>Topline 2H 2027 <span class="pill-dq guidance">guidance</span></td><td><b>Pure option value.</b> Crossover design is efficient but OA is a noisy endpoint; Vertex's chronic setbacks apply as class caution.</td></tr>
+<tr><td><b>#3</b></td><td><b>Onzotrigine IV</b></td><td>Intravenous formulation for hospital/inpatient-to-outpatient transition <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Bioavailability work showed ~100% oral bioavailability, which weakens the standalone IV rationale <span class="tag interp">INTERPRETATION</span>.</td><td>Formulation / preclinical</td><td>Undisclosed <span class="tag gap">GAP</span></td><td>Negligible; no timeline or spend disclosed.</td></tr>
+<tr><td><b>#4</b></td><td><b>LTG-418</b></td><td>Next-gen, structurally distinct NaV1.8 inhibitor for acute and chronic pain; predicted substantially lower dose than onzotrigine/LTG-321, potentially enabling gels, patches, eye drops, inhalers, injectables <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. 14-day non-GLP tox in rats + NHP showed suitable tolerability <span class="tag fact">FACT</span> <a class="src" href="#r8k">Q2'26 PR</a>.</td><td>Preclinical</td><td>Undisclosed <span class="tag gap">GAP</span></td><td>Zero in disciplined models.</td></tr>
+<tr><td><b>#5</b></td><td>Discovery: additional ion-channel modulators</td><td>Early discovery of complementary peripheral pain mechanisms incl. neuropathic pain <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>.</td><td>Discovery</td><td>—</td><td>Zero.</td></tr>
+</table>
+<div class="callout">
+<p><b>IPO use of proceeds (from S-1, via Fierce Biotech):</b> ~$124.7M earmarked for onzotrigine through the Phase 3 bunionectomy trial + commercial readiness; ~$46.2M for LTG-321 through Phase 2 and into Phase 3; remainder for LTG-418 and general corporate purposes <span class="tag fact">FACT</span> <a class="src" href="#rfierce">Fierce Biotech</a>. This confirms the capital plan is built around the 2H 2027 binary.</p>
+</div>
+</section>
+
+<section id="s4">
+<h2><span class="num">4</span>Trial Design Deep Dive</h2>
+<p class="kicker">The Phase 2b that everything rests on — endpoints, statistics, powering — and what Phase 3 must show.</p>
+
+<h3>4a · Phase 2b abdominoplasty trial (Singla et al., <i>NEJM</i> 2026; DOI 10.1056/nejmoa2602910)</h3>
+<table>
+<tr><th style="width:30%">Design element</th><th>Detail</th></tr>
+<tr><td>Design</td><td>Randomized, double-blind, placebo- <b>and</b> active-controlled Phase 2b <span class="tag fact">FACT</span> <a class="src" href="#rnejm">NEJM</a></td></tr>
+<tr><td>Population</td><td>343 adults, ages 18–65, moderate-to-severe pain (NPRS ≥5/10) within 4 hours after abdominoplasty (tummy tuck) <span class="tag fact">FACT</span> <a class="src" href="#rmedx">MedicalXpress</a>. Predominantly female abdominoplasty population; excluded chronic pain and prior opioid use <span class="tag fact">FACT</span> <a class="src" href="#rmed">Medscape</a> — limits generalizability, flagged by the authors.</td></tr>
+<tr><td>Arms (n)</td><td>Low-dose onzotrigine 300 mg loading → 150 mg q12h (n=85); high-dose 450 mg → 300 mg q12h (n=86); hydrocodone/APAP 5/325 mg q6h (n=86); placebo (n=86). Oral, BID, 48-hour treatment <span class="tag fact">FACT</span> <a class="src" href="#rmedx">MedicalXpress</a> <a class="src" href="#rgen">GEN</a></td></tr>
+<tr><td>Primary endpoint</td><td><b>SPID48</b> — summed (time-weighted) pain intensity difference over 48 hours vs. placebo, a standard acute-pain regulatory endpoint <span class="tag fact">FACT</span> <a class="src" href="#rnejm">NEJM</a></td></tr>
+<tr><td>Key secondaries</td><td>Rescue opioid consumption (morphine milligram equivalents, MME); proportion opioid-free (no rescue); median time to meaningful pain relief (≥2-point NPRS reduction); safety <span class="tag fact">FACT</span> <a class="src" href="#rmed">Medscape</a></td></tr>
+<tr><td>Statistical plan / powering</td><td>Not disclosed in materials reviewed for this dossier <span class="tag gap">GAP</span>. The published results report least-squares means with 95% CIs and p-values vs. placebo; no multiplicity-adjustment scheme was described in secondary reporting. Treat the secondary p-values as supportive, not confirmatory.</td></tr>
+</table>
+
+<h4>Results (all vs. placebo; hydrocodone/APAP arm was NOT a formal comparator — no head-to-head claims)</h4>
+<table>
+<tr><th>Endpoint</th><th>High dose (n=86)</th><th>Low dose (n=85)</th><th>Placebo (n=86)</th><th>Hydrocodone/APAP (n=86)</th></tr>
+<tr><td>SPID48 LSM</td><td><b>185.30</b> (Δ +62.08, p&lt;.001)</td><td>161.05 (Δ +37.82, p=.003)</td><td>123.22</td><td>164.08 (numerical only)</td></tr>
+<tr><td>Rescue opioid (MME)</td><td><b>11.00</b> (Δ −7.35, p=.01)</td><td>— (not significant)</td><td>18.35</td><td>—</td></tr>
+<tr><td>Opioid-free patients</td><td><b>52%</b> (Δ +30pp, p&lt;.001)</td><td>—</td><td>22.1%</td><td>—</td></tr>
+<tr><td>Median time to meaningful relief</td><td><b>51.7 min</b></td><td>60.0 min</td><td>87.5 min</td><td>82.8 min</td></tr>
+</table>
+<p class="fine">Sources: GEN Engineering News; Medscape; company NEJM-publication PR (StreetInsider). High dose only separated on the opioid-sparing secondaries. <span class="tag fact">FACT</span></p>
+
+<h4>Safety (n=343)</h4>
+<ul>
+<li>TEAEs mostly mild-to-moderate; overall AE levels <b>below</b> the placebo arm; most common: nausea, headache, dizziness <span class="tag fact">FACT</span> <a class="src" href="#rpr">NEJM PR</a> <a class="src" href="#rmed">Medscape</a>.</li>
+<li>Imbalances to watch: <b>pyrexia 7% vs 2%</b> and <b>presyncope 6% vs 1%</b> (high dose vs placebo) <span class="tag fact">FACT</span> <a class="src" href="#rmed">Medscape</a>. In ~86 patients per arm these could be noise — or the first hint of a signal. The Phase 3 safety database is the arbiter.</li>
+</ul>
+
+<h4>How to read this trial honestly</h4>
+<div class="callout">
+<p><b>Strengths:</b> both doses hit the primary with a clean dose response; the high dose separated on <i>all three</i> key secondaries (pain, opioid consumption, opioid-free rate); onset ~52 min is fast for the class; NEJM publication is a genuine quality signal (the company notes it is only the second original acute-pain drug paper in NEJM in 15 years <span class="tag fact">FACT</span> <a class="src" href="#r8k">Q2'26 PR</a>).</p>
+<p><b>Weaknesses a Phase 3 must overcome:</b> single surgical model (soft-tissue abdominoplasty); 48-hour duration; monotherapy setting (real-world acute pain is multimodal); small safety n; and the company's own prior dental study failed <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. The Phase 2b powering/alpha-control details are undisclosed <span class="tag gap">GAP</span>.</p>
+</div>
+
+<h3>4b · Phase 3 program (planned)</h3>
+<table>
+<tr><th>Trial</th><th>Design (per company)</th><th>Status</th></tr>
+<tr><td>Pivotal efficacy</td><td>Randomized, double-blind, <b>placebo-controlled</b> Phase 3 in moderate-to-severe acute pain after <b>bunionectomy</b> <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Detailed design — sample size, primary endpoint definition, powering, alpha control, interim analyses — <b>not yet disclosed</b> <span class="tag gap">GAP</span>; no NCT number found on ClinicalTrials.gov as of 2026-10-10 <span class="tag gap">GAP</span>.</td><td>Initiation guided H2 2026 <span class="pill-dq guidance">guidance</span></td></tr>
+<tr><td>Open-label safety</td><td>Single-arm, open-label Phase 3 safety trial across a broader population (mix of demographics, post-surgical and non-surgical settings) to reach FDA-required exposure counts at the commercial dose <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>.</td><td>Initiation guided H2 2026 <span class="pill-dq guidance">guidance</span>; topline 2H 2027 <span class="pill-dq guidance">guidance</span></td></tr>
+</table>
+<div class="callout warn">
+<p><b>Design risk to flag:</b> the company has said the Phase 2b "may serve as one of the well-controlled trials needed" for approval <span class="tag fact">FACT</span> <a class="src" href="#rpnn">Pain News Network</a> — implying a one-pivotal-trial NDA strategy. The 10-Q simultaneously warns that "the FDA's regulatory expectations for non-opioid pain therapies continue to evolve" and the agency "may impose novel requirements, including additional or expanded clinical trials" <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. If FDA requires two adequate and well-controlled trials, the timeline extends materially. This is a first-order regulatory risk, not a footnote.</p>
+</div>
+</section>
+
+<section id="s5">
+<h2><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
+<p class="kicker">Where the program stands with regulators and what the path to NDA requires.</p>
+<ul>
+<li><b>IND history:</b> FDA placed the onzotrigine IND on <b>clinical hold May 2024 – November 2024</b> due to insufficient nonclinical data to support the abdominoplasty trial submission (April 2024). Hold lifted; trial completed and published <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. A resolved hold, but it documents that FDA has already pushed back on this program's nonclinical package once.</li>
+<li><b>CMC:</b> per company, FDA discussions support that the proposed CMC manufacturing and stability plan for commercial material is "reasonable for supporting regulatory approval" <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a> (company characterization; FDA minutes not public <span class="tag gap">GAP</span>).</li>
+<li><b>Preclinical pharmacology:</b> limited drug-drug-interaction potential; balanced renal and hepatic clearance (preclinical) <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. If confirmed clinically, this is the cleanest differentiation vs. Journavx's CYP3A contraindication (see §6).</li>
+<li><b>Regulatory designations:</b> none disclosed (no Fast Track / Breakthrough announced for onzotrigine) <span class="tag gap">GAP</span>. Contrast: suzetrigine carried both Fast Track and Breakthrough Therapy designations <span class="tag fact">FACT</span> <a class="src" href="#rrheum">The Rheumatologist</a>.</li>
+<li><b>Path to NDA (company plan):</b> one placebo-controlled Phase 3 bunionectomy trial + one open-label safety trial → NDA for moderate-to-severe acute pain including postoperative pain. NDA timing not guided <span class="tag gap">GAP</span>; mechanically, a 2H 2027 topline implies a 2028 NDA at the earliest <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Outlook:</b> the regulatory setup is standard for an acute-pain 505(b)(1): replicate efficacy in a second model, build the safety database, file. The two swing variables are (1) whether one pivotal trial suffices and (2) whether the safety database stays clean on presyncope/pyrexia. The recent FDA posture toward the class is mixed — Journavx got a broad label, but FDA told Vertex it sees <b>no path to approval for suzetrigine in peripheral neuropathic pain</b> and no further sciatica trial will be run <span class="tag fact">FACT</span> <a class="src" href="#rvx993">Pharmaphorum 2026</a> — relevant as background for LTG-321's chronic ambitions, not for the acute-pain NDA.</li>
+</ul>
+</section>
+
+<section id="s6">
+<h2><span class="num">6</span>Competition — Clinical Differentiation Only</h2>
+<p class="kicker">No marketing language. Numbers are presented side-by-side with non-comparability stated explicitly.</p>
+
+<h3>6a · Journavx (suzetrigine, Vertex) — the approved in-class comparator</h3>
+<table>
+<tr><th style="width:30%">Attribute</th><th>Journavx (suzetrigine)</th><th>Onzotrigine (what is known)</th></tr>
+<tr><td>Regulatory status</td><td>FDA-approved <b>Jan 30, 2025</b> for moderate-to-severe acute pain in adults (incl. postoperative); first-in-class NaV1.8 inhibitor <span class="tag fact">FACT</span> <a class="src" href="#rjv">Vertex PR</a></td><td>Investigational; Phase 3 not yet started <span class="tag fact">FACT</span></td></tr>
+<tr><td>Pivotal efficacy basis</td><td>2 randomized placebo-controlled Ph3 trials (bunionectomy NCT05553366; abdominoplasty NCT05558410) + single-arm safety study; SPID48 LSM difference vs placebo: <b>48.4</b> (abdominoplasty, p&lt;.0001) / <b>29.3</b> (bunionectomy, p=.0002) <span class="tag fact">FACT</span> <a class="src" href="#rsuz">Pain Manag. Nurs. 2026</a>. Did <b>not</b> separate from hydrocodone/APAP on secondary endpoints <span class="tag fact">FACT</span> <a class="src" href="#rcta">Clin. Trials Arena</a>.</td><td>Single Ph2b (n=343): SPID48 Δ +62.08 (high dose, p&lt;.001) / +37.82 (low, p=.003) vs placebo <span class="tag fact">FACT</span>. <b>Not comparable across trials</b> — different studies, populations, timepoints, and analysis populations. No formal head-to-head exists.</td></tr>
+<tr><td>Onset of meaningful relief</td><td>Median 119 min (abdominoplasty) / 240 min (bunionectomy) in Ph3 <span class="tag fact">FACT</span> <a class="src" href="#rfierce">Fierce Biotech</a> (citing Vertex data)</td><td>Median 51.7 min (high dose) / 60.0 min (low) in Ph2b <span class="tag fact">FACT</span>. <b>Cross-trial comparison is invalid</b>; the relevant test is whether onzotrigine's onset replicates in its own Phase 3.</td></tr>
+<tr><td>Dosing</td><td>Oral, twice daily <span class="tag fact">FACT</span> <a class="src" href="#rjv">Vertex PR</a></td><td>Oral, twice daily (Ph2b regimen) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Drug interactions (label)</td><td><b>Contraindicated with strong CYP3A inhibitors</b>; dose reduction with moderate CYP3A inhibitors; suzetrigine is itself a CYP3A inducer (hormonal-contraceptive interaction — backup contraception required during + 28 days after treatment); hepatic-impairment warnings <span class="tag fact">FACT</span> <a class="src" href="#rlabel">FDA label via fda.report</a></td><td>Company reports <b>limited DDI potential</b> and balanced renal/hepatic clearance in preclinical/clin-pharm studies <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. <b>If confirmed clinically, this is the single cleanest differentiation</b> — a pain drug without CYP3A baggage fits perioperative polypharmacy far better <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td>Tolerability (label/trials)</td><td>Ph3: nausea, constipation, headache, dizziness; generally ≤ placebo/active-control rates; no serious AEs in bunionectomy Ph3 <span class="tag fact">FACT</span> <a class="src" href="#rrheum">The Rheumatologist</a></td><td>Ph2b: nausea, headache, dizziness most common; presyncope/pyrexia imbalances noted (§4) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Commercial traction</td><td>WAC <b>$15.50 per 50 mg pill</b>; &gt;1.6M prescriptions written/filled (Vertex, 2026); &gt;250M covered lives; &gt;130 health systems / 1,400 hospitals on formulary <span class="tag fact">FACT</span> <a class="src" href="#rjvhcp">Journavx HCP</a>. Sales: $29M in Q2 2026, below consensus (~$35M) <span class="tag fact">FACT</span> <a class="src" href="#rbpd">BioPharma Dive</a>; ~$33M cumulative since launch per Fierce Pharma (Q3'25) <span class="tag fact">FACT</span>. Launch is real but slower than bull cases assumed.</td><td>Pre-revenue; no commercial infrastructure <span class="tag fact">FACT</span></td></tr>
+</table>
+
+<h3>6b · Pipeline competitors (clinical facts only)</h3>
+<ul>
+<li><b>Vertex VX-993</b> (next-gen NaV1.8): Phase 2 bunionectomy <b>failed</b> — no statistically significant pain improvement vs placebo; Vertex ended its development as an acute-pain monotherapy <span class="tag fact">FACT</span> <a class="src" href="#rvx993">Pharmaphorum 2026</a>. Direct evidence that NaV1.8 efficacy is molecule- and trial-specific, not a class guarantee.</li>
+<li><b>Vertex suzetrigine in chronic pain:</b> Phase 3 DPN program ongoing; FDA sees no approval path in peripheral neuropathic pain; sciatica (LSR) data disappointed and no further trial planned <span class="tag fact">FACT</span> <a class="src" href="#rvx993">Pharmaphorum 2026</a>. Sets the bar — and the graveyard — for LTG-321.</li>
+<li><b>Algiax GAT100</b> (NaV1.8, neuropathic pain): early-stage; tracked as a class competitor in the 2027 catalyst calendar <span class="tag fact">FACT</span> <a class="src" href="#rcal">catalyst-calendar-2027</a>.</li>
+<li><b>Standard of care:</b> opioids (efficacy benchmark, addiction/overdose liability), NSAIDs/acetaminophen (ceiling effects, GI/renal/hepatic risk), and multimodal regimens. Onzotrigine was tested as <b>monotherapy</b>; real-world adoption would likely be within multimodal protocols, where its opioid-sparing data is the relevant currency <span class="tag interp">INTERPRETATION</span>.</li>
+</ul>
+<div class="callout">
+<p><b>Bottom line on differentiation:</b> the credible clinical differentiators to watch in Phase 3 are (1) replicated rapid onset, (2) a clean DDI profile vs. Journavx's CYP3A contraindication, and (3) opioid-sparing secondaries. "More efficacious than Journavx" is <b>not</b> an establishable claim without a head-to-head trial, which is not planned <span class="tag gap">GAP</span>.</p>
+</div>
+
+<h3>6c · Commercial — kept lean</h3>
+<p>The commercial phase is not the traded thesis; this section is context only. Journavx's launch ($29M Q2'26, below consensus; &gt;1.6M Rx; broad formulary coverage) proves payer/physician willingness to adopt a non-opioid acute-pain drug at $15.50/pill, but also shows adoption is gradual — a second entrant faces an entrenched, covered incumbent, not a greenfield <span class="tag interp">INTERPRETATION</span>. Off-label chronic use of Journavx (~33% of prescriptions per a prescription-data analysis cited in trade press <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rpnn">Pain News Network</a>) hints at demand LTG-321 could address — if its POC succeeds.</p>
+</section>
+
+<section id="s7">
+<h2><span class="num">7</span>Financials — Cash, Burn, Runway, Dilution History</h2>
+<p class="kicker">From the Q2 2026 10-Q (filed 2026-09-03) and the September 3, 2026 business update. All figures in USD.</p>
+
+<h3>Cash &amp; burn</h3>
+<table>
+<tr><th>Metric</th><th>Value</th><th>Source</th></tr>
+<tr><td>Cash &amp; equivalents, 6/30/2026</td><td><b>$55.0 million</b></td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Net IPO proceeds (Aug 2026)</td><td><b>$363.9 million</b> (gross $397.4M on 22,080,000 shares @ $18.00 incl. full greenshoe; costs ~$33.6M)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Pro-forma cash at IPO close</td><td><b>~$418.9 million</b> ($55.0M + $363.9M, before Aug burn)</td><td><span class="tag interp">INTERPRETATION</span> (arithmetic on filed figures)</td></tr>
+<tr><td>Net loss, 6M ended 6/30/2026</td><td><b>$48.8 million</b> (Q2: $25.8M; R&amp;D $21.2M, G&amp;A $4.6M in Q2)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Operating cash used, 6M 2026</td><td><b>$48.4 million</b> (~$8.1M/month pre-Phase-3 run-rate)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Accumulated deficit, 6/30/2026</td><td>$291.9 million</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Company runway guidance</td><td>Cash + IPO proceeds sufficient to fund projected operating expenses and capex <b>"into 2029"</b></td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Debt post-IPO</td><td>~nil: $35.0M June-2026 convertible notes (+interest = $35.2M) converted into 1,957,755 common shares at IPO close; $5.1M derivative liability extinguished with them</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+</table>
+<div class="callout">
+<p><b>Runway read:</b> "into 2029" covers the 2H 2027 binary with margin — this is the single most important financial fact for a hold-through-the-binary investor <span class="tag interp">INTERPRETATION</span>. But the company explicitly states current cash <b>will not</b> fund candidates through approval and commercialization — substantial additional capital will be needed, i.e., future dilution is a stated certainty, only its timing/price is unknown <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Note the burn will ramp: Phase 3 + safety trial + LTG-321 Phase 2 all run concurrently from H2 2026.</p>
+</div>
+
+<h3>Dilution history</h3>
+<table>
+<tr><th>Financing</th><th>Amount / terms</th><th>Source</th></tr>
+<tr><td>Series A (Feb 2024)</td><td><b>$135M</b> — Westlake Village BioPartners led; 5AM Ventures + Foresite Capital co-led; Corner Ventures participated</td><td><span class="tag fact">FACT</span> <a class="src" href="#rseed">BioSpace/PR</a></td></tr>
+<tr><td>Series B (2025)</td><td><b>$150M</b> ($99.4M net Series B proceeds in 6M 2025 per cash-flow statement; $150M round per trade press)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a> <a class="src" href="#rfierce">Fierce Biotech</a></td></tr>
+<tr><td>Convertible notes (June 2026)</td><td><b>$35.0M</b> principal; converted at IPO into 1,957,755 shares</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>IPO (Aug 7–10, 2026)</td><td><b>22,080,000 shares @ $18.00</b> (19.2M base + 2.88M greenshoe, fully exercised); gross $397.4M; net $363.9M. All 41,155,082 preferred shares (liq. pref. $287.9M) converted to common</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Ongoing dilution machinery</td><td><b>2026 Equity Incentive Plan:</b> max 14,611,431 shares (3,764,069 new + 1,004,213 rolled from 2019 Plan + 9,843,149 returning); <b>5% annual evergreen</b> every Jan 1, 2027–2036. <b>2026 ESPP:</b> 627,345 initial + <b>1% annual evergreen</b> (cap 1,882,035/yr). Zero awards granted under either as of 6/30/2026.</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+</table>
+</section>
+
+<section id="s8">
+<h2><span class="num">8</span>FDMC / EV — Dilution-Honest</h2>
+<p class="kicker">Using the latest filed share counts. Price: $16.00 (MarketBeat/Finnhub, close 2026-10-09).</p>
+<table>
+<tr><th>Component</th><th>Count / value</th><th>Source</th></tr>
+<tr><td>Basic shares outstanding</td><td><b>66,299,347</b> (as of 2026-09-01, 10-Q cover)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Options outstanding</td><td><b>9,961,425</b> @ $3.62 avg exercise (4,127,360 vested @ $2.67); 7.87 yrs avg remaining life; $45.2M aggregate intrinsic value at 6/30/26</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td>Warrants / convertibles</td><td><b>None outstanding</b> post-IPO (notes converted; no warrants disclosed)</td><td><span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a></td></tr>
+<tr><td><b>Fully-diluted shares</b></td><td><b>76,260,772 ≈ 76.26M</b> (basic + options; treasury-stock-method proceeds immaterial at these strikes)</td><td><span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Basic market cap</td><td>66.30M × $16.00 = <b>~$1.06B</b></td><td>calc</td></tr>
+<tr><td><b>Fully-diluted market cap</b></td><td>76.26M × $16.00 = <b>~$1.22B</b></td><td>calc</td></tr>
+<tr><td>Net cash (pro-forma)</td><td><b>~$418.9M</b>; debt ~nil</td><td><span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Enterprise value (FD)</b></td><td>~$1.22B − ~$0.42B = <b>~$801M</b> (basic EV ~$642M)</td><td>calc</td></tr>
+<tr><td>Cash per share</td><td>~$6.32 basic / ~$5.49 FD</td><td>calc</td></tr>
+</table>
+<div class="callout">
+<p><b>Valuation context (no recommendation implied):</b> ~$801M FD enterprise value for a single Phase-3-ready asset with NEJM-published Phase 2b data and ~$419M cash. The options overhang is 13.1% of FD shares at a $3.62 average strike — deeply in the money, i.e., economically equivalent to shares. The 5% annual evergreen starting Jan 2027 adds ~3.8M shares/year of potential dilution at current FD counts <span class="tag interp">INTERPRETATION</span>. Sell-side targets (all Buy/Outperform): Goldman $73, Guggenheim $50, Jefferies $50, Leerink $36; consensus $52.25 <span class="tag fact">FACT</span> <a class="src" href="#rpt">MarketBeat/BBNS</a>.</p>
+</div>
+</section>
+
+<section id="s9">
+<h2><span class="num">9</span>Catalyst / Event Map</h2>
+<p class="kicker">Every known upcoming event. Date-quality pills: <span class="pill-dq hard">hard</span> = confirmed date · <span class="pill-dq guidance">guidance</span> = company-guided window · <span class="pill-dq inferred">inferred</span> = analyst inference. Local datasets checked: 2027 catalyst calendar (1 LTGO row: Ph3 bunionectomy topline 2H27, record v16-0123) and Q4-2026 dossier (0 LTGO rows).</p>
+
+<h3>Catalyst breakdown — what each event is, what "good" looks like, what to watch</h3>
+<table>
+<tr><th>Event</th><th>Timing</th><th>Date quality</th><th>What "good" looks like</th><th>What to watch</th></tr>
+<tr><td><b>Vertex Q3'26 earnings</b> — Journavx sales read-through</td><td>Late Oct 2026</td><td><span class="pill-dq inferred">inferred</span></td><td>Q/Q growth vs the $29M Q2'26 print; continued formulary momentum</td><td>Prescriber commentary on DDI friction; consensus trajectory for the acute non-opioid market onzotrigine would enter</td></tr>
+<tr><td><b>LTGO Q3 2026 10-Q</b> — first full quarter post-IPO</td><td>Mid-Nov 2026</td><td><span class="pill-dq inferred">inferred</span></td><td>Cash ≥ ~$400M; first Phase 3 design disclosure (sample size, endpoints, powering)</td><td>R&amp;D ramp pace vs "into 2029" runway; confirmation that H2'26 trial initiations happened</td></tr>
+<tr><td><b>Phase 3 bunionectomy + open-label safety trial initiation</b></td><td>H2 2026</td><td><span class="pill-dq guidance">guidance</span></td><td>NCT registration posted before year-end</td><td>A slip past year-end without explanation is the first negative tell</td></tr>
+<tr><td><b>IPO lockup expiry</b> — Foresite (14.5%), Access (5%) become free to sell</td><td>~Feb 2027</td><td><span class="pill-dq inferred">inferred</span></td><td>Orderly; limited insider selling</td><td>Technical overhang, not fundamental — but a large holder exit would pressure the stock into the quiet period before the binary</td></tr>
+<tr><td><b>LTG-321 Phase 2 enrollment completion</b> (~120 knee-OA, Denmark, crossover)</td><td>1H 2027</td><td><span class="pill-dq inferred">inferred</span></td><td>Full enrollment on schedule</td><td>Site pace; any safety holds; whether an interim look is announced at spring pain meetings</td></tr>
+<tr><td><b>Vertex suzetrigine DPN Phase 3</b> — class read-through for chronic NaV1.8</td><td>2027</td><td><span class="pill-dq inferred">inferred</span></td><td>DPN success would lift LTG-321's odds materially</td><td>A failure deepens class skepticism for chronic NaV1.8 and strands LTG-321's thesis</td></tr>
+<tr><td><b>★ THE BINARY: onzotrigine Phase 3 bunionectomy topline</b> — single pivotal efficacy readout; determines NDA fileability</td><td>2H 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>SPID48 p&lt;.05 with opioid-sparing secondaries hit and clean safety</td><td>Effect size — suzetrigine's bunionectomy Δ was only 29.3, the bar for "good"; onset replication (~52 min Ph2b); presyncope signal</td></tr>
+<tr><td><b>Open-label Phase 3 safety topline</b> — exposure counts across surgical/non-surgical settings</td><td>2H 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Exposure counts met; presyncope/pyrexia cleared</td><td>SAE rate; label-risk language on syncope</td></tr>
+<tr><td><b>LTG-321 Phase 2 knee-OA topline</b> (WOMAC pain, within-patient crossover)</td><td>2H 2027</td><td><span class="pill-dq guidance">guidance</span></td><td>Statistically significant WOMAC pain improvement</td><td>Effect size vs OA noise; dropout rate; any durability signal — pure option value, so a miss costs little</td></tr>
+<tr><td><b>LTG-418 IND-enabling / potential Phase 1</b></td><td>2027</td><td><span class="pill-dq inferred">inferred</span></td><td>GLP tox clean; IND filed</td><td>Any timeline disclosure at all — none exists today</td></tr>
+<tr><td><b>Potential NDA submission</b> (onzotrigine, moderate-to-severe acute pain)</td><td>2028</td><td><span class="pill-dq inferred">inferred</span></td><td>One-pivotal path accepted by FDA</td><td>Agency feedback on pivotal-trial count; NDA timing guidance — company has guided nothing here</td></tr>
+</table>
+<div class="callout">
+<p><b>Stale-data check (2026-10-10):</b> no catalyst was dated between the original 10/07 as-of and today — <b>nothing has already passed</b>. The only post-10/07 movement is market action: LTGO closed <b>$14.79 on 10/08</b> (near its $14.60 52-week low) then rebounded <b>8.2% to $16.00 on 10/09</b> <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a>; one-month return −25.72% <span class="tag fact">FACT</span> <a class="src" href="#rmb">MarketBeat</a>. The position-defining binary remains 2H 2027 — there is no earlier clinical de-risking event. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<div class="timeline">
+  <div class="tl-item past">
+    <div class="dt">Aug 7–10, 2026 <span class="pill-dq hard">hard</span></div>
+    <div class="ev"><b>IPO landed</b> — 22.08M shares @ $18.00, $363.9M net; greenshoe fully exercised.</div>
+    <div class="note">FACT · 10-Q / IPO PR</div>
+  </div>
+  <div class="tl-item past">
+    <div class="dt">Sep 3, 2026 <span class="pill-dq hard">hard</span></div>
+    <div class="ev"><b>Q2 2026 results + business update</b> — NEJM publication, pipeline progress, Lowy appointment, runway into 2029.</div>
+    <div class="note">FACT · GlobeNewswire 8-K</div>
+  </div>
+  <div class="tl-item past">
+    <div class="dt">Sep 26, 2026 <span class="pill-dq hard">hard</span></div>
+    <div class="ev"><b>Wall Street Zen upgraded LTGO from Sell to Hold</b> — the only post-IPO rating change found in reviewed materials.</div>
+    <div class="note">FACT · reported 2026-10-09 (thelincolnianonline, citing Wall Street Zen)</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">Late Oct 2026 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>Vertex Q3 2026 earnings — Journavx sales read-through.</b> Q2'26 was $29M (below ~$35M consensus); the trajectory sets expectations for the acute non-opioid market onzotrigine would enter.</div>
+    <div class="note">INTERPRETATION · consensus figures per BioPharma Dive</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">Mid-Nov 2026 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>LTGO Q3 2026 10-Q</b> — first full quarter post-IPO; watch cash balance, R&amp;D ramp (Ph3 starts), and any Phase 3 design disclosure.</div>
+    <div class="note">INFERRED from filing cadence (Q2 10-Q filed Sep 3)</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">H2 2026 <span class="pill-dq guidance">guidance</span></div>
+    <div class="ev"><b>Phase 3 bunionectomy trial initiation + open-label safety trial initiation.</b> No NCT posted as of 2026-10-10 — a delay past year-end without explanation would be a negative signal.</div>
+    <div class="note">FACT (guidance) · 10-Q; GAP on registry/design details</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">~Feb 2027 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>IPO lockup expiry</b> (~180 days post-IPO; standard; company-specific terms undisclosed). Foresite (14.5%), Blavatnik/Access (5%) become free to sell — overhang event, not a fundamental one.</div>
+    <div class="note">INFERRED · lockup length unconfirmed in reviewed materials (GAP)</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">1H 2027 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>LTG-321 Phase 2 enrollment completion</b> (~120 knee-OA patients, Denmark, crossover design). Any interim safety readout at pain conferences (e.g., spring 2027 meetings) would be incremental.</div>
+    <div class="note">INFERRED from trial size/design; no interim guided</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">2H 2027 <span class="pill-dq guidance">guidance</span></div>
+    <div class="ev"><b>★ THE BINARY: onzotrigine Phase 3 bunionectomy topline.</b> Single pivotal efficacy readout; determines NDA fileability. Impact: high.</div>
+    <div class="note">FACT (guidance) · 10-Q; also calendar record v16-0123</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">2H 2027 <span class="pill-dq guidance">guidance</span></div>
+    <div class="ev"><b>Open-label Phase 3 safety topline</b> — exposure counts and tolerability across surgical/non-surgical settings; the presyncope/pyrexia question gets answered here.</div>
+    <div class="note">FACT (guidance) · 10-Q</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">2H 2027 <span class="pill-dq guidance">guidance</span></div>
+    <div class="ev"><b>LTG-321 Phase 2 knee-OA topline</b> (WOMAC pain, crossover). Pure option-value event; a positive POC re-rates the chronic franchise, a negative one costs little given zero is modeled.</div>
+    <div class="note">FACT (guidance) · 10-Q</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">2027 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>LTG-418 IND-enabling progress / potential Phase 1.</b> No timeline disclosed; 14-day non-GLP tox complete in rats + NHP.</div>
+    <div class="note">GAP on timing · 10-Q</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">2028 <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>Potential NDA submission</b> for onzotrigine in moderate-to-severe acute pain — only if 2H 2027 data support it. Company has not guided timing.</div>
+    <div class="note">INTERPRETATION · mechanical inference from 2H27 topline</div>
+  </div>
+  <div class="tl-item">
+    <div class="dt">Ongoing <span class="pill-dq inferred">inferred</span></div>
+    <div class="ev"><b>Vertex suzetrigine DPN Phase 3</b> — class read-through for NaV1.8 in chronic pain; a DPN success would lift LTG-321's odds, a failure would deepen skepticism. (Vertex's calendar row: readout 2027-Q1, inferred.)</div>
+    <div class="note">FACT (trial exists) · calendar dataset; read-through value is INTERPRETATION</div>
+  </div>
+</div>
+<div class="callout">
+<p><b>For the catalyst-risk map:</b> the only hard/guidance events in the next 12 months are trial initiations (H2 2026), Q3 10-Q (Nov 2026, inferred), and lockup expiry (~Feb 2027, inferred). The position-defining binary is 2H 2027 — there is no earlier clinical de-risking event. Cash into 2029 means no financing is <i>required</i> before the readout <span class="tag interp">INTERPRETATION</span>.</p>
+</div>
+</section>
+
+<section id="s10">
+<h2><span class="num">10</span>Ranked Red Flags</h2>
+<p class="kicker">Ordered by expected impact on the hold-through-the-binary thesis.</p>
+
+<div class="flag"><span class="rank">1</span><b>Single-shot pivotal on a translated model.</b> One Phase 3 bunionectomy trial is the entire near-term thesis; the company's own prior dental-pain study failed to separate from placebo <span class="tag fact">FACT</span>; suzetrigine's bunionectomy effect was its smallest <span class="tag fact">FACT</span>. If the trial misses, there is no second pivotal in flight and the NDA path collapses to a redesign — with the stock at ~$801M FD EV.</div>
+<div class="flag"><span class="rank">2</span><b>One-pivotal NDA strategy may not survive FDA.</b> Company suggests the Phase 2b "may serve as one of the well-controlled trials"; FDA's non-opioid expectations are explicitly "evolving" and may demand additional trials <span class="tag fact">FACT</span>. A two-pivotal requirement pushes approval years out and forces a raise.</div>
+<div class="flag"><span class="rank">3</span><b>Prior IND clinical hold (May–Nov 2024).</b> Resolved, but it shows FDA has already found the nonclinical package insufficient once <span class="tag fact">FACT</span>. Execution credibility on regulatory matters starts from a deficit.</div>
+<div class="flag"><span class="rank">4</span><b>Safety signals need a bigger database.</b> Presyncope 6% vs 1%, pyrexia 7% vs 2% at high dose in n=343 <span class="tag fact">FACT</span>. Perioperative syncope is not a trivial label issue — the open-label safety trial must clear this.</div>
+<div class="flag"><span class="rank">5</span><b>LTG-321 chronic thesis faces class-level headwinds.</b> Vertex: suzetrigine failed in sciatica, no FDA path in PNP <span class="tag fact">FACT</span>; Woolf lab (Oct 2026): classic NaV1.8 blockade unproven clinically in neuropathic pain <span class="tag fact">FACT</span>; NaV1.7's clinical graveyard despite great genetics <span class="tag fact">FACT</span>. Knee OA is a better mechanistic fit than neuropathic pain, but nothing is proven.</div>
+<div class="flag"><span class="rank">6</span><b>Guaranteed future dilution.</b> Company states cash won't carry programs through approval/commercialization <span class="tag fact">FACT</span>; plus a 5% annual evergreen (2026 Plan) and 1% ESPP evergreen from Jan 2027 <span class="tag fact">FACT</span>. The only questions are timing and price — a weak 2H 2027 print would force a raise into weakness.</div>
+<div class="flag"><span class="rank">7</span><b>Entrenched incumbent.</b> Journavx: approved, &gt;1.6M prescriptions, &gt;250M covered lives, $15.50/pill <span class="tag fact">FACT</span>. Onzotrigine's differentiation (onset, DDI) is plausible but unproven in Phase 3; "better than Journavx" cannot be claimed without a head-to-head that isn't planned.</div>
+<div class="flag"><span class="rank">8</span><b>Thin team, heavy outsourcing.</b> ~59–66 employees running a Phase 3, a safety trial, and a Phase 2 simultaneously via CROs <span class="tag fact">FACT</span>. Execution risk concentrates in vendors the company doesn't control — a risk the 10-Q itself enumerates at length.</div>
+<div class="flag"><span class="rank">9</span><b>No regulatory designations disclosed.</b> No Fast Track/Breakthrough for onzotrigine vs. both for suzetrigine <span class="tag fact">FACT</span>/<span class="tag gap">GAP</span>. Not fatal, but it signals FDA hasn't (yet) endorsed the program's differentiation.</div>
+<div class="flag"><span class="rank">10</span><b>Insider buying only at the IPO price.</b> Foresite/Tananbaum's $2.52M buy was at $18.00 in the offering <span class="tag fact">FACT</span>; no open-market buying has been disclosed since, with the stock ~14% below IPO. Not a sell signal — but not the conviction signal it would be at current prices either <span class="tag interp">INTERPRETATION</span>.</div>
+</section>
+
+<section id="s11">
+<h2><span class="num">11</span>Bear / Base / Bull + Scenario Analyses</h2>
+<p class="kicker">Framed for a hold-through-the-binary investor. <b>Soft, scenario-based price targets</b> below are arithmetic illustrations — not recommendations, not DCF. Takeout scenarios capped at the highest published sell-side target ($73, Goldman Sachs).</p>
+
+<h3>Soft price targets (scenario arithmetic)</h3>
+<div class="callout warn">
+<p><b>Assumptions — read before using any number:</b> (1) 76.26M fully-diluted shares, today's count — the 5%/yr evergreen starting Jan 2027 is <i>excluded</i>; (2) net cash held at ~$419M pro-forma — burn through 2H 2027 will reduce it, so every target decays with time; (3) program-EV figures are scenario judgments, not comps-derived — they state what the market would need to pay for the pipeline in the described state. These are labeled <b>soft</b> precisely because the EV inputs are judgment calls on a single binary. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<table>
+<tr><th>Scenario</th><th>Soft target</th><th>Arithmetic</th><th>What it assumes</th></tr>
+<tr><td>&#128078; <b>Bear</b> — Ph3 misses / safety derails</td><td><b>~$7.50</b></td><td>($419M cash + $150M residual pipeline option value) ÷ 76.26M = <b>$7.46</b></td><td>Equity = cash + option value on LTG-321 / LTG-418 / discovery; onzotrigine program value ~zero; no distress raise needed (cash into 2029)</td></tr>
+<tr><td>&#10145; <b>Base</b> — narrow Ph3 win, fileable NDA</td><td><b>~$25</b></td><td>($1.5B program EV + $419M cash) ÷ 76.26M = <b>$25.2</b></td><td>Bunionectomy hits the primary with a modest, suzetrigine-like effect; secondaries mixed; one-pivotal NDA accepted; EV ≈ 2× today's ~$801M — still far below approved-asset value</td></tr>
+<tr><td>&#128077; <b>Bull</b> — clean sweep, strategic takeout</td><td><b>~$73</b></td><td>Street-high cap (Goldman Sachs Buy, $73); implies ~$5.15B EV</td><td>Ph3 replicates Ph2b (onset, opioid-sparing, clean DDI/safety); LTG-321 POC positive; strategic buyer pays for a best-in-class acute non-opioid franchise; <b>capped at the published street high per dossier rules</b></td></tr>
+</table>
+<p class="fine">Current price $16.00 (10/09/2026 close): bear ≈ −53%, base ≈ +56%, bull ≈ +356%. Street targets for context: GS $73, Guggenheim $50, Jefferies $50, Leerink $36, consensus $52.25 <span class="tag fact">FACT</span> <a class="src" href="#rpt">MarketBeat</a>. The soft base sits below street mid — the dossier's base is deliberately a "merely fileable" outcome, while street targets price approval-and-launch success. <span class="tag interp">INTERPRETATION</span></p>
+
+<div class="grid2">
+<div class="card">
+<h4>🐻 Bear — Phase 3 misses or safety derails</h4>
+<p><b>Trigger:</b> bunionectomy SPID48 misses statistical significance (dental-study precedent; harder bone model; high placebo response), or the safety database surfaces a presyncope/syncope signal that forces dose reduction or a label restriction.</p>
+<p><b>Path:</b> NDA strategy collapses to a redesigned second pivotal; company raises into weakness (evergreen + follow-on); LTG-321 POC (2H27) becomes the only live asset and inherits full class skepticism. Cash into 2029 prevents immediate distress but the equity is re-rated to cash-plus-option-value.</p>
+<p><b>What to watch:</b> trial initiation timing (H2 2026 guidance — a slip without explanation is the first tell); safety-trial enrollment pace; any Phase 3 design disclosure in the Q3 10-Q (sample size/powering assumptions reveal management's own confidence).</p>
+</div>
+<div class="card">
+<h4>🐂 Bull — clean Phase 3 + safety, best-in-class profile</h4>
+<p><b>Trigger:</b> bunionectomy replicates Ph2b (SPID48 significant, opioid-sparing secondaries hit, onset ~1 hr confirmed), safety database clean on syncope/pyrexia, DDI profile confirmed clean vs. Journavx's CYP3A contraindication.</p>
+<p><b>Path:</b> one-pivotal NDA accepted (or FDA requests a confirmatory study the cash balance can fund); onzotrigine positioned as the perioperative-friendly NaV1.8 (no CYP3A baggage, rapid onset); LTG-321 POC positive adds a chronic franchise. Strategic interest plausible — but any takeout/max-value framing is <b>capped at $73/share</b> (Goldman target, the street high) per dossier rules.</p>
+<p><b>What to watch:</b> secondary-endpoint hierarchy in the Phase 3 SAP (is onset formally tested?); FDA meeting minutes tone in future filings; Journavx formulary/prescriber feedback on DDI friction (supports the differentiation story).</p>
+</div>
+</div>
+
+<div class="card" style="margin-top:16px">
+<h4>➡ Base — Phase 3 succeeds narrowly; execution is the story</h4>
+<p><b>Trigger:</b> bunionectomy hits the primary with a modest effect size (think suzetrigine-like: significant but not dramatic), secondaries mixed, safety acceptable with label language on syncope.</p>
+<p><b>Path:</b> NDA filed 2028 on one pivotal + Ph2b + safety database; FDA accepts but the label is narrow and launch faces an entrenched Journavx. LTG-321 POC is the second binary — 50/50 given class history. The stock works if the binary is held through 2H 2027 and the data are merely "good enough," which fits the hold-through-the-binary frame: commercial outperformance isn't required, just clinical-binary survival.</p>
+<p><b>Key scenario branch:</b> if FDA requires a second pivotal, add ~18–24 months and a financing — the "into 2029" cash covers the wait, but dilution lands before any approval.</p>
+</div>
+
+<h3>Scenario matrix (2H 2027)</h3>
+<table>
+<tr><th>Scenario</th><th>Ph3 bunionectomy</th><th>Safety db</th><th>LTG-321 POC</th><th>Thesis outcome</th></tr>
+<tr><td><b>A — Clean sweep</b></td><td>Hit, strong secondaries</td><td>Clean</td><td>Positive</td><td>NDA path clear; chronic franchise opens; strategic value maximizes (capped at $73 street-high framing)</td></tr>
+<tr><td><b>B — Narrow win</b></td><td>Hit, modest effect</td><td>Acceptable w/ label</td><td>Miss</td><td>NDA fileable; LTG-321 written off (already zero in model); single-asset acute story</td></tr>
+<tr><td><b>C — Efficacy miss</b></td><td>Miss</td><td>—</td><td>Either</td><td>Thesis breaks; equity → cash + option value; raise into weakness likely</td></tr>
+<tr><td><b>D — Safety issue</b></td><td>Hit</td><td>Syncope signal</td><td>Either</td><td>Dose/label restriction or program delay; worst risk-adjusted outcome (efficacy proven but undruggable at dose)</td></tr>
+<tr><td><b>E — Regulatory ask</b></td><td>Hit</td><td>Clean</td><td>—</td><td>FDA requires second pivotal; timeline + financing; cash covers but dilution precedes value</td></tr>
+</table>
+<p class="fine">Probabilities are deliberately not assigned — the dossier's job is to define the branches, not to price them. <span class="tag interp">INTERPRETATION</span></p>
+</section>
+
+<section id="s12">
+<h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
+<p class="kicker">Who is running the binary, what they've done before, and what the money is doing.</p>
+
+<h3>Leadership</h3>
+<table>
+<tr><th>Person</th><th>Role</th><th>Background</th></tr>
+<tr><td><b>Nima Farzan</b></td><td>President &amp; CEO (since 2024)</td><td>Previously CEO of <b>Kinnate Biopharma</b> through its acquisition by Xoma <span class="tag fact">FACT</span> <a class="src" href="#rfierce">Fierce Biotech</a>. Received ~2.8M-share option grant package (with CMO/CFO) on joining, incl. early-exercise provision <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Track record: company-builder who has sold a biotech, but no approved-drug launch on his personal ledger disclosed.</td></tr>
+<tr><td><b>Neil Singla, M.D.</b></td><td>Chief Medical Officer</td><td>Lead author of the NEJM Phase 2b paper; career pain-trial specialist <span class="tag fact">FACT</span> <a class="src" href="#rnejm">NEJM</a>. Deep domain fit for exactly this binary — trial design and execution is his craft.</td></tr>
+<tr><td><b>Neha Krishnamohan</b></td><td>CFO &amp; Chief Business Officer</td><td>Principal financial/accounting officer; co-certified the 10-Q with Farzan <span class="tag fact">FACT</span> <a class="src" href="#r10q">10-Q</a>. Detailed prior background not established in reviewed materials <span class="tag gap">GAP</span>.</td></tr>
+<tr><td><b>Naomi Lowy, M.D.</b></td><td>SVP, Global Regulatory Affairs (joined ~Sep 2026)</td><td><b>Former deputy director of FDA's Division of Anesthesia, Addiction Medicine, and Pain Medicine (DAAP)</b> — the exact division that will review onzotrigine <span class="tag fact">FACT</span> <a class="src" href="#r8k">Q2'26 PR</a>. This is the highest-signal hire in the dossier: a regulator who knows the division's evolving expectations for non-opioid analgesics, brought in just as the Phase 3 program starts. Partially mitigates Red Flag #2/#3 <span class="tag interp">INTERPRETATION</span>.</td></tr>
+</table>
+
+<h3>Origins &amp; board</h3>
+<ul>
+<li><b>Founded/incubated 2020 by Westlake Village BioPartners</b> (Sean Harper); foundational science from the <b>Lieber Institute for Brain Development</b>; early team built from Amgen neuroscience staff after Amgen's 2019 neuroscience divestment <span class="tag fact">FACT</span> <a class="src" href="#rfierce">Fierce Biotech</a>.</li>
+<li><b>Board chair:</b> Nancy Stagliano, Ph.D. (CEO, Neuron23) <span class="tag fact">FACT</span> <a class="src" href="#rseed">BioSpace 2024</a>. Directors include James B. Tananbaum (Foresite Capital) and representation tied to Len Blavatnik / Access Industries <span class="tag fact">FACT</span> <a class="src" href="#r13d">13D filings via StockTitan</a>.</li>
+<li><b>Financing pedigree:</b> $135M Series A (Feb 2024; Westlake led, 5AM + Foresite co-led) → $150M Series B (2025) → $35M converts → $363.9M net IPO. Top-tier syndicate, oversubscribed IPO (upsized from $247M target) <span class="tag fact">FACT</span> — smart money has consistently paid up, but that is a financing signal, not a clinical one.</li>
+</ul>
+
+<h3>Insider &amp; ownership signals</h3>
+<table>
+<tr><th>Holder / insider</th><th>Position / action</th><th>Read</th></tr>
+<tr><td><b>Foresite Capital</b> (James B. Tananbaum)</td><td><b>14.5%</b> — 9,181,328 shares post-IPO (13D); bought <b>140,000 shares @ $18.00</b> ($2.52M) in the IPO via Form 4, 2026-08-10 <span class="tag fact">FACT</span> <a class="src" href="#r13d">StockTitan/InsiderMonkey</a></td><td>Real money added at IPO price; no open-market buys since <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Access Industries</b> (Len Blavatnik)</td><td><b>5.0%</b> — 3,185,177 shares (13G/D) <span class="tag fact">FACT</span> <a class="src" href="#r13d">StockTitan</a></td><td>Passive anchor holder</td></tr>
+<tr><td>Director Todd N. Smith</td><td>Option grant: 105,542 shares @ $18.00, 36-month vest <span class="tag fact">FACT</span> <a class="src" href="#r13d">StockTitan</a></td><td>Standard director comp; not a signal</td></tr>
+<tr><td>Short interest</td><td>0.68% of float; <b>up 45.8% month-over-month</b> <span class="tag fact">FACT</span> <a class="src" href="#rpt">MarketBeat</a></td><td>Small base, but the direction says skepticism is building post-IPO <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Net insider buying (3 mo)</td><td>~$5.04M net buying (2 insiders), per MarketBeat aggregate <span class="tag fact">FACT</span> <a class="src" href="#rpt">MarketBeat</a></td><td>All at/around the $18 IPO price; none in the open market below it</td></tr>
+</table>
+<div class="callout">
+<p><b>Net assessment:</b> the team is purpose-built for this exact task (pain-trial CMO + ex-DAAP regulatory chief + repeat biotech CEO) and the investor syndicate is first-rate — but <b>no one on the team has taken a drug through FDA approval and launch together</b>, and the only insider buying happened at the IPO price, not in the open market since. Execution credibility is reasonable; it is not yet proven <span class="tag interp">INTERPRETATION</span>.</p>
+</div>
+</section>
+
+<section id="s13">
+<h2><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
+<p class="kicker">Source order per evidence discipline: SEC → FDA/labels → CT.gov → papers/conferences → company PR/decks → trade press.</p>
+
+<h3>Filings used</h3>
+<ul class="refs">
+<li id="r10q"><b>SEC — Form 10-Q, quarter ended June 30, 2026, filed 2026-09-03</b> (Commission file 001-43436, CIK 2056611): balance sheet, statements of operations/cash flows, MD&amp;A (pipeline, trial plans, runway), risk factors (dental study, clinical hold, FDA expectations), stock-compensation note (options, 2026 Plan, ESPP evergreens), IPO/subsequent-events notes. Via StockTitan EDGAR mirror.</li>
+<li><b>SEC — Prospectus 424(b)(4) filed 2026-08-07</b>: 63,238,030 shares outstanding immediately post-IPO (pre-greenshoe); IPO terms. Referenced via StockTitan 13D reporting.</li>
+<li><b>SEC — Form 8-A (2026-08-06)</b>: Nasdaq listing certification.</li>
+<li><b>SEC — Form 4s (2026-08-10)</b>: Foresite/Tananbaum 140,000-share IPO purchase @ $18.00; Todd Smith director option grant.</li>
+<li id="r13d"><b>SEC — Schedules 13D/G</b>: Foresite Capital 9,181,328 shares (14.5%); Access Industries/Blavatnik 3,185,177 shares (5.0%). Via StockTitan summaries.</li>
+<li id="r8k"><b>8-K / GlobeNewswire press release, 2026-09-03</b>: "Latigo Biotherapeutics Reports Second Quarter 2026 Financial Results and Recent Business Highlights" — NEJM publication, Phase 3 plans (H2 2026 starts, 2H 2027 toplines), LTG-321/LTG-418 status, Naomi Lowy appointment (ex-deputy director, FDA DAAP), runway into 2029.</li>
+</ul>
+
+<h3>FDA / labels</h3>
+<ul class="refs">
+<li id="rlabel"><b>Journavx (suzetrigine) FDA Prescribing Information</b> (via fda.report DailyMed): contraindication with strong CYP3A inhibitors; CYP3A-inducer warnings; hormonal-contraceptive interaction; hepatic-impairment warnings.</li>
+</ul>
+
+<h3>Academic papers &amp; literature</h3>
+<ul class="refs">
+<li id="rnejm"><b>Singla N. et al., "Phase 2b Trial of a NaV1.8 Inhibitor for Acute Pain," <i>N. Engl. J. Med.</i> 2026 (published online July 29, 2026). DOI: 10.1056/nejmoa2602910.</b> Company-funded; n=343 abdominoplasty trial; primary SPID48; results as tabulated in §4. (Efficacy/safety figures cross-checked via Medscape and GEN secondary reporting.)</li>
+<li id="rpnas"><b>Faber C.G. et al., "Gain-of-function Nav1.8 mutations in painful neuropathy," <i>PNAS</i> 2012</b> — human-genetic validation of SCN10A/NaV1.8 in painful small-fiber neuropathy.</li>
+<li id="rbiomed"><b>"Nav1.8 and Chronic Pain: From Laboratory Animals to Clinical Patients," <i>Biomedicines</i> 2025 (PMID 40427587)</b> — review incl. the NaV1.7 clinical-failure caution.</li>
+<li id="rf-pharm"><b>"Sodium channels as a new target for pain treatment," <i>Frontiers in Pharmacology</i> 2025</b> — NaV1.8 peripheral restriction; NaV1.7-threshold vs NaV1.8-amplitude physiology.</li>
+<li id="rosteen"><b>Osteen J.D. et al., "Pharmacology and mechanism of action of suzetrigine," <i>Pain Ther.</i> 2025</b> — Vertex mechanistic paper (cited via Journavx HCP site).</li>
+<li id="rwoolf"><b>Woolf lab (Boston Children's), <i>Cell Reports Medicine</i>, Oct 2026</b> — NaV1.8/ankyrin-G membrane-trafficking mechanism; classic blockade unproven clinically in neuropathic pain (via MedLink/MedicalXpress reporting).</li>
+<li id="ryale"><b>Yale School of Medicine, "Peripheral Sodium Channel Blocker Could Revolutionize Treatment for Nerve Pain"</b> — Waxman lab overview of peripheral sodium-channel rationale.</li>
+<li id="rsuz"><b>Dextras C., Compton P., "Suzetrigine: A New and Novel Analgesic for Acute Pain," <i>Pain Management Nursing</i> 2026</b> — suzetrigine Ph3 SPID48 differences (48.4 abdominoplasty / 29.3 bunionectomy).</li>
+</ul>
+
+<h3>Market data (refreshed 2026-10-10)</h3>
+<ul class="refs">
+<li id="rmb"><b>MarketBeat LTGO stock page, accessed 2026-10-10</b> — $16.00 close 10/09/2026 (+8.18% on the day; prior close $14.79 on 10/08); 1-month return −25.72%; 52-week range $14.60–$25.93; 10/09 volume 184,215 shares.</li>
+<li id="rfh"><b>Finnhub LTGO quote, accessed 2026-10-10</b> — current price $16.00; 52-week high $25.93.</li>
+<li id="rlin"><b>The Lincolnian Online, 2026-10-09</b> — "Latigo Biotherapeutics (NASDAQ:LTGO) Shares Climb 6.2% – Time to Buy?"; Wall Street Zen upgrade Sell → Hold (2026-09-26); analyst target recap (Goldman $73, Guggenheim $50, Jefferies $50, Leerink $36; consensus $52.25).</li>
+</ul>
+
+<h3>Company PR / trade press</h3>
+<ul class="refs">
+<li id="rgen"><b>GEN Engineering News, 2026-08</b> — "Latigo Reports Positive Phase IIb Data for Non-Opioid Acute Pain Candidate" (LSM figures, onset times, S-1 linkage for Phase 3 plans).</li>
+<li id="rmed"><b>Medscape, 2026-08</b> — "Novel Nonopioid May Offer Acute Pain Relief" (NEJM secondary reporting; pyrexia/presyncope figures).</li>
+<li id="rmedx"><b>MedicalXpress, 2026-08-17</b> — NEJM trial design details (dosing arms, n=343).</li>
+<li id="rpr"><b>StreetInsider/BusinessWire, 2026-07-29</b> — Latigo NEJM-publication PR (dose-response, TEAEs below placebo).</li>
+<li id="rpnn"><b>Pain News Network, 2026-07-31</b> — critical read on opioid-free framing; one-pivotal-trial strategy quote; off-label Journavx chronic-use analysis (UNVERIFIED).</li>
+<li id="rfierce"><b>Fierce Biotech, 2026-08</b> — IPO coverage: $124.7M/$46.2M use-of-proceeds split; founding history (Westlake, Lieber Institute, Amgen staff); Farzan background; suzetrigine onset times (119/240 min).</li>
+<li id="rseed"><b>BioSpace/PRNewswire, 2024-02-14</b> — $135M Series A emergence; Westlake incubation; Padhi/Stagliano appointments.</li>
+<li id="rjv"><b>Vertex Pharmaceuticals PR, 2025-01-30</b> — Journavx FDA approval; $15.50 WAC.</li>
+<li id="rjvhcp"><b>Journavx HCP site (journavxhcp.com), accessed Oct 2026</b> — &gt;1.6M prescriptions; &gt;250M covered lives; formulary counts.</li>
+<li id="rvx150"><b>Pharmaphorum</b> — Vertex VX-150/VX-961 discontinuation history; <b>BioSpace (2019)</b> — VX-150 Phase 2 data.</li>
+<li id="rcta"><b>Clinical Trials Arena, 2024-01</b> — VX-548 Phase 3 program design (NCT05553366/NCT05558410); missed hydrocodone/APAP secondaries; VX-128/VX-150/VX-961 scrapped.</li>
+<li id="rvx993"><b>Pharmaphorum, 2026</b> — VX-993 Phase 2 bunionectomy failure; FDA no-path in PNP; no further LSR trial.</li>
+<li id="rrheum"><b>The Rheumatologist</b> — suzetrigine NDA background; Fast Track + Breakthrough designations; Ph3 AE tables.</li>
+<li id="rbpd"><b>BioPharma Dive, 2026-08</b> — Vertex Q2 2026: Journavx $29M vs consensus.</li>
+<li id="rpt"><b>MarketBeat / BBNS, Oct 2026</b> — sell-side ratings &amp; targets (GS $73, Guggenheim $50, Jefferies $50, Leerink $36; consensus $52.25); short interest 0.68% (+45.8% MoM); insider-buying aggregate.</li>
+<li id="rcal"><b>Local datasets checked 2026-10-07</b>: <i>~/workspace/research_notes/catalyst-calendar-2027/data.json</i> (1 LTGO row: v16-0123, Ph3 bunionectomy topline 2027-H2, guidance); <i>~/workspace/research_notes/q4-2026-dossier/dossier-v4.json</i> (0 LTGO rows).</li>
+</ul>
+
+<h3>As-of statement</h3>
+<ul class="refs">
+<li><b>As of October 10, 2026</b> (originally prepared October 7, 2026; enhanced to final standard October 10, 2026). Price and market data: Finnhub/MarketBeat ($16.00 close 10/09/2026; prior close $14.79). Financials: Q2 2026 10-Q filed 2026-09-03 (latest filing; Q3 2026 not yet filed). Clinical: NEJM Phase 2b publication (July 29, 2026); company guidance per Sept 3, 2026 business update. Phase 3 trial design details and NCT registration were <b>not publicly available</b> as of this date (GAP). §11 contains <b>soft, scenario-based price targets</b> with labeled assumptions; no DCF or recommendation is contained in this dossier.</li>
+</ul>
+</section>
+
+</main>
+<footer>
+LTGO deep-dive dossier · prepared 2026-10-07 · enhanced to final standard 2026-10-10 · single-file interactive HTML · evidence labels per standing discipline (FACT / INTERPRETATION / GAP / UNVERIFIED) · soft targets in §11 are scenario illustrations, not recommendations · not investment advice.
+</footer>
+<button id="toTop" type="button" aria-label="Back to top">&#8593;</button>
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement;
+  var themeBtn=document.getElementById('themeBtn');
+  function setTheme(t){
+    root.setAttribute('data-theme',t);
+    try{localStorage.setItem('ltgo-theme',t);}catch(e){}
+    themeBtn.innerHTML=(t==='dark'?'&#9728;&#65039; Light mode':'&#127769; Dark mode');
+  }
+  var saved=null;try{saved=localStorage.getItem('ltgo-theme');}catch(e){}
+  setTheme(saved==='dark'?'dark':'light');
+  themeBtn.addEventListener('click',function(){
+    setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+  });
+  var secs=Array.prototype.slice.call(document.querySelectorAll('main > section'));
+  secs.forEach(function(sec){
+    var h2=sec.querySelector('h2');if(!h2)return;
+    var b=document.createElement('button');
+    b.className='sec-toggle';b.type='button';
+    b.setAttribute('aria-label','Collapse section');b.setAttribute('aria-expanded','true');
+    b.textContent='\u25BE';
+    h2.insertBefore(b,h2.firstChild);
+    h2.style.cursor='pointer';h2.setAttribute('tabindex','0');h2.setAttribute('role','button');
+    function toggle(){
+      var c=sec.classList.toggle('collapsed');
+      b.textContent=c?'\u25B8':'\u25BE';
+      b.setAttribute('aria-expanded',String(!c));
+      b.setAttribute('aria-label',(c?'Expand':'Collapse')+' section');
+    }
+    h2.addEventListener('click',function(e){if(e.target.closest('a'))return;toggle();});
+    h2.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+  });
+  function syncToggles(){
+    secs.forEach(function(sec){
+      var b=sec.querySelector('.sec-toggle');if(!b)return;
+      var c=sec.classList.contains('collapsed');
+      b.textContent=c?'\u25B8':'\u25BE';b.setAttribute('aria-expanded',String(!c));
+    });
+  }
+  document.getElementById('expandAll').addEventListener('click',function(){
+    secs.forEach(function(s){s.classList.remove('collapsed');});syncToggles();
+  });
+  document.getElementById('collapseAll').addEventListener('click',function(){
+    secs.forEach(function(s){s.classList.add('collapsed');});syncToggles();
+  });
+  document.querySelectorAll('main table').forEach(function(t){
+    var p=t.parentNode;
+    if(p&&p.classList&&p.classList.contains('table-scroll'))return;
+    var w=document.createElement('div');w.className='table-scroll';
+    p.insertBefore(w,t);w.appendChild(t);
+  });
+  var top=document.getElementById('toTop');
+  window.addEventListener('scroll',function(){
+    top.classList.toggle('show',window.scrollY>600);
+  },{passive:true});
+  top.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>
