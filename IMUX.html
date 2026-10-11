@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMUX — Immunic Inc · Deep-Dive Dossier</title>
+<style>
+:root{
+  --ink:#1b2430; --muted:#5b6b7d; --line:#dfe5ec; --bg:#f7f9fb; --card:#ffffff;
+  --navy:#16324f; --accent:#0e7c86; --accent-soft:#e3f2f4;
+  --fact:#1a7f4b; --fact-bg:#e6f4ec; --interp:#9a6a00; --interp-bg:#fdf3dc;
+  --gap:#5b6b7d; --gap-bg:#edf0f4; --unver:#b3372f; --unver-bg:#fbe9e7;
+  --red:#b3372f; --amber:#c77e00; --green:#1a7f4b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+/* header */
+.topbar{background:var(--navy);color:#fff;padding:34px 28px 26px}
+.topbar .wrap{max-width:1120px;margin:0 auto}
+.kicker{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9fb4c8;margin:0 0 8px}
+.topbar h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:34px;font-weight:600}
+.topbar h1 .tick{color:#7fd4dc}
+.sub{color:#c6d4e2;margin:10px 0 0;font-size:14px;max-width:820px}
+.statrow{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px}
+.stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:10px 16px;min-width:150px}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9fb4c8}
+.stat .v{font-size:19px;font-weight:650;margin-top:2px}
+.stat .n{font-size:11px;color:#9fb4c8;margin-top:2px}
+/* layout */
+.layout{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:28px;padding:28px}
+@media(max-width:880px){.layout{grid-template-columns:1fr}.sidenav{position:static!important}}
+.sidenav{position:sticky;top:20px;align-self:start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.sidenav h3{margin:0 0 10px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.sidenav ol{margin:0;padding:0;list-style:none}
+.sidenav li{margin:2px 0}
+.sidenav a{display:block;padding:7px 10px;border-radius:6px;font-size:13.5px;color:var(--ink)}
+.sidenav a:hover{background:var(--accent-soft);text-decoration:none}
+.sidenav .legend{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.content{min-width:0}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:26px 28px;margin-bottom:22px}
+section.card h2{margin:0 0 4px;font-family:Georgia,"Times New Roman",serif;font-size:23px;color:var(--navy)}
+.eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 6px}
+h3{font-size:16.5px;color:var(--navy);margin:22px 0 8px}
+h4{font-size:14.5px;margin:16px 0 6px}
+p{margin:10px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f1f5f8;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+/* evidence badges */
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-right:6px;vertical-align:1px;white-space:nowrap}
+.fact{background:var(--fact-bg);color:var(--fact);border:1px solid #bfe0cd}
+.interp{background:var(--interp-bg);color:var(--interp);border:1px solid #ecd9a8}
+.gap{background:var(--gap-bg);color:var(--gap);border:1px solid #cfd6de}
+.unver{background:var(--unver-bg);color:var(--unver);border:1px solid #eec4c0}
+.claim{margin:12px 0;padding:12px 14px;background:#fafbfc;border:1px solid var(--line);border-radius:8px;font-size:14px}
+.claim .src{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px}
+.warn{border-left:4px solid var(--red);background:#fdf0ef;padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px}
+.note{font-size:12.5px;color:var(--muted)}
+.small{font-size:13px}
+/* timeline */
+.timeline{position:relative;margin:18px 0 6px;padding-left:26px}
+.timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.titem{position:relative;margin:0 0 18px}
+.titem:before{content:"";position:absolute;left:-24px;top:7px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--accent)}
+.titem .date{font-weight:700;color:var(--navy);font-size:14px}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:20px;padding:2px 10px;margin-left:8px}
+.pill.hard{background:#e6f4ec;color:#1a7f4b;border:1px solid #bfe0cd}
+.pill.guidance{background:#fdf3dc;color:#9a6a00;border:1px solid #ecd9a8}
+.pill.inferred{background:#edf0f4;color:#5b6b7d;border:1px solid #cfd6de}
+/* flags */
+.flag{display:flex;gap:12px;margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.rank{flex:0 0 34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px}
+.r1{background:#b3372f}.r2{background:#d4691a}.r3{background:#c77e00}.r4{background:#7a8a99}.r5{background:#9aa7b4}
+/* refs */
+.refs{font-size:13px}
+.refs li{margin:7px 0}
+.footer{max-width:1120px;margin:0 auto 40px;padding:0 28px;color:var(--muted);font-size:12.5px}
+.kv{display:grid;grid-template-columns:200px 1fr;gap:6px 14px;font-size:14px;margin:12px 0}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0}
+.bar{height:10px;background:#e8edf2;border-radius:5px;overflow:hidden;margin:6px 0}
+.bar>div{height:100%;background:var(--accent)}
+
+/* ---- audit additions: theme, collapse, toTop, tables, mobile ---- */
+.theme-toggle{position:fixed;top:14px;right:14px;z-index:1000;min-height:44px;min-width:44px;padding:8px 14px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#toTop{position:fixed;bottom:18px;right:18px;z-index:1000;min-height:48px;min-width:48px;border-radius:24px;border:1px solid var(--line);background:var(--navy);color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:none;box-shadow:0 2px 10px rgba(0,0,0,.2);padding:0 16px}
+#toTop.show{display:block}
+.sec-toggle{float:right;min-height:44px;min-width:44px;border:1px solid var(--line);background:var(--card);color:var(--accent);border-radius:8px;font-size:18px;cursor:pointer;line-height:1}
+section.card.collapsed>:not(.eyebrow):not(h2){display:none}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px -4px;padding:0 4px}
+.tablewrap table{margin:0;min-width:640px}
+.sidenav a{min-height:44px;display:flex;align-items:center}
+.audit{border-left-color:var(--accent)}
+/* dark mode */
+[data-theme="dark"]{--ink:#e6edf3;--muted:#9fb0c0;--line:#2b3a4a;--bg:#0e1520;--card:#15202e;--navy:#dbe7f3;--accent:#63d2dc;--accent-soft:#123036;--fact:#7fd6a4;--fact-bg:#122e20;--interp:#e8c56a;--interp-bg:#33290f;--gap:#a9b7c6;--gap-bg:#202a38;--unver:#e89a94;--unver-bg:#381d1b;--red:#e89a94;--amber:#e8a83e;--green:#7fd6a4}
+[data-theme="dark"] .topbar{background:#080f1a}
+[data-theme="dark"] th{background:#1a2534}
+[data-theme="dark"] .claim{background:#111a26}
+[data-theme="dark"] .flag{background:#15202e}
+[data-theme="dark"] .titem:before{background:#15202e}
+[data-theme="dark"] .callout{background:#123036}
+[data-theme="dark"] .warn{background:#381d1b}
+[data-theme="dark"] .topbar h1{color:#fff}
+[data-theme="dark"] section.card h2,[data-theme="dark"] h3{color:#dbe7f3}
+[data-theme="dark"] .titem .date{color:#dbe7f3}
+@media(max-width:880px){
+  .layout{padding:14px}
+  section.card{padding:18px 16px}
+  .topbar{padding:26px 18px 20px}
+  .topbar h1{font-size:27px}
+  .stat{flex:1 1 calc(50% - 7px);min-width:0}
+  .kv{grid-template-columns:1fr}
+  .kv dt{margin-top:8px}
+  .theme-toggle{top:10px;right:10px}
+  .flag .rank{flex-basis:40px;height:40px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <p class="kicker">Deep-Dive Investment Dossier · Clinical Binary Series</p>
+    <h1><span class="tick">IMUX</span> — Immunic, Inc.</h1>
+    <p class="sub">Vidofludimus calcium (IMU-838): oral DHODH inhibitor + Nurr1 activator for multiple sclerosis. Two identical Phase&nbsp;3 trials (ENSURE-1 / ENSURE-2) in relapsing MS read out by end of 2026 — the single binary event this dossier is built around. Cash funds operations into late 2027; a $0.873 warrant structure creates ~7&times; fully-diluted share overhang versus basic count.</p>
+    <div class="statrow">
+      <div class="stat"><div class="k">Price (Oct 7, 2026 close)</div><div class="v">$7.63</div><div class="n">Nasdaq · 52-wk $5.06–$17.43 · Oct 2 close was $7.96</div></div>
+      <div class="stat"><div class="k">Basic mkt cap</div><div class="v">~$104M</div><div class="n">13.64M × $7.63 (Oct 7 close)</div></div>
+      <div class="stat"><div class="k">Cash</div><div class="v">$155.1M</div><div class="n">Jun 30, 2026 · no debt</div></div>
+      <div class="stat"><div class="k">Lead catalyst</div><div class="v">ENSURE topline</div><div class="n">By end of 2026 (guidance)</div></div>
+      <div class="stat"><div class="k">Analyst view</div><div class="v">Strong Buy ×9</div><div class="n">Avg PT $39.14 (Oct 2, 2026)</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidenav">
+  <h3>Sections</h3>
+  <ol>
+    <li><a href="#identity">1 · Identity &amp; thesis</a></li>
+    <li><a href="#science">2 · Science</a></li>
+    <li><a href="#pipeline">3 · Pipeline</a></li>
+    <li><a href="#trials">4 · Trial design deep dive</a></li>
+    <li><a href="#regulatory">5 · Clinical / regulatory status</a></li>
+    <li><a href="#competition">6 · Competition</a></li>
+    <li><a href="#financials">7 · Financials</a></li>
+    <li><a href="#fdmc">8 · FDMC / EV</a></li>
+    <li><a href="#catalysts">9 · Catalyst map</a></li>
+    <li><a href="#redflags">10 · Ranked red flags</a></li>
+    <li><a href="#scenarios">11 · Bear / base / bull</a></li>
+    <li><a href="#management">12 · Management &amp; insiders</a></li>
+    <li><a href="#references">13 · References</a></li>
+  </ol>
+  <div class="legend">
+    Evidence labels:<br>
+    <span class="badge fact">Fact</span> verified source<br>
+    <span class="badge interp">Interpretation</span> judgment<br>
+    <span class="badge gap">Gap</span> not disclosed<br>
+    <span class="badge unver">Unverified</span> weak source
+  </div>
+</nav>
+
+<main class="content">
+<div class="callout audit"><strong>Audit update — October 10, 2026.</strong> This dossier was re-verified and enhanced: (1) MSToronto2026 corrected — meeting is <strong>Oct 21–23, 2026</strong> with <strong>four</strong> abstracts (not three), including new CALLIPER open-label-extension disability data through week 48 (company PR Oct 7, 2026); (2) price updated to $7.63 (Oct 7 close), valuation math recomputed; Q2 EPS math corroborates ~29M+ pre-funded warrants as economically outstanding; (3) pipeline re-ranked by value, most→least; (4) catalyst timeline replaced with a full breakdown table — each event tagged hard/guidance/inferred with what "good" looks like and what to watch; (5) <strong>soft scenario price targets added</strong> (bear $1.00 / base $20 / bull $50) with explicit assumptions; (6) dark mode, collapsible sections, back-to-top. <strong>Stale/passed items:</strong> ENSURE-1 completion guide (Q2 2026) window has passed; Sep 9, 2026 R&amp;D day already occurred; Nov 12 Q3 date remains unverified. No ENSURE readout has occurred — the binary is still ahead (by end of 2026).</div>
+
+<!-- 1 -->
+<section class="card" id="identity">
+  <p class="eyebrow">Section 1</p>
+  <h2>Identity &amp; thesis snapshot</h2>
+  <dl class="kv">
+    <dt>Company</dt><dd>Immunic, Inc. (Nasdaq: IMUX) — New York–based, late-stage biotech <span class="badge fact">Fact</span><span class="note">Source: company PRs, SEC filings</span></dd>
+    <dt>Lead asset</dt><dd>Vidofludimus calcium (IMU-838), once-daily oral small molecule <span class="badge fact">Fact</span></dd>
+    <dt>Lead indication</dt><dd>Relapsing multiple sclerosis (RMS) — twin Phase 3 ENSURE-1 (NCT05134441) / ENSURE-2 (NCT05201638) <span class="badge fact">Fact</span></dd>
+    <dt>Stage</dt><dd>Clinical-stage; no approved products, no revenue <span class="badge fact">Fact</span><span class="note">Source: Q2 2026 10-Q</span></dd>
+    <dt>Binary event</dt><dd>ENSURE-1/ENSURE-2 topline, primary endpoint time to first relapse (up to 72 weeks), expected by end of 2026 <span class="badge fact">Fact</span><span class="note">Source: Aug 11, 2026 company PR</span></dd>
+    <dt>Cash</dt><dd>$155.1M cash and cash equivalents at Jun 30, 2026; guided to fund operations into late 2027 <span class="badge fact">Fact</span></dd>
+  </dl>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>Thesis in one paragraph.</strong> Immunic is a single-asset, single-binary MS bet: vidofludimus calcium showed strong MRI-lesion suppression and a placebo-like safety profile in Phase 2, and the company is running the largest placebo-controlled program in its history to prove that effect translates into fewer relapses. The market prices the equity at ~$104M basic (~negative enterprise value on a basic basis) precisely because the fully-diluted share count is roughly seven times the basic count after the February 2026 warrant-heavy financing — per-share upside on a win is far thinner than the headline price implies, while the 5% net-sales royalty sold in February permanently encumbers the asset. The swing factor is whether 30 mg vidofludimus calcium delays first relapse versus placebo in two identical trials; everything else (PPMS optionality, Nurr1 neuroprotection narrative, commercial build-out) is secondary to that readout.
+  <span class="src">Numbers: basic shares 13,644,467 (Q2 2026 10-Q); price $7.96 (Oct 2, 2026 Nasdaq close, ad-hoc-news); financing terms (Feb 17, 2026 PR); royalty exchange (Feb 12, 2026 purchase &amp; sale agreement via 8-K summary).</span></div>
+  <div class="callout"><strong>What this dossier is and isn't.</strong> This is a clinical-binary diligence document: it weights trial design, statistical risk, cash to readout, and dilution honesty. It contains no DCF and no buy/sell recommendation. §11 carries labeled, scenario-based <strong>soft</strong> price targets with explicit assumptions — not forecasts. Commercial sections are intentionally lean.</div>
+</section>
+
+<!-- 2 -->
+<section class="card" id="science">
+  <p class="eyebrow">Section 2</p>
+  <h2>Science: mechanism of action &amp; why it could fail</h2>
+
+  <h3>Plain-language mechanism</h3>
+  <p>Vidofludimus calcium has two claimed pharmacologic actions:</p>
+  <ol>
+    <li><strong>Selective DHODH inhibition (anti-inflammatory / anti-viral).</strong> Dihydroorotate dehydrogenase is a mitochondrial enzyme in the rate-limiting step of <em>de novo</em> pyrimidine synthesis. Rapidly dividing cells — activated T and B lymphocytes, and virus-infected cells — depend on this pathway; blocking it preferentially starves activated lymphocytes while resting immune cells, which can use salvage pathways, are largely spared. The net effect is immunomodulation without broad immunosuppression. <span class="badge fact">Fact</span><span class="note">Mechanism as described in the EMPhASIS publication (Fox et al., <em>Ann Clin Transl Neurol</em> 2022) and the FDA label of the class precedent teriflunomide (Aubagio).</span></li>
+    <li><strong>Nurr1 activation (postulated neuroprotection).</strong> Nuclear receptor-related 1 (Nurr1, NR4A2) is a transcription factor involved in neuronal survival and anti-neuroinflammatory signaling. Immunic, with Ludwig-Maximilians-University Munich, reported in a peer-reviewed paper that vidofludimus calcium is a potent Nurr1 agonist at low concentrations, selective over the related receptors Nur77 and NOR-1, and that other DHODH inhibitors tested did not activate Nurr1. <span class="badge fact">Fact</span><span class="note">Source: Vietor et al., <em>J Med Chem</em> 2023;66(9):6391–6402.</span></li>
+  </ol>
+  <p>Preclinical support for the neuroprotective leg: vidofludimus calcium enhanced Nurr1 target-gene expression (BDNF, SOD1, TH, VMAT2) in neuronal/microglial cell lines, protected neurons under pro-apoptotic conditions, and attenuated disease severity with reduced plasma neurofilament light chain in experimental autoimmune encephalomyelitis (EAE) mouse models. A 2026 poster reports the pro-survival effect in human neuronal cells is abolished by Nurr1 knockout. <span class="badge fact">Fact</span><span class="note">Source: company ECTRIMS 2024 ePoster P1410; MSToronto2026 poster P1273 (company PR, Oct 7, 2026). Preclinical — not human efficacy.</span></p>
+
+  <h3>Why it could fail — the scientific bear case</h3>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>1. The DHODH efficacy ceiling is modest.</strong> The class precedent, teriflunomide (Aubagio, approved 2012 for relapsing MS), is an oral DHODH inhibitor with placebo-controlled efficacy in the moderate range — its pivotal TEMSO trial showed roughly a one-third relative reduction in annualized relapse rate (O'Connor et al., <em>N Engl J Med</em> 2011). Vidofludimus is more selective (teriflunomide's diarrhea, alopecia, and liver signals are attributed to off-target kinase interactions, per Cleveland Clinic's review of the EMPhASIS data), but selectivity improves <em>tolerability</em>, not necessarily <em>potency</em> — the anti-inflammatory effect still runs through the same enzyme. If 30 mg vidofludimus behaves like a cleaner teriflunomide, the relapse effect size may be real but modest, and the ENSURE primary (time to first relapse vs placebo) must clear statistical significance in both trials, not just one.
+  <span class="src">Class efficacy: TEMSO (O'Connor et al., NEJM 2011); teriflunomide side-effect attribution: Cleveland Clinic ConsultQD review of EMPhASIS. Effect-size judgment: interpretation.</span></div>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>2. MRI lesions ≠ relapses.</strong> EMPhASIS proved lesion suppression (70% fewer combined unique active lesions at 30 mg, p&lt;.0001). But the Phase 3 primary is <em>time to first relapse</em> — a clinical endpoint with more noise (relapse ascertainment, pseudo-relapses, regional adjudication variability across 100+ sites in 15 countries). Lesion effects do not always translate one-for-one into relapse effects, and the trial is powered on relapse <em>events</em>, not patients.
+  <span class="src">EMPhASIS: Fox et al., ACTN 2022. ENSURE design: company deck Feb 2025. Translation risk: interpretation.</span></div>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>3. Nurr1 neuroprotection is unproven in humans.</strong> The neuroprotective leg rests on cell lines, EAE mice, and biomarker movement (serum NfL reductions in CALLIPER). CALLIPER's actual primary endpoint — change in brain volume — was <em>missed</em> (trade-press reporting of full data). A drug can lower NfL without changing clinical disability trajectories; regulators do not accept NfL as a surrogate for approval in MS.
+  <span class="src">CALLIPER primary miss: multiplesclerosisnewstoday.com (trade press) — <span class="badge unver">Unverified</span> pending peer-reviewed publication. NfL regulatory status: interpretation of FDA precedent.</span></div>
+  <div class="claim"><span class="badge fact">Fact</span><strong>4. DHODH is a teratogenicity-flagged pathway.</strong> Teriflunomide carries a boxed warning for hepatotoxicity and is contraindicated in pregnancy (embryofetal toxicity in animals); leflunomide (the RA prodrug of teriflunomide) carries similar warnings. Whether vidofludimus calcium's selectivity spares it from class labeling is a regulatory question that will only be answered at NDA review — and the label negotiation, not the readout, will determine the commercial warning box.
+  <span class="src">Aubagio (teriflunomide) US prescribing information; Arava (leflunomide) US prescribing information.</span></div>
+  <div class="claim"><span class="badge gap">Gap</span><strong>5. Dose–response is thin.</strong> EMPhASIS tested 10, 30, and 45 mg; only 30 and 45 mg worked on MRI, and 45 mg added liver-enzyme elevations (2/69) without better efficacy — hence 30 mg for Phase 3. There is no published evidence that 30 mg is at the top of the dose–response curve for <em>relapse</em> prevention rather than just the best-tolerated active dose.
+  <span class="src">Dose rationale: Practical Neurology summary of EMPhASIS; company CMO statement.</span></div>
+
+  <h3>Academic literature consulted</h3>
+  <ul class="refs">
+    <li>Fox RJ et al. Phase 2 EMPhASIS trial of vidofludimus calcium in relapsing-remitting MS. <em>Annals of Clinical and Translational Neurology</em>. 2022 (published June 15, 2022, per company PR). <span class="badge fact">Fact</span></li>
+    <li>Vietor J et al. "Development of a potent Nurr1 agonist tool for in vivo applications." <em>Journal of Medicinal Chemistry</em>. 2023;66(9):6391–6402. — identifies vidofludimus calcium as a potent, selective Nurr1 activator (Immunic + LMU Munich). <span class="badge fact">Fact</span></li>
+    <li>O'Connor P et al. Randomized trial of oral teriflunomide for relapsing multiple sclerosis (TEMSO). <em>N Engl J Med</em>. 2011. — DHODH class efficacy precedent. <span class="badge fact">Fact</span></li>
+    <li>Lublin FD et al. Defining the clinical course of multiple sclerosis: the 2013 revisions. <em>Neurology</em>. 2014;83(3):278–286. — diagnostic/activity criteria used in ENSURE enrollment. <span class="badge fact">Fact</span><span class="note">Cited in company ENSURE design deck, Feb 2025.</span></li>
+    <li>Aubagio (teriflunomide) and Arava (leflunomide) US prescribing information — class safety/labeling precedent. <span class="badge fact">Fact</span></li>
+    <li>Cleveland Clinic ConsultQD review of EMPhASIS (Fox, PI) — teriflunomide off-target kinase attribution for its tolerability profile. <span class="badge fact">Fact</span><span class="note">Academic medical center publication.</span></li>
+  </ul>
+</section>
+
+<!-- 3 -->
+<section class="card" id="pipeline">
+  <p class="eyebrow">Section 3</p>
+  <h2>Pipeline overview</h2>
+  <table>
+    <tr><th>Value rank</th><th>Program</th><th>Indication</th><th>Stage</th><th>Status / notes</th></tr>
+    <tr><td><strong>1</strong></td><td><strong>Vidofludimus calcium (IMU-838)</strong></td><td>Relapsing MS</td><td>Phase 3 (ENSURE-1/2)</td><td>1,121 + 1,100 patients enrolled; topline by end-2026 — the binary; ~all near-term equity value sits here <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>2</strong></td><td>Vidofludimus calcium (IMU-838)</td><td>Progressive MS</td><td>Phase 2 done (CALLIPER); Phase 3 planned</td><td>CALLIPER (n=467) completed; PPMS Phase 3 initiation guided "later in 2026"; pure option value until RMS reads out <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>3</strong></td><td><strong>IMU-856</strong> (SIRT6 modulator)</td><td>Celiac disease / GI</td><td>Phase 1/1b done; Phase 2 in preparation</td><td>Ph1/1b published <em>Lancet Gastroenterol Hepatol</em> Nov 2024; GLP-1 signal post hoc; early, non-MS — no near-term binary value <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>4</strong></td><td><strong>IMU-381</strong></td><td>GI diseases</td><td>Preclinical</td><td>Next-gen GI molecule; no clinical data; effectively zero in a binary framework <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>5</strong></td><td>Vidofludimus calcium</td><td>Post-COVID syndrome</td><td>Investigator-sponsored Ph2 (RAPID_REVIVE)</td><td>University Hospital Frankfurt sponsor; non-core; no value ascribed <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>6</strong></td><td>Vidofludimus calcium (IMU-838)</td><td>Ulcerative colitis</td><td>Phase 2 done — <strong>discontinued</strong></td><td>CALDOSE-1 missed primary (Jun 2022); no Ph3 without partner; zero value, historical context only <span class="badge fact">Fact</span></td></tr>
+  </table>
+  <p class="note">Source: company pipeline slide, September 2025 corporate overview; IMU-856 publication PR (Nov 13, 2024); CALDOSE-1 PR (Jun 2, 2022).</p>
+  <div class="claim"><span class="badge interp">Interpretation</span>This is a single-asset company in economic terms: IMU-856 and IMU-381 are early, non-MS, and carry no near-term value in a binary framework. The UC failure (2022) is the historical proof that vidofludimus's DHODH effect does not automatically translate across indications — relevant context for the RMS translation question, though MS is where the drug's actual Ph2 wins occurred.</div>
+</section>
+
+<!-- 4 -->
+<section class="card" id="trials">
+  <p class="eyebrow">Section 4</p>
+  <h2>Trial design deep dive</h2>
+
+  <h3>ENSURE-1 (NCT05134441) &amp; ENSURE-2 (NCT05201638) — the binary</h3>
+  <table>
+    <tr><th>Design element</th><th>Detail</th></tr>
+    <tr><td>Design</td><td>Two identical multicenter, randomized, double-blind, placebo-controlled Phase 3 trials <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Population</td><td>Adults 18–55 yrs; MS per 2017 McDonald criteria; confirmed relapsing MS (1996 Lublin); active disease per Lublin 2014; EDSS 0–5.5 at screening <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Arms</td><td>30 mg vidofludimus calcium QD vs placebo, 1:1 (N≈525/arm planned) <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Actual enrollment</td><td>ENSURE-1: 1,121 patients; ENSURE-2: 1,100 patients; &gt;100 sites, 15 countries (US, India, Latin America, Central/Eastern Europe) <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Treatment duration</td><td>Up to 72 weeks, double-blind <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Primary endpoint</td><td><strong>Time to first relapse</strong> up to 72 weeks <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Key secondary</td><td>Time to confirmed disability worsening (EDSS-based) — <strong>pooled analysis across both trials only</strong> <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Other secondaries</td><td>New T2-lesion volume; sustained clinically relevant cognition change; whole-brain / grey / white matter volume change <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Interim</td><td>Oct 22, 2024: unblinded IDMC futility analysis at ~half of planned first-relapse events → "continue as planned," no sample-size increase; sponsor remained blinded <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Completion guide</td><td>ENSURE-1: Q2 2026; ENSURE-2: H2 2026; topline both by end of 2026 <span class="badge fact">Fact</span><span class="note">Audit Oct 10, 2026: the Q2 2026 window has passed (completion presumed; not separately re-confirmed by the company). ENSURE-2 completion in H2 2026 still in progress.</span></td></tr>
+  </table>
+  <p class="note">Sources: company ENSURE design deck (Feb 2025); interim futility PR + presentation (Oct 22, 2024); enrollment-completion PR (May 2025); Q2 2026 results PR (Aug 11, 2026). NCT numbers per company presentation.</p>
+
+  <h3>Statistical plan &amp; powering — what matters</h3>
+  <ul>
+    <li><strong>Event-driven.</strong> The interim was triggered at approximately half of the <em>planned first-relapse events</em> — the trial reads out on relapse count, not calendar time. <span class="badge fact">Fact</span></li>
+    <li><strong>Futility only.</strong> The IDMC answered two questions: (1) are futility criteria met? No. (2) should sample size increase? No — continue as planned. Conditional power at interim supported continuation. <span class="badge fact">Fact</span></li>
+    <li><span class="badge interp">Interpretation</span> <strong>What "continue" does and doesn't mean.</strong> Passing futility rules out a disaster (conditional power below the futility boundary); it does not confirm the trial will hit significance, and the sponsor never saw unblinded data. The no-upsize call means observed event rates tracked close enough to plan — mildly reassuring on operations, neutral on efficacy.</li>
+    <li><span class="badge gap">Gap</span> <strong>Target number of relapse events, assumed hazard ratio, and alpha-spending details were not disclosed</strong> in any source reviewed. Without the assumed treatment effect, outside powering math is guesswork.</li>
+    <li><span class="badge interp">Interpretation</span> <strong>Placebo-controlled in 2026 RMS is a design risk.</strong> With &gt;20 approved DMTs, placebo relapse rates in modern RMS trials run lower than historical norms, and relapses are adjudicated across 100+ sites in 15 countries. Low event rates + adjudication noise = the classic way a real-but-modest drug misses.</li>
+  </ul>
+
+  <h3>Readouts to date</h3>
+  <h4>EMPhASIS — Phase 2 RRMS (NCT03846219)</h4>
+  <ul>
+    <li>268 patients randomized (36 centers, 4 European countries); 24-week double-blind; cohorts: 30 mg, 45 mg, 10 mg, placebo QD. <span class="badge fact">Fact</span></li>
+    <li>Primary + key secondaries met: 30 mg → <strong>−70% cumulative CUA lesions vs placebo (p&lt;.0001)</strong>; 45 mg → <strong>−62% (p=.0002)</strong>; 10 mg → −13% (pooled cohorts). Gd+ lesion reductions similar. <span class="badge fact">Fact</span></li>
+    <li>Serum NfL reduced; signal on preventing confirmed disability worsening. <span class="badge fact">Fact</span></li>
+    <li>Safety ≈ placebo: no SAEs at 30 mg; 45 mg had 3 treatment-related events (2 liver-enzyme elevations, 1 rash); discontinuations 2.8% (30 mg) / 5.8% (45 mg) / 7.2% (placebo); no increased infection rate, no liver/blood-cell signals at 30 mg. <span class="badge fact">Fact</span></li>
+    <li>Open-label extension (n=182, 144 weeks / ~3 yrs): <strong>92.3% free of 12-week CDW; 92.7% free of 24-week CDW</strong>. Of 29 CDW events, 44.8% relapse-associated, only 13.8% progression-independent-of-relapse (PIRA). <span class="badge fact">Fact</span></li>
+  </ul>
+  <p class="note">Source: Fox et al., <em>Ann Clin Transl Neurol</em> 2022 (peer-reviewed); OLE data via company/ECTRIMS 2025 presentations (trade-press reporting).</p>
+  <h4>CALLIPER — Phase 2 progressive MS (NCT05054140)</h4>
+  <ul>
+    <li>467 patients with progressive MS (PPMS + active/non-active SPMS). <span class="badge fact">Fact</span></li>
+    <li>Interim (n=203, 24 weeks): serum NfL <strong>−22.4% vs placebo (p=.01, post hoc)</strong>, consistent across PMS subtypes, age and EDSS strata. <span class="badge fact">Fact</span><span class="note">Post-hoc analysis; ECTRIMS 2024.</span></li>
+    <li>Full data: <strong>primary endpoint (change in brain volume) not met</strong>; risk of 24-week confirmed disability worsening reduced by 23.8%, including in non-active patients. <span class="badge unver">Unverified</span><span class="note">Via multiplesclerosisnewstoday.com; no peer-reviewed publication located.</span></li>
+    <li><strong>Oct 7, 2026:</strong> company announced new CALLIPER open-label extension data — disability outcomes favoring continuous vidofludimus calcium treatment maintained through extension week 48, with low treatment discontinuation — to be presented at MSToronto2026 (Oct 21–23, 2026, Toronto). <span class="badge fact">Fact</span><span class="note">Company PR, Oct 7, 2026 (PRNewswire). Full data pending conference presentation; not yet peer-reviewed.</span></li>
+    <li><span class="badge interp">Interpretation</span> Mixed: biomarker and disability-worsening signals with a missed primary is the profile of a drug with <em>possible</em> neuroprotective activity — supportive of the PPMS Phase 3 option, not proof of it.</li>
+  </ul>
+</section>
+
+<!-- 5 -->
+<section class="card" id="regulatory">
+  <p class="eyebrow">Section 5</p>
+  <h2>Clinical / regulatory status &amp; outlook</h2>
+  <ul>
+    <li><strong>Now → end-2026:</strong> ENSURE-1/ENSURE-2 topline (time to first relapse). Company guides "by the end of 2026" (Aug 11, 2026 PR). <span class="badge fact">Fact</span></li>
+    <li><strong>Regulatory alignment:</strong> Company states "regulatory alignment and precedent surrounding the time to first relapse primary endpoint" with FDA — i.e., the endpoint is accepted as a basis for filing. <span class="badge fact">Fact</span><span class="note">CMO statement, Aug 2026 corporate update (trade-press).</span></li>
+    <li><strong>Mid-2027 (guidance):</strong> US NDA submission planned, contingent on positive ENSURE data; potential approval 2028. <span class="badge fact">Fact</span><span class="note">Q4 2025 earnings release (Feb 26, 2026); also in 2027 catalyst-calendar dataset as 2027-H2, guidance quality.</span></li>
+    <li><strong>Later in 2026 (guidance):</strong> initiation of a Phase 3 program in primary progressive MS (~3.5–4 year duration per company framing). <span class="badge fact">Fact</span></li>
+    <li><span class="badge gap">Gap</span> No disclosed FDA special designations (Breakthrough, Fast Track) for vidofludimus calcium in any source reviewed. EMA filing strategy undisclosed.</li>
+    <li><span class="badge gap">Gap</span> No disclosed AdCom planning; standard for a first-in-class-neuroprotective-claim NDA but not yet relevant pre-data.</li>
+  </ul>
+  <div class="callout"><strong>Regulatory read.</strong> Time-to-first-relapse is a well-precedented RMS primary (used across the DMT class), so the <em>endpoint</em> is not the regulatory risk — the <em>effect size vs placebo</em> is. The pooled CDW key secondary is the lever for any disability claim on the label; single-trial CDW will not carry a label claim.</div>
+</section>
+
+<!-- 6 -->
+<section class="card" id="competition">
+  <p class="eyebrow">Section 6</p>
+  <h2>Competition — clinical differentiation only</h2>
+  <p class="note">No cross-trial head-to-head efficacy claims are made. Positioning is by trial design, endpoint, and mechanism class.</p>
+  <h3>Oral BTK inhibitors — the direct pipeline threat</h3>
+  <table>
+    <tr><th>Drug / sponsor</th><th>Status (as of Oct 2026)</th><th>Differentiation vs vidofludimus</th></tr>
+    <tr><td><strong>Tolebrutinib</strong> (Sanofi) — brain-penetrant BTK</td><td>US: <strong>CRL Dec 2025</strong> for nrSPMS; EU: <strong>approved Jun 2026</strong> as Cenrifki for nrSPMS. GEMINI-1/2 (RMS) met; PERSEUS (PPMS) ongoing. <span class="badge fact">Fact</span></td><td>Targets smoldering neuroinflammation via BTK in microglia/B cells; ahead on progressive-MS data but set back in the US. Different MOA; no direct RMS comparison to vidofludimus. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Fenebrutinib</strong> (Genentech/Roche) — BTK</td><td><strong>NDA accepted Sep 29, 2026, priority review</strong> for RMS <em>and</em> PPMS — first BTK with US filing in both. <span class="badge fact">Fact</span></td><td>If approved, becomes the oral competitor with a progressive-MS label — the exact positioning vidofludimus wants. Liver/mortality signals flagged in review will set the class bar. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Evobrutinib</strong> (Merck KGaA) — BTK</td><td>Failed Phase 3 EVOLUTION RMS trials (Dec 2023). <span class="badge fact">Fact</span></td><td>Proof that BTK ≠ automatic RMS win; de-risks nothing for vidofludimus but shows the indication's difficulty. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Remibrutinib</strong> (Novartis); <strong>Orelabrutinib</strong> (InnoCare)</td><td>Phase 3 REMODEL (RMS) ongoing; Phase 2/3 RMS ongoing. <span class="badge fact">Fact</span></td><td>Later; watch-list only.</td></tr>
+  </table>
+  <h3>Approved DMT landscape (context, not comparators)</h3>
+  <ul>
+    <li><strong>Anti-CD20s</strong> (ocrelizumab 2017 RMS+PPMS; ofatumumab 2020 RMS; ublituximab 2022 RMS): infused/injectable, high efficacy, infection-monitoring burden. <span class="badge fact">Fact</span><span class="note">FDA labels.</span></li>
+    <li><strong>S1P modulators</strong> (fingolimod 2010; siponimod 2019 SPMS; ozanimod 2020 RMS; ponesimod 2021 RMS): oral, cardiac/first-dose and lymphopenia monitoring. <span class="badge fact">Fact</span></li>
+    <li><strong>Oral DHODH incumbent: teriflunomide (Aubagio, 2012)</strong> — the mechanistic comp; moderate efficacy, liver/pregnancy boxed warnings. <span class="badge fact">Fact</span></li>
+  </ul>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>Where vidofludimus would slot — if it works.</strong> Its clinical pitch is <em>oral convenience + placebo-like tolerability + anti-inflammatory efficacy in the teriflunomide-or-better range + a neuroprotective story no oral currently owns</em>. It does not need to beat anti-CD20s on efficacy to be viable; it needs to be a tolerable oral that delays relapses and can credibly claim disability biology. The commercial threat is a BTK inhibitor reaching market first with a progressive-MS label (fenebrutinib) — but that is a post-binary, commercial-phase concern, deliberately out of scope here.</div>
+</section>
+
+<!-- 7 -->
+<section class="card" id="financials">
+  <p class="eyebrow">Section 7</p>
+  <h2>Financials</h2>
+  <table>
+    <tr><th>Item</th><th>Value</th><th>Period / source</th></tr>
+    <tr><td>Cash and cash equivalents</td><td><strong>$155.1M</strong></td><td>Jun 30, 2026 — Q2 2026 10-Q <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Net loss</td><td><strong>$34.1M</strong> ($0.80/share)</td><td>Q2 2026 (vs $2.03/share in Q2 2025 on fewer shares) <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Operating expenses</td><td><strong>$35.3M</strong> (R&amp;D $25.9M; G&amp;A $9.4M)</td><td>Q2 2026 <span class="badge fact">Fact</span></td></tr>
+    <tr><td>1H 2026 net loss / cash used in ops</td><td>$66.7M / $48.3M</td><td>Six months ended Jun 30, 2026 <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Stockholders' equity</td><td>+$127.6M (vs −$6.7M at Dec 31, 2025)</td><td>Jun 30, 2026 <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Debt</td><td>None disclosed (operating leases only)</td><td>Q2 2026 10-Q <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Runway guide</td><td><strong>Into late 2027</strong></td><td>Company guidance (Feb &amp; Aug 2026 PRs) <span class="badge fact">Fact</span></td></tr>
+  </table>
+  <h3>Dilution history (condensed)</h3>
+  <ul>
+    <li><strong>Jan 2024 financing:</strong> pre-funded warrants + tranched warrants (second/third tranches up to 46.6M shares each, pre-split). <span class="badge fact">Fact</span><span class="note">Q3 2025 10-Q.</span></li>
+    <li><strong>May 2025 public offering:</strong> 86,666,667 pre-funded warrants + Series A + Series B warrants (pre-split figures). <span class="badge fact">Fact</span></li>
+    <li><strong>Feb 2026 private placement:</strong> $200M gross ($187.3M net); 229,076,000 pre-funded warrants at $0.873; plus warrants for 229,076,000 shares at $0.873, expiring 30 days after ENSURE topline or Feb 17, 2031. Led by BVF; 12 named institutions (OrbiMed, RA Capital, Janus Henderson, EcoR1, TCGX, Vivo, Avidity, others). <span class="badge fact">Fact</span><span class="note">All pre-split figures; split-adjusted share counts not disclosed by the company — see §8.</span></li>
+    <li><strong>Feb 2026 royalty deal:</strong> 51,087,000 Series B warrants (pre-split) exchanged for an aggregate <strong>5% royalty on future net sales of vidofludimus calcium</strong>; 35,579,667 Series B remain (pre-split). <span class="badge fact">Fact</span></li>
+    <li><strong>1-for-10 reverse split</strong> effective April 27, 2026 (Nasdaq bid-price compliance context). <span class="badge fact">Fact</span></li>
+  </ul>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>Burn math.</strong> 1H 2026 cash used in operations was $48.3M (~$24M/quarter operating cash burn; net loss ~$33M/quarter). $155.1M ÷ ~$30M/quarter ≈ 5 quarters from Jun 30, 2026 → consistent with the company's "late 2027" guide. The runway covers the ENSURE readout and PPMS Phase 3 <em>start</em> — not a 3.5–4-year PPMS program, which will require substantial additional capital. The warrant structure is designed for that: a positive readout triggers up to $200M of warrant exercises within 30 days.</div>
+</section>
+
+<!-- 8 -->
+<section class="card" id="fdmc">
+  <p class="eyebrow">Section 8</p>
+  <h2>FDMC / EV — dilution-honest</h2>
+  <p>This is the section that changes the picture. Basic share count massively understates the equity base.</p>
+  <table>
+    <tr><th>Component</th><th>Shares (post 1-for-10 split)</th><th>Basis</th></tr>
+    <tr><td>Common outstanding</td><td><strong>13,644,467</strong></td><td>Q2 2026 10-Q (Jun 30, 2026) <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Feb 2026 pre-funded warrants</td><td>~22,907,600</td><td>229,076,000 pre-split ÷ 10; $0.0001 exercise — economically outstanding <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Feb 2026 common warrants ($0.873)</td><td>~22,907,600</td><td>229,076,000 pre-split ÷ 10; strike $0.873 per post-split 13G evidence <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Jan 2024 + May 2025 pre-funded/Series A/B warrants</td><td>~25–30M</td><td>Q3 2025 10-Q reserved-for-issuance table ÷ 10, net of royalty-exchanged Series B <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Stock options / SARs / inducement pool</td><td>~3–6M</td><td>10-K/A Apr 2026 (pre-split: 27.6M options, 5.2M SARs, 30M inducement authorized) ÷ 10 <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Fully-diluted estimate</strong></td><td><strong>~88–95M shares</strong></td><td>Sum of above <span class="badge interp">Interpretation</span></td></tr>
+  </table>
+  <div class="warn"><strong>Split-adjustment caveat.</strong> The company disclosed warrant counts pre-split; it has not published a post-split fully-diluted reconciliation. The ÷10 adjustment is mechanical and standard, but warrant <em>strike</em> economics post-split are ambiguous in the record: a July 31, 2026 13G reports common-warrant strike at $0.873220 (not the $8.73 a mechanical adjustment would imply). Treat the FD share <em>count</em> as the reliable input and the strike as a <span class="badge gap">Gap</span>.</div>
+  <table>
+    <tr><th>Valuation lens</th><th>Math (at $7.63, Oct 7, 2026 close)</th><th>Result</th></tr>
+    <tr><td>Basic mkt cap</td><td>13.64M × $7.63</td><td><strong>~$104M</strong> <span class="badge fact">Fact</span></td></tr>
+    <tr><td>Basic EV</td><td>$104M − $155.1M cash</td><td><strong>~−$51M</strong> (negative) <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Fully-diluted mkt cap</td><td>~90M × $7.63</td><td><strong>~$687M</strong> <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Fully-diluted EV</td><td>$687M − $155.1M</td><td><strong>~$532M</strong> <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Pro-forma FD EV if $0.873 warrants exercised</td><td>$687M − ($155.1M + $200M)</td><td><strong>~$332M</strong> <span class="badge interp">Interpretation</span></td></tr>
+  </table>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>Corroboration from Q2 EPS math.</strong> Q2 2026 net loss of $34.1M at $0.80/share implies ~42.6M weighted-average shares — ~29M above the 13.64M basic count — consistent with the Feb 2026 pre-funded warrants being counted as economically outstanding (ad-hoc-news.de reports the same 42.5M figure). This supports treating pre-funded warrants as outstanding in the FD table above.
+  <span class="src">Q2 2026 10-Q EPS figures; ad-hoc-news.de, Oct 2026.</span></div>
+  <div class="claim"><span class="badge interp">Interpretation</span><strong>Why this matters for the binary.</strong> The stock screens "cheap" on a basic basis (negative EV) — that is an artifact. On a dilution-honest basis the market already values the RMS program at roughly $330–530M EV ahead of data. Per-share upside on a win accrues across ~90M shares, not 13.6M; and the 30-day post-data warrant exercise window means a positive readout is mechanically followed by up to 22.9M shares of dilution at $0.873 — a built-in sell-the-news supply overhang regardless of data quality.</div>
+</section>
+
+<!-- 9 -->
+<section class="card" id="catalysts">
+  <p class="eyebrow">Section 9</p>
+  <h2>Catalyst / event map</h2>
+  <table>
+    <tr><th>#</th><th>Event</th><th>Timing</th><th>Quality</th><th>What "good" looks like</th><th>What to watch</th></tr>
+    <tr><td>1</td><td><strong>MSToronto2026</strong> — 4 vidofludimus calcium abstracts (CALLIPER OLE week-48 disability; EBV immune activity &amp; cognition; novel bidirectional-disability endpoint; Nurr1 neuronal survival) <span class="badge fact">Fact</span></td><td>Oct 21–23, 2026</td><td><span class="pill hard">Hard</span></td><td>CALLIPER OLE disability data consistent with earlier signal; clean safety narrative; KOL interest in the disability endpoint</td><td>EBV/cognition ePoster detail; any new safety signal; reception of the bidirectional endpoint proposal</td></tr>
+    <tr><td>2</td><td><strong>Q3 2026 financial results / corporate update</strong> <span class="badge unver">Unverified</span></td><td>~Nov 12, 2026</td><td><span class="pill guidance">Guidance</span></td><td>Cash ≥ ~$125M; ENSURE "by end of 2026" reaffirmed; PPMS Phase 3 design/initiation detail</td><td>Any readout-timing shift; quarterly burn rate; pre-data financing talk</td></tr>
+    <tr><td>3</td><td><strong>ENSURE-1 + ENSURE-2 topline</strong> — time to first relapse (primary), pooled CDW (key secondary). THE binary. <span class="badge fact">Fact</span></td><td>By end of 2026</td><td><span class="pill guidance">Guidance</span></td><td>Statistically significant delay in time to first relapse in <em>both</em> trials; pooled CDW supportive; safety ≈ placebo</td><td>Effect size; cross-trial consistency; adjudication quality across 100+ sites; any liver signal at 30 mg in ~2,200 patients</td></tr>
+    <tr><td>4</td><td><strong>Phase 3 initiation — primary progressive MS</strong> (~3.5–4 yr program) <span class="badge fact">Fact</span></td><td>Later in 2026</td><td><span class="pill guidance">Guidance</span></td><td>Design informed by CALLIPER learnings; credible funding plan attached</td><td>Starts pre- vs post-readout (a confidence signal); financing structure for a multi-year program</td></tr>
+    <tr><td>5</td><td><strong>Warrant exercise / expiry window</strong> — Feb 2026 common warrants, up to $200M at $0.873 <span class="badge fact">Fact</span></td><td>≤30 days after ENSURE topline</td><td><span class="pill hard">Hard</span></td><td>On a win: ~$200M cash inflow funds the PPMS program and commercial prep</td><td>22.9M shares of mechanical supply — sell-the-news pressure regardless of data quality; on a miss, warrants expire worthless and the funding plan collapses</td></tr>
+    <tr><td>6</td><td><strong>US NDA submission</strong> — vidofludimus calcium in RMS <span class="badge fact">Fact</span></td><td>Mid-2027</td><td><span class="pill guidance">Guidance</span></td><td>Accepted for filing; clean path through label negotiation</td><td>Class labeling discussion (liver/pregnancy); whether pooled CDW supports a disability claim</td></tr>
+    <tr><td>7</td><td><strong>Potential FDA approval</strong> <span class="badge fact">Fact</span></td><td>2028</td><td><span class="pill inferred">Inferred</span></td><td>On-time approval on the RMS indication</td><td>Label breadth; commercial build-out and partnership decisions</td></tr>
+    <tr><td>8</td><td><strong>Ongoing</strong> — CALLIPER full-data peer-reviewed publication; IMU-856 Phase 2 celiac initiation <span class="badge interp">Interpretation</span></td><td>—</td><td><span class="pill inferred">Inferred</span></td><td>Peer-reviewed CALLIPER data strengthens the PPMS/regulatory story</td><td>Competitor read-through: fenebrutinib FDA action (~H1 2027, priority review); tolebrutinib PERSEUS PPMS readout</td></tr>
+  </table>
+  <p class="note"><strong>Already landed / passed (as of Oct 10, 2026):</strong> Sep 9, 2026 virtual R&amp;D day (RMS-focused, readout preview) — occurred; ENSURE-1 completion guide (Q2 2026) — window passed. The Nov 12, 2026 Q3 date is <em>not</em> company-confirmed in sources reviewed. No ENSURE readout has occurred — the binary is still ahead.</p>
+  <p class="note">Dataset cross-check: the 2027 catalyst calendar carries one IMUX row (US NDA filing, 2027-H2, guidance, high impact). The Q4-2026 dossier dataset carries no IMUX event row — the ENSURE readout is captured here from company guidance instead.</p>
+</section>
+
+<!-- 10 -->
+<section class="card" id="redflags">
+  <p class="eyebrow">Section 10</p>
+  <h2>Ranked red flags</h2>
+  <div class="flag"><div class="rank r1">1</div><div><strong>Translation risk: MRI → relapses.</strong> The entire investment case rests on Phase 2 lesion suppression converting into Phase 3 relapse prevention against placebo in 2,221 patients across 15 countries. Lesion effects and relapse effects can diverge; the primary is adjudicated clinical events, not imaging. <span class="badge interp">Interpretation</span></div></div>
+  <div class="flag"><div class="rank r1">2</div><div><strong>Dilution overhang is extreme.</strong> ~90M fully-diluted shares vs 13.6M basic; 22.9M warrants exercisable at $0.873 within 30 days of data; a 5% net-sales royalty already sold. Per-share economics on any outcome are far thinner than the headline price suggests, and a win brings mechanical supply. <span class="badge fact">Fact</span><span class="note">Counts: SEC filings; split-adjustment estimated.</span></div></div>
+  <div class="flag"><div class="rank r2">3</div><div><strong>Single-asset dependence + prior indication failure.</strong> CALDOSE-1 (UC, 2022) missed its primary and the program was shelved without a partner — proof this molecule's effects don't translate automatically. IMU-856/IMU-381 are pre-revenue early stage. <span class="badge fact">Fact</span></div></div>
+  <div class="flag"><div class="rank r2">4</div><div><strong>Neuroprotection narrative is preclinical + biomarker.</strong> CALLIPER missed its brain-volume primary; the disability-worsening signal (−23.8% 24-week CDW) is trade-press-reported, post-hoc-flavored, and unpublished peer-reviewed. No human proof that Nurr1 activation changes disability. <span class="badge unver">Unverified</span> / <span class="badge interp">Interpretation</span></div></div>
+  <div class="flag"><div class="rank r3">5</div><div><strong>Management turnover into the binary.</strong> Founder-CEO Daniel Vitt stepped down May 2026 (now consulting + Chair of SAB); new CEO Erik Lundgren is a commercial operator (ex-Genentech, Ocrevus launch) with no history with this asset; CMO changed to Michael Panzara. Leadership that ran the trials is partially out the door before data. <span class="badge fact">Fact</span></div></div>
+  <div class="flag"><div class="rank r3">6</div><div><strong>Placebo-controlled RMS trials in 2026.</strong> Modern placebo relapse rates are low and adjudication across 100+ sites / 15 countries adds noise — the classic setup for a real-but-modest drug to miss statistical significance. <span class="badge interp">Interpretation</span></div></div>
+  <div class="flag"><div class="rank r4">7</div><div><strong>Runway covers the readout, not the program.</strong> Cash to late 2027 funds ENSURE completion and PPMS Phase 3 <em>start</em>; a 3.5–4-year PPMS program plus commercial build needs far more capital → future dilution is structural, not situational. <span class="badge interp">Interpretation</span></div></div>
+  <div class="flag"><div class="rank r4">8</div><div><strong>1-for-10 reverse split (Apr 2026)</strong> — signals how far the stock had fallen (52-wk low $5.06 pre-data) and resets the technical base, but splits don't change value. <span class="badge fact">Fact</span></div></div>
+  <div class="flag"><div class="rank r5">9</div><div><strong>Class labeling overhang.</strong> DHODH inhibitors carry liver/pregnancy warnings (teriflunomide boxed warning); whether vidofludimus's selectivity earns a cleaner label is decided at NDA review, not at readout. <span class="badge fact">Fact</span> / <span class="badge interp">Interpretation</span></div></div>
+  <div class="flag"><div class="rank r5">10</div><div><strong>BTK inhibitors could own the "progressive" narrative first.</strong> Fenebrutinib's priority-review NDA (RMS + PPMS, accepted Sep 2026) could deliver an oral progressive-MS label before vidofludimus's PPMS program reads out (~2030). Post-binary concern; not a readout risk. <span class="badge interp">Interpretation</span></div></div>
+</section>
+
+<!-- 11 -->
+<section class="card" id="scenarios">
+  <p class="eyebrow">Section 11</p>
+  <h2>Bear / base / bull + scenarios</h2>
+  <p class="note"><strong>Rules observed:</strong> no DCF, no recommendation. <strong>Soft scenario price targets</strong> below are explicit, assumption-labeled, and scenario-based — not predictions or recommendations. The maximum-value case is capped at the highest published sell-side target (LifeSci Capital $56, Sep 1, 2026; consensus avg $39.14 across 9 analysts, Oct 2, 2026).</p>
+  <h3>Scenario framework — the ENSURE binary</h3>
+  <table>
+    <tr><th>Scenario</th><th>What happens</th><th>Read-through</th></tr>
+    <tr><td><strong>Bull — both trials hit</strong></td><td>Statistically significant delay in time to first relapse in ENSURE-1 <em>and</em> ENSURE-2; pooled CDW secondary supportive; safety ≈ placebo.</td><td>NDA mid-2027 path opens; PPMS Ph3 starts; $200M warrant exercise funds the program. Maximum-value case bounded by sell-side targets ($39 avg / $56 high); on ~90M FD shares that implies ~$3.5B FD value at the average — the per-share arithmetic is the point, not a forecast. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Base — mixed / marginal</strong></td><td>One trial hits, or both hit with a modest effect size; CDW pooled secondary mixed; safety clean.</td><td>Filing still possible on one positive trial + supportive second, but FDA risk rises and the label narrows; warrant exercise still likely funds operations. The "cleaner teriflunomide" outcome — approvable, not transformative. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Bear — both miss</strong></td><td>No significant relapse separation vs placebo in either trial.</td><td>Program effectively over for RMS; PPMS Ph3 unlikely to be funded; value collapses toward net cash (~$155M at Jun 30, 2026, declining with burn) minus wind-down — with ~90M FD shares, the cash-per-share floor is thin. <span class="badge interp">Interpretation</span></td></tr>
+  </table>
+  <h3>Soft price targets — scenario-based, explicit assumptions</h3>
+  <table>
+    <tr><th>Scenario</th><th>Soft target</th><th>Core assumptions (all on ~90M fully-diluted shares)</th></tr>
+    <tr><td><strong>Bear</strong> — both trials miss</td><td><strong>$1.00</strong></td><td>Value collapses to net-cash floor: $155.1M (Jun 30) − est. ~$50M burn to readout ≈ ~$105M net cash ÷ ~90M FD shares ≈ $1.17, haircut for wind-down. Warrants expire worthless; no pipeline value ascribed. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Base</strong> — mixed / marginal</td><td><strong>$20</strong></td><td>One trial hits or modest effect in both; approvable but narrower label; $200M warrant exercise funds PPMS Phase 3 start; FD value ≈ $1.8B. 5% royalty encumbrance priced in. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Bull</strong> — both trials hit clean</td><td><strong>$50</strong></td><td>Stat-sig delay in time to first relapse in both trials; pooled CDW supportive; safety ≈ placebo; NDA mid-2027 accepted. Capped below LifeSci high $56 (standing max-value rule); FD value ≈ $4.5B. <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td>Reference — current</td><td>$7.63</td><td>Oct 7, 2026 close. FD EV ≈ $532M already embeds partial win probability — the market is not pricing a certain miss. <span class="badge fact">Fact</span></td></tr>
+  </table>
+  <div class="warn"><strong>Soft-target discipline.</strong> These targets are scenario arithmetic on the dossier's own numbers (cash $155.1M, ~$25–30M/quarter burn, ~90M FD shares, 5% royalty encumbrance, sell-side cap at $56) — not forecasts, not a recommendation, no DCF. The per-share math is the point: the ~7× FD/basic ratio compresses every outcome.</div>
+  <h3>Key sensitivities (what actually moves the needle)</h3>
+  <ul>
+    <li><strong>Effect size on relapses</strong> — the only number that matters at readout; everything else is commentary. <span class="badge interp">Interpretation</span></li>
+    <li><strong>Consistency across the twin trials</strong> — regulators and the market discount a single positive out of two. <span class="badge interp">Interpretation</span></li>
+    <li><strong>Pooled CDW secondary</strong> — the difference between a relapse drug and a disability drug on the label. <span class="badge interp">Interpretation</span></li>
+    <li><strong>Safety vs placebo</strong> — the tolerability edge over teriflunomide is the commercial thesis; any liver signal at 30 mg in 2,200 patients re-opens the class discount. <span class="badge interp">Interpretation</span></li>
+    <li><strong>Warrant exercise mechanics</strong> — $200M inflow vs 22.9M new shares within 30 days of data; direction-independent dilution event. <span class="badge fact">Fact</span></li>
+  </ul>
+  <div class="callout"><strong>Base-case posture.</strong> The evidence supports a genuine drug (peer-reviewed Ph2 efficacy + placebo-like safety) facing a genuinely hard translation (MRI→relapse, placebo-controlled, global adjudication) inside a capital structure that punishes per-share outcomes. The dossier's central judgment: <strong>the readout is close to a coin-flip on statistical significance, with the payoff asymmetry compressed by the ~7× FD/basic share ratio.</strong> <span class="badge interp">Interpretation</span></div>
+</section>
+
+<!-- 12 -->
+<section class="card" id="management">
+  <p class="eyebrow">Section 12</p>
+  <h2>Management track record &amp; insider signals</h2>
+  <table>
+    <tr><th>Person</th><th>Role</th><th>Background / signal</th></tr>
+    <tr><td><strong>Erik Lundgren</strong></td><td>CEO (from Jun 1, 2026)</td><td>Ex-Genentech SVP Commercial Portfolio Organization; GM Roche Czech Republic; lifecycle leader for Huntington's in Roche neuroscience; credited with a key role in the Ocrevus launch. $685k base + ≥60% bonus. A commercial hire ahead of a binary — signals the board is planning for a win, not hedging for a loss. <span class="badge fact">Fact</span><span class="note">May 27, 2026 PR; Morningstar/Dow Jones.</span></td></tr>
+    <tr><td><strong>Daniel Vitt, PhD</strong></td><td>Co-founder; ex-CEO → consulting + Chair of Scientific Advisory Board + board seat</td><td>Ran the company through EMPhASIS, CALLIPER, and ENSURE enrollment; resigned CEO May 2026 under a detailed severance/consulting arrangement. Founder retained for science is orderly, not acrimonious — but the trial architect is no longer operating the company at readout. <span class="badge fact">Fact</span> / <span class="badge interp">Interpretation</span></td></tr>
+    <tr><td><strong>Michael A. Panzara, MD</strong></td><td>Chief Medical Officer (2026)</td><td>Quoted as CMO in Aug 2026 corporate update; succeeded Andreas Muehler (CMO through the EMPhASIS/CALLIPER era). <span class="badge fact">Fact</span><span class="note">Trade-press; transition details undisclosed.</span></td></tr>
+    <tr><td><strong>Glenn Whaley</strong></td><td>CFO</td><td>503,500 options at $0.7729 (Jun 2025 grant, 4-yr vest). <span class="badge fact">Fact</span><span class="note">Form 4/A.</span></td></tr>
+    <tr><td><strong>Duane Nash</strong></td><td>Executive Chairman</td><td>570,000 options at $0.7729 (Jun 2025). <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>Simona Skerjanec / Barclay Phillips</strong></td><td>Chair / Lead independent director</td><td>Board: 9 members, 7 independent (10-K/A Apr 2026). <span class="badge fact">Fact</span></td></tr>
+    <tr><td><strong>Elena Ridloff</strong></td><td>Director (from Aug 2026)</td><td>Inaugural grant 50,740 options at $14.54. <span class="badge fact">Fact</span><span class="note">Form 4, Aug 6, 2026.</span></td></tr>
+    <tr><td><strong>New C-suite appointment</strong></td><td>Commercial-ready data ecosystem role</td><td>Announced Sep 1, 2026: underscored "commitment to building a strong, commercial-ready data ecosystem, in preparation for potential NDA submission and commercialization." A pre-binary commercial-infrastructure hire. <span class="badge fact">Fact</span><span class="note">PRNewswire, via stocksguide news roundup.</span> <span class="badge gap">Gap</span> Name and exact title not captured in sources reviewed.</td></tr>
+  </table>
+  <h3>Institutional / insider signals</h3>
+  <ul>
+    <li><strong>Feb 2026 financing syndicate:</strong> led by BVF Partners; OrbiMed, RA Capital, Janus Henderson, EcoR1, TCGX, Vivo Capital, Avidity, Coastlands, Aberdeen, Trails Edge, Woodline — a specialist-heavy crossover book writing $200M upfront. Specialist validation of the binary, not of the outcome. <span class="badge fact">Fact</span> / <span class="badge interp">Interpretation</span></li>
+    <li><strong>13G holders (post-split, mid-2026):</strong> Commodore 9.9%, Nantahala 7.47%, Millennium 7.0%, Integrated Core Strategies 6.9%, Laurion 6.06%, OrbiMed entities 5.3% + 2.8% — concentrated specialist ownership, much of it in warrant form with 9.99% blockers. <span class="badge fact">Fact</span></li>
+    <li><strong>Insider transactions:</strong> Form 4s reviewed show <em>option grants</em> (Lundgren-era board/executives), not open-market purchases or sales by insiders. <span class="badge fact">Fact</span></li>
+    <li><span class="badge gap">Gap</span> No disclosed open-market insider buying ahead of the readout in sources reviewed; no Form 4 purchase filings located.</li>
+  </ul>
+</section>
+
+<!-- 13 -->
+<section class="card" id="references">
+  <p class="eyebrow">Section 13</p>
+  <h2>References, filings used &amp; as-of</h2>
+  <p><strong>As-of date: October 10, 2026</strong> (audit update; original build October 7, 2026). Price $7.63 = Oct 7, 2026 Nasdaq close (stocksguide; Oct 2 close was $7.96); 52-week range $5.06–$17.43 (ad-hoc-news). Financials from Q2 2026 10-Q (period ended Jun 30, 2026).</p>
+  <h3>SEC filings used</h3>
+  <ul class="refs">
+    <li>Form 10-Q, quarter ended June 30, 2026 (cash $155.1M; 13,644,467 shares; $34.1M net loss; $48.3M 1H operating cash use).</li>
+    <li>Form 10-Q, quarter ended September 30, 2025 (reserved-for-issuance table: 389,308,174 shares pre-split; May 2025 warrant tranches).</li>
+    <li>Form 10-K/A filed April 22, 2026 (1-for-10 reverse split effective Apr 27, 2026; equity-comp tables; board composition; Vitt 2025 comp $2.31M).</li>
+    <li>Form 8-K (Feb 2026): private placement terms; Series B warrant-for-royalty purchase &amp; sale agreement (5% royalty on vidofludimus calcium net sales).</li>
+    <li>Schedule 13G/As: Commodore, Nantahala, Millennium/ICS, Laurion, OrbiMed, Soleus (warrant counts, strikes, ownership %).</li>
+    <li>Forms 4/4A: Whaley, Nash, Muehler (Jun 2025 option grants); Ridloff (Aug 2026 grant).</li>
+  </ul>
+  <h3>Peer-reviewed literature</h3>
+  <ul class="refs">
+    <li>Fox RJ et al. EMPhASIS Phase 2 trial of vidofludimus calcium in relapsing-remitting MS. <em>Ann Clin Transl Neurol</em>. 2022.</li>
+    <li>Vietor J et al. Development of a potent Nurr1 agonist tool for in vivo applications. <em>J Med Chem</em>. 2023;66(9):6391–6402.</li>
+    <li>O'Connor P et al. TEMSO: oral teriflunomide for relapsing MS. <em>N Engl J Med</em>. 2011.</li>
+    <li>Lublin FD et al. Defining the clinical course of MS: 2013 revisions. <em>Neurology</em>. 2014;83(3):278–286.</li>
+    <li>IMU-856 Phase 1/1b data: <em>The Lancet Gastroenterology &amp; Hepatology</em>. Nov 2024 (per company PR).</li>
+    <li>Aubagio (teriflunomide) / Arava (leflunomide) US prescribing information (class safety precedent).</li>
+  </ul>
+  <h3>Company sources (PRs, decks)</h3>
+  <ul class="refs">
+    <li>Q2 2026 financial results &amp; corporate update PR (Aug 11, 2026) — ENSURE topline by end-2026; PPMS Ph3 later 2026.</li>
+    <li>Private placement closing PR (Feb 17, 2026) — $200M + $200M warrant terms; syndicate list.</li>
+    <li>CEO appointment PR (May 27, 2026) — Lundgren; Vitt transition.</li>
+    <li>Interim futility analysis PR + presentation (Oct 22, 2024) — IDMC continue/no-upsize.</li>
+    <li>ENSURE design deck (Feb 27, 2025) — enrollment criteria, endpoints, NCT05134441/NCT05201638.</li>
+    <li>Corporate overview (Sep 2025) — pipeline; CALLIPER/EMPhASIS summaries; IMU-856/IMU-381.</li>
+    <li>MSToronto2026 abstracts PR (Oct 7, 2026, PRNewswire) — <strong>four</strong> accepted abstracts: CALLIPER OLE week-48 disability outcomes; EBV-related immune activity &amp; cognition; novel bidirectional-disability endpoint; Nurr1-mediated neuronal survival. Meeting Oct 21–23, 2026, Toronto, Canada.</li>
+    <li>Virtual R&amp;D day PR (Sep 2, 2026, PRNewswire) — RMS-focused event held Sep 9, 2026 (readout preview; already occurred).</li>
+    <li>New C-suite appointment PR (Sep 1, 2026, PRNewswire) — commercial-ready data ecosystem role ahead of potential NDA (name/title not captured).</li>
+    <li>CALDOSE-1 topline PR (Jun 2, 2022) — UC primary missed; program deprioritized.</li>
+    <li>ECTRIMS 2024 ePoster P1410 (Nurr1 preclinical); Nurr1 target paper PR (May 17, 2023).</li>
+  </ul>
+  <h3>Trade press / data</h3>
+  <ul class="refs">
+    <li>ad-hoc-news.de (Oct 2026) — price, mcap, 52-wk range, analyst targets (Wedbush $45 Sep 10, 2026; LifeSci $56 Sep 1, 2026; 9-analyst avg $39.14 Oct 2, 2026); reports Q2 2026 weighted-average share count of 42.5M (vs 13.2M prior year).</li>
+    <li>stocksguide.com — IMUX $7.63 close, Oct 7, 2026; news roundup (MSToronto2026 abstracts; Sep 9 R&amp;D day; Sep 1 C-suite appointment).</li>
+    <li>multiplesclerosisnewstoday.com — enrollment completion (May 2025); CALLIPER full-data summary; Aug 2026 readout-preview interview (CMO Panzara).</li>
+    <li>neurologylive.com — futility analysis; fenebrutinib NDA acceptance (Sep 29, 2026, priority review RMS+PPMS); tolebrutinib CRL (Dec 2025) / EU approval as Cenrifki (Jun 2026).</li>
+    <li>Practical Neurology; Cleveland Clinic ConsultQD — EMPhASIS summaries; teriflunomide off-target attribution.</li>
+    <li>fiercebiotech.com — CALDOSE-1 failure (Jun 2022); CALLIPER interim (2023).</li>
+    <li>2027 catalyst-calendar dataset (local): one IMUX row — US NDA filing 2027-H2, guidance, high impact. Q4-2026 dossier dataset: no IMUX event row.</li>
+  </ul>
+  <p class="note">Evidence discipline: every material claim above carries a FACT / INTERPRETATION / GAP / UNVERIFIED label. Source order followed: SEC → labels → CT.gov identifiers → peer-reviewed papers → company PRs/decks → trade press. No dates, cash figures, enrollment counts, endpoints, or p-values were invented; each number carries units, population/timepoint, and source. No DCF, price target, or recommendation. Maximum-value framing capped at published sell-side targets.</p>
+</section>
+
+</main>
+</div>
+
+<footer class="footer">
+  IMUX deep-dive dossier · as of October 10, 2026 (audited &amp; enhanced) · single-file HTML, works offline · For research purposes only; not investment advice. No personal data is contained in this document.
+</footer>
+
+<button id="themeBtn" class="theme-toggle" aria-label="Toggle dark mode">&#127769; Dark</button>
+<button id="toTop" aria-label="Back to top">&uarr; Top</button>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themeBtn');
+  function label(){ btn.innerHTML = root.getAttribute('data-theme')==='dark' ? '&#9728;&#65039; Light' : '&#127769; Dark'; }
+  try{ var t=localStorage.getItem('imux-theme'); if(t){ root.setAttribute('data-theme',t); } }catch(e){}
+  label();
+  window.toggleTheme=function(){
+    var dark = root.getAttribute('data-theme')!=='dark';
+    root.setAttribute('data-theme', dark?'dark':'light');
+    try{ localStorage.setItem('imux-theme', dark?'dark':'light'); }catch(e){}
+    label();
+  };
+  btn.addEventListener('click', window.toggleTheme);
+  var toTop=document.getElementById('toTop');
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>600){ toTop.classList.add('show'); } else { toTop.classList.remove('show'); }
+  },{passive:true});
+  toTop.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  document.querySelectorAll('table').forEach(function(t){
+    var w=document.createElement('div'); w.className='tablewrap';
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  });
+  document.querySelectorAll('section.card').forEach(function(sec){
+    var h2=sec.querySelector('h2'); if(!h2) return;
+    var b=document.createElement('button');
+    b.className='sec-toggle'; b.setAttribute('aria-expanded','true'); b.setAttribute('aria-label','Collapse section');
+    b.textContent='\u25BE';
+    b.addEventListener('click',function(){
+      var collapsed=sec.classList.toggle('collapsed');
+      b.setAttribute('aria-expanded', collapsed?'false':'true');
+      b.setAttribute('aria-label', collapsed?'Expand section':'Collapse section');
+      b.textContent= collapsed?'\u25B8':'\u25BE';
+    });
+    h2.appendChild(b);
+  });
+})();
+</script>
+
+</body>
+</html>
