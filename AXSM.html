@@ -1,584 +1,707 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/><meta content="light dark" name="color-scheme"/><link href="data:," rel="icon"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>AXSM — Axsome Therapeutics · Deep-Dive Dossier · 2026-10-10</title>
-<style>
-  :root{
-    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
-    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
-    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
-    --hard:#166534; --guid:#b45309; --inf:#6b7280;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
-  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
-  header.top .wrap{max-width:1080px;margin:0 auto}
-  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
-  header.top h1 .tick{color:#7fd4d1}
-  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
-  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
-  .pricebar .pill b{color:#fff;font-size:14px}
-  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
-  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
-  nav.toc a:hover{background:var(--wash);color:var(--ink)}
-  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
-  section{padding:30px 0;border-bottom:1px solid var(--line)}
-  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
-  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  h3{font-size:16.5px;margin:26px 0 8px}
-  h4{font-size:14.5px;margin:20px 0 6px}
-  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
-  p,li{font-size:14.5px}
-  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
-  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
-  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
-  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
-  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
-  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
-  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
-  tr:nth-child(even) td{background:#fbfcfd}
-  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
-  .callout.warn{border-left-color:var(--unver)}
-  .callout p{margin:6px 0}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
-  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
-  .card h4{margin:0 0 8px;font-size:15px}
-  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
-  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
-  .tl-item{position:relative;margin:0 0 18px}
-  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
-  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
-  .tl-item .dt{font-weight:700;font-size:13.5px}
-  .tl-item .ev{font-size:14px;margin:2px 0}
-  .tl-item .note{font-size:12.5px;color:var(--muted)}
-  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
-  .flag .rank{display:inline-block;background:var(--ink);color:#fff;font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
-  .refs{font-size:13px;color:var(--muted)}
-  .refs li{margin-bottom:8px}
-  .refs a{color:var(--accent-ink)}
-  .fine{font-size:12.5px;color:var(--muted)}
-  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
-  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px;font-size:12px;color:var(--muted)}
-  .verdict{background:var(--ink);color:#fff;border-radius:10px;padding:18px 22px;margin:22px 0}
-  .verdict h3{color:#7fd4d1;margin:0 0 8px}
-  .verdict p{margin:6px 0;font-size:14.5px;color:#e6ecf2}
-  a.src{color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted var(--accent-ink);font-size:12.5px}
+<style>:root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
 
-  /* --- audit pass additions (2026-10-10) --- */
-  body[data-theme="dark"]{--ink:#e8eef4;--muted:#9fb0bf;--paper:#0e141a;--wash:#151d25;--line:#27313c;--accent:#2fb3ae;--accent-ink:#7fd4d1}
-  body[data-theme="dark"] header.top{background:#0a0e13}
-  body[data-theme="dark"] nav.toc{background:var(--paper)}
-  body[data-theme="dark"] .card{background:var(--paper)}
-  body[data-theme="dark"] tr:nth-child(even) td{background:#121922}
-  body[data-theme="dark"] th{background:var(--wash)}
-  body[data-theme="dark"] .pricebar .pill{background:#151d25;border-color:#2c3641}
-  body[data-theme="dark"] .verdict{background:#0a0e13}
-  .theme-btn{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:12.5px;padding:9px 12px;cursor:pointer;white-space:nowrap;min-height:44px}
-  .theme-btn:hover{background:var(--wash);color:var(--ink)}
-  nav.toc a{padding:12px 10px;min-height:44px;display:inline-flex;align-items:center}
-  h2.sec-toggle{cursor:pointer;user-select:none}
-  h2.sec-toggle .chev{display:inline-block;transition:transform .18s ease;color:var(--accent);margin-right:8px;font-size:16px}
-  h2.sec-toggle.collapsed .chev{transform:rotate(-90deg)}
-  .secbody.collapsed{display:none}
-  .expand-all{font-size:12.5px;color:var(--accent-ink);background:none;border:none;cursor:pointer;padding:12px 10px;min-height:44px;white-space:nowrap}
-  .table-wrap{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
-  .table-wrap table{margin:0}
-  #toTop{position:fixed;bottom:22px;right:22px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:#fff;font-size:20px;cursor:pointer;display:none;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-  body[data-theme="dark"] #toTop{background:#27313c}
-  #toTop:hover{background:var(--accent-ink)}
-  .gwl{margin:8px 0 0}
-  .gwl li{margin-bottom:5px}
-  .gwl .lbl{display:inline-block;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
-  .assump{background:var(--wash);border:1px dashed var(--line);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:13px}
-  .assump p{margin:6px 0}
-  @media(max-width:760px){
-    nav.toc .wrap{flex-wrap:nowrap;overflow-x:auto;gap:0;padding:6px 8px}
-    nav.toc a{font-size:13px}
-    header.top h1{font-size:24px}
-    main{padding:8px 14px 80px}
-    .pricebar .pill{font-size:12.5px}
-    td,th{font-size:12.5px;padding:8px 8px}
-  }
+/* ============ legacy component compat (re-skinned on PEPG variables) ============ */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.box{background:var(--raised);box-shadow:var(--shadow);padding:18px;min-width:0}
+.box .v{font:600 26px/1.1 var(--serif);letter-spacing:-.02em;overflow-wrap:break-word}
+.box .l{font-size:12px;color:var(--muted);margin-top:6px}
+.tablewrap,.tscroll,.twrap,.table-wrap{overflow-x:auto;margin:14px 0;-webkit-overflow-scrolling:touch}
+.tablewrap table,.tscroll table,.twrap table,.table-wrap table{margin:0;min-width:560px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+td{vertical-align:top;padding:11px 8px;border-bottom:1px solid var(--line)}
+tr.past td{background:var(--pill-bg);color:var(--muted)}
+.callout{background:var(--mint);padding:22px;margin:16px 0;border-left:5px solid var(--teal);font-size:14.5px}
+.callout.bad{border-left-color:var(--red)}
+.warn{background:var(--orange-soft);padding:22px;margin:16px 0;border-left:5px solid var(--orange);font-size:14.5px}
+.verdict{background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}
+.verdict h3{color:var(--panel-text)}
+.verdict p{color:#d0dedb;margin:0}
+.flag{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--orange);padding:18px 20px;margin:14px 0;box-shadow:var(--shadow)}
+.flag h4{margin:0 0 6px;font-size:15px}
+.flag p{font-size:13.5px;color:var(--ink-2);margin:6px 0 0}
+.flag .rank,.flag .sev{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--orange-soft);color:#8e351d;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+html[data-theme="dark"] .flag .rank,html[data-theme="dark"] .flag .sev{color:var(--orange)}
+.flag .sev.med{background:#f4edcf;color:#67510e}
+html[data-theme="dark"] .flag .sev.med{background:#2e2a17;color:#d8c26a}
+.flag .sev.low{background:var(--mint);color:var(--teal-dark)}
+.risk{background:var(--raised);border:1px solid var(--line);border-left:5px solid var(--red);padding:18px 20px;margin:14px 0;font-size:14.5px}
+.risk .rank{display:inline-block;font:800 10px/1 var(--mono);letter-spacing:.08em;background:var(--red);color:#fff;padding:5px 8px;border-radius:2px;margin-right:8px;vertical-align:middle}
+.risk.base{background:var(--mint);border-left-color:var(--teal)}
+.risk.base .rank{background:var(--teal)}
+.risk.bull{background:#e8eef0;border-left-color:var(--teal-dark)}
+html[data-theme="dark"] .risk.bull{background:#1e2c29}
+.risk.bull .rank{background:var(--teal-dark)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:16px}
+.card{background:var(--raised);padding:22px;box-shadow:var(--shadow);min-width:0}
+.card h4{margin:0 0 8px;font-size:15px}
+.card p{font-size:13.5px;color:var(--ink-2);margin:0}
+.refs{font-size:13.5px;color:var(--muted);padding-left:20px}
+.refs li{margin:7px 0;word-break:break-word}
+.src{font-size:12px;color:var(--muted)}
+.ref{font-size:12px;color:var(--muted)}
+.fine{font-size:12.5px;color:var(--muted)}
+.small{font-size:13px;color:var(--muted)}
+.audit{background:var(--surface);border:1px solid var(--line);padding:18px 20px;margin-top:18px;font-size:13.5px}
+.keybox{border:1px solid var(--line);padding:14px 18px;background:var(--surface);margin:14px 0;font-size:14.5px}
+.keybox b.t{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:4px}
+.soft{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.softbox{border:2px dashed var(--teal);padding:16px 18px;margin:14px 0;background:var(--surface)}
+.tight li{margin:6px 0}
+.gwl{margin:10px 0;padding-left:20px}
+.gwl li{margin:8px 0;font-size:14px}
+.lbl{font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+@media(max-width:620px){.grid2,.kpi{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
-<header class="top">
-  <div class="wrap">
-    <h1><span class="tick">AXSM</span> · Axsome Therapeutics, Inc.</h1>
-    <p class="sub">Comprehensive deep-dive investment dossier — commercial-stage CNS (depression, sleep, migraine) · As of October 10, 2026</p>
-    <div class="pricebar">
-      <div class="pill">Price <b>$168.35</b> <span style="color:#9fb0c2">(Finnhub, 10/09/2026 close; −14.1% over prior 11 sessions)</span></div>
-      <div class="pill">52-wk range <b>$117.30 – $260.19</b></div>
-      <div class="pill">Basic mcap <b>~$8.80B</b> <span style="color:#9fb0c2">(52.3M shares, 6/30/26)</span></div>
-      <div class="pill">FD mcap <b>~$10.17B</b> <span style="color:#9fb0c2">(60.4M FD shares)</span></div>
-      <div class="pill">Cash <b>$319.9M</b> <span style="color:#9fb0c2">(6/30/26)</span></div>
-      <div class="pill">Debt (face) <b>$190M</b></div>
-    </div>
-  </div>
+<div class="topline"></div>
+<header class="hero">
+<div class="hero-grid">
+<div>
+<div class="ticker-line"><span class="ticker">NASDAQ · AXSM</span><span class="stamp">Deep-dive dossier · Audited October 10, 2026</span></div>
+<h1>Revenue is real. The price is a pipeline multiple.</h1>
+<p class="hero-dek">Comprehensive deep-dive investment dossier — commercial-stage CNS (depression, sleep, migraine) · As of October 10, 2026</p>
+</div>
+<div aria-label="Market snapshot" class="hero-quote">
+<div class="quote-price">$168.35</div>
+<div class="quote-label">Fixed market snapshot · Oct 9, 2026 close (Finnhub) · −14.1% over prior 11 sessions</div>
+<div class="quote-meta">52-wk $117.30 – $260.19 · Basic mcap ~$8.80B (52.3M shares, 6/30/26) · FD mcap ~$10.17B (60.4M FD shares) · Cash $319.9M (6/30/26) · Debt (face) $190M</div>
+</div>
+</div>
 </header>
-
-<nav class="toc"><div class="wrap">
-  <a href="#s1">1 · Identity &amp; Thesis</a><a href="#s2">2 · Science</a><a href="#s3">3 · Pipeline</a>
-  <a href="#s4">4 · Trial Design</a><a href="#s5">5 · Clinical/Regulatory</a><a href="#s6">6 · Competition</a>
-  <a href="#s7">7 · Financials</a><a href="#s8">8 · FDMC/EV</a><a href="#s9">9 · Catalyst Map</a>
-  <a href="#s10">10 · Red Flags</a><a href="#s11">11 · Bear/Base/Bull</a><a href="#s12">12 · Management</a>
-  <a href="#s13">13 · References</a>
-<button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">◐ Dark</button><button class="expand-all" id="expandAll">Expand all</button></div></nav>
-
+<div class="jump-wrap">
+<nav aria-label="Jump to section" class="jump">
+<a href="#s1">Frame</a><a href="#s2">Science</a><a href="#s3">Pipeline</a><a href="#s4">Trial</a><a href="#s5">Clinical</a><a href="#s6">Landscape</a><a href="#s7">Financials</a><a href="#s8">Value</a><a href="#s9">Catalysts</a><a href="#s10">Risks</a><a href="#s11">Scenarios</a><a href="#s12">People</a><a href="#s13">Sources</a>
+<button aria-pressed="false" class="theme-toggle" id="themeToggle" type="button">◐ Dark mode</button>
+</nav>
+</div>
 <main>
 
-<div class="legend">
-  <span><b>Evidence labels:</b></span>
-  <span><span class="tag fact">FACT</span> = from a primary/verified source</span>
-  <span><span class="tag interp">INTERPRETATION</span> = analyst inference from facts</span>
-  <span><span class="tag gap">GAP</span> = missing data, not yet disclosed</span>
-  <span><span class="tag unver">UNVERIFIED</span> = single/weak source, not corroborated</span>
-</div>
+<section id="s1"><div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>Revenue is real. The price is a pipeline multiple.</h2><p class="lede">Commercial-stage CNS company. The traded binary is clinical/regulatory, but revenue and cash cover real risk here.</p></div></div><div aria-label="Evidence legend" class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
 
-<section id="s1">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">1</span>Identity &amp; Thesis Snapshot</h2>
-<div class="secbody">
-<p class="kicker">Commercial-stage CNS company. The traded binary is clinical/regulatory, but revenue and cash cover real risk here.</p>
+
 
 <div class="table-wrap"><table>
 <tr><th style="width:26%">Item</th><th>Detail</th></tr>
-<tr><td>Company</td><td>Axsome Therapeutics, Inc. (Nasdaq: AXSM), New York, NY; incorporated 2012; founder/chairman/CEO Herriot Tabuteau, MD <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a></td></tr>
-<tr><td>What it sells</td><td>Three FDA-approved products: <b>Auvelity</b> (AXS-05; dextromethorphan + bupropion) for major depressive disorder (MDD) and, since April 30, 2026, agitation associated with dementia due to Alzheimer's disease; <b>Sunosi</b> (solriamfetol) for excessive daytime sleepiness (EDS) in narcolepsy or obstructive sleep apnea; <b>Symbravo</b> (AXS-07; MoSEIC meloxicam + rizatriptan) for acute migraine <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a>; <a class="src" href="#rzacks26">Zacks 1/26</a></td></tr>
-<tr><td>Scale</td><td>Q2 2026 (ended 6/30/26) total revenue <b>$218.4M</b> (+46% YoY); Auvelity $180.3M (+51%), Sunosi $35.8M (+20%), Symbravo $2.3M; net loss $51.3M <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a></td></tr>
-<tr><td>The binary</td><td><b>AXS-12 (reboxetine) PDUFA May 1, 2027</b> for cataplexy in narcolepsy <span class="pill-dq hard">hard</span>; <b>solriamfetol ENGAGE Phase 3 (binge eating disorder) topline Q4 2026</b> <span class="pill-dq guidance">guidance</span>; SUSTAIN (shift work disorder) topline 2027 <span class="pill-dq guidance">guidance</span> <span class="tag fact">FACT</span> <a class="src" href="#rnda12">AXS-12 NDA acceptance PR</a>; <a class="src" href="#rq1">Q1 2026 business update</a></td></tr>
-<tr><td>Why it matters</td><td>At ~$9B basic / ~$10.4B FD mcap on ~$875M annualized revenue (~10x sales), the price already assumes (a) Auvelity keeps growing ~50% with the new Alzheimer's-agitation label, and (b) the AXS-12 PDUFA and ENGAGE readout deliver clean wins with no financing in between <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Company</td><td>Axsome Therapeutics, Inc. (Nasdaq: AXSM), New York, NY; incorporated 2012; founder/chairman/CEO Herriot Tabuteau, MD <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a></td></tr>
+<tr><td>What it sells</td><td>Three FDA-approved products: <b>Auvelity</b> (AXS-05; dextromethorphan + bupropion) for major depressive disorder (MDD) and, since April 30, 2026, agitation associated with dementia due to Alzheimer's disease; <b>Sunosi</b> (solriamfetol) for excessive daytime sleepiness (EDS) in narcolepsy or obstructive sleep apnea; <b>Symbravo</b> (AXS-07; MoSEIC meloxicam + rizatriptan) for acute migraine <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a>; <a class="src" href="#rzacks26">Zacks 1/26</a></td></tr>
+<tr><td>Scale</td><td>Q2 2026 (ended 6/30/26) total revenue <b>$218.4M</b> (+46% YoY); Auvelity $180.3M (+51%), Sunosi $35.8M (+20%), Symbravo $2.3M; net loss $51.3M <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a></td></tr>
+<tr><td>The binary</td><td><b>AXS-12 (reboxetine) PDUFA May 1, 2027</b> for cataplexy in narcolepsy <span class="date-tag hard">hard</span>; <b>solriamfetol ENGAGE Phase 3 (binge eating disorder) topline Q4 2026</b> <span class="date-tag guidance">guidance</span>; SUSTAIN (shift work disorder) topline 2027 <span class="date-tag guidance">guidance</span> <span class="ev fact">FACT</span> <a class="src" href="#rnda12">AXS-12 NDA acceptance PR</a>; <a class="src" href="#rq1">Q1 2026 business update</a></td></tr>
+<tr><td>Why it matters</td><td>At ~$9B basic / ~$10.4B FD mcap on ~$875M annualized revenue (~10x sales), the price already assumes (a) Auvelity keeps growing ~50% with the new Alzheimer's-agitation label, and (b) the AXS-12 PDUFA and ENGAGE readout deliver clean wins with no financing in between <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <div class="verdict">
 <h3>Dossier verdict — the key swing factor</h3>
 <p>The swing factor is the <b>Q4 2026 → May 2027 binary double-header</b>: solriamfetol's ENGAGE readout in binge eating disorder (the first label-expansion test of the Sunosi engine) immediately followed by the AXS-12 PDUFA for narcolepsy cataplexy — against a backdrop where the NDA rests on a small (n=90) pivotal trial with a 66% placebo response (p=0.018). Auvelity's commercial engine is real ($507M in 2025, $180M in Q2 2026 alone), but the ~10x-sales multiple is a pipeline multiple, and the AXS-14 Refusal-to-File from 2025 is proof that FDA deference is not automatic here.</p>
 </div>
-</div>
-</section>
 
-<section id="s2">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">2</span>Science — Mechanism of Action &amp; Why It Could Fail</h2>
-<div class="secbody">
-<p class="kicker">Plain-language mechanisms from the published literature, then the failure modes specific to each.</p>
+</section>
+<section id="s2"><div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Old molecules, new indications — and why each could fail</h2><p class="lede">Plain-language mechanisms from the published literature, then the failure modes specific to each.</p></div></div>
+
+
 
 <h3>Why each mechanism could work (plain English)</h3>
-<p><b>Auvelity (MDD):</b> Most antidepressants tune serotonin/norepinephrine; Auvelity hits the brain's main excitatory system (glutamate, via NMDA blockade) plus sigma-1 — the same family of biology behind ketamine's rapid antidepressant effect, but in a daily pill. That explains both the week-1 separation in GEMINI and why it works in patients who failed monoamine drugs <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>Auvelity (AD agitation):</b> Agitation in dementia is linked to excitatory/inhibitory imbalance and NMDA-receptor dysregulation; dampening glutamatergic overactivity is a biologically coherent target, and the two-positive-trials package (ADVANCE-1 + ACCORD-2) cleared FDA on that basis <span class="tag fact">FACT</span> <a class="src" href="#rnovapharma">FDA label summary</a>; <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>AXS-12 (reboxetine, cataplexy):</b> Cataplexy is a sudden loss of muscle tone driven by dysregulated REM-sleep circuitry; norepinephrine tone is what keeps muscles "on" during wakefulness, so a selective norepinephrine reuptake inhibitor directly replaces a missing signal. The drug was used in Europe for years, so its human pharmacology is unusually well-characterized for a "new" NDA <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>Solriamfetol (BED):</b> Binge eating disorder is treated today only by Vyvanse, a stimulant — the mechanism (dopamine/norepinephrine reuptake inhibition) overlaps with solriamfetol's. Vyvanse proved the endpoint and the regulatory path, so ENGAGE is a me-too-mechanism trial in a validated indication, not a first-in-indication leap <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>AXS-14 (esreboxetine, fibromyalgia):</b> Fibromyalgia is centralized pain — the brain's volume knob is stuck high. Boosting descending noradrenergic inhibition (the brain's own pain-brake) is the mechanism behind two of the three approved fibromyalgia drugs (Cymbalta, Savella); esreboxetine is a more selective version of the same idea <span class="tag interp">INTERPRETATION</span>.</p>
-
+<p><b>Auvelity (MDD):</b> Most antidepressants tune serotonin/norepinephrine; Auvelity hits the brain's main excitatory system (glutamate, via NMDA blockade) plus sigma-1 — the same family of biology behind ketamine's rapid antidepressant effect, but in a daily pill. That explains both the week-1 separation in GEMINI and why it works in patients who failed monoamine drugs <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>Auvelity (AD agitation):</b> Agitation in dementia is linked to excitatory/inhibitory imbalance and NMDA-receptor dysregulation; dampening glutamatergic overactivity is a biologically coherent target, and the two-positive-trials package (ADVANCE-1 + ACCORD-2) cleared FDA on that basis <span class="ev fact">FACT</span> <a class="src" href="#rnovapharma">FDA label summary</a>; <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>AXS-12 (reboxetine, cataplexy):</b> Cataplexy is a sudden loss of muscle tone driven by dysregulated REM-sleep circuitry; norepinephrine tone is what keeps muscles "on" during wakefulness, so a selective norepinephrine reuptake inhibitor directly replaces a missing signal. The drug was used in Europe for years, so its human pharmacology is unusually well-characterized for a "new" NDA <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>Solriamfetol (BED):</b> Binge eating disorder is treated today only by Vyvanse, a stimulant — the mechanism (dopamine/norepinephrine reuptake inhibition) overlaps with solriamfetol's. Vyvanse proved the endpoint and the regulatory path, so ENGAGE is a me-too-mechanism trial in a validated indication, not a first-in-indication leap <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>AXS-14 (esreboxetine, fibromyalgia):</b> Fibromyalgia is centralized pain — the brain's volume knob is stuck high. Boosting descending noradrenergic inhibition (the brain's own pain-brake) is the mechanism behind two of the three approved fibromyalgia drugs (Cymbalta, Savella); esreboxetine is a more selective version of the same idea <span class="ev interp">INTERPRETATION</span>.</p>
 <h3>AXS-20 (balipodect) — schizophrenia; Tourette syndrome</h3>
-<p><b>Mechanism.</b> AXS-20 (balipodect) is a phosphodiesterase 10A (PDE10A) inhibitor — it modulates striatal signaling downstream of dopamine receptors rather than blocking D2 receptors directly, which is the basis for the claimed metabolic-safety edge (no observed glucose or prolactin changes in preclinical/clinical work cited by management). Phase 3-enabling activities are ongoing with a Phase 3 start targeted around year-end 2026 <span class="tag fact">FACT</span> <a class="src" href="#rq1b">Q1 2026 earnings-call highlights</a>.</p>
-<p><b>Why it could fail:</b> PDE10A is a graveyard mechanism — Pfizer, Lundbeck/Takeda and others all failed Phase 2/3 with PDE10A inhibitors in schizophrenia (TAK-063, OMS824, PF-02545920). The "downstream of dopamine" elegance has not yet produced a single approved antipsychotic <span class="tag interp">INTERPRETATION</span>. Tourette is an earlier-stage, smaller indication. Commercially, schizophrenia is a generic-dominated, adherence-challenged market <span class="tag interp">INTERPRETATION</span>.</p>
-
+<p><b>Mechanism.</b> AXS-20 (balipodect) is a phosphodiesterase 10A (PDE10A) inhibitor — it modulates striatal signaling downstream of dopamine receptors rather than blocking D2 receptors directly, which is the basis for the claimed metabolic-safety edge (no observed glucose or prolactin changes in preclinical/clinical work cited by management). Phase 3-enabling activities are ongoing with a Phase 3 start targeted around year-end 2026 <span class="ev fact">FACT</span> <a class="src" href="#rq1b">Q1 2026 earnings-call highlights</a>.</p>
+<p><b>Why it could fail:</b> PDE10A is a graveyard mechanism — Pfizer, Lundbeck/Takeda and others all failed Phase 2/3 with PDE10A inhibitors in schizophrenia (TAK-063, OMS824, PF-02545920). The "downstream of dopamine" elegance has not yet produced a single approved antipsychotic <span class="ev interp">INTERPRETATION</span>. Tourette is an earlier-stage, smaller indication. Commercially, schizophrenia is a generic-dominated, adherence-challenged market <span class="ev interp">INTERPRETATION</span>.</p>
 <h3>AXS-17 — epilepsy</h3>
-<p><b>Mechanism.</b> A novel oral GABA-A receptor α2,3 subtype-selective positive allosteric modulator (PAM) — acquired as AZD7325 in November 2025; tech transfer and Phase 2 trial-enabling activities are underway <span class="tag fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR</a>. Subtype-selective GABA modulation aims for antiseizure activity with less sedation than non-selective benzodiazepine-site agents <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>Why it could fail:</b> Pre-Phase 2; no human efficacy data disclosed; epilepsy is a crowded market with cheap generics and entrenched newer agents — a novel GABA PAM needs a tolerability/efficacy story, not just selectivity <span class="tag interp">INTERPRETATION</span>.</p>
-
+<p><b>Mechanism.</b> A novel oral GABA-A receptor α2,3 subtype-selective positive allosteric modulator (PAM) — acquired as AZD7325 in November 2025; tech transfer and Phase 2 trial-enabling activities are underway <span class="ev fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR</a>. Subtype-selective GABA modulation aims for antiseizure activity with less sedation than non-selective benzodiazepine-site agents <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>Why it could fail:</b> Pre-Phase 2; no human efficacy data disclosed; epilepsy is a crowded market with cheap generics and entrenched newer agents — a novel GABA PAM needs a tolerability/efficacy story, not just selectivity <span class="ev interp">INTERPRETATION</span>.</p>
 <h3>Auvelity / AXS-05 (dextromethorphan + bupropion)</h3>
-<p><b>Mechanism.</b> Dextromethorphan is an NMDA-receptor antagonist and sigma-1 receptor agonist; bupropion is included primarily as a CYP2D6 inhibitor that raises dextromethorphan plasma levels (it also contributes its own aminoketone / dopamine-norepinephrine activity) <span class="tag fact">FACT</span> <a class="src" href="#rhelixtalk">Rosalind Franklin HelixTalk review</a>. The proposed benefit in depression is glutamatergic modulation — a different pathway from monoamine antidepressants <span class="tag interp">INTERPRETATION</span>. The exact mechanism for reducing agitation in Alzheimer's disease is <b>not fully established</b> <span class="tag fact">FACT</span> <a class="src" href="#rnovapharma">NovaPharmaNews (citing FDA label)</a>.</p>
+<p><b>Mechanism.</b> Dextromethorphan is an NMDA-receptor antagonist and sigma-1 receptor agonist; bupropion is included primarily as a CYP2D6 inhibitor that raises dextromethorphan plasma levels (it also contributes its own aminoketone / dopamine-norepinephrine activity) <span class="ev fact">FACT</span> <a class="src" href="#rhelixtalk">Rosalind Franklin HelixTalk review</a>. The proposed benefit in depression is glutamatergic modulation — a different pathway from monoamine antidepressants <span class="ev interp">INTERPRETATION</span>. The exact mechanism for reducing agitation in Alzheimer's disease is <b>not fully established</b> <span class="ev fact">FACT</span> <a class="src" href="#rnovapharma">NovaPharmaNews (citing FDA label)</a>.</p>
 <p><b>Why it could fail (clinical/commercial):</b></p>
 <ul>
-<li>Effect size is real but modest: GEMINI Phase 3 (n=327, MDD, 6 wks) showed MADRS least-squares mean difference −3.87 vs placebo (p=0.002); remission 39.5% vs 17.3% (p&lt;0.001) <span class="tag fact">FACT</span> <a class="src" href="#rgemini">Iosifescu et al., J Clin Psychiatry 2022</a>. Large placebo responses are the norm in this field.</li>
-<li>The bupropion component is used for a drug interaction but is a <b>therapeutic dose</b> carrying seizure risk, hypertension, and extensive CYP2D6-mediated drug interactions (antidepressants, antipsychotics, opioids) <span class="tag fact">FACT</span> <a class="src" href="#rhelixtalk">HelixTalk</a> — a real prescribing friction in elderly Alzheimer's-agitation patients on polypharmacy <span class="tag interp">INTERPRETATION</span>.</li>
-<li>Common AEs: dizziness, nausea, headache, diarrhea, somnolence, dry mouth <span class="tag fact">FACT</span> <a class="src" href="#rgemini">GEMINI</a>; tolerability in a frail 65+ agitation population was evaluated in the AD program (no increased falls/sedation signal per company), but real-world uptake is still early <span class="tag interp">INTERPRETATION</span>.</li>
-<li>Antidepressant-class boxed warning on suicidality applies, and the Alzheimer's-agitation label competes with Rexulti, which had a three-year head start <span class="tag interp">INTERPRETATION</span>.</li>
+<li>Effect size is real but modest: GEMINI Phase 3 (n=327, MDD, 6 wks) showed MADRS least-squares mean difference −3.87 vs placebo (p=0.002); remission 39.5% vs 17.3% (p&lt;0.001) <span class="ev fact">FACT</span> <a class="src" href="#rgemini">Iosifescu et al., J Clin Psychiatry 2022</a>. Large placebo responses are the norm in this field.</li>
+<li>The bupropion component is used for a drug interaction but is a <b>therapeutic dose</b> carrying seizure risk, hypertension, and extensive CYP2D6-mediated drug interactions (antidepressants, antipsychotics, opioids) <span class="ev fact">FACT</span> <a class="src" href="#rhelixtalk">HelixTalk</a> — a real prescribing friction in elderly Alzheimer's-agitation patients on polypharmacy <span class="ev interp">INTERPRETATION</span>.</li>
+<li>Common AEs: dizziness, nausea, headache, diarrhea, somnolence, dry mouth <span class="ev fact">FACT</span> <a class="src" href="#rgemini">GEMINI</a>; tolerability in a frail 65+ agitation population was evaluated in the AD program (no increased falls/sedation signal per company), but real-world uptake is still early <span class="ev interp">INTERPRETATION</span>.</li>
+<li>Antidepressant-class boxed warning on suicidality applies, and the Alzheimer's-agitation label competes with Rexulti, which had a three-year head start <span class="ev interp">INTERPRETATION</span>.</li>
 </ul>
 <p class="fine"><b>Literature consulted:</b> Iosifescu DV et al., <i>J Clin Psychiatry</i> 2022;83(4):21m14345 (GEMINI, PMID 35649167) <a class="src" href="#rgemini">PubMed</a>; Tabuteau H et al., <i>Am J Psychiatry</i> 2022;179(7):490–499 (Phase 2 ASCEND in MDD); McCarthy B et al., <i>Clin Psychopharmacol Neurosci</i> 2023;21(4):609–616 (Auvelity review) <a class="src" href="#rmccarthy">PMC</a>; Kotlyar M et al., <i>J Clin Psychopharmacol</i> 2005 (bupropion CYP2D6 inhibition).</p>
-
 <h3>AXS-12 (reboxetine) — narcolepsy cataplexy</h3>
-<p><b>Mechanism.</b> A highly selective and potent norepinephrine reuptake inhibitor and cortical dopamine modulator; the hypothesis is that restoring noradrenergic tone maintains muscle tone during wakefulness and supports wakefulness and cognition <span class="tag fact">FACT</span> <a class="src" href="#rnda12">NDA acceptance PR</a>. Reboxetine was marketed in Europe as an antidepressant (Edronax) from the late 1990s but <b>never approved in the US</b>; Axsome acquired exclusive US rights and the data package from Pfizer in 2020 <span class="tag fact">FACT</span> <a class="src" href="#rfierce12">Fierce Pharma</a>.</p>
+<p><b>Mechanism.</b> A highly selective and potent norepinephrine reuptake inhibitor and cortical dopamine modulator; the hypothesis is that restoring noradrenergic tone maintains muscle tone during wakefulness and supports wakefulness and cognition <span class="ev fact">FACT</span> <a class="src" href="#rnda12">NDA acceptance PR</a>. Reboxetine was marketed in Europe as an antidepressant (Edronax) from the late 1990s but <b>never approved in the US</b>; Axsome acquired exclusive US rights and the data package from Pfizer in 2020 <span class="ev fact">FACT</span> <a class="src" href="#rfierce12">Fierce Pharma</a>.</p>
 <p><b>Why it could fail:</b></p>
 <ul>
-<li>The SYMPHONY primary (n=90, 5 wks) separated with p=0.018 on a <b>66% placebo reduction</b> in weekly cataplexy attacks (−83% vs −66%) <span class="tag fact">FACT</span> <a class="src" href="#rsymph">SEC EX99.1 / BioSpace</a>. High placebo response + small n = reviewer scrutiny at PDUFA, even with no AdCom planned <span class="tag interp">INTERPRETATION</span>.</li>
-<li>Cardiovascular: ENCORE reported tachycardia in 5.9% of patients; norepinephrine reuptake inhibition raises heart-rate/blood-pressure questions a reviewer will not ignore in a chronic-use drug <span class="tag fact">FACT</span> <a class="src" href="#rencore">ENCORE results (Drugs.com)</a>.</li>
-<li>ENCORE's long-term maintenance evidence comes from a <b>randomized-withdrawal design after open-label enrichment</b> (only the 42 of 68 who completed open-label were randomized) — durability claims rest on a selected population <span class="tag interp">INTERPRETATION</span>.</li>
-<li>The NDA seeks a <b>cataplexy-only</b> indication; EDS benefit was a secondary (CGI-S −1.8 vs −0.9, p=0.027). Payers and prescribers may view it as adjunctive to existing EDS therapy rather than a standalone narcolepsy drug <span class="tag interp">INTERPRETATION</span>.</li>
+<li>The SYMPHONY primary (n=90, 5 wks) separated with p=0.018 on a <b>66% placebo reduction</b> in weekly cataplexy attacks (−83% vs −66%) <span class="ev fact">FACT</span> <a class="src" href="#rsymph">SEC EX99.1 / BioSpace</a>. High placebo response + small n = reviewer scrutiny at PDUFA, even with no AdCom planned <span class="ev interp">INTERPRETATION</span>.</li>
+<li>Cardiovascular: ENCORE reported tachycardia in 5.9% of patients; norepinephrine reuptake inhibition raises heart-rate/blood-pressure questions a reviewer will not ignore in a chronic-use drug <span class="ev fact">FACT</span> <a class="src" href="#rencore">ENCORE results (Drugs.com)</a>.</li>
+<li>ENCORE's long-term maintenance evidence comes from a <b>randomized-withdrawal design after open-label enrichment</b> (only the 42 of 68 who completed open-label were randomized) — durability claims rest on a selected population <span class="ev interp">INTERPRETATION</span>.</li>
+<li>The NDA seeks a <b>cataplexy-only</b> indication; EDS benefit was a secondary (CGI-S −1.8 vs −0.9, p=0.027). Payers and prescribers may view it as adjunctive to existing EDS therapy rather than a standalone narcolepsy drug <span class="ev interp">INTERPRETATION</span>.</li>
 </ul>
-
 <h3>AXS-14 (esreboxetine) — fibromyalgia</h3>
-<p><b>Mechanism.</b> Esreboxetine is the SS-enantiomer of reboxetine, a highly selective norepinephrine reuptake inhibitor; the hypothesis is that enhanced descending noradrenergic inhibition dampens centralized pain <span class="tag fact">FACT</span> <a class="src" href="#rfwd">FORWARD announcement (MarketBeat)</a>.</p>
-<p><b>Why it could fail:</b> The FDA already issued a <b>Refusal to File</b> on an AXS-14 fibromyalgia NDA (June 9, 2025) <span class="tag fact">FACT</span> <a class="src" href="#rrtf">MarketBeat FDA events</a> — the underlying package was deemed unfilable, and the reasons were not publicly detailed <span class="tag gap">GAP</span>. The replacement FORWARD Phase 3 is a randomized-withdrawal design (12-wk open-label → responders 1:1 continue vs placebo; primary = time to loss of response) — enrichment designs inflate apparent effect and can support only a maintenance-type claim <span class="tag interp">INTERPRETATION</span>.</p>
-
+<p><b>Mechanism.</b> Esreboxetine is the SS-enantiomer of reboxetine, a highly selective norepinephrine reuptake inhibitor; the hypothesis is that enhanced descending noradrenergic inhibition dampens centralized pain <span class="ev fact">FACT</span> <a class="src" href="#rfwd">FORWARD announcement (MarketBeat)</a>.</p>
+<p><b>Why it could fail:</b> The FDA already issued a <b>Refusal to File</b> on an AXS-14 fibromyalgia NDA (June 9, 2025) <span class="ev fact">FACT</span> <a class="src" href="#rrtf">MarketBeat FDA events</a> — the underlying package was deemed unfilable, and the reasons were not publicly detailed <span class="ev gap">GAP</span>. The replacement FORWARD Phase 3 is a randomized-withdrawal design (12-wk open-label → responders 1:1 continue vs placebo; primary = time to loss of response) — enrichment designs inflate apparent effect and can support only a maintenance-type claim <span class="ev interp">INTERPRETATION</span>.</p>
 <h3>Solriamfetol (Sunosi) — label-expansion engine</h3>
-<p><b>Mechanism.</b> Dual-acting dopamine/norepinephrine reuptake inhibitor; also described as a TAAR1 agonist and 5-HT1A agonist <span class="tag fact">FACT</span> <a class="src" href="#rsleeprev">Sleep Review</a>. It is a <b>Schedule IV controlled substance</b> (abuse/misuse risk) <span class="tag fact">FACT</span> <a class="src" href="#rzacksadhd">Zacks</a>.</p>
+<p><b>Mechanism.</b> Dual-acting dopamine/norepinephrine reuptake inhibitor; also described as a TAAR1 agonist and 5-HT1A agonist <span class="ev fact">FACT</span> <a class="src" href="#rsleeprev">Sleep Review</a>. It is a <b>Schedule IV controlled substance</b> (abuse/misuse risk) <span class="ev fact">FACT</span> <a class="src" href="#rzacksadhd">Zacks</a>.</p>
 <p><b>Why it could fail:</b></p>
 <ul>
-<li>PARADIGM missed its primary: in overall MDD (n=346, 300 mg, 6 wks) there was no significant MADRS change vs placebo; only the small prespecified severe-EDS subgroup (n=51, not powered) looked better <span class="tag fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM PR</a>. The MDD program now hinges on CLARITY in an EDS-only subpopulation.</li>
-<li>FOCUS (adult ADHD, n=516) met primary at 150 mg (AISRS −17.7 vs −14.3, p=0.039) but the <b>300 mg dose missed statistical significance</b> — a flat/negative dose-response the FDA will notice <span class="tag fact">FACT</span> <a class="src" href="#rfocus">FOCUS PR</a>. The stock fell 6.8% on the news <span class="tag fact">FACT</span> <a class="src" href="#rzacksfocus">Zacks</a>.</li>
-<li>Stimulant-like class effects (cardiovascular, psychiatric, insomnia) and Schedule IV status cap the commercial story vs non-controlled alternatives <span class="tag interp">INTERPRETATION</span>.</li>
+<li>PARADIGM missed its primary: in overall MDD (n=346, 300 mg, 6 wks) there was no significant MADRS change vs placebo; only the small prespecified severe-EDS subgroup (n=51, not powered) looked better <span class="ev fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM PR</a>. The MDD program now hinges on CLARITY in an EDS-only subpopulation.</li>
+<li>FOCUS (adult ADHD, n=516) met primary at 150 mg (AISRS −17.7 vs −14.3, p=0.039) but the <b>300 mg dose missed statistical significance</b> — a flat/negative dose-response the FDA will notice <span class="ev fact">FACT</span> <a class="src" href="#rfocus">FOCUS PR</a>. The stock fell 6.8% on the news <span class="ev fact">FACT</span> <a class="src" href="#rzacksfocus">Zacks</a>.</li>
+<li>Stimulant-like class effects (cardiovascular, psychiatric, insomnia) and Schedule IV status cap the commercial story vs non-controlled alternatives <span class="ev interp">INTERPRETATION</span>.</li>
 </ul>
-
 <h3>Symbravo / AXS-07 (MoSEIC meloxicam + rizatriptan) — acute migraine</h3>
-<p><b>Mechanism.</b> MoSEIC (Molecular Solubility Enhancing Inclusion Complex) technology pairs the NSAID meloxicam with the triptan rizatriptan to speed absorption and improve onset <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a>.</p>
-<p><b>Why it could fail:</b> The acute-migraine market is saturated (gepants, ditans, cheap generic triptan/NSAID combos); Q2 2026 sales were only $2.3M and missed consensus ($7.2M) <span class="tag fact">FACT</span> <a class="src" href="#rcnhi">CNHI/Zacks recap</a>. Differentiation is pharmacokinetic, not mechanistic <span class="tag interp">INTERPRETATION</span>.</p>
-</div>
+<p><b>Mechanism.</b> MoSEIC (Molecular Solubility Enhancing Inclusion Complex) technology pairs the NSAID meloxicam with the triptan rizatriptan to speed absorption and improve onset <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">Q2 2026 8-K deck</a>.</p>
+<p><b>Why it could fail:</b> The acute-migraine market is saturated (gepants, ditans, cheap generic triptan/NSAID combos); Q2 2026 sales were only $2.3M and missed consensus ($7.2M) <span class="ev fact">FACT</span> <a class="src" href="#rcnhi">CNHI/Zacks recap</a>. Differentiation is pharmacokinetic, not mechanistic <span class="ev interp">INTERPRETATION</span>.</p>
+
 </section>
-<section id="s3">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">3</span>Full Pipeline Overview</h2>
-<div class="secbody">
-<p class="kicker">Marketed assets first, then every clinical program with stage and next milestone.</p>
+<section id="s3"><div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>Three drugs selling, five programs carrying the price</h2><p class="lede">Marketed assets first, then every clinical program with stage and next milestone.</p></div></div>
+
+
 
 <h3>Pipeline ranked by value, high → low</h3>
-<p class="fine">Ranking is an analyst judgment weighting near-term cash generation, probability-adjusted pipeline value, and exclusivity <span class="tag interp">INTERPRETATION</span>. Peak-sales anchors are company statements where noted.</p>
+<p class="fine">Ranking is an analyst judgment weighting near-term cash generation, probability-adjusted pipeline value, and exclusivity <span class="ev interp">INTERPRETATION</span>. Peak-sales anchors are company statements where noted.</p>
 <div class="table-wrap"><table>
 <tr><th style="width:6%">Rank</th><th>Asset</th><th>Value basis</th></tr>
-<tr><td><b>1</b></td><td><b>Auvelity (AXS-05)</b> — MDD + AD agitation</td><td>$180.3M in Q2 2026 (+51% YoY); two approved indications; management peak-sales estimate ≥$8B/year (roughly half MDD, half AD agitation) <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rq1c">Q1 2026 call summary</a>; IP to early 2039 per company. This is the franchise — everything else is option value beside it <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>2</b></td><td><b>AXS-12 (reboxetine)</b> — narcolepsy cataplexy</td><td>NDA filed, PDUFA May 1, 2027 (hard); orphan designation; issued patents to 2039; non-controlled oral — a differentiated slot vs scheduled oxybates and off-label Wakix. Risk: thin SYMPHONY package (n=90, p=0.018, 66% placebo response) <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>3</b></td><td><b>Solriamfetol expansion engine</b> — ENGAGE (BED) → SUSTAIN (SWD) → ADHD (FOCUS) → CLARITY (MDD+EDS)</td><td>One marketed base ($35.8M Q2 2026, +20%) with up to four Phase 3 expansion shots; BED is the most valuable swing (Vyvanse validated the indication; only approved BED drug). Base Sunosi US exclusivity to 2040 per the Feb 2026 Alkem settlement <span class="tag fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR</a>. Ranked below AXS-12 because PARADIGM already missed and FOCUS won on only one dose <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>4</b></td><td><b>Symbravo (AXS-07)</b> — acute migraine</td><td>Approved and launched, but $2.3M in Q2 2026 missed $7.2M consensus; differentiation is pharmacokinetic, not mechanistic, in a saturated generic-heavy market. Management peak-sales estimate $500M–$1B <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rhcw">HCW</a>; IP to ≥2045. Currently a call option on commercial execution <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>5</b></td><td><b>AXS-14 (esreboxetine)</b> — fibromyalgia</td><td>De-risked mechanism but the FDA already refused the prior NDA (June 2025); the FORWARD redo uses an enrichment design and reads out no earlier than H2 2027 (inferred). Generic-dominated endpoint market caps upside <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>6</b></td><td><b>AXS-05 smoking cessation (SUMMIT)</b></td><td>Pivotal Phase 2/3 initiated Q2 2026; Chantix's 2021 withdrawal left a real vacuum, so the indication is commercially interesting — but no data and no disclosed readout timing <span class="tag gap">GAP</span> <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>7</b></td><td><b>AXS-20 (balipodect)</b> — schizophrenia / Tourette</td><td>Pre-Phase 3; PDE10A has a multi-sponsor failure history in schizophrenia. Pure option value <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>8</b></td><td><b>AXS-17</b> — epilepsy</td><td>Phase 2-enabling; no human efficacy data disclosed. Negligible near-term value <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>1</b></td><td><b>Auvelity (AXS-05)</b> — MDD + AD agitation</td><td>$180.3M in Q2 2026 (+51% YoY); two approved indications; management peak-sales estimate ≥$8B/year (roughly half MDD, half AD agitation) <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rq1c">Q1 2026 call summary</a>; IP to early 2039 per company. This is the franchise — everything else is option value beside it <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>2</b></td><td><b>AXS-12 (reboxetine)</b> — narcolepsy cataplexy</td><td>NDA filed, PDUFA May 1, 2027 (hard); orphan designation; issued patents to 2039; non-controlled oral — a differentiated slot vs scheduled oxybates and off-label Wakix. Risk: thin SYMPHONY package (n=90, p=0.018, 66% placebo response) <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>3</b></td><td><b>Solriamfetol expansion engine</b> — ENGAGE (BED) → SUSTAIN (SWD) → ADHD (FOCUS) → CLARITY (MDD+EDS)</td><td>One marketed base ($35.8M Q2 2026, +20%) with up to four Phase 3 expansion shots; BED is the most valuable swing (Vyvanse validated the indication; only approved BED drug). Base Sunosi US exclusivity to 2040 per the Feb 2026 Alkem settlement <span class="ev fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR</a>. Ranked below AXS-12 because PARADIGM already missed and FOCUS won on only one dose <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>4</b></td><td><b>Symbravo (AXS-07)</b> — acute migraine</td><td>Approved and launched, but $2.3M in Q2 2026 missed $7.2M consensus; differentiation is pharmacokinetic, not mechanistic, in a saturated generic-heavy market. Management peak-sales estimate $500M–$1B <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rhcw">HCW</a>; IP to ≥2045. Currently a call option on commercial execution <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>5</b></td><td><b>AXS-14 (esreboxetine)</b> — fibromyalgia</td><td>De-risked mechanism but the FDA already refused the prior NDA (June 2025); the FORWARD redo uses an enrichment design and reads out no earlier than H2 2027 (inferred). Generic-dominated endpoint market caps upside <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>6</b></td><td><b>AXS-05 smoking cessation (SUMMIT)</b></td><td>Pivotal Phase 2/3 initiated Q2 2026; Chantix's 2021 withdrawal left a real vacuum, so the indication is commercially interesting — but no data and no disclosed readout timing <span class="ev gap">GAP</span> <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>7</b></td><td><b>AXS-20 (balipodect)</b> — schizophrenia / Tourette</td><td>Pre-Phase 3; PDE10A has a multi-sponsor failure history in schizophrenia. Pure option value <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>8</b></td><td><b>AXS-17</b> — epilepsy</td><td>Phase 2-enabling; no human efficacy data disclosed. Negligible near-term value <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <h3>Marketed</h3>
 <div class="table-wrap"><table>
 <tr><th>Product</th><th>Indication</th><th>Status</th><th>Q2 2026 sales</th></tr>
-<tr><td><b>Auvelity</b> (AXS-05)</td><td>Major depressive disorder (adults)</td><td>FDA-approved Aug 2022; launched Oct 2022 <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td><td rowspan="2"><b>$180.3M</b> (+51% YoY; ~266k TRx, +34% YoY) <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Auvelity</b> (AXS-05)</td><td>Agitation associated with dementia due to Alzheimer's disease</td><td>sNDA approved <b>April 30, 2026</b> (priority review, Breakthrough designation); launched June 2026; ~630-rep sales force; 126% increase in new-to-brand Rx among 65+ in first 8 weeks <span class="tag fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a>; <a class="src" href="#r8kq2">8-K deck</a></td></tr>
-<tr><td><b>Sunosi</b> (solriamfetol)</td><td>EDS in narcolepsy or obstructive sleep apnea</td><td>Acquired from Jazz (US rights; $53M upfront, 2022); Jazz entitled to high single-digit US royalty <span class="tag fact">FACT</span> <a class="src" href="#rfierce12">Fierce Pharma</a>; <a class="src" href="#rzacksadhd">Zacks</a></td><td><b>$35.8M</b> (+20% YoY; ~61k TRx, +14% YoY) <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Symbravo</b> (AXS-07)</td><td>Acute treatment of migraine</td><td>FDA-approved late Jan 2025 (company hosted approval investor event Jan 31, 2025); launched June 2025 <span class="tag fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a></td><td><b>$2.3M</b> (missed $7.2M consensus; ~23.5k TRx, +30% QoQ) <span class="tag fact">FACT</span> <a class="src" href="#rcnhi">CNHI</a></td></tr>
+<tr><td><b>Auvelity</b> (AXS-05)</td><td>Major depressive disorder (adults)</td><td>FDA-approved Aug 2022; launched Oct 2022 <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td><td rowspan="2"><b>$180.3M</b> (+51% YoY; ~266k TRx, +34% YoY) <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Auvelity</b> (AXS-05)</td><td>Agitation associated with dementia due to Alzheimer's disease</td><td>sNDA approved <b>April 30, 2026</b> (priority review, Breakthrough designation); launched June 2026; ~630-rep sales force; 126% increase in new-to-brand Rx among 65+ in first 8 weeks <span class="ev fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a>; <a class="src" href="#r8kq2">8-K deck</a></td></tr>
+<tr><td><b>Sunosi</b> (solriamfetol)</td><td>EDS in narcolepsy or obstructive sleep apnea</td><td>Acquired from Jazz (US rights; $53M upfront, 2022); Jazz entitled to high single-digit US royalty <span class="ev fact">FACT</span> <a class="src" href="#rfierce12">Fierce Pharma</a>; <a class="src" href="#rzacksadhd">Zacks</a></td><td><b>$35.8M</b> (+20% YoY; ~61k TRx, +14% YoY) <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Symbravo</b> (AXS-07)</td><td>Acute treatment of migraine</td><td>FDA-approved late Jan 2025 (company hosted approval investor event Jan 31, 2025); launched June 2025 <span class="ev fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a></td><td><b>$2.3M</b> (missed $7.2M consensus; ~23.5k TRx, +30% QoQ) <span class="ev fact">FACT</span> <a class="src" href="#rcnhi">CNHI</a></td></tr>
 </table></div>
-
 <h3>Clinical pipeline</h3>
 <div class="table-wrap"><table>
 <tr><th>Asset</th><th>Indication</th><th>Stage</th><th>Next milestone</th><th>Thesis weight</th></tr>
-<tr><td><b>AXS-12</b> (reboxetine)</td><td>Cataplexy in narcolepsy</td><td>NDA under FDA review</td><td><b>PDUFA May 1, 2027</b> <span class="pill-dq hard">hard</span></td><td><b>High</b> — first new-product binary; orphan drug</td></tr>
-<tr><td><b>Solriamfetol</b></td><td>Binge eating disorder (ENGAGE)</td><td>Phase 3 (n≈450, 1:1:1, 12 wks)</td><td>Topline <b>Q4 2026</b> <span class="pill-dq guidance">guidance</span></td><td><b>High</b> — first test of the expansion engine</td></tr>
-<tr><td><b>Solriamfetol</b></td><td>Shift work disorder (SUSTAIN)</td><td>Phase 3</td><td>Topline <b>2027</b> <span class="pill-dq guidance">guidance</span></td><td>Medium</td></tr>
-<tr><td><b>Solriamfetol</b></td><td>Adult ADHD (FOCUS)</td><td>Phase 3 complete (met primary at 150 mg)</td><td>sNDA filing timing <b>not disclosed</b> <span class="tag gap">GAP</span></td><td>Medium — one pivotal may not suffice</td></tr>
-<tr><td><b>Solriamfetol</b></td><td>Pediatric / adolescent ADHD (FOCUS-2, FOCUS-3)</td><td>Phase 3 initiated July 2026</td><td>Topline timing undisclosed <span class="tag gap">GAP</span></td><td>Low near-term</td></tr>
-<tr><td><b>Solriamfetol</b></td><td>MDD with EDS (CLARITY)</td><td>Phase 3 initiated Feb 2026 (randomized withdrawal; primary = time to relapse)</td><td>Topline timing undisclosed <span class="tag gap">GAP</span></td><td>Medium — follows PARADIGM miss</td></tr>
-<tr><td><b>AXS-14</b> (esreboxetine)</td><td>Fibromyalgia (FORWARD)</td><td>Phase 3 initiated Jan 2026 (randomized withdrawal)</td><td>Topline timing undisclosed <span class="tag gap">GAP</span></td><td>Medium — post-RTF redo</td></tr>
-<tr><td><b>AXS-05</b></td><td>Smoking cessation (SUMMIT)</td><td>Pivotal Phase 2/3 initiated Q2 2026</td><td>Topline timing undisclosed <span class="tag gap">GAP</span></td><td>Low near-term</td></tr>
-<tr><td><b>AXS-20</b></td><td>Schizophrenia; Tourette syndrome</td><td>Phase 3 prep (schizophrenia); earlier stage (Tourette)</td><td>Undisclosed <span class="tag gap">GAP</span></td><td>Low near-term</td></tr>
-<tr><td><b>AXS-17</b></td><td>Epilepsy</td><td>Phase 2-enabling</td><td>Undisclosed <span class="tag gap">GAP</span></td><td>Negligible near-term</td></tr>
+<tr><td><b>AXS-12</b> (reboxetine)</td><td>Cataplexy in narcolepsy</td><td>NDA under FDA review</td><td><b>PDUFA May 1, 2027</b> <span class="date-tag hard">hard</span></td><td><b>High</b> — first new-product binary; orphan drug</td></tr>
+<tr><td><b>Solriamfetol</b></td><td>Binge eating disorder (ENGAGE)</td><td>Phase 3 (n≈450, 1:1:1, 12 wks)</td><td>Topline <b>Q4 2026</b> <span class="date-tag guidance">guidance</span></td><td><b>High</b> — first test of the expansion engine</td></tr>
+<tr><td><b>Solriamfetol</b></td><td>Shift work disorder (SUSTAIN)</td><td>Phase 3</td><td>Topline <b>2027</b> <span class="date-tag guidance">guidance</span></td><td>Medium</td></tr>
+<tr><td><b>Solriamfetol</b></td><td>Adult ADHD (FOCUS)</td><td>Phase 3 complete (met primary at 150 mg)</td><td>sNDA filing timing <b>not disclosed</b> <span class="ev gap">GAP</span></td><td>Medium — one pivotal may not suffice</td></tr>
+<tr><td><b>Solriamfetol</b></td><td>Pediatric / adolescent ADHD (FOCUS-2, FOCUS-3)</td><td>Phase 3 initiated July 2026</td><td>Topline timing undisclosed <span class="ev gap">GAP</span></td><td>Low near-term</td></tr>
+<tr><td><b>Solriamfetol</b></td><td>MDD with EDS (CLARITY)</td><td>Phase 3 initiated Feb 2026 (randomized withdrawal; primary = time to relapse)</td><td>Topline timing undisclosed <span class="ev gap">GAP</span></td><td>Medium — follows PARADIGM miss</td></tr>
+<tr><td><b>AXS-14</b> (esreboxetine)</td><td>Fibromyalgia (FORWARD)</td><td>Phase 3 initiated Jan 2026 (randomized withdrawal)</td><td>Topline timing undisclosed <span class="ev gap">GAP</span></td><td>Medium — post-RTF redo</td></tr>
+<tr><td><b>AXS-05</b></td><td>Smoking cessation (SUMMIT)</td><td>Pivotal Phase 2/3 initiated Q2 2026</td><td>Topline timing undisclosed <span class="ev gap">GAP</span></td><td>Low near-term</td></tr>
+<tr><td><b>AXS-20</b></td><td>Schizophrenia; Tourette syndrome</td><td>Phase 3 prep (schizophrenia); earlier stage (Tourette)</td><td>Undisclosed <span class="ev gap">GAP</span></td><td>Low near-term</td></tr>
+<tr><td><b>AXS-17</b></td><td>Epilepsy</td><td>Phase 2-enabling</td><td>Undisclosed <span class="ev gap">GAP</span></td><td>Negligible near-term</td></tr>
 </table></div>
-<p class="fine">Company states a goal of approximately one NDA filing per year through 2031 <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rhcw">HCW conference recap (MarketBeat)</a>; seven trials are ongoing per the company <span class="tag fact">FACT</span> <a class="src" href="#rhcw">HCW</a>.</p>
-</div>
-</section>
+<p class="fine">Company states a goal of approximately one NDA filing per year through 2031 <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rhcw">HCW conference recap (MarketBeat)</a>; seven trials are ongoing per the company <span class="ev fact">FACT</span> <a class="src" href="#rhcw">HCW</a>.</p>
 
-<section id="s4">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">4</span>Trial Design Deep Dive</h2>
-<div class="secbody">
-<p class="kicker">Endpoints, statistical plans, powering, and readouts to date for the key binaries.</p>
+</section>
+<section id="s4"><div class="section-head"><div class="section-num">04 / TRIAL DESIGN</div><div><h2>The trial designs behind each binary</h2><p class="lede">Endpoints, statistical plans, powering, and readouts to date for the key binaries.</p></div></div>
+
+
 
 <h3>AXS-12 — SYMPHONY (Phase 3, NCT05059223)</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Design element</th><th>Detail</th></tr>
-<tr><td>Population / n</td><td>90 patients with narcolepsy with cataplexy; randomized 1:1 AXS-12 vs placebo <span class="tag fact">FACT</span> <a class="src" href="#rsymph">BioSpace / SEC EX99.1</a></td></tr>
-<tr><td>Dosing / duration</td><td>Once-daily week 1, then twice-daily weeks 2–5 (5 weeks total) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Primary endpoint</td><td>Change from baseline in weekly cataplexy attacks at week 5: <b>−83% (AXS-12) vs −66% (placebo), p=0.018</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Key secondaries (week 5 unless noted)</td><td>Week 1 cataplexy −56% vs −31% (p=0.007); remission (100% reduction) 33% vs 9.5% (p=0.008); cataplexy-free days 84.5% vs 22.6% (p=0.014); CGI-S for EDS −1.8 vs −0.9 (p=0.027); concurrent cataplexy+EDS response 57% vs 33% (p=0.029) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Safety</td><td>Most common: dry mouth, nausea, constipation; 1 discontinuation per arm; <b>no serious adverse events</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Powering / design risk</td><td>Small n=90; placebo response was 66% — separation is statistically significant but clinically narrow; no formal non-inferiority or active comparator <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Population / n</td><td>90 patients with narcolepsy with cataplexy; randomized 1:1 AXS-12 vs placebo <span class="ev fact">FACT</span> <a class="src" href="#rsymph">BioSpace / SEC EX99.1</a></td></tr>
+<tr><td>Dosing / duration</td><td>Once-daily week 1, then twice-daily weeks 2–5 (5 weeks total) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Primary endpoint</td><td>Change from baseline in weekly cataplexy attacks at week 5: <b>−83% (AXS-12) vs −66% (placebo), p=0.018</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Key secondaries (week 5 unless noted)</td><td>Week 1 cataplexy −56% vs −31% (p=0.007); remission (100% reduction) 33% vs 9.5% (p=0.008); cataplexy-free days 84.5% vs 22.6% (p=0.014); CGI-S for EDS −1.8 vs −0.9 (p=0.027); concurrent cataplexy+EDS response 57% vs 33% (p=0.029) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Safety</td><td>Most common: dry mouth, nausea, constipation; 1 discontinuation per arm; <b>no serious adverse events</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Powering / design risk</td><td>Small n=90; placebo response was 66% — separation is statistically significant but clinically narrow; no formal non-inferiority or active comparator <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <h3>AXS-12 — ENCORE (Phase 3 long-term, NCT05113745)</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Design element</th><th>Detail</th></tr>
-<tr><td>Design</td><td>6-month open-label AXS-12 (n=68) → 3-week double-blind randomized withdrawal in 42 patients (1:1 continue AXS-12 vs switch to placebo) <span class="tag fact">FACT</span> <a class="src" href="#rneurol">NeurologyLive</a></td></tr>
-<tr><td>Primary endpoint</td><td>Change in weekly cataplexy attacks at 3 weeks: <b>+10.29 (placebo) vs +1.32 (AXS-12), p=0.017</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Long-term efficacy</td><td>Mean −24.1 attacks/week at 6 months (−77%); ≥50% response 82% at 6 months; cataplexy-free days 14.3% → 70%; ESS −7.3 at 6 months <span class="tag fact">FACT</span> <a class="src" href="#rencore">Drugs.com</a></td></tr>
-<tr><td>Safety</td><td>Open-label AE discontinuation 17.6% (no single AE &gt;1 patient); most common nausea, tachycardia (5.9% each); double-blind TRAEs 4.5% AXS-12 vs 15% placebo <span class="tag fact">FACT</span></td></tr>
-<tr><td>Design risk</td><td>Randomized withdrawal after open-label enrichment: the randomized population is selected for tolerance/response; cannot establish efficacy in a treatment-naïve population <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Design</td><td>6-month open-label AXS-12 (n=68) → 3-week double-blind randomized withdrawal in 42 patients (1:1 continue AXS-12 vs switch to placebo) <span class="ev fact">FACT</span> <a class="src" href="#rneurol">NeurologyLive</a></td></tr>
+<tr><td>Primary endpoint</td><td>Change in weekly cataplexy attacks at 3 weeks: <b>+10.29 (placebo) vs +1.32 (AXS-12), p=0.017</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Long-term efficacy</td><td>Mean −24.1 attacks/week at 6 months (−77%); ≥50% response 82% at 6 months; cataplexy-free days 14.3% → 70%; ESS −7.3 at 6 months <span class="ev fact">FACT</span> <a class="src" href="#rencore">Drugs.com</a></td></tr>
+<tr><td>Safety</td><td>Open-label AE discontinuation 17.6% (no single AE &gt;1 patient); most common nausea, tachycardia (5.9% each); double-blind TRAEs 4.5% AXS-12 vs 15% placebo <span class="ev fact">FACT</span></td></tr>
+<tr><td>Design risk</td><td>Randomized withdrawal after open-label enrichment: the randomized population is selected for tolerance/response; cannot establish efficacy in a treatment-naïve population <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-<p>Supporting: Phase 2 CONCERT crossover corroborated efficacy with large week-2 cataplexy reductions and no SAEs <span class="tag fact">FACT</span> <a class="src" href="#rneurol">NeurologyLive</a>. Orphan Drug designation granted October 2018; issued patents to at least 2039 <span class="tag fact">FACT</span> <a class="src" href="#rsymph">SEC EX99.1</a>.</p>
-
+<p>Supporting: Phase 2 CONCERT crossover corroborated efficacy with large week-2 cataplexy reductions and no SAEs <span class="ev fact">FACT</span> <a class="src" href="#rneurol">NeurologyLive</a>. Orphan Drug designation granted October 2018; issued patents to at least 2039 <span class="ev fact">FACT</span> <a class="src" href="#rsymph">SEC EX99.1</a>.</p>
 <h3>Auvelity — Alzheimer's agitation program (approved)</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Trial</th><th>Outcome</th></tr>
-<tr><td>ADVANCE-1</td><td>Primary (CMAI total change at week 5) met, p=0.010 <span class="tag fact">FACT</span> <a class="src" href="#radv">PatientCare / company PR</a></td></tr>
-<tr><td>ADVANCE-2 (n=408, 1:1, 5 wks)</td><td>Primary <b>missed</b>: CMAI −13.8 vs −12.6 placebo, not significant; nearly all endpoints numerically favored AXS-05 <span class="tag fact">FACT</span></td></tr>
-<tr><td>ACCORD-1</td><td>Primary (time to relapse) met, p=0.014 <span class="tag fact">FACT</span></td></tr>
-<tr><td>ACCORD-2</td><td>Primary (time to relapse, CMAI) met: HR 0.276, p=0.001 (3.6-fold lower relapse risk); key secondary relapse prevention p=0.001; CGI-S worsening p&lt;0.001; AE rates 29.3% vs 32.1% placebo; no deaths; no increased falls/sedation/cognitive decline <span class="tag fact">FACT</span></td></tr>
+<tr><td>ADVANCE-1</td><td>Primary (CMAI total change at week 5) met, p=0.010 <span class="ev fact">FACT</span> <a class="src" href="#radv">PatientCare / company PR</a></td></tr>
+<tr><td>ADVANCE-2 (n=408, 1:1, 5 wks)</td><td>Primary <b>missed</b>: CMAI −13.8 vs −12.6 placebo, not significant; nearly all endpoints numerically favored AXS-05 <span class="ev fact">FACT</span></td></tr>
+<tr><td>ACCORD-1</td><td>Primary (time to relapse) met, p=0.014 <span class="ev fact">FACT</span></td></tr>
+<tr><td>ACCORD-2</td><td>Primary (time to relapse, CMAI) met: HR 0.276, p=0.001 (3.6-fold lower relapse risk); key secondary relapse prevention p=0.001; CGI-S worsening p&lt;0.001; AE rates 29.3% vs 32.1% placebo; no deaths; no increased falls/sedation/cognitive decline <span class="ev fact">FACT</span></td></tr>
 </table></div>
-<p class="fine">FDA approval rested on ADVANCE-1 + ACCORD-2 <span class="tag fact">FACT</span> <a class="src" href="#rnovapharma">NovaPharmaNews</a>. The one-miss-in-four pattern (ADVANCE-2) is exactly the kind of mixed package that makes FDA reviews — including AXS-12's — worth watching closely <span class="tag interp">INTERPRETATION</span>.</p>
-
+<p class="fine">FDA approval rested on ADVANCE-1 + ACCORD-2 <span class="ev fact">FACT</span> <a class="src" href="#rnovapharma">NovaPharmaNews</a>. The one-miss-in-four pattern (ADVANCE-2) is exactly the kind of mixed package that makes FDA reviews — including AXS-12's — worth watching closely <span class="ev interp">INTERPRETATION</span>.</p>
 <h3>Solriamfetol — FOCUS (adult ADHD, NCT05972044; reported March 25, 2025)</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Design element</th><th>Detail</th></tr>
-<tr><td>Population / n</td><td>516 adults with ADHD; 1:1:1 solriamfetol 150 mg / 300 mg / placebo; 6 weeks QD <span class="tag fact">FACT</span> <a class="src" href="#rfocus">FOCUS PR</a></td></tr>
-<tr><td>Primary</td><td>AISRS total change at week 6: <b>−17.7 (150 mg) vs −14.3 (placebo), p=0.039</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Key secondary</td><td>CGI-S for ADHD at week 6: significant, p=0.017 (150 mg) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Other</td><td>Clinical response (≥30% AISRS improvement) 53.5% vs 41.3% (p=0.024); onset at week 1 (p=0.036); <b>300 mg numerically better but not statistically significant</b>; no SAEs <span class="tag fact">FACT</span></td></tr>
-<tr><td>Design risk</td><td>Flat dose-response (150 mg works, 300 mg misses) is a classic FDA question; a single pivotal trial is generally insufficient for an sNDA — a second confirmatory trial has not been announced <span class="tag interp">INTERPRETATION</span> <span class="tag gap">GAP</span></td></tr>
+<tr><td>Population / n</td><td>516 adults with ADHD; 1:1:1 solriamfetol 150 mg / 300 mg / placebo; 6 weeks QD <span class="ev fact">FACT</span> <a class="src" href="#rfocus">FOCUS PR</a></td></tr>
+<tr><td>Primary</td><td>AISRS total change at week 6: <b>−17.7 (150 mg) vs −14.3 (placebo), p=0.039</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Key secondary</td><td>CGI-S for ADHD at week 6: significant, p=0.017 (150 mg) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Other</td><td>Clinical response (≥30% AISRS improvement) 53.5% vs 41.3% (p=0.024); onset at week 1 (p=0.036); <b>300 mg numerically better but not statistically significant</b>; no SAEs <span class="ev fact">FACT</span></td></tr>
+<tr><td>Design risk</td><td>Flat dose-response (150 mg works, 300 mg misses) is a classic FDA question; a single pivotal trial is generally insufficient for an sNDA — a second confirmatory trial has not been announced <span class="ev interp">INTERPRETATION</span> <span class="ev gap">GAP</span></td></tr>
 </table></div>
-
 <h3>Solriamfetol — PARADIGM (MDD, proof-of-concept; reported April 1, 2025)</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Design element</th><th>Detail</th></tr>
-<tr><td>Population / n</td><td>346 MDD patients (severe EDS n=51; without severe EDS n=295); solriamfetol 300 mg vs placebo; 6 weeks <span class="tag fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM PR</a></td></tr>
-<tr><td>Primary</td><td>MADRS total change in the <b>overall population: not statistically significant</b> vs placebo <span class="tag fact">FACT</span></td></tr>
-<tr><td>Subgroup</td><td>Prespecified severe-EDS subgroup (ESS ≥16, n=51): numerically greater improvements on MADRS, anhedonia subscale, remission, CGI-S/I, PGI-I — <b>not powered for significance</b> <span class="tag fact">FACT</span></td></tr>
-<tr><td>Design risk</td><td>Post-hoc-style reliance on a small subgroup (n=51) to justify CLARITY; FDA has historically been skeptical of failed overall trials rescued by subgroups <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Population / n</td><td>346 MDD patients (severe EDS n=51; without severe EDS n=295); solriamfetol 300 mg vs placebo; 6 weeks <span class="ev fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM PR</a></td></tr>
+<tr><td>Primary</td><td>MADRS total change in the <b>overall population: not statistically significant</b> vs placebo <span class="ev fact">FACT</span></td></tr>
+<tr><td>Subgroup</td><td>Prespecified severe-EDS subgroup (ESS ≥16, n=51): numerically greater improvements on MADRS, anhedonia subscale, remission, CGI-S/I, PGI-I — <b>not powered for significance</b> <span class="ev fact">FACT</span></td></tr>
+<tr><td>Design risk</td><td>Post-hoc-style reliance on a small subgroup (n=51) to justify CLARITY; FDA has historically been skeptical of failed overall trials rescued by subgroups <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <h3>Upcoming binary designs</h3>
 <div class="table-wrap"><table>
 <tr><th>Trial</th><th>Design (as disclosed)</th></tr>
-<tr><td><b>ENGAGE</b> (solriamfetol, BED)</td><td>Phase 3, n≈450, 1:1:1, 12 weeks; primary = change in binge-eating episodes; topline Q4 2026 <span class="tag fact">FACT</span> <a class="src" href="#rq4ctx">Aug 10, 2026 8-K milestone list</a></td></tr>
-<tr><td><b>FORWARD</b> (AXS-14, fibromyalgia)</td><td>12-week open-label AXS-14 8 mg QD → responders randomized 1:1 continue vs placebo ≤12 wks; primary = time to loss of therapeutic response <span class="tag fact">FACT</span> <a class="src" href="#rchemdiv">ChemDiv / MarketBeat</a></td></tr>
-<tr><td><b>CLARITY</b> (solriamfetol, MDD with EDS)</td><td>Phase 3 randomized-withdrawal; primary = time from randomization to relapse of depressive symptoms <span class="tag fact">FACT</span> <a class="src" href="#rzacksadhd">Zacks</a></td></tr>
+<tr><td><b>ENGAGE</b> (solriamfetol, BED)</td><td>Phase 3, n≈450, 1:1:1, 12 weeks; primary = change in binge-eating episodes; topline Q4 2026 <span class="ev fact">FACT</span> <a class="src" href="#rq4ctx">Aug 10, 2026 8-K milestone list</a></td></tr>
+<tr><td><b>FORWARD</b> (AXS-14, fibromyalgia)</td><td>12-week open-label AXS-14 8 mg QD → responders randomized 1:1 continue vs placebo ≤12 wks; primary = time to loss of therapeutic response <span class="ev fact">FACT</span> <a class="src" href="#rchemdiv">ChemDiv / MarketBeat</a></td></tr>
+<tr><td><b>CLARITY</b> (solriamfetol, MDD with EDS)</td><td>Phase 3 randomized-withdrawal; primary = time from randomization to relapse of depressive symptoms <span class="ev fact">FACT</span> <a class="src" href="#rzacksadhd">Zacks</a></td></tr>
 </table></div>
-</div>
+
 </section>
-<section id="s5">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">5</span>Clinical / Regulatory Status &amp; Outlook</h2>
-<div class="secbody">
-<p class="kicker">Where each program stands with FDA, and what the review risks are.</p>
+<section id="s5"><div class="section-head"><div class="section-num">05 / CLINICAL &amp; REGULATORY</div><div><h2>FDA posture: approvals banked, one refusal on the record</h2><p class="lede">Where each program stands with FDA, and what the review risks are.</p></div></div>
+
+
 
 <div class="table-wrap"><table>
 <tr><th>Program</th><th>Regulatory status</th><th>Outlook / risk</th></tr>
-<tr><td>Auvelity — AD agitation</td><td><b>Approved April 30, 2026</b> (sNDA, priority review, Breakthrough Therapy designation); launched June 2026 <span class="tag fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a></td><td>Execution question, not regulatory: long-term-care uptake, 65+ NBRx +126% in first 8 weeks is early-positive <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>AXS-12</b> — narcolepsy cataplexy</td><td>NDA <b>accepted for filing July 15, 2026</b>; PDUFA <b>May 1, 2027</b>; no AdCom planned; Orphan Drug designation <span class="tag fact">FACT</span> <a class="src" href="#rnda12">NDA acceptance PR</a></td><td>Key risk is the SYMPHONY package: n=90, p=0.018 with 66% placebo response. No AdCom is favorable but not dispositive <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>AXS-14 — fibromyalgia</td><td><b>Refusal to File (June 9, 2025)</b> on the prior NDA; replacement FORWARD Phase 3 dosing since Jan 2026 <span class="tag fact">FACT</span> <a class="src" href="#rrtf">MarketBeat</a>; <a class="src" href="#rfwd">MarketBeat</a></td><td>FDA has already found this package unfilable once; the redo must be clean <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Solriamfetol — ADHD</td><td>FOCUS met primary; sNDA filing timing undisclosed <span class="tag gap">GAP</span></td><td>Single pivotal + flat dose-response may draw an FDA request for a second trial <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Solriamfetol — BED / SWD / MDD-EDS</td><td>ENGAGE Ph3 topline Q4 2026; SUSTAIN Ph3 topline 2027; CLARITY Ph3 ongoing <span class="tag fact">FACT</span> <a class="src" href="#rq1">Q1 2026 update</a></td><td>Readout-dependent; no regulatory interaction disclosed <span class="tag gap">GAP</span></td></tr>
+<tr><td>Auvelity — AD agitation</td><td><b>Approved April 30, 2026</b> (sNDA, priority review, Breakthrough Therapy designation); launched June 2026 <span class="ev fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a></td><td>Execution question, not regulatory: long-term-care uptake, 65+ NBRx +126% in first 8 weeks is early-positive <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>AXS-12</b> — narcolepsy cataplexy</td><td>NDA <b>accepted for filing July 15, 2026</b>; PDUFA <b>May 1, 2027</b>; no AdCom planned; Orphan Drug designation <span class="ev fact">FACT</span> <a class="src" href="#rnda12">NDA acceptance PR</a></td><td>Key risk is the SYMPHONY package: n=90, p=0.018 with 66% placebo response. No AdCom is favorable but not dispositive <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>AXS-14 — fibromyalgia</td><td><b>Refusal to File (June 9, 2025)</b> on the prior NDA; replacement FORWARD Phase 3 dosing since Jan 2026 <span class="ev fact">FACT</span> <a class="src" href="#rrtf">MarketBeat</a>; <a class="src" href="#rfwd">MarketBeat</a></td><td>FDA has already found this package unfilable once; the redo must be clean <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Solriamfetol — ADHD</td><td>FOCUS met primary; sNDA filing timing undisclosed <span class="ev gap">GAP</span></td><td>Single pivotal + flat dose-response may draw an FDA request for a second trial <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Solriamfetol — BED / SWD / MDD-EDS</td><td>ENGAGE Ph3 topline Q4 2026; SUSTAIN Ph3 topline 2027; CLARITY Ph3 ongoing <span class="ev fact">FACT</span> <a class="src" href="#rq1">Q1 2026 update</a></td><td>Readout-dependent; no regulatory interaction disclosed <span class="ev gap">GAP</span></td></tr>
 </table></div>
-
 <div class="callout">
-<p><b>IP runway (per company, HCW conference Sept 2026):</b> Auvelity exclusivity to early 2039 (incl. pediatric extension); Sunosi to 2040; Symbravo to at least 2045; AXS-12 issued patents to at least 2039 <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rhcw">HCW recap</a>; <a class="src" href="#rsymph">SEC EX99.1</a>. These are company statements, not independent patent opinions — treat as claims, not facts <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>Sunosi IP upgraded to filed fact:</b> In February 2026 the company settled Sunosi patent litigation with Alkem — the license permits Alkem's generic to launch <b>on or after September 1, 2040</b> (if pediatric exclusivity is granted) or <b>March 1, 2040</b> (if not) <span class="tag fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR (GlobeNewswire)</a>. This converts the "Sunosi to 2040" claim from conference remarks into a settlement-backed date <span class="tag interp">INTERPRETATION</span>.</p>
-<p><b>CLARITY regulatory bar:</b> On the Q1 2026 call, management said the CLARITY design is intended to address placebo response and that it <b>expects two positive trials to be needed</b> for an MDD-with-EDS sNDA — a useful anchor for the ADHD program too, where only one pivotal (FOCUS) exists so far <span class="tag fact">FACT</span> <a class="src" href="#rq1b">Q1 2026 earnings-call highlights</a>.</p>
+<p><b>IP runway (per company, HCW conference Sept 2026):</b> Auvelity exclusivity to early 2039 (incl. pediatric extension); Sunosi to 2040; Symbravo to at least 2045; AXS-12 issued patents to at least 2039 <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rhcw">HCW recap</a>; <a class="src" href="#rsymph">SEC EX99.1</a>. These are company statements, not independent patent opinions — treat as claims, not facts <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>Sunosi IP upgraded to filed fact:</b> In February 2026 the company settled Sunosi patent litigation with Alkem — the license permits Alkem's generic to launch <b>on or after September 1, 2040</b> (if pediatric exclusivity is granted) or <b>March 1, 2040</b> (if not) <span class="ev fact">FACT</span> <a class="src" href="#rsunosettlement">Q4/FY2025 PR (GlobeNewswire)</a>. This converts the "Sunosi to 2040" claim from conference remarks into a settlement-backed date <span class="ev interp">INTERPRETATION</span>.</p>
+<p><b>CLARITY regulatory bar:</b> On the Q1 2026 call, management said the CLARITY design is intended to address placebo response and that it <b>expects two positive trials to be needed</b> for an MDD-with-EDS sNDA — a useful anchor for the ADHD program too, where only one pivotal (FOCUS) exists so far <span class="ev fact">FACT</span> <a class="src" href="#rq1b">Q1 2026 earnings-call highlights</a>.</p>
 </div>
-</div>
-</section>
 
-<section id="s6">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">6</span>Competition — Clinical Differentiation Only</h2>
-<div class="secbody">
-<p class="kicker">What else a prescriber could reach for, and what is actually different about it. No marketing language.</p>
+</section>
+<section id="s6"><div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>What else a prescriber can reach for</h2><p class="lede">What else a prescriber could reach for, and what is actually different about it. No marketing language.</p></div></div>
+
+
 
 <div class="table-wrap"><table>
 <tr><th style="width:22%">Indication</th><th>Axsome asset</th><th>Established competitors</th><th>Clinical differentiation (facts only)</th></tr>
-<tr><td>MDD</td><td>Auvelity</td><td>Generic SSRIs/SNRIs; Spravato (esketamine); Zurzuvae (zuranolone); Rexulti add-on</td><td>Oral, rapid onset (separation at week 1 in GEMINI); GEMINI showed no weight gain, sexual dysfunction, or psychotomimetic effects vs placebo <span class="tag fact">FACT</span> <a class="src" href="#rgemini">GEMINI</a>. Versus Spravato/Zurzuvae: no REMS/clinic-visit requirement (Spravato) and no 14-day course limit framing — but no head-to-head data exist <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>AD agitation</td><td>Auvelity</td><td><b>Rexulti</b> (brexpiprazole; Otsuka/Lundbeck) — first FDA approval for this indication, <b>May 2023</b>, on Studies 213 + 283 (JAMA Neurology) <span class="tag fact">FACT</span> <a class="src" href="#rrexulti">Business Wire</a></td><td>Different mechanism (NMDA/sigma-1 vs dopamine partial agonism). Rexulti has a 3-year head start and carries the antipsychotic class boxed warning on mortality in elderly dementia patients; Auvelity's DDI/seizure profile is its own liability. No head-to-head trial <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Narcolepsy cataplexy</td><td>AXS-12 (if approved)</td><td><b>Wakix</b> (pitolisant — non-controlled, approved 2019 for EDS + cataplexy); <b>Xyrem/Xywav</b> (oxybates — EDS + cataplexy, controlled); Lumryz</td><td>AXS-12 would be an <b>oral, non-controlled</b> option dosed for cataplexy — vs oxybates (scheduled, twice-nightly or once-nightly sodium oxybate with sodium load) <span class="tag interp">INTERPRETATION</span>. But Wakix already occupies the non-controlled cataplexy slot, and AXS-12's NDA is cataplexy-only (not EDS) <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>EDS (narcolepsy/OSA)</td><td>Sunosi</td><td>Modafinil/armodafinil (generic); Wakix; Xywav</td><td>Sunosi is Schedule IV with stimulant-like effects; faces generic wake-promoters on price <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Acute migraine</td><td>Symbravo</td><td>Ubrelvy, Nurtec (gepants); Zavzpret; Reyvow; generic triptans/NSAIDs</td><td>MoSEIC formulation speeds rizatriptan absorption — a pharmacokinetic edge, not a new mechanism; payer coverage against cheap generics is the hurdle (Q2 sales $2.3M vs $7.2M consensus) <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>BED (if approved)</td><td>Solriamfetol</td><td><b>Vyvanse</b> (lisdexamfetamine) — the only FDA-approved BED drug</td><td>Precedent exists, so the regulatory path is de-risked relative to a first-in-indication; Vyvanse is a Schedule II stimulant, solriamfetol Schedule IV <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Adult ADHD (if filed)</td><td>Solriamfetol</td><td>Stimulants (Schedule II); Qelbree (viloxazine, non-stimulant); Strattera</td><td>Would be a non-stimulant with Schedule IV (not II) status; FOCUS effect size (AISRS −17.7 vs −14.3) is modest <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Fibromyalgia</td><td>AXS-14</td><td>Lyrica (pregabalin); Cymbalta (duloxetine); Savella (milnacipran) — all generic</td><td>Generic-dominated market; any AXS-14 would need a tolerability/efficacy story vs pennies-a-day generics <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>MDD</td><td>Auvelity</td><td>Generic SSRIs/SNRIs; Spravato (esketamine); Zurzuvae (zuranolone); Rexulti add-on</td><td>Oral, rapid onset (separation at week 1 in GEMINI); GEMINI showed no weight gain, sexual dysfunction, or psychotomimetic effects vs placebo <span class="ev fact">FACT</span> <a class="src" href="#rgemini">GEMINI</a>. Versus Spravato/Zurzuvae: no REMS/clinic-visit requirement (Spravato) and no 14-day course limit framing — but no head-to-head data exist <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>AD agitation</td><td>Auvelity</td><td><b>Rexulti</b> (brexpiprazole; Otsuka/Lundbeck) — first FDA approval for this indication, <b>May 2023</b>, on Studies 213 + 283 (JAMA Neurology) <span class="ev fact">FACT</span> <a class="src" href="#rrexulti">Business Wire</a></td><td>Different mechanism (NMDA/sigma-1 vs dopamine partial agonism). Rexulti has a 3-year head start and carries the antipsychotic class boxed warning on mortality in elderly dementia patients; Auvelity's DDI/seizure profile is its own liability. No head-to-head trial <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Narcolepsy cataplexy</td><td>AXS-12 (if approved)</td><td><b>Wakix</b> (pitolisant — non-controlled, approved 2019 for EDS + cataplexy); <b>Xyrem/Xywav</b> (oxybates — EDS + cataplexy, controlled); Lumryz</td><td>AXS-12 would be an <b>oral, non-controlled</b> option dosed for cataplexy — vs oxybates (scheduled, twice-nightly or once-nightly sodium oxybate with sodium load) <span class="ev interp">INTERPRETATION</span>. But Wakix already occupies the non-controlled cataplexy slot, and AXS-12's NDA is cataplexy-only (not EDS) <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>EDS (narcolepsy/OSA)</td><td>Sunosi</td><td>Modafinil/armodafinil (generic); Wakix; Xywav</td><td>Sunosi is Schedule IV with stimulant-like effects; faces generic wake-promoters on price <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Acute migraine</td><td>Symbravo</td><td>Ubrelvy, Nurtec (gepants); Zavzpret; Reyvow; generic triptans/NSAIDs</td><td>MoSEIC formulation speeds rizatriptan absorption — a pharmacokinetic edge, not a new mechanism; payer coverage against cheap generics is the hurdle (Q2 sales $2.3M vs $7.2M consensus) <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>BED (if approved)</td><td>Solriamfetol</td><td><b>Vyvanse</b> (lisdexamfetamine) — the only FDA-approved BED drug</td><td>Precedent exists, so the regulatory path is de-risked relative to a first-in-indication; Vyvanse is a Schedule II stimulant, solriamfetol Schedule IV <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Adult ADHD (if filed)</td><td>Solriamfetol</td><td>Stimulants (Schedule II); Qelbree (viloxazine, non-stimulant); Strattera</td><td>Would be a non-stimulant with Schedule IV (not II) status; FOCUS effect size (AISRS −17.7 vs −14.3) is modest <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Fibromyalgia</td><td>AXS-14</td><td>Lyrica (pregabalin); Cymbalta (duloxetine); Savella (milnacipran) — all generic</td><td>Generic-dominated market; any AXS-14 would need a tolerability/efficacy story vs pennies-a-day generics <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-</div>
-</section>
 
-<section id="s7">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">7</span>Financials — Cash, Burn, Runway, Dilution History</h2>
-<div class="secbody">
-<p class="kicker">From the latest filings. Every number carries units, period, and source.</p>
+</section>
+<section id="s7"><div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Growing fast, still burning cash</h2><p class="lede">From the latest filings. Every number carries units, period, and source.</p></div></div>
+
+
 
 <h3>Revenue trend</h3>
 <div class="table-wrap"><table>
 <tr><th>Period</th><th>Total revenue</th><th>Auvelity</th><th>Sunosi</th><th>Symbravo</th></tr>
-<tr><td>FY2025</td><td>~$638.5M product revenue (+66% YoY) <span class="tag fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a></td><td>$507.1M (+74% YoY) <span class="tag fact">FACT</span></td><td>$124.8M (+32% YoY) <span class="tag fact">FACT</span></td><td>$6.6M (launched June 2025) <span class="tag fact">FACT</span></td></tr>
-<tr><td>Q2 2026 (ended 6/30/26)</td><td>$218.4M (+46% YoY, +14% QoQ); incl. $2M royalty/milestone <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td><td>$180.3M (+51%; ~266k TRx, +34% YoY) <span class="tag fact">FACT</span></td><td>$35.8M (+20%; ~61k TRx, +14% YoY) <span class="tag fact">FACT</span></td><td>$2.3M (~23.5k TRx, +30% QoQ) <span class="tag fact">FACT</span></td></tr>
+<tr><td>FY2025</td><td>~$638.5M product revenue (+66% YoY) <span class="ev fact">FACT</span> <a class="src" href="#rzacks26">Zacks</a></td><td>$507.1M (+74% YoY) <span class="ev fact">FACT</span></td><td>$124.8M (+32% YoY) <span class="ev fact">FACT</span></td><td>$6.6M (launched June 2025) <span class="ev fact">FACT</span></td></tr>
+<tr><td>Q2 2026 (ended 6/30/26)</td><td>$218.4M (+46% YoY, +14% QoQ); incl. $2M royalty/milestone <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td><td>$180.3M (+51%; ~266k TRx, +34% YoY) <span class="ev fact">FACT</span></td><td>$35.8M (+20%; ~61k TRx, +14% YoY) <span class="ev fact">FACT</span></td><td>$2.3M (~23.5k TRx, +30% QoQ) <span class="ev fact">FACT</span></td></tr>
 </table></div>
-
 <h3>Price action into the audit date</h3>
-<p>AXSM closed <b>$168.35 on 10/09/2026</b> (Finnhub), down <b>−14.1% over an 11-session losing streak</b> and −20.3% over the prior month — a derisking into the Q4 2026 catalyst window (ENGAGE topline + Q3 earnings) <span class="tag fact">FACT</span> <a class="src" href="#rtrefis">Trefis 10/10/2026</a>; <a class="src" href="#rfinnhub">Finnhub</a>. The 52-wk range remains $117.30–$260.19; the all-time high ($260.19) was set 6/17/2026 <span class="tag fact">FACT</span> <a class="src" href="#rfinnhub">Finnhub</a>.</p>
-
+<p>AXSM closed <b>$168.35 on 10/09/2026</b> (Finnhub), down <b>−14.1% over an 11-session losing streak</b> and −20.3% over the prior month — a derisking into the Q4 2026 catalyst window (ENGAGE topline + Q3 earnings) <span class="ev fact">FACT</span> <a class="src" href="#rtrefis">Trefis 10/10/2026</a>; <a class="src" href="#rfinnhub">Finnhub</a>. The 52-wk range remains $117.30–$260.19; the all-time high ($260.19) was set 6/17/2026 <span class="ev fact">FACT</span> <a class="src" href="#rfinnhub">Finnhub</a>.</p>
 <h3>Profitability, cash, debt</h3>
 <div class="table-wrap"><table>
 <tr><th style="width:30%">Item</th><th>Detail</th></tr>
-<tr><td>Q2 2026 opex</td><td>R&amp;D $46.2M (−7% YoY, incl. stock comp); SG&amp;A $208.1M (+60% YoY, incl. stock comp) — SG&amp;A ≈ 95% of quarterly revenue <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
-<tr><td>Q2 2026 net loss</td><td>$51.3M <span class="tag fact">FACT</span> <a class="src" href="#rainvest">AInvest</a></td></tr>
-<tr><td>Cash</td><td>$319.9M at 6/30/26 vs $305.1M at 3/31/26 <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
-<tr><td>Debt</td><td>Face value $190M at 6/30/26 <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a>. Facility: $570M with Blackstone ($500M term + $70M revolver), signed May 2025; SOFR+4.75% (term) / SOFR+4.0% (revolver); matures May 2030; 60-month interest-only; $120M drawn at close to retire the Hercules loan <span class="tag fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a></td></tr>
-<tr><td>Runway</td><td>Company states runway to <b>cash-flow positivity</b> on the current operating plan; H2 2026 SG&amp;A expected ~level, R&amp;D up modestly <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rhcw">HCW recap</a> — a forward claim, not a filed fact</td></tr>
+<tr><td>Q2 2026 opex</td><td>R&amp;D $46.2M (−7% YoY, incl. stock comp); SG&amp;A $208.1M (+60% YoY, incl. stock comp) — SG&amp;A ≈ 95% of quarterly revenue <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
+<tr><td>Q2 2026 net loss</td><td>$51.3M <span class="ev fact">FACT</span> <a class="src" href="#rainvest">AInvest</a></td></tr>
+<tr><td>Cash</td><td>$319.9M at 6/30/26 vs $305.1M at 3/31/26 <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
+<tr><td>Debt</td><td>Face value $190M at 6/30/26 <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a>. Facility: $570M with Blackstone ($500M term + $70M revolver), signed May 2025; SOFR+4.75% (term) / SOFR+4.0% (revolver); matures May 2030; 60-month interest-only; $120M drawn at close to retire the Hercules loan <span class="ev fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a></td></tr>
+<tr><td>Runway</td><td>Company states runway to <b>cash-flow positivity</b> on the current operating plan; H2 2026 SG&amp;A expected ~level, R&amp;D up modestly <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rhcw">HCW recap</a> — a forward claim, not a filed fact</td></tr>
 </table></div>
-
 <h3>Dilution history (major disclosed financings)</h3>
 <ul>
-<li>June 2023: underwritten public offering, net proceeds <b>$211.3M</b> + $31.7M greenshoe exercise <span class="tag fact">FACT</span> <a class="src" href="#r10qold">TradingView 10-Q summary</a></li>
-<li>2024: at-the-market sales (Leerink agreement), ~$24.4M gross <span class="tag fact">FACT</span> <a class="src" href="#r10qold">TradingView 10-Q summary</a></li>
-<li>May 2025: Blackstone purchased $15M of common stock at $107.14 (30-day VWAP) alongside the credit facility <span class="tag fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a></li>
-<li>Exact historical share-count series and any warrant overhang beyond the 8.1M options/RSUs/others: <span class="tag gap">GAP</span> (Q3 2026 10-Q not yet filed as of 10/07/2026)</li>
+<li>June 2023: underwritten public offering, net proceeds <b>$211.3M</b> + $31.7M greenshoe exercise <span class="ev fact">FACT</span> <a class="src" href="#r10qold">TradingView 10-Q summary</a></li>
+<li>2024: at-the-market sales (Leerink agreement), ~$24.4M gross <span class="ev fact">FACT</span> <a class="src" href="#r10qold">TradingView 10-Q summary</a></li>
+<li>May 2025: Blackstone purchased $15M of common stock at $107.14 (30-day VWAP) alongside the credit facility <span class="ev fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a></li>
+<li>Exact historical share-count series and any warrant overhang beyond the 8.1M options/RSUs/others: <span class="ev gap">GAP</span> (Q3 2026 10-Q not yet filed as of 10/07/2026)</li>
 </ul>
-</div>
-</section>
 
-<section id="s8">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">8</span>FDMC / EV — Dilution-Honest</h2>
-<div class="secbody">
-<p class="kicker">Using the company's own disclosed share counts from the Q2 2026 earnings deck.</p>
+</section>
+<section id="s8"><div class="section-head"><div class="section-num">08 / VALUE</div><div><h2>The dilution-honest share count</h2><p class="lede">Using the company's own disclosed share counts from the Q2 2026 earnings deck.</p></div></div>
+
+
 
 <div class="table-wrap"><table>
 <tr><th style="width:40%">Component</th><th>Value</th><th>Source</th></tr>
-<tr><td>Share price (reference)</td><td><b>$168.35</b> (10/09/2026 close; 52-wk $117.30–$260.19)</td><td>Finnhub <span class="tag fact">FACT</span></td></tr>
-<tr><td>Shares outstanding</td><td><b>52.3M</b> (as of 6/30/2026)</td><td>Company 8-K deck <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
-<tr><td>Basic market cap</td><td><b>~$8.80B</b> (52.3M × $168.35)</td><td>Calculated <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Options / RSUs / other</td><td><b>8.1M</b> (5.9M options + 2.0M RSUs + 0.2M other, as of 6/30/2026)</td><td>Company 8-K deck <span class="tag fact">FACT</span></td></tr>
-<tr><td>Fully-diluted shares</td><td><b>~60.4M</b></td><td>Calculated <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Fully-diluted market cap</b></td><td><b>~$10.17B</b> (60.4M × $168.35)</td><td>Calculated <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Cash</td><td>$319.9M (6/30/2026)</td><td>Company 8-K deck <span class="tag fact">FACT</span></td></tr>
-<tr><td>Debt (face value)</td><td>$190M (6/30/2026)</td><td>Company 8-K deck <span class="tag fact">FACT</span></td></tr>
-<tr><td><b>Enterprise value (FD)</b></td><td><b>~$10.04B</b> (10.17 − 0.32 + 0.19)</td><td>Calculated <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Share price (reference)</td><td><b>$168.35</b> (10/09/2026 close; 52-wk $117.30–$260.19)</td><td>Finnhub <span class="ev fact">FACT</span></td></tr>
+<tr><td>Shares outstanding</td><td><b>52.3M</b> (as of 6/30/2026)</td><td>Company 8-K deck <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a></td></tr>
+<tr><td>Basic market cap</td><td><b>~$8.80B</b> (52.3M × $168.35)</td><td>Calculated <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Options / RSUs / other</td><td><b>8.1M</b> (5.9M options + 2.0M RSUs + 0.2M other, as of 6/30/2026)</td><td>Company 8-K deck <span class="ev fact">FACT</span></td></tr>
+<tr><td>Fully-diluted shares</td><td><b>~60.4M</b></td><td>Calculated <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Fully-diluted market cap</b></td><td><b>~$10.17B</b> (60.4M × $168.35)</td><td>Calculated <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Cash</td><td>$319.9M (6/30/2026)</td><td>Company 8-K deck <span class="ev fact">FACT</span></td></tr>
+<tr><td>Debt (face value)</td><td>$190M (6/30/2026)</td><td>Company 8-K deck <span class="ev fact">FACT</span></td></tr>
+<tr><td><b>Enterprise value (FD)</b></td><td><b>~$10.04B</b> (10.17 − 0.32 + 0.19)</td><td>Calculated <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-
 <div class="callout">
-<p><b>Valuation context (soft scenario targets in §11; no recommendation).</b> EV ~$10.0B on ~$874M annualized revenue (Q2 2026 × 4) ≈ <b>~11.5x sales (FD basis)</b> — a pipeline multiple, not a commercial multiple <span class="tag interp">INTERPRETATION</span>. Identified sell-side targets: Mizuho $306 (7/31/26, outperform — highest identified), RBC $304, TD Cowen $300, Needham $267, Deutsche Bank $267, Guggenheim $260, Wells Fargo $255, Baird $246, Morgan Stanley $247; consensus avg $285.42 (Yahoo Finance via Motley Fool, 9/18/26) / $275.84 (MarketBeat, 10/5/26) <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rpt">aggregator reports</a>. Per standing rules, any takeout/max-value scenario in this dossier is capped at the top of the identified street range ($306).</p>
+<p><b>Valuation context (soft scenario targets in §11; no recommendation).</b> EV ~$10.0B on ~$874M annualized revenue (Q2 2026 × 4) ≈ <b>~11.5x sales (FD basis)</b> — a pipeline multiple, not a commercial multiple <span class="ev interp">INTERPRETATION</span>. Identified sell-side targets: Mizuho $306 (7/31/26, outperform — highest identified), RBC $304, TD Cowen $300, Needham $267, Deutsche Bank $267, Guggenheim $260, Wells Fargo $255, Baird $246, Morgan Stanley $247; consensus avg $285.42 (Yahoo Finance via Motley Fool, 9/18/26) / $275.84 (MarketBeat, 10/5/26) <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rpt">aggregator reports</a>. Per standing rules, any takeout/max-value scenario in this dossier is capped at the top of the identified street range ($306).</p>
 </div>
-</div>
+
 </section>
-<section id="s9">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">9</span>Catalyst / Event Map</h2>
-<div class="secbody">
-<p class="kicker">Every known upcoming event for the stock, tagged by date quality. Local datasets checked: catalyst-calendar-2027/data.json (2 AXSM rows), q4-2026-dossier/dossier-v4.json (1 AXSM row).</p>
+<section id="s9"><div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The Q4 2026 → May 2027 double-header</h2><p class="lede">Every known upcoming event for the stock, tagged by date quality. Local datasets checked: catalyst-calendar-2027/data.json (2 AXSM rows), q4-2026-dossier/dossier-v4.json (1 AXSM row).</p></div></div>
+
+
 
 <div class="timeline">
-<div class="tl-item">
-  <div class="dt">Q4 2026 <span class="pill-dq guidance">guidance</span></div>
-  <div class="ev"><b>ENGAGE Phase 3 topline — solriamfetol in binge eating disorder</b></div>
-  <div class="note">n≈450, 1:1:1, 12 weeks; primary = change in binge-eating episodes (Aug 10, 2026 8-K milestone list).</div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> statistically significant reduction in binge-eating episodes at week 12 on at least one dose, with a clean dose-response (FOCUS taught the FDA notices when 150 mg works and 300 mg doesn't) and no new safety signal beyond the known stimulant-like profile. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> placebo response rate (BED trials are placebo-prone); dropout/retention; treatment-emergent CV/psychiatric AEs; whether the effect size looks commercially relevant next to Vyvanse, the only approved BED drug. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">Q4 2026 <span class="date-tag guidance">guidance</span></div>
+<div class="event-body"><b>ENGAGE Phase 3 topline — solriamfetol in binge eating disorder</b><div class="note">n≈450, 1:1:1, 12 weeks; primary = change in binge-eating episodes (Aug 10, 2026 8-K milestone list).</div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> statistically significant reduction in binge-eating episodes at week 12 on at least one dose, with a clean dose-response (FOCUS taught the FDA notices when 150 mg works and 300 mg doesn't) and no new safety signal beyond the known stimulant-like profile. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> placebo response rate (BED trials are placebo-prone); dropout/retention; treatment-emergent CV/psychiatric AEs; whether the effect size looks commercially relevant next to Vyvanse, the only approved BED drug. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">Early Nov 2026 <span class="pill-dq inferred">inferred</span></div>
-  <div class="ev"><b>Q3 2026 earnings</b> — first full quarter of the Auvelity AD-agitation launch</div>
-  <div class="note">Exact date not yet announced; aggregators conflict (Nov 2 vs Nov 9, 2026) — do not trade the calendar on either <span class="tag gap">GAP</span> <a class="src" href="#rtradingview">TradingView</a>; <a class="src" href="#rtradestie">TradeStie</a>.</div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> 65+ new-to-brand Rx growth at or above the +126% seen in the first 8 weeks; SG&amp;A growth finally trailing revenue growth (the core "operating leverage arrives" question); gross-to-net improving from the low-to-mid-50s; cash roughly flat. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> Symbravo's trajectory (still tiny at $2.3M in Q2); Sunosi TRx trend; any R&amp;D step-up for the AXS-20 Phase 3 start; management tone on cash-flow-positivity timing. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">Early Nov 2026 <span class="date-tag inferred">inferred</span></div>
+<div class="event-body"><b>Q3 2026 earnings</b> — first full quarter of the Auvelity AD-agitation launch<div class="note">Exact date not yet announced; aggregators conflict (Nov 2 vs Nov 9, 2026) — do not trade the calendar on either <span class="ev gap">GAP</span> <a class="src" href="#rtradingview">TradingView</a>; <a class="src" href="#rtradestie">TradeStie</a>.</div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> 65+ new-to-brand Rx growth at or above the +126% seen in the first 8 weeks; SG&amp;A growth finally trailing revenue growth (the core "operating leverage arrives" question); gross-to-net improving from the low-to-mid-50s; cash roughly flat. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> Symbravo's trajectory (still tiny at $2.3M in Q2); Sunosi TRx trend; any R&amp;D step-up for the AXS-20 Phase 3 start; management tone on cash-flow-positivity timing. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">2027 <span class="pill-dq guidance">guidance</span></div>
-  <div class="ev"><b>SUSTAIN Phase 3 topline — solriamfetol in shift work disorder</b></div>
-  <div class="note">Per FY2025 business update / Q1 2026 milestones. <a class="src" href="#rq1">Q1 2026 update</a>; <a class="src" href="#rcal27">calendar data.json</a></div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> a second positive solriamfetol Phase 3 in 12 months — turns the expansion engine from "hope" into a repeatable label-expansion machine and directly offsets the PARADIGM miss. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> trial endpoints (sleepiness vs performance measures in shift workers); same Schedule IV commercial-overhang question as BED. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">2027 <span class="date-tag guidance">guidance</span></div>
+<div class="event-body"><b>SUSTAIN Phase 3 topline — solriamfetol in shift work disorder</b><div class="note">Per FY2025 business update / Q1 2026 milestones. <a class="src" href="#rq1">Q1 2026 update</a>; <a class="src" href="#rcal27">calendar data.json</a></div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> a second positive solriamfetol Phase 3 in 12 months — turns the expansion engine from "hope" into a repeatable label-expansion machine and directly offsets the PARADIGM miss. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> trial endpoints (sleepiness vs performance measures in shift workers); same Schedule IV commercial-overhang question as BED. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">May 1, 2027 <span class="pill-dq hard">hard</span></div>
-  <div class="ev"><b>AXS-12 PDUFA — cataplexy in narcolepsy</b></div>
-  <div class="note">NDA accepted 7/15/2026; no AdCom currently planned; Orphan Drug. The single largest regulatory binary on the calendar. <a class="src" href="#rnda12">NDA acceptance PR</a></div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> approval with a cataplexy label and manageable tachycardia/CV language — no boxed warning, no restricted distribution; ideally language broad enough to support EDS-adjacent positioning. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> the review division's treatment of the thin SYMPHONY package (n=90, p=0.018, 66% placebo response); any mid-cycle communication or late-cycle meeting; whether the AXS-14 RTF history makes this review harsher than the "no AdCom" signal suggests. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">May 1, 2027 <span class="date-tag hard">hard</span></div>
+<div class="event-body"><b>AXS-12 PDUFA — cataplexy in narcolepsy</b><div class="note">NDA accepted 7/15/2026; no AdCom currently planned; Orphan Drug. The single largest regulatory binary on the calendar. <a class="src" href="#rnda12">NDA acceptance PR</a></div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> approval with a cataplexy label and manageable tachycardia/CV language — no boxed warning, no restricted distribution; ideally language broad enough to support EDS-adjacent positioning. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> the review division's treatment of the thin SYMPHONY package (n=90, p=0.018, 66% placebo response); any mid-cycle communication or late-cycle meeting; whether the AXS-14 RTF history makes this review harsher than the "no AdCom" signal suggests. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">2027–2028 <span class="pill-dq inferred">inferred</span></div>
-  <div class="ev"><b>FORWARD Phase 3 topline — AXS-14 in fibromyalgia</b></div>
-  <div class="note">First patient dosed 1/15/2026; 24-week total design → readout timing not guided; inferred H2 2027 at earliest. <span class="tag gap">GAP</span> <a class="src" href="#rfwd">MarketBeat</a></div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> clean separation on time-to-loss-of-response in the withdrawal phase with durability data that supports a chronic-use label — the redemption arc after the 2025 RTF. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> enrichment-design criticism from FDA; whether the agency that refused to file the last package accepts a withdrawal-design package this time. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">2027–2028 <span class="date-tag inferred">inferred</span></div>
+<div class="event-body"><b>FORWARD Phase 3 topline — AXS-14 in fibromyalgia</b><div class="note">First patient dosed 1/15/2026; 24-week total design → readout timing not guided; inferred H2 2027 at earliest. <span class="ev gap">GAP</span> <a class="src" href="#rfwd">MarketBeat</a></div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> clean separation on time-to-loss-of-response in the withdrawal phase with durability data that supports a chronic-use label — the redemption arc after the 2025 RTF. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> enrichment-design criticism from FDA; whether the agency that refused to file the last package accepts a withdrawal-design package this time. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">Undisclosed <span class="pill-dq inferred">inferred</span></div>
-  <div class="ev"><b>Possible ADHD sNDA filing (solriamfetol, adult)</b></div>
-  <div class="note">FOCUS met primary; company has not disclosed filing plans or whether FDA wants a second pivotal. <span class="tag gap">GAP</span></div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> an sNDA filing accepted without a second-pivotal requirement — or a second confirmatory trial announced with a funded, dated plan. <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> FDA's read of the flat dose-response (150 mg wins, 300 mg misses); management's own "two positive trials" framing from the CLARITY discussion. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">Undisclosed <span class="date-tag inferred">inferred</span></div>
+<div class="event-body"><b>Possible ADHD sNDA filing (solriamfetol, adult)</b><div class="note">FOCUS met primary; company has not disclosed filing plans or whether FDA wants a second pivotal. <span class="ev gap">GAP</span></div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> an sNDA filing accepted without a second-pivotal requirement — or a second confirmatory trial announced with a funded, dated plan. <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> FDA's read of the flat dose-response (150 mg wins, 300 mg misses); management's own "two positive trials" framing from the CLARITY discussion. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
-<div class="tl-item">
-  <div class="dt">Undisclosed <span class="pill-dq inferred">inferred</span></div>
-  <div class="ev"><b>FOCUS-2 / FOCUS-3 (pediatric/adolescent ADHD), CLARITY (MDD+EDS), SUMMIT (smoking cessation) readouts</b></div>
-  <div class="note">All initiated 2026 (FOCUS-2/3 July; CLARITY Feb; SUMMIT Q2); no topline timing disclosed. <span class="tag gap">GAP</span> <a class="src" href="#rhcw">HCW recap</a></div>
-  <ul class="gwl">
-    <li><span class="lbl">What good looks like:</span> FOCUS-2/3 wins (pediatric exclusivity + Sunosi IP extension to Sept 2040); CLARITY positive (salvages solriamfetol in MDD); SUMMIT positive (Chantix's exit left a real vacuum). <span class="tag interp">INTERPRETATION</span></li>
-    <li><span class="lbl">What to watch:</span> CLARITY's randomized-withdrawal design vs FDA's two-trial expectation; SUMMIT's "pivotal Phase 2/3" hybrid design and whether it supports an sNDA. <span class="tag interp">INTERPRETATION</span></li>
-  </ul>
+<div class="event">
+<div class="event-date">Undisclosed <span class="date-tag inferred">inferred</span></div>
+<div class="event-body"><b>FOCUS-2 / FOCUS-3 (pediatric/adolescent ADHD), CLARITY (MDD+EDS), SUMMIT (smoking cessation) readouts</b><div class="note">All initiated 2026 (FOCUS-2/3 July; CLARITY Feb; SUMMIT Q2); no topline timing disclosed. <span class="ev gap">GAP</span> <a class="src" href="#rhcw">HCW recap</a></div><ul class="gwl">
+<li><span class="lbl">What good looks like:</span> FOCUS-2/3 wins (pediatric exclusivity + Sunosi IP extension to Sept 2040); CLARITY positive (salvages solriamfetol in MDD); SUMMIT positive (Chantix's exit left a real vacuum). <span class="ev interp">INTERPRETATION</span></li>
+<li><span class="lbl">What to watch:</span> CLARITY's randomized-withdrawal design vs FDA's two-trial expectation; SUMMIT's "pivotal Phase 2/3" hybrid design and whether it supports an sNDA. <span class="ev interp">INTERPRETATION</span></li>
+</ul></div>
+
+
 </div>
 </div>
-<p class="fine"><b>Freshness audit (2026-10-10):</b> none of the events above dated before today has landed — ENGAGE has not read out, Q3 earnings have not been reported, and no new FDA actions were disclosed between the dossier build (10/07) and this audit. The stock did sell off (−14.1% over 11 sessions to $168.35 on 10/09) into this catalyst window <span class="tag fact">FACT</span> <a class="src" href="#rtrefis">Trefis</a>.</p>
-<p class="fine">Company guides roughly one NDA filing per year through 2031 <span class="tag unver">UNVERIFIED</span> <a class="src" href="#rhcw">HCW</a> — treat as aspiration, not a dated catalyst.</p>
-</div>
+<p class="fine"><b>Freshness audit (2026-10-10):</b> none of the events above dated before today has landed — ENGAGE has not read out, Q3 earnings have not been reported, and no new FDA actions were disclosed between the dossier build (10/07) and this audit. The stock did sell off (−14.1% over 11 sessions to $168.35 on 10/09) into this catalyst window <span class="ev fact">FACT</span> <a class="src" href="#rtrefis">Trefis</a>.</p>
+<p class="fine">Company guides roughly one NDA filing per year through 2031 <span class="ev unverified">UNVERIFIED</span> <a class="src" href="#rhcw">HCW</a> — treat as aspiration, not a dated catalyst.</p>
+
 </section>
+<section id="s10"><div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>What keeps the downside open</h2><p class="lede">Highest-consequence first.</p></div></div>
 
-<section id="s10">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">10</span>Ranked Red Flags</h2>
-<div class="secbody">
-<p class="kicker">Highest-consequence first.</p>
 
-<div class="flag"><span class="rank">#1</span><b>FDA already refused to file one Axsome NDA.</b> The AXS-14 fibromyalgia NDA drew a Refusal to File (June 2025); the replacement FORWARD trial uses a responder-enriched withdrawal design. FDA deference is not automatic here <span class="tag fact">FACT</span> <a class="src" href="#rrtf">MarketBeat</a>. <span class="tag interp">INTERPRETATION</span>: this directly raises the stakes on the AXS-12 review.</div>
-<div class="flag"><span class="rank">#2</span><b>AXS-12's pivotal package is thin.</b> SYMPHONY: n=90, primary p=0.018, placebo response 66% (−83% vs −66%). ENCORE is withdrawal-after-enrichment. Two positive trials on paper, but a reviewer could reasonably ask whether the effect is robust <span class="tag interp">INTERPRETATION</span> <span class="tag fact">FACT</span> <a class="src" href="#rsymph">SYMPHONY</a>; <a class="src" href="#rneurol">ENCORE</a>.</div>
-<div class="flag"><span class="rank">#3</span><b>Insiders sell; nobody buys.</b> 801,591 shares sold ($139.6M) in the last 12 months, zero reported buys; CEO 10b5-1 sales of ~$34M+ in June–Aug 2026; CFO and COO also selling; insiders own 20.6% <span class="tag fact">FACT</span> <a class="src" href="#rinsider">InsiderTrades / MarketBeat</a>. 10b5-1 plans are pre-scheduled, but the direction is unanimous <span class="tag interp">INTERPRETATION</span>.</div>
-<div class="flag"><span class="rank">#4</span><b>Still loss-making with heavy SG&amp;A.</b> Q2 2026: SG&amp;A $208.1M (+60% YoY) vs $218.4M revenue; net loss $51.3M. "Cash-flow positivity" is a forward claim, not a filed fact <span class="tag fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a>. If Auvelity growth decelerates, the burn story returns <span class="tag interp">INTERPRETATION</span>.</div>
-<div class="flag"><span class="rank">#5</span><b>AD-agitation is a second-to-market launch.</b> Rexulti (approved May 2023) has the incumbent position with long-term-care formularies; Auvelity's DDI/seizure profile is a real friction in polypharmacy elderly <span class="tag interp">INTERPRETATION</span> <span class="tag fact">FACT</span> <a class="src" href="#rrexulti">Rexulti approval</a>; <a class="src" href="#rhelixtalk">HelixTalk</a>.</div>
-<div class="flag"><span class="rank">#6</span><b>Solriamfetol expansion is batting under .500.</b> PARADIGM missed overall (n=346); FOCUS won at 150 mg but missed at 300 mg; the ADHD sNDA path is undisclosed and a single pivotal is usually insufficient <span class="tag interp">INTERPRETATION</span> <span class="tag fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM</a>; <a class="src" href="#rfocus">FOCUS</a>.</div>
-<div class="flag"><span class="rank">#7</span><b>Debt and dilution overhang.</b> $190M drawn (face) of a $570M Blackstone facility at SOFR+4.75%, maturing May 2030; history of large equity raises (June 2023: $243M total) plus an active ATM <span class="tag fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a>; <a class="src" href="#r10qold">10-Q summary</a>. If the stock weakens on a binary miss, the next raise gets expensive <span class="tag interp">INTERPRETATION</span>.</div>
-<div class="flag"><span class="rank">#8</span><b>Symbravo is a slow start.</b> $2.3M in Q2 vs $7.2M consensus; migraine is a saturated, generic-heavy market <span class="tag fact">FACT</span> <a class="src" href="#rcnhi">CNHI</a>.</div>
-<div class="flag"><span class="rank">#9</span><b>Short interest 7.34% of float</b> (as of 5/29/2026) with ~5 days to cover — a real skeptical cohort, not just noise <span class="tag fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a>.</div>
-<div class="flag"><span class="rank">#10</span><b>Multiple compression risk.</b> ~11.8x sales on a fully-diluted EV basis leaves little room for a binary miss; the 52-week range ($117–$260) shows how violently this name reprices <span class="tag interp">INTERPRETATION</span>.</div>
-</div>
+
+<div class="flag"><span class="rank">#1</span><b>FDA already refused to file one Axsome NDA.</b> The AXS-14 fibromyalgia NDA drew a Refusal to File (June 2025); the replacement FORWARD trial uses a responder-enriched withdrawal design. FDA deference is not automatic here <span class="ev fact">FACT</span> <a class="src" href="#rrtf">MarketBeat</a>. <span class="ev interp">INTERPRETATION</span>: this directly raises the stakes on the AXS-12 review.</div>
+<div class="flag"><span class="rank">#2</span><b>AXS-12's pivotal package is thin.</b> SYMPHONY: n=90, primary p=0.018, placebo response 66% (−83% vs −66%). ENCORE is withdrawal-after-enrichment. Two positive trials on paper, but a reviewer could reasonably ask whether the effect is robust <span class="ev interp">INTERPRETATION</span> <span class="ev fact">FACT</span> <a class="src" href="#rsymph">SYMPHONY</a>; <a class="src" href="#rneurol">ENCORE</a>.</div>
+<div class="flag"><span class="rank">#3</span><b>Insiders sell; nobody buys.</b> 801,591 shares sold ($139.6M) in the last 12 months, zero reported buys; CEO 10b5-1 sales of ~$34M+ in June–Aug 2026; CFO and COO also selling; insiders own 20.6% <span class="ev fact">FACT</span> <a class="src" href="#rinsider">InsiderTrades / MarketBeat</a>. 10b5-1 plans are pre-scheduled, but the direction is unanimous <span class="ev interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#4</span><b>Still loss-making with heavy SG&amp;A.</b> Q2 2026: SG&amp;A $208.1M (+60% YoY) vs $218.4M revenue; net loss $51.3M. "Cash-flow positivity" is a forward claim, not a filed fact <span class="ev fact">FACT</span> <a class="src" href="#r8kq2">8-K deck</a>. If Auvelity growth decelerates, the burn story returns <span class="ev interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#5</span><b>AD-agitation is a second-to-market launch.</b> Rexulti (approved May 2023) has the incumbent position with long-term-care formularies; Auvelity's DDI/seizure profile is a real friction in polypharmacy elderly <span class="ev interp">INTERPRETATION</span> <span class="ev fact">FACT</span> <a class="src" href="#rrexulti">Rexulti approval</a>; <a class="src" href="#rhelixtalk">HelixTalk</a>.</div>
+<div class="flag"><span class="rank">#6</span><b>Solriamfetol expansion is batting under .500.</b> PARADIGM missed overall (n=346); FOCUS won at 150 mg but missed at 300 mg; the ADHD sNDA path is undisclosed and a single pivotal is usually insufficient <span class="ev interp">INTERPRETATION</span> <span class="ev fact">FACT</span> <a class="src" href="#rparadigm">PARADIGM</a>; <a class="src" href="#rfocus">FOCUS</a>.</div>
+<div class="flag"><span class="rank">#7</span><b>Debt and dilution overhang.</b> $190M drawn (face) of a $570M Blackstone facility at SOFR+4.75%, maturing May 2030; history of large equity raises (June 2023: $243M total) plus an active ATM <span class="ev fact">FACT</span> <a class="src" href="#rblackstone">GlobeNewswire</a>; <a class="src" href="#r10qold">10-Q summary</a>. If the stock weakens on a binary miss, the next raise gets expensive <span class="ev interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#8</span><b>Symbravo is a slow start.</b> $2.3M in Q2 vs $7.2M consensus; migraine is a saturated, generic-heavy market <span class="ev fact">FACT</span> <a class="src" href="#rcnhi">CNHI</a>.</div>
+<div class="flag"><span class="rank">#9</span><b>Short interest 7.34% of float</b> (as of 5/29/2026) with ~5 days to cover — a real skeptical cohort, not just noise <span class="ev fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a>.</div>
+<div class="flag"><span class="rank">#10</span><b>Multiple compression risk.</b> ~11.8x sales on a fully-diluted EV basis leaves little room for a binary miss; the 52-week range ($117–$260) shows how violently this name reprices <span class="ev interp">INTERPRETATION</span>.</div>
+
 </section>
+<section id="s11"><div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Three paths, priced with soft anchors</h2><p class="lede">Soft, scenario-based price targets with explicit assumptions — not a recommendation. Takeout/max-value capped at the top of the identified street range ($306, Mizuho), per standing rules.</p></div></div>
 
-<section id="s11">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">11</span>Bear / Base / Bull + Scenario Analyses</h2>
-<div class="secbody">
-<p class="kicker">Soft, scenario-based price targets with explicit assumptions — not a recommendation. Takeout/max-value capped at the top of the identified street range ($306, Mizuho), per standing rules.</p>
+
 
 <div class="assump">
-<p><b>Shared assumptions for all three scenarios:</b> ~60.4M fully-diluted shares (52.3M basic + 8.1M options/RSUs, 6/30/26); net cash ≈ +$130M ($320M cash − $190M debt face); reference price $168.35 (10/09/2026 close); street range identified $246–$306 (consensus ~$276–$285). Targets are valuation sketches from the dossier's own EV/sales math, not a model output — treat as "soft." <span class="tag interp">INTERPRETATION</span></p>
+<p><b>Shared assumptions for all three scenarios:</b> ~60.4M fully-diluted shares (52.3M basic + 8.1M options/RSUs, 6/30/26); net cash ≈ +$130M ($320M cash − $190M debt face); reference price $168.35 (10/09/2026 close); street range identified $246–$306 (consensus ~$276–$285). Targets are valuation sketches from the dossier's own EV/sales math, not a model output — treat as "soft." <span class="ev interp">INTERPRETATION</span></p>
 </div>
 <div class="table-wrap"><table>
 <tr><th>Scenario</th><th>Soft target</th><th>What it assumes</th></tr>
-<tr><td><b>Bear</b></td><td><b>~$95</b></td><td>ENGAGE misses; AXS-12 draws a CRL or a narrow label with restrictive CV language; Auvelity growth decelerates against Rexulti. Multiple compresses from ~11.5x to <b>~5.5x on ~$900M forward revenue</b> (EV ≈ $5.0B) + $0.13B net cash → ~$5.1B equity ÷ 60.4M ≈ $85–100. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Base</b></td><td><b>~$195</b></td><td>AXS-12 approved May 2027 with manageable label language; ENGAGE positive but modest; Auvelity AD-agitation ramps steadily; cash-flow positivity in 2027 as guided. <b>~9x on ~$1.15B 2027E revenue</b> (EV ≈ $10.4B) + $0.13B net cash → ~$10.9B equity ÷ 60.4M ≈ $180. Street consensus (~$276–285) sits above this; the gap is the market pricing in the pipeline wins that the base case only partially grants. <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Bull</b></td><td><b>~$235</b></td><td>Clean sweep: ENGAGE hits in Q4 2026, AXS-12 approved cleanly May 2027, Auvelity AD-agitation beats early expectations, ADHD sNDA path clarifies. <b>~11x on ~$1.25B forward revenue</b> (EV ≈ $13.8B) + $0.13B net cash → ~$13.9B equity ÷ 60.4M ≈ $230. A takeout bid is the mechanical upside path beyond this — capped at the <b>$306</b> street high, per standing rules. <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bear</b></td><td><b>~$95</b></td><td>ENGAGE misses; AXS-12 draws a CRL or a narrow label with restrictive CV language; Auvelity growth decelerates against Rexulti. Multiple compresses from ~11.5x to <b>~5.5x on ~$900M forward revenue</b> (EV ≈ $5.0B) + $0.13B net cash → ~$5.1B equity ÷ 60.4M ≈ $85–100. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Base</b></td><td><b>~$195</b></td><td>AXS-12 approved May 2027 with manageable label language; ENGAGE positive but modest; Auvelity AD-agitation ramps steadily; cash-flow positivity in 2027 as guided. <b>~9x on ~$1.15B 2027E revenue</b> (EV ≈ $10.4B) + $0.13B net cash → ~$10.9B equity ÷ 60.4M ≈ $180. Street consensus (~$276–285) sits above this; the gap is the market pricing in the pipeline wins that the base case only partially grants. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bull</b></td><td><b>~$235</b></td><td>Clean sweep: ENGAGE hits in Q4 2026, AXS-12 approved cleanly May 2027, Auvelity AD-agitation beats early expectations, ADHD sNDA path clarifies. <b>~11x on ~$1.25B forward revenue</b> (EV ≈ $13.8B) + $0.13B net cash → ~$13.9B equity ÷ 60.4M ≈ $230. A takeout bid is the mechanical upside path beyond this — capped at the <b>$306</b> street high, per standing rules. <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-<p class="fine">Why the bull ($235) sits below street consensus: the street's $276–285 average already embeds a high probability of the binary wins; the bull case here is a <i>post-win operating valuation</i>, not a probability-weighted target. If ENGAGE and the PDUFA both clear, convergence toward street is the natural move. <span class="tag interp">INTERPRETATION</span></p>
-
+<p class="fine">Why the bull ($235) sits below street consensus: the street's $276–285 average already embeds a high probability of the binary wins; the bull case here is a <i>post-win operating valuation</i>, not a probability-weighted target. If ENGAGE and the PDUFA both clear, convergence toward street is the natural move. <span class="ev interp">INTERPRETATION</span></p>
 <div class="grid2">
-<div class="card"><h4>Bear — binaries misfire</h4><p>ENGAGE misses (BED placebo response is notoriously high); AXS-12 gets a CRL or a narrow cataplexy-only label with CV warnings; Auvelity growth decelerates as Rexulti defends LTC. SG&amp;A stays elevated, cash-flow positivity slips, and a dilutive raise follows a weak print. The multiple compresses from pipeline (~12x sales) toward commercial specialty-pharma (~4–6x). <span class="tag interp">INTERPRETATION</span></p></div>
-<div class="card"><h4>Base — one win, one grind</h4><p>AXS-12 approved May 2027 (possibly with a tachycardia/CV label note); ENGAGE positive but modest; Auvelity AD-agitation ramps steadily off the 65+ NBRx signal; company reaches cash-flow positivity in 2027 as guided. Solriamfetol ADHD sNDA path clarifies. Value accretes through commercial execution rather than multiple expansion. <span class="tag interp">INTERPRETATION</span></p></div>
+<div class="card"><h4>Bear — binaries misfire</h4><p>ENGAGE misses (BED placebo response is notoriously high); AXS-12 gets a CRL or a narrow cataplexy-only label with CV warnings; Auvelity growth decelerates as Rexulti defends LTC. SG&amp;A stays elevated, cash-flow positivity slips, and a dilutive raise follows a weak print. The multiple compresses from pipeline (~12x sales) toward commercial specialty-pharma (~4–6x). <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="card"><h4>Base — one win, one grind</h4><p>AXS-12 approved May 2027 (possibly with a tachycardia/CV label note); ENGAGE positive but modest; Auvelity AD-agitation ramps steadily off the 65+ NBRx signal; company reaches cash-flow positivity in 2027 as guided. Solriamfetol ADHD sNDA path clarifies. Value accretes through commercial execution rather than multiple expansion. <span class="ev interp">INTERPRETATION</span></p></div>
 </div>
-<div class="card" style="margin-top:16px"><h4>Bull — clean sweep</h4><p>ENGAGE hits in Q4 2026 (first-in-class-adjacent BED win for a non-stimulant mechanism); AXS-12 approved cleanly May 2027 with orphan exclusivity and broad narcolepsy positioning; Auvelity AD-agitation beats early expectations; the "one NDA per year through 2031" cadence looks credible. A takeout bid is the mechanical upside path — capped here at the top of the identified sell-side range (<b>$306</b>, Mizuho), per standing rules. <span class="tag interp">INTERPRETATION</span></p></div>
-
+<div class="card" style="margin-top:16px"><h4>Bull — clean sweep</h4><p>ENGAGE hits in Q4 2026 (first-in-class-adjacent BED win for a non-stimulant mechanism); AXS-12 approved cleanly May 2027 with orphan exclusivity and broad narcolepsy positioning; Auvelity AD-agitation beats early expectations; the "one NDA per year through 2031" cadence looks credible. A takeout bid is the mechanical upside path — capped here at the top of the identified sell-side range (<b>$306</b>, Mizuho), per standing rules. <span class="ev interp">INTERPRETATION</span></p></div>
 <h3>Scenario analyses</h3>
 <div class="table-wrap"><table>
 <tr><th>Scenario</th><th>What has to be true</th><th>What breaks it</th></tr>
-<tr><td><b>AXS-12 PDUFA (5/1/2027)</b></td><td>Two adequate, well-controlled trials (SYMPHONY + ENCORE) + no AdCom + orphan designation → approval</td><td>Small-n p=0.018 with 66% placebo response; tachycardia signal; RTF history shows FDA willingness to push back <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>ENGAGE BED (Q4 2026)</b></td><td>n≈450 powered for binge-episode reduction; Vyvanse precedent de-risks the indication</td><td>BED trials have high placebo response; solriamfetol is 0-for-1 on psychiatric primaries (PARADIGM) <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Financing</b></td><td>Cash-flow positivity on current plan; $380M undrawn on Blackstone facility as backstop</td><td>SG&amp;A growth outruns revenue; a binary miss forces equity at a discount <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td><b>Takeout</b></td><td>Commercial CNS asset with $1B+ revenue trajectory + deep late-stage pipeline is a classic specialty-pharma target</td><td>CEO owns ~14% and controls the board dynamic; any max-value case capped at $306 street high <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>AXS-12 PDUFA (5/1/2027)</b></td><td>Two adequate, well-controlled trials (SYMPHONY + ENCORE) + no AdCom + orphan designation → approval</td><td>Small-n p=0.018 with 66% placebo response; tachycardia signal; RTF history shows FDA willingness to push back <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>ENGAGE BED (Q4 2026)</b></td><td>n≈450 powered for binge-episode reduction; Vyvanse precedent de-risks the indication</td><td>BED trials have high placebo response; solriamfetol is 0-for-1 on psychiatric primaries (PARADIGM) <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Financing</b></td><td>Cash-flow positivity on current plan; $380M undrawn on Blackstone facility as backstop</td><td>SG&amp;A growth outruns revenue; a binary miss forces equity at a discount <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Takeout</b></td><td>Commercial CNS asset with $1B+ revenue trajectory + deep late-stage pipeline is a classic specialty-pharma target</td><td>CEO owns ~14% and controls the board dynamic; any max-value case capped at $306 street high <span class="ev interp">INTERPRETATION</span></td></tr>
 </table></div>
-</div>
-</section>
 
-<section id="s12">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
-<div class="secbody">
-<p class="kicker">Founder-led, heavily insider-owned, and unanimously selling.</p>
+</section>
+<section id="s12"><div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Founder-led, insider-owned — and unanimously selling</h2><p class="lede">Founder-led, heavily insider-owned, and unanimously selling.</p></div></div>
+
+
 
 <div class="table-wrap"><table>
 <tr><th style="width:26%">Item</th><th>Detail</th></tr>
-<tr><td>CEO / founder</td><td><b>Herriot Tabuteau, MD</b> — founder, chairman &amp; CEO; "Ten Percent Owner"; ~7.35M shares (~14.29%) per TipRanks, ~$1.54B value at $207.44 <span class="tag fact">FACT</span> <a class="src" href="#rtipranks">TipRanks</a>. Track record: took AXS-05 from in-license concept to two FDA approvals (MDD 2022, AD agitation 2026), built a 630-rep commercial org, and executed the Jazz/Sunosi and Blackstone deals <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Key lieutenants</td><td>COO <b>Mark Jacobson</b>; CFO <b>Nick Pizzie</b> <span class="tag fact">FACT</span> <a class="src" href="#rhcw">HCW recap</a></td></tr>
-<tr><td>CEO transactions (2026)</td><td>6/9: sold 49,670 sh @ $241.01 ($11.97M); 7/1: sold 49,666 sh @ $240.25 ($11.93M); 8/5: sold 45,004 sh @ $212.01 ($9.54M); 8/6: sold 4,660 sh @ $213.95 ($1.0M) — all via Rule 10b5-1 plans; also received 24,081 performance stock units (Apr 2026) vesting on sales/launch milestones <span class="tag fact">FACT</span> <a class="src" href="#rtipranks">TipRanks</a>; <a class="src" href="#rmarketbeat">MarketBeat</a>; <a class="src" href="#rpsu">StockTitan Form 4</a></td></tr>
-<tr><td>Other insiders</td><td>COO Jacobson sold 10,000 sh @ $208.65 (9/3/26); CFO Pizzie sold 33,000 sh @ $240.09 (6/9/26); directors Coleman/Jeffs/Mahony also sold <span class="tag fact">FACT</span> <a class="src" href="#rmarketbeat">MarketBeat</a></td></tr>
-<tr><td>Aggregate signal</td><td>Last 12 months: <b>33 insider sales, 801,591 shares, $139.6M; zero buys</b>; insiders own 20.6% <span class="tag fact">FACT</span> <a class="src" href="#rinsider">InsiderTrades</a>. Pre-scheduled selling is normal at a founder-led company up ~660% over 5 years — but there is no countervailing buy anywhere in the tape <span class="tag interp">INTERPRETATION</span></td></tr>
-<tr><td>Short interest</td><td>7.34% of float (5/29/2026), ~5 days to cover <span class="tag fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a></td></tr>
+<tr><td>CEO / founder</td><td><b>Herriot Tabuteau, MD</b> — founder, chairman &amp; CEO; "Ten Percent Owner"; ~7.35M shares (~14.29%) per TipRanks, ~$1.54B value at $207.44 <span class="ev fact">FACT</span> <a class="src" href="#rtipranks">TipRanks</a>. Track record: took AXS-05 from in-license concept to two FDA approvals (MDD 2022, AD agitation 2026), built a 630-rep commercial org, and executed the Jazz/Sunosi and Blackstone deals <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Key lieutenants</td><td>COO <b>Mark Jacobson</b>; CFO <b>Nick Pizzie</b> <span class="ev fact">FACT</span> <a class="src" href="#rhcw">HCW recap</a></td></tr>
+<tr><td>CEO transactions (2026)</td><td>6/9: sold 49,670 sh @ $241.01 ($11.97M); 7/1: sold 49,666 sh @ $240.25 ($11.93M); 8/5: sold 45,004 sh @ $212.01 ($9.54M); 8/6: sold 4,660 sh @ $213.95 ($1.0M) — all via Rule 10b5-1 plans; also received 24,081 performance stock units (Apr 2026) vesting on sales/launch milestones <span class="ev fact">FACT</span> <a class="src" href="#rtipranks">TipRanks</a>; <a class="src" href="#rmarketbeat">MarketBeat</a>; <a class="src" href="#rpsu">StockTitan Form 4</a></td></tr>
+<tr><td>Other insiders</td><td>COO Jacobson sold 10,000 sh @ $208.65 (9/3/26); CFO Pizzie sold 33,000 sh @ $240.09 (6/9/26); directors Coleman/Jeffs/Mahony also sold <span class="ev fact">FACT</span> <a class="src" href="#rmarketbeat">MarketBeat</a></td></tr>
+<tr><td>Aggregate signal</td><td>Last 12 months: <b>33 insider sales, 801,591 shares, $139.6M; zero buys</b>; insiders own 20.6% <span class="ev fact">FACT</span> <a class="src" href="#rinsider">InsiderTrades</a>. Pre-scheduled selling is normal at a founder-led company up ~660% over 5 years — but there is no countervailing buy anywhere in the tape <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Short interest</td><td>7.34% of float (5/29/2026), ~5 days to cover <span class="ev fact">FACT</span> <a class="src" href="#rstocktitan">StockTitan</a></td></tr>
 </table></div>
-</div>
-</section>
 
-<section id="s13">
-<h2 class="sec-toggle"><span class="chev">▾</span><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
-<div class="secbody">
-<p class="kicker">Full source list in the mandated order: SEC → FDA/labels → CT.gov → papers/conferences → company PR/decks → trade press.</p>
+</section>
+<section id="s13"><div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Full source list in the mandated order: SEC → FDA/labels → CT.gov → papers/conferences → company PR/decks → trade press.</p></div></div>
+
+
 
 <h3>References</h3>
 <ul class="refs">
@@ -602,11 +725,11 @@
 <li id="rcal27"><b>Local dataset</b> — <i>catalyst-calendar-2027/data.json</i>: AXS-12 PDUFA May 1, 2027 (hard); solriamfetol SUSTAIN readout 2027 (guidance)</li>
 <li id="rencore"><b>ENCORE Phase 3 results (Nov 26, 2024 PR)</b> — +10.29 vs +1.32 attacks/wk (p=0.017); −77% at 6 mo; ESS −7.3; tachycardia 5.9% — via <a href="https://www.drugs.com/clinical_trials/axsome-therapeutics-announces-axs-12-achieves-primary-endpoint-encore-long-term-phase-3-trial-21804.html">Drugs.com</a></li>
 <li id="rneurol"><b>NeurologyLive (July 2026)</b> — NDA acceptance detail; ENCORE 42-patient withdrawal; CONCERT Ph2 — <a href="https://www.neurologylive.com/view/fda-accepts-nda-axsome-therapeutics-axs-12-treatment-cataplexy-narcolepsy">neurologylive.com</a></li>
-<li id="rfwd"><b>FORWARD Phase 3 initiation (Jan 15, 2026)</b> — 12-wk open-label → 1:1 withdrawal; primary = time to loss of response — via <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/fda-events/?drug=AXS12&anchor=fda-axs12-2026-07-15">MarketBeat FDA events</a>; <a href="https://www.chemdiv.com/company/media/pharma-news/2026/axsome-begins-phase-iii-axs-14-forward-trial-for-fibromyalgia-management/">ChemDiv</a></li>
-<li id="rrtf"><b>AXS-14 Refusal to File (June 9, 2025)</b> — <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/fda-events/?drug=AXS05&anchor=event-on-2025-12-31">MarketBeat FDA events</a></li>
+<li id="rfwd"><b>FORWARD Phase 3 initiation (Jan 15, 2026)</b> — 12-wk open-label → 1:1 withdrawal; primary = time to loss of response — via <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/fda-events/?drug=AXS12&amp;anchor=fda-axs12-2026-07-15">MarketBeat FDA events</a>; <a href="https://www.chemdiv.com/company/media/pharma-news/2026/axsome-begins-phase-iii-axs-14-forward-trial-for-fibromyalgia-management/">ChemDiv</a></li>
+<li id="rrtf"><b>AXS-14 Refusal to File (June 9, 2025)</b> — <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/fda-events/?drug=AXS05&amp;anchor=event-on-2025-12-31">MarketBeat FDA events</a></li>
 <li id="rfierce12"><b>Fierce Pharma</b> — reboxetine history; Pfizer US rights 2020 — <a href="https://www.fiercepharma.com/pharma/resounding-win-narcolepsy-axsome-looks-revive-former-pfizer-antidepressant-us-market">fiercepharma.com</a></li>
 <li id="rsleeprev"><b>Sleep Review</b> — solriamfetol programs (FOCUS/PARADIGM/ENGAGE/SUSTAIN) — <a href="https://sleepreviewmag.com/sleep-disorders/hypersomnias/narcolepsy/axsome-submit-narcolepsy-drug-candidate-axs-12-fda/">sleepreviewmag.com</a></li>
-<li id="rzacksadhd"><b>Zacks (July 8, 2026)</b> — solriamfetol Schedule IV; CLARITY/FOCUS-2/FOCUS-3; Jazz high-single-digit royalty — <a href="https://www.zacks.com/stock/news/2950314/axsome-begins-phase-iii-study-on-solriamfetol-for-adhd-in-children?cid=CS-STOCKTWITS-HL-analyst_blog|company_news_medical_sector-2950314&adid=SYND_STOCKTWITS_HEADLINE_ANALYSTBLOG_256_2950314">zacks.com</a></li>
+<li id="rzacksadhd"><b>Zacks (July 8, 2026)</b> — solriamfetol Schedule IV; CLARITY/FOCUS-2/FOCUS-3; Jazz high-single-digit royalty — <a href="https://www.zacks.com/stock/news/2950314/axsome-begins-phase-iii-study-on-solriamfetol-for-adhd-in-children?cid=CS-STOCKTWITS-HL-analyst_blog|company_news_medical_sector-2950314&amp;adid=SYND_STOCKTWITS_HEADLINE_ANALYSTBLOG_256_2950314">zacks.com</a></li>
 <li id="rzacks26"><b>Zacks (Jan 26, 2026)</b> — FY2025: $638.5M product revenue; Auvelity $507.1M; Sunosi $124.8M; Symbravo $6.6M; sNDA priority review — <a href="https://www.zacks.com/stock/news/2822795/auvelity-continues-to-aid-axsms-top-line-more-upside-in-2026">zacks.com</a></li>
 <li id="rzacksfocus"><b>Zacks (Mar 26, 2025)</b> — FOCUS recap; stock −6.8% on 300 mg miss — <a href="https://www.zacks.com/stock/news/2435686/axsm-stock-down-despite-adhd-study-meeting-primary-endpoint?cid=CS-AlphaNewsStream-FT-analyst_blog">zacks.com</a></li>
 <li id="rfinnhub"><b>Finnhub market data (10/09/2026)</b> — AXSM close $168.35 (−1.02%); 52-wk $117.30–$260.19; all-time high $260.19 (6/17/2026) — <a href="https://finnhub.io/?q=%22AXSM%22">finnhub.io</a></li>
@@ -621,12 +744,11 @@
 <li id="rhcw"><b>HCW Conference recap (Sept 19–22, 2026; MarketBeat)</b> — 3 marketed products; 6 candidates / 10 indications; $218.4M Q2; $320M cash; Symbravo peak $500M–$1B; IP to 2039/2040/2045; ~1 NDA/year through 2031 — via <a href="https://www.themarketsdaily.com/2026/09/19/axsome-therapeutics-highlights-auvelity-growth-pipeline-progress-at-h-c-wainwright-conference.html">themarketsdaily.com</a></li>
 <li id="rstocktitan"><b>StockTitan</b> — Symbravo approval investor event (Jan 31, 2025); Auvelity AD-agitation approval event (May 1, 2026); short interest 7.34% — <a href="https://www.stocktitan.net/news/AXSM/axsome-therapeutics-hosts-auvelity-fda-approval-investor-event-kdqt2wbv8lib.html">stocktitan.net</a></li>
 <li id="rtipranks"><b>TipRanks insider page</b> — CEO ~7.35M shares (14.29%), 10b5-1 sales — <a href="https://www.tipranks.com/experts/insiders/tabuteau-herriot">tipranks.com</a></li>
-<li id="rmarketbeat"><b>MarketBeat insider trades</b> — 2026 insider sales detail — <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/insider-trades/?AccountID=10790435&hash=DBE7362B334CD0ADCE62C5DD369164C664A4EF0C745F9960D23F064D56FB506918A3EB38254C6623BA413C46C6E2DC63DED36B9728F184F30FC432070F366D92&utm_source=newsletter&utm_medium=email&utm_campaign=newsletterclick">marketbeat.com</a></li>
+<li id="rmarketbeat"><b>MarketBeat insider trades</b> — 2026 insider sales detail — <a href="https://www.marketbeat.com/stocks/NASDAQ/AXSM/insider-trades/?AccountID=10790435&amp;hash=DBE7362B334CD0ADCE62C5DD369164C664A4EF0C745F9960D23F064D56FB506918A3EB38254C6623BA413C46C6E2DC63DED36B9728F184F30FC432070F366D92&amp;utm_source=newsletter&amp;utm_medium=email&amp;utm_campaign=newsletterclick">marketbeat.com</a></li>
 <li id="rinsider"><b>InsiderTrades.com</b> — 12-mo insider aggregate: 33 sales, 801,591 sh, $139.6M; 20.6% insider ownership — <a href="https://www.insidertrades.com/axsome-therapeutics-inc-stock/herriot-tabuteau/">insidertrades.com</a></li>
 <li id="rpt"><b>Sell-side targets (aggregators)</b> — Mizuho $306 (7/31/26); RBC $304; TD Cowen $300; Needham $267; Deutsche Bank $267; Guggenheim $260; Wells Fargo $255; Baird $246; Morgan Stanley $247; consensus $285.42 (Yahoo via Fool 9/18/26) / $275.84 (MarketBeat 10/5/26) — via <a href="https://www.americanbankingnews.com/2026/09/29/axsome-therapeutics-axsm-research-analysts-recent-ratings-updates.html">americanbankingnews.com</a>; <a href="https://WWW.FOOL.COM/investing/2026/09/18/analysts-think-axsome-therapeutics-stock-could-soa/">fool.com</a>; <a href="https://www.thecerbatgem.com/2026/10/05/axsome-therapeutics-inc-nasdaqaxsm-stock-has-consensus-target-price-of-275-84.html">thecerbatgem.com</a></li>
 <li id="rchemdiv"><b>ChemDiv pharma news</b> — FORWARD trial design summary — <a href="https://www.chemdiv.com/company/media/pharma-news/2026/axsome-begins-phase-iii-axs-14-forward-trial-for-fibromyalgia-management/">chemdiv.com</a></li>
 </ul>
-
 <h3>Filings used</h3>
 <ul class="refs">
 <li>Q2 2026 earnings 8-K + investor deck (Aug 2026) — latest filed financials; Q3 2026 10-Q not yet filed as of 10/10/2026</li>
@@ -635,57 +757,45 @@
 <li>8-K — Blackstone $570M facility (May 2025)</li>
 <li>Aug 10, 2026 8-K milestone list (ENGAGE design)</li>
 </ul>
-
 <h3>As-of statement</h3>
 <ul class="refs">
 <li><b>As of October 10, 2026.</b> Price: Finnhub ($168.35 close 10/09/2026; 52-wk $117.30–$260.19). Financials: Q2 2026 8-K/deck (latest filing; Q3 2026 not yet filed). Clinical/regulatory: company PRs and trade-press summaries dated as cited; local catalyst datasets checked 2026-10-07. Freshness audit 2026-10-10 found no new FDA actions, readouts, or filings; soft scenario price targets are included in §11 with explicit assumptions. No recommendation is contained in this dossier. This document contains no personal information and is suitable for distribution.</li>
 </ul>
-</div>
-</section>
 
+</section>
 </main>
 <footer>
-AXSM deep-dive dossier · prepared 2026-10-07, audited & enhanced 2026-10-10 · single-file interactive HTML · evidence labels per standing discipline (FACT / INTERPRETATION / GAP / UNVERIFIED) · not investment advice · no personal data contained.
+AXSM deep-dive dossier · prepared 2026-10-07, audited &amp; enhanced 2026-10-10 · single-file interactive HTML · evidence labels per standing discipline (FACT / INTERPRETATION / GAP / UNVERIFIED) · not investment advice · no personal data contained.
 </footer>
 
-<script>
-(function(){
-  // Theme toggle (persisted)
-  var btn = document.getElementById('themeBtn');
-  var saved = null;
-  try { saved = localStorage.getItem('axsm-theme'); } catch(e) {}
-  if (saved === 'dark') { document.body.setAttribute('data-theme','dark'); btn.textContent = '◑ Light'; }
-  btn.addEventListener('click', function(){
-    var dark = document.body.getAttribute('data-theme') === 'dark';
-    if (dark) { document.body.removeAttribute('data-theme'); btn.textContent = '◐ Dark'; }
-    else { document.body.setAttribute('data-theme','dark'); btn.textContent = '◑ Light'; }
-    try { localStorage.setItem('axsm-theme', dark ? 'light' : 'dark'); } catch(e) {}
+<button aria-label="Back to top" class="totop" id="toTop" type="button">↑</button><script>/* Theme toggle */
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'☀ Light mode':'◐ Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';
+try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+/* Collapsible sections */
+document.querySelectorAll('main > section').forEach(function(sec){
+  const head=sec.querySelector('.section-head'); if(!head)return;
+  const body=document.createElement('div'); body.className='section-body';
+  let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+  sec.appendChild(body);
+  const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+  btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+  btn.addEventListener('click',function(){
+    const c=sec.classList.toggle('collapsed');
+    btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+    btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
   });
-  // Collapsible sections
-  document.querySelectorAll('h2.sec-toggle').forEach(function(h){
-    h.addEventListener('click', function(){
-      var body = h.nextElementSibling;
-      if (body && body.classList.contains('secbody')) {
-        body.classList.toggle('collapsed');
-        h.classList.toggle('collapsed');
-      }
-    });
-  });
-  document.getElementById('expandAll').addEventListener('click', function(){
-    var anyCollapsed = !!document.querySelector('.secbody.collapsed');
-    document.querySelectorAll('.secbody').forEach(function(b){ b.classList.toggle('collapsed', !anyCollapsed); });
-    document.querySelectorAll('h2.sec-toggle').forEach(function(h){ h.classList.toggle('collapsed', !anyCollapsed); });
-    this.textContent = anyCollapsed ? 'Collapse all' : 'Expand all';
-  });
-  // Back to top
-  var toTop = document.createElement('button');
-  toTop.id = 'toTop'; toTop.setAttribute('aria-label','Back to top'); toTop.textContent = '↑';
-  document.body.appendChild(toTop);
-  toTop.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
-  window.addEventListener('scroll', function(){
-    toTop.style.display = window.scrollY > 600 ? 'block' : 'none';
-  }, {passive:true});
-})();
-</script>
-</body>
+  head.appendChild(btn);
+});
+
+/* Back to top */
+const toTop=document.getElementById('toTop');
+function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script></body>
 </html>
