@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IRON — Disc Medicine Inc · Deep-Dive Dossier · 2026-10-07 (audit pass 2026-10-10)</title>
+<style>
+  :root{
+    --ink:#1b2430; --muted:#5b6675; --paper:#ffffff; --wash:#f5f7f9;
+    --line:#dfe5ea; --accent:#0e6b6e; --accent-ink:#0b4f52;
+    --fact:#1d4ed8; --interp:#7c3aed; --gap:#b45309; --unver:#b91c1c;
+    --hard:#166534; --guid:#b45309; --inf:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+  header.top{background:var(--ink);color:#fff;padding:34px 24px 28px}
+  header.top .wrap{max-width:1080px;margin:0 auto}
+  header.top h1{margin:0 0 6px;font-size:30px;letter-spacing:.2px}
+  header.top h1 .tick{color:#7fd4d1}
+  header.top p.sub{margin:0;color:#c3ccd6;font-size:15px}
+  .pricebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .pricebar .pill{background:#27313f;border:1px solid #3a4656;border-radius:8px;padding:8px 12px;font-size:13px;color:#dbe2ea}
+  .pricebar .pill b{color:#fff;font-size:14px}
+  nav.toc{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+  nav.toc .wrap{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:2px;padding:8px 16px}
+  nav.toc a{font-size:12.5px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:6px;white-space:nowrap}
+  nav.toc a:hover{background:var(--wash);color:var(--ink)}
+  main{max-width:1080px;margin:0 auto;padding:8px 24px 80px}
+  section{padding:30px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:22px;margin:0 0 4px;color:var(--ink)}
+  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
+  h3{font-size:16.5px;margin:26px 0 8px}
+  h4{font-size:14.5px;margin:20px 0 6px}
+  p.kicker{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  p,li{font-size:14.5px}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:4px;color:#fff;vertical-align:middle;margin-left:6px;text-transform:uppercase}
+  .tag.fact{background:var(--fact)} .tag.interp{background:var(--interp)}
+  .tag.gap{background:var(--gap)} .tag.unver{background:var(--unver)}
+  .pill-dq{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-left:6px;text-transform:uppercase;letter-spacing:.4px}
+  .pill-dq.hard{background:var(--hard)} .pill-dq.guidance{background:var(--guid)} .pill-dq.inferred{background:var(--inf)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th{background:var(--wash);text-align:left;padding:9px 10px;border:1px solid var(--line);font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  td{padding:9px 10px;border:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fbfcfd}
+  .callout{background:var(--wash);border-left:4px solid var(--accent);padding:14px 18px;margin:18px 0;border-radius:0 8px 8px 0}
+  .callout.warn{border-left-color:var(--unver)}
+  .callout p{margin:6px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .card{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fff}
+  .card h4{margin:0 0 8px;font-size:15px}
+  .timeline{position:relative;margin:20px 0 10px;padding-left:26px}
+  .timeline:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .tl-item{position:relative;margin:0 0 18px}
+  .tl-item:before{content:"";position:absolute;left:-24px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--accent)}
+  .tl-item.past:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+  .tl-item .dt{font-weight:700;font-size:13.5px}
+  .tl-item .ev{font-size:14px;margin:2px 0}
+  .tl-item .note{font-size:12.5px;color:var(--muted)}
+  .flag{border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .flag .rank{display:inline-block;background:var(--ink);color:#fff;font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
+  .refs{font-size:13px;color:var(--muted)}
+  .refs li{margin-bottom:8px}
+  .refs a{color:var(--accent-ink)}
+  .fine{font-size:12.5px;color:var(--muted)}
+  footer{max-width:1080px;margin:0 auto;padding:24px;color:var(--muted);font-size:12.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 18px;font-size:12px;color:var(--muted)}
+  .verdict{background:var(--ink);color:#fff;border-radius:10px;padding:18px 22px;margin:22px 0}
+  .verdict h3{color:#7fd4d1;margin:0 0 8px}
+  .verdict p{margin:6px 0;font-size:14.5px;color:#e6ecf2}
+  a.src{color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted var(--accent-ink);font-size:12.5px}
+
+  /* ---- audit pass 2026-10-10: dark mode, collapsibles, back-to-top, mobile ---- */
+  [data-theme="dark"]{--ink:#e9eef4;--muted:#9fb0c0;--paper:#10161d;--wash:#182230;--line:#2b3646;--accent:#3fbdb9;--accent-ink:#7fd4d1}
+  [data-theme="dark"] nav.toc{background:#10161d}
+  [data-theme="dark"] header.top{background:#0b1118}
+  [data-theme="dark"] .card{background:#141c26}
+  [data-theme="dark"] .callout{background:#182230}
+  [data-theme="dark"] .softbox{background:#182230}
+  [data-theme="dark"] .verdict{background:#182230}
+  [data-theme="dark"] .flag{background:#141c26}
+  [data-theme="dark"] tr:nth-child(even) td{background:#141c26}
+  [data-theme="dark"] th{background:#182230}
+  [data-theme="dark"] .refs a,[data-theme="dark"] a.src{color:#7fd4d1}
+  .tag.soft{background:#0e7490}
+  .vrank{font-weight:700;color:var(--accent-ink);text-align:center;width:34px}
+  h2.collapsible{cursor:pointer;user-select:none}
+  h2.collapsible .chev{display:inline-block;color:var(--accent);margin-right:4px;transition:transform .2s;font-size:18px}
+  section.collapsed .sec-body{display:none}
+  section.collapsed h2.collapsible .chev{transform:rotate(-90deg)}
+  #backTop{display:none;position:fixed;right:18px;bottom:18px;z-index:60;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--ink);color:var(--paper);font-size:22px;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .navbtn{font-size:12.5px;padding:7px 14px;margin-left:8px;border:1px solid var(--line);border-radius:20px;background:var(--wash);color:var(--ink);cursor:pointer;min-height:36px;white-space:nowrap}
+  .table-scroll{overflow-x:auto;margin:14px -4px;padding:0 4px}
+  .softbox{background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:18px 0}
+  .dq-audit{border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--muted)}
+  .legend .pill-dq{margin-left:0}
+  @media(max-width:560px){
+    nav.toc a{font-size:13px;padding:14px 12px}
+    main{padding:8px 14px 80px}
+    header.top{padding:26px 16px 22px}
+    header.top h1{font-size:24px}
+    p,li{font-size:15px}
+    td,th{font-size:13px;padding:8px 8px}
+    .navbtn{min-height:44px}
+    #backTop{width:52px;height:52px;right:14px;bottom:14px}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1><span class="tick">IRON</span> — Disc Medicine Inc</h1>
+    <p class="sub">Deep-dive investment dossier · Hematology (heme &amp; iron biology) · As of 2026-10-07 · Enhanced &amp; audited 2026-10-10</p>
+    <div class="pricebar">
+      <div class="pill">Price <b>$61.18</b> <span style="color:#9fb0c0">(Finnhub, 2026-10-07)</span></div>
+      <div class="pill">52-wk range <b>$40.00 – $99.50</b></div>
+      <div class="pill">Basic mcap <b>~$2.35B</b></div>
+      <div class="pill">FD mcap <b>~$2.63B</b> · EV <b>~$1.97B</b></div>
+      <div class="pill">Cash <b>$717.7M</b> <span style="color:#9fb0c0">(2026-06-30)</span></div>
+      <div class="pill">Key binary <b>APOLLO Ph3 topline · Q4 2026</b></div>
+    </div>
+  </div>
+</header>
+<nav class="toc"><div class="wrap">
+  <a href="#identity">1 · Identity &amp; Thesis</a>
+  <a href="#science">2 · Science</a>
+  <a href="#pipeline">3 · Pipeline</a>
+  <a href="#trials">4 · Trial Design</a>
+  <a href="#regulatory">5 · Clinical / Regulatory</a>
+  <a href="#competition">6 · Competition</a>
+  <a href="#financials">7 · Financials</a>
+  <a href="#fdmc">8 · FDMC / EV</a>
+  <a href="#catalysts">9 · Catalyst Map</a>
+  <a href="#redflags">10 · Red Flags</a>
+  <a href="#scenarios">11 · Bear / Base / Bull</a>
+  <a href="#management">12 · Management</a>
+  <a href="#references">13 · References</a>
+  <button class="navbtn" id="themeToggle" style="margin-left:auto" aria-label="Toggle dark mode">&#127769; Dark</button>
+  <button class="navbtn" id="collapseAll" aria-label="Collapse or expand all sections">Collapse all</button>
+</div></nav>
+<main>
+
+<div class="legend">
+  <span><span class="tag fact">FACT</span> sourced &amp; verifiable</span>
+  <span><span class="tag interp">INTERPRETATION</span> analyst judgment</span>
+  <span><span class="tag gap">GAP</span> not disclosed / unavailable</span>
+  <span><span class="tag unver">UNVERIFIED</span> single-source or unconfirmed</span>
+</div>
+
+<div class="verdict">
+  <h3>Dossier verdict</h3>
+  <p><b>The single swing factor is the APOLLO Phase 3 readout (Q4 2026):</b> whether bitopertin's 60 mg dose separates from placebo on the <i>clinical</i> co-primary — average monthly pain-free sunlight time — after the FDA's CRL explicitly rejected the PPIX biomarker as a surrogate and AURORA Phase 2 failed to separate on sunlight endpoints due to a large placebo response. The drug works on its biomarker (−40.7% PPIX at 60 mg, p&lt;0.001); the open question is whether that biology translates into statistically significant, patient-meaningful light tolerance in a 183-patient, 6-month, placebo-controlled trial.</p>
+  <p style="color:#c3ccd6">Everything else — a CRL response and mid-2027 FDA decision, selcodebart's EoP2 meeting, DISC-3405's PV/sickle readouts, and the competitive clock set by LEO Pharma's dersimelagon PDUFA (end of Feb 2027) — branches off this one readout. No recommendation — §11 now carries <b>soft, assumption-labeled scenario levels</b> (not price targets).</p>
+</div>
+
+<section id="identity">
+<h2><span class="num">1</span>Identity &amp; thesis snapshot</h2>
+<p class="kicker">What the company is and why the stock moves.</p>
+<p><b>Disc Medicine, Inc. (Nasdaq: IRON)</b>, headquartered in Watertown, Massachusetts <span class="tag fact">FACT</span>, is a clinical-stage biopharmaceutical company developing medicines for hematologic diseases by modulating heme biosynthesis and iron homeostasis <span class="tag fact">FACT</span>. The company went public via a reverse merger with Gemini Therapeutics and trades under ticker IRON <span class="tag fact">FACT</span>.</p>
+<table>
+  <tr><th style="width:32%">Item</th><th>Detail</th></tr>
+  <tr><td>Lead program</td><td><b>Bitopertin</b> — oral glycine transporter 1 (GlyT1) inhibitor for erythropoietic protoporphyria (EPP), including X-linked protoporphyria (XLP). Licensed worldwide from Roche (May 2021); Roche retains tiered royalties (high single-digits to high teens) and milestones <span class="tag fact">FACT</span>.</td></tr>
+  <tr><td>Second program</td><td><b>Selcodebart (DISC-0974)</b> — anti-hemojuvelin (HJV) monoclonal antibody that suppresses hepcidin, in Phase 2 for anemia of myelofibrosis (RALLY-MF) and anemia of IBD; EU Orphan Drug Designation for myelofibrosis <span class="tag fact">FACT</span>.</td></tr>
+  <tr><td>Third program</td><td><b>DISC-3405</b> — anti-TMPRSS6 monoclonal antibody that induces hepcidin, in Phase 2 for polycythemia vera (RESTORE-PV) and Phase 1b for sickle cell disease <span class="tag fact">FACT</span>.</td></tr>
+  <tr><td>Current status</td><td>No approved products; all three candidates investigational and unapproved in every jurisdiction <span class="tag fact">FACT</span>. Bitopertin received an FDA Complete Response Letter (CRL) on 2026-02-13 for EPP; stock fell 22% that day <span class="tag fact">FACT</span>.</td></tr>
+  <tr><td>Thesis in one line</td><td>A cash-rich (~$718M), three-asset hematology company whose near-term value is dominated by one binary: the APOLLO Phase 3 readout for bitopertin in Q4 2026, which — if successful — underpins a CRL resubmission and a mid-2027 FDA decision <span class="tag interp">INTERPRETATION</span>.</td></tr>
+</table>
+</section>
+
+<section id="science">
+<h2><span class="num">2</span>Science: mechanism of action &amp; why it could fail</h2>
+<p class="kicker">Plain-language biology, with the academic literature the company materials rest on.</p>
+
+<h3>Bitopertin — GlyT1 inhibition to choke off PPIX at its source</h3>
+<p>EPP is caused by loss-of-function mutations in <i>FECH</i> (ferrochelatase), the last enzyme in heme biosynthesis; its substrate, the photoreactive molecule protoporphyrin IX (PPIX), accumulates in red blood cells and tissues. On light exposure PPIX generates tissue damage and severe pain <span class="tag fact">FACT</span>. XLP is the mirror image: gain-of-function <i>ALAS2</i> mutations overproduce the pathway's first committed intermediate <span class="tag fact">FACT</span>.</p>
+<p>The first and rate-limiting step of heme synthesis in erythroid cells is ALAS2 condensing <b>glycine</b> with succinyl-CoA to make 5-aminolevulinic acid. Erythroid cells have an enormous glycine demand that is supplied primarily by the membrane transporter GlyT1 (encoded by <i>SLC6A9</i>) <span class="tag fact">FACT</span>. Bitopertin blocks GlyT1, restricting intracellular glycine and thereby slowing the entire heme pathway upstream of the FECH bottleneck — so less PPIX accumulates <span class="tag fact">FACT</span>. Unlike photoprotective drugs (afamelanotide, dersimelagon), which shield skin from light damage, bitopertin is disease-modifying in the mechanistic sense: it reduces the toxic metabolite itself <span class="tag interp">INTERPRETATION</span>.</p>
+<div class="callout">
+<p><b>Academic grounding (mandatory literature):</b></p>
+<p>• A 2021 phenotypic screen in FECH-knockout K562 erythroid cells found that GlyT1/GlyT2 inhibitors selectively lowered PPIX and oxidative-stress markers, including in primary erythroid cultures from an EPP patient — the in-vitro repurposing rationale for bitopertin (<i>Cell Chem Biol</i>-family repurposing paper, ScienceDirect) <span class="tag fact">FACT</span>.</p>
+<p>• A JCI paper (2025/2026, "Blocking extracellular glycine uptake mediated by GlyT1 mitigates protoporphyria," JCI 197344) showed bitopertin-mediated glycine blockade decreases PPIX in EPP and XLP models — but notably <i>without</i> decreasing heme content, pointing to compensatory mechanisms that preserve heme independently of FECH activity <span class="tag fact">FACT</span>.</p>
+<p>• JCI Insight (2019) showed bitopertin improved anemia in a mouse model of β-thalassemia by modulating heme biosynthesis and reducing oxidative stress <span class="tag fact">FACT</span> — though a subsequent review notes bitopertin failed to improve erythropoiesis in human β-thalassemia patients, i.e., the mouse result did not translate <span class="tag fact">FACT</span>.</p>
+<p>• Roche originally developed bitopertin (RG1678) as a GlyT1 inhibitor for schizophrenia; six Phase 3 trials failed their primary endpoints (2014) and the program was discontinued — a failure of the CNS indication, not a safety failure <span class="tag fact">FACT</span>.</p>
+</div>
+<h4>Why bitopertin could fail <span class="tag interp">INTERPRETATION</span></h4>
+<ul>
+<li><b>The biomarker-to-clinic gap.</b> The FDA's CRL accepted that bitopertin lowers PPIX but concluded the trials "did not show evidence of association between percent change in PPIX and sunlight exposure-based endpoints" — the core regulatory risk is now clinical, not pharmacologic <span class="tag fact">FACT</span>.</li>
+<li><b>Placebo response on sunlight endpoints.</b> In AURORA, the placebo arm's sunlight-time improvement was "greater than expected," wiping out statistical significance on the key clinical secondaries despite a −40.7% PPIX effect <span class="tag fact">FACT</span>. APOLLO's co-primary on pain-free sunlight time faces the same adversary.</li>
+<li><b>Anemia as a class liability.</b> GlyT1 inhibition in rats produced a microcytic, hypochromic, regenerative anemia with ~20% steady-state hemoglobin reduction and reticulocyte iron inclusion bodies (Exp Hematol, 2016) <span class="tag fact">FACT</span>. Human EPP trials have shown an acceptable profile so far, but hemoglobin monitoring is a standing safety watch item <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Competitive obsolescence.</b> If LEO Pharma's oral dersimelagon is approved (PDUFA end of Feb 2027) with a positive Phase 3 already in hand, bitopertin — even if approved mid-2027 — launches into a market with an approved oral alternative, behind an approved implant (Scenesse) <span class="tag interp">INTERPRETATION</span>.</li>
+</ul>
+
+<h3>Selcodebart (DISC-0974) — anti-hemojuvelin to suppress hepcidin</h3>
+<p>Hepcidin is the master regulator of systemic iron: high hepcidin locks iron inside macrophages and enterocytes, starving erythropoiesis — the central driver of anemia of chronic disease/inflammation. In myelofibrosis, chronic inflammation drives hepcidin production, worsening anemia and transfusion dependence <span class="tag fact">FACT</span>. Hemojuvelin (HJV) is a BMP co-receptor that drives hepcidin transcription; blocking HJV represses hepcidin, mobilizes iron, and restores erythropoiesis <span class="tag fact">FACT</span>. Selcodebart is a monoclonal antibody against HJV, dosed 50 mg subcutaneously monthly <span class="tag fact">FACT</span>.</p>
+<p><b>Academic grounding:</b> Babitt et al. (<i>Nature Genetics</i>, 2006) established that BMP signaling through hemojuvelin regulates hepcidin expression — the foundational biology; Ganz &amp; Nemeth's reviews define the hepcidin–ferroportin axis of iron homeostasis <span class="tag fact">FACT</span>.</p>
+<h4>Why selcodebart could fail <span class="tag interp">INTERPRETATION</span></h4>
+<ul>
+<li>RALLY-MF is open-label and single-arm; the 56% major / 72% overall response rates have no concurrent control, and MF anemia trials are notoriously hard to measure — luspatercept's Phase 3 INDEPENDENCE missed its primary (p=0.0674) in the same disease <span class="tag fact">FACT</span>.</li>
+<li>The CKD program showed "variable effects on hemoglobin" with meaningful increases only in a subset (higher baseline EPO) — evidence the mechanism needs adequate endogenous erythropoietin to convert iron mobilization into red cells, which may narrow the responsive population <span class="tag fact">FACT</span>.</li>
+<li>Registrational endpoint and trial design are not yet agreed with FDA (EoP2 meeting expected by end of 2026) — pivotal design risk sits ahead, not behind <span class="tag gap">GAP</span>.</li>
+</ul>
+
+<h3>DISC-3405 — anti-TMPRSS6 to induce hepcidin</h3>
+<p>The mirror image of selcodebart: TMPRSS6 (matriptase-2) is a negative regulator of hepcidin; blocking it raises hepcidin, restricting iron availability to red-cell precursors. In polycythemia vera — where JAK2-driven erythrocytosis pushes hematocrit above 45% — iron restriction controls hematocrit and reduces phlebotomy need <span class="tag fact">FACT</span>. Academic grounding: Du et al. (<i>Science</i>, 2008) showed matriptase-2 (TMPRSS6) is required to sense iron deficiency and suppress hepcidin <span class="tag fact">FACT</span>.</p>
+<h4>Why DISC-3405 could fail <span class="tag interp">INTERPRETATION</span></h4>
+<ul>
+<li>RESTORE-PV is open-label with small numbers (n=13 completers at the SOHO cut); phlebotomy decisions can be investigator-influenced — no control arm <span class="tag fact">FACT</span>.</li>
+<li>Pathway validation cuts both ways: rusfertide (MIMRYLO), a hepcidin mimetic peptide, was FDA-approved for PV on 2026-08-28 on the VERIFY Phase 3 (N=293) — DISC-3405 now chases an approved drug with a broad label, and must differentiate on dosing, durability, or safety <span class="tag fact">FACT</span>.</li>
+<li>Overshooting iron restriction causes anemia — rusfertide's label shows anemia in 16% of patients; the therapeutic window for hepcidin induction is narrow <span class="tag fact">FACT</span>.</li>
+</ul>
+</section>
+
+<section id="pipeline">
+<h2><span class="num">3</span>Pipeline overview</h2>
+<p class="kicker">Every disclosed program, stage, and next readout.</p>
+<div class="callout">
+<p><b>Ranked by estimated value contribution (most → least):</b></p>
+<ol>
+<li><b>Bitopertin (EPP incl. XLP)</b> — the only asset within ~8 months of a potential FDA decision; the dominant term in the ~$1.97B EV <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Selcodebart — anemia of myelofibrosis</b> — Phase 2 with 56% major / 72% overall response (N=61 cut, 2026-04-27); EoP2 meeting by year-end 2026 defines the pivotal path in an anemia market with no approved add-on therapy <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>DISC-3405 — polycythemia vera</b> — positive early Phase 2 signal (mean phlebotomies 4.0 → 0.6 per 26 wks, p&lt;0.0001, n=13) but now a follower behind approved MIMRYLO; antibody-vs-peptide differentiation unproven <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Selcodebart — anemia of IBD</b> — Phase 2 initiated Q1 2026, initial data 2027; indication expansion of a mechanism validated (preclinically + early clinically) in MF <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>DISC-3405 — sickle cell disease</b> — Phase 1b, initial data Q4 2026; proof-of-mechanism only, in a crowded and commercially difficult SCD field <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Selcodebart — anemia of NDD-CKD</b> — Phase 1b complete, "variable Hb effects" (meaningful only in higher-baseline-EPO subset); program under assessment; the mechanism needs adequate endogenous EPO to convert iron mobilization into red cells <span class="tag interp">INTERPRETATION</span>.</li>
+<li><b>Next-gen long-acting anti-HJV</b> — IND-enabling, unguided; pure option value <span class="tag gap">GAP</span>.</li>
+</ol>
+</div>
+<table>
+<tr><th>#</th><th>Program</th><th>Mechanism</th><th>Indication</th><th>Stage</th><th>Next event</th></tr>
+<tr><td class="vrank">1</td><td><b>Bitopertin</b></td><td>Oral GlyT1 inhibitor (heme synthesis modulation)</td><td>EPP incl. XLP</td><td>Phase 3 (APOLLO); CRL received 2026-02-13</td><td>APOLLO topline Q4 2026 <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">2</td><td><b>Selcodebart (DISC-0974)</b></td><td>Anti-HJV mAb (hepcidin suppression)</td><td>Anemia of myelofibrosis</td><td>Phase 2 (RALLY-MF); EU Orphan Designation</td><td>Additional data + EoP2 FDA meeting Q4 2026 <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">4</td><td><b>Selcodebart (DISC-0974)</b></td><td>Anti-HJV mAb</td><td>Anemia of IBD</td><td>Phase 2 (initiated Q1 2026)</td><td>Initial data 2027 <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">6</td><td><b>Selcodebart (DISC-0974)</b></td><td>Anti-HJV mAb</td><td>Anemia of NDD-CKD</td><td>Phase 1b complete</td><td>Program under assessment; variable Hb effects <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">3</td><td><b>DISC-3405</b></td><td>Anti-TMPRSS6 mAb (hepcidin induction)</td><td>Polycythemia vera</td><td>Phase 2 (RESTORE-PV)</td><td>Further updates by end 2026; initial data positive at SOHO Sep 2026 <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">5</td><td><b>DISC-3405</b></td><td>Anti-TMPRSS6 mAb</td><td>Sickle cell disease</td><td>Phase 1b</td><td>Initial data Q4 2026 <span class="tag fact">FACT</span></td></tr>
+<tr><td class="vrank">7</td><td>Next-gen long-acting anti-HJV</td><td>Anti-HJV mAb</td><td>Anemia</td><td>IND-enabling</td><td>Not guided <span class="tag gap">GAP</span></td></tr>
+</table>
+<p class="fine">Licensing economics: bitopertin — Roche (2021): $4.5M upfront paid, up to $50M/$35M dev-reg milestones (1st/2nd indication), $120M sales milestones, tiered royalties high single-digits to high teens; 482,313 shares issued to Roche at merger; $10M Ph3-initiation milestone paid Jun 2025; $15M US-approval milestone not deemed probable as of 2026-06-30 <span class="tag fact">FACT</span> (Q2 2026 10-Q). Legacy 2019 AbbVie Deutschland license: $0.6M upfront, up to $18M/$45M/$87.5M milestones plus royalties (asset not specified in filing) <span class="tag fact">FACT</span>. Mabwell license (Jan 2023, $10M upfront) covers antibody IP <span class="tag fact">FACT</span> (asset mapping not specified — <span class="tag gap">GAP</span>).</p>
+</section>
+
+<section id="trials">
+<h2><span class="num">4</span>Trial design deep dive</h2>
+<p class="kicker">Endpoints, statistical plan, powering, and readouts to date. No invented numbers — everything below is sourced.</p>
+
+<h3>APOLLO — Phase 3, bitopertin in EPP/XLP (the binary)</h3>
+<table>
+<tr><th style="width:30%">Design element</th><th>Detail</th></tr>
+<tr><td>Design</td><td>Randomized, double-blind, placebo-controlled Phase 3 <span class="tag fact">FACT</span></td></tr>
+<tr><td>Population</td><td>Ages 12+, EPP and XLP; sites in US, Canada, Europe, Australia <span class="tag fact">FACT</span></td></tr>
+<tr><td>Dose / duration</td><td>60 mg once daily, 6 months <span class="tag fact">FACT</span></td></tr>
+<tr><td>Size</td><td>N=183 (expanded from planned N=150 "due to patient and physician demand"); enrollment completed March 2026, last patient dosed 2026-03-26 <span class="tag fact">FACT</span></td></tr>
+<tr><td>Co-primary endpoints</td><td>(1) Average monthly total time in sunlight without pain between 10:00–18:00 during the last month of the 6-month treatment period; (2) percent change from baseline in whole-blood metal-free PPIX after 6 months <span class="tag fact">FACT</span></td></tr>
+<tr><td>Other measures</td><td>Change in PPIX, occurrence of phototoxic reactions, cumulative total pain-free sunlight time, PGIC <span class="tag fact">FACT</span></td></tr>
+<tr><td>Powering</td><td>Company states powering assumptions are in its corporate presentation; not disclosed in the enrollment PR or 10-Q <span class="tag gap">GAP</span>. The expansion from 150 to 183 increases power for the sunlight-time endpoint — directionally de-risking, but the assumed effect size and variance are undisclosed <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td>Regulatory agreement</td><td>FDA agreed to the APOLLO design at the Nov 2024 EoP2 meeting (single trial, primary endpoint, dose, duration, population); Type A meeting (Jun 2026) aligned that a successful APOLLO can support the CRL response and potentially traditional approval <span class="tag fact">FACT</span></td></tr>
+</table>
+<div class="callout warn">
+<p><b>The statistical crux:</b> AURORA's sunlight-time secondaries failed on a placebo response that was "greater than expected" — patients in trials change behavior (more time outdoors) once enrolled, inflating the control arm. APOLLO's co-primary (1) is measured only in the <i>last month</i> of 6 months of treatment, a design choice that should dampen early novelty-driven behavior change <span class="tag interp">INTERPRETATION</span>, but the placebo risk is not eliminated — it is the central uncertainty of the readout <span class="tag interp">INTERPRETATION</span>.</p>
+</div>
+
+<h3>Readouts to date — bitopertin</h3>
+<table>
+<tr><th>Trial</th><th>Design</th><th>Key results</th></tr>
+<tr><td><b>AURORA</b> (Ph2)</td><td>N=75 adults; 20 mg / 60 mg / placebo 1:1:1, 17 weeks</td><td>Primary (PPIX): −21.6% (20 mg, p=0.003) and −40.7% (60 mg, p&lt;0.001) vs +8.0% placebo <span class="tag fact">FACT</span>. Sunlight time (10am–6pm, pain-free days): 175.1 / 153.1 vs 133.9 hrs — not significant; placebo benefit "greater than expected" <span class="tag fact">FACT</span>. Phototoxic reactions with pain: −75% incidence rate at 60 mg (p=0.011) <span class="tag fact">FACT</span>. PGIC "much better": 86% at 60 mg (p=0.022) vs 50% placebo <span class="tag fact">FACT</span>. Data reported 2024-04-01.</td></tr>
+<tr><td><b>BEACON</b> (Ph2, open-label)</td><td>Open-label; 20/60 mg</td><td>Mean whole-blood metal-free PPIX reduction &gt;40% vs baseline; light-tolerance anecdotes (e.g., 4.5 min → 6+ hrs); 96% reduction in patient-reported phototoxic reactions (n=15); PGIC "much better" in 8/10 at day 43. EHA 2023 <span class="tag fact">FACT</span>. Open-label — no control <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td><b>HELIOS</b> (open-label extension)</td><td>OLE of BEACON/AURORA</td><td>EHA 2026: sustained PPIX reductions, significant durable improvement in average light tolerance and time to prodrome, favorable longer-term safety over up to 2.5+ years in adults and adolescents <span class="tag fact">FACT</span>.</td></tr>
+</table>
+
+<h3>RALLY-MF — Phase 1/2, selcodebart in MF anemia (NCT05320198)</h3>
+<p>Open-label, single-arm; adults with primary/secondary MF and Hb &lt;10 g/dL or RBC transfusion dependence; cohorts: non-transfusion-dependent (nTD), low transfusion burden (1–2 units/84d), high burden (3–12 units/84d); 50 mg SC monthly up to 6 months, optional continuation; JAK inhibitor background therapy permitted <span class="tag fact">FACT</span>.</p>
+<ul>
+<li>Mechanism engagement (ASH/EHA 2026, N=54 cut): day-15 mean hepcidin reduction 87%, serum iron mobilization +150%, day-22 reticulocytes +110% <span class="tag fact">FACT</span>.</li>
+<li>Efficacy (ASCO/EHA/SOHO 2026, data cutoff 2026-04-27, N=61): major anemia response 56%, overall response 72%; nTD ≥1.5 g/dL Hb increase sustained ≥12 wks in 55% (n=31); low-burden TI ≥16 wks in 64% (n=11); high-burden TI ≥12 wks in 50% (n=8); responses similar with/without JAKi (56% vs 56%) <span class="tag fact">FACT</span>.</li>
+<li>Durability: among 23 patients continuing post-study, mean longest major response 318 ± 235 days <span class="tag fact">FACT</span>.</li>
+<li>Design risk: single-arm; registrational endpoint/Trial design pending EoP2 FDA meeting by end of 2026 <span class="tag gap">GAP</span>.</li>
+</ul>
+
+<h3>RESTORE-PV — Phase 2, DISC-3405 in PV (open-label)</h3>
+<p>SOHO 2026 initial data (Cohort A): hepcidin increased, serum iron lowered, ferritin raised; mean hematocrit stably &lt;45% through week 26; among 13 patients completing 26 weeks, mean phlebotomies fell from 4.0 (26 wks pre-Day 1) to 0.6 (26 wks post, p&lt;0.0001); 61.5% phlebotomy-free through 26 weeks; 77.8% of 9 patients completing weeks 12–32 phlebotomy-free in that window; dose-proportional PK; generally well tolerated (mild self-limited injection-site reactions) <span class="tag fact">FACT</span>. Open-label, small N — treat as proof-of-mechanism, not registrational <span class="tag interp">INTERPRETATION</span>.</p>
+</section>
+
+<section id="regulatory">
+<h2><span class="num">5</span>Clinical / regulatory status and outlook</h2>
+<p class="kicker">Where each program stands with regulators.</p>
+<table>
+<tr><th>Program</th><th>Status</th><th>Outlook</th></tr>
+<tr><td>Bitopertin (EPP)</td><td>NDA submitted 2025-09-30 under accelerated approval + Commissioner's National Priority Voucher (CNPV) pilot; CRL issued 2026-02-13. FDA acknowledged AURORA/BEACON showed significant PPIX lowering with strong mechanistic plausibility, but found no association between % PPIX change and sunlight endpoints; stated APOLLO results could support traditional approval <span class="tag fact">FACT</span>. Type A meeting completed Jun 2026 — alignment that successful APOLLO can anchor the CRL response <span class="tag fact">FACT</span>. Expanded Access Program launched (US + select geographies) <span class="tag fact">FACT</span>.</td><td>APOLLO topline Q4 2026 → CRL response submission by end of 2026 → FDA decision by mid-2027 (company guidance) <span class="tag fact">FACT</span>. Note: the $15M Roche US-approval milestone was "not deemed probable" as of 2026-06-30 — the company's own accounting reflects approval uncertainty <span class="tag fact">FACT</span>.</td></tr>
+<tr><td>Selcodebart (MF anemia)</td><td>Phase 2; EU Orphan Drug Designation for MF <span class="tag fact">FACT</span>. No FDA registrational agreement yet.</td><td>Additional RALLY-MF data Q4 2026; end-of-Phase-2 FDA meeting expected by year-end 2026 — the meeting that defines the pivotal path <span class="tag fact">FACT</span>.</td></tr>
+<tr><td>Selcodebart (IBD anemia)</td><td>Phase 2 initiated Q1 2026</td><td>Initial data 2027 <span class="tag fact">FACT</span>.</td></tr>
+<tr><td>DISC-3405 (PV)</td><td>Phase 2 RESTORE-PV ongoing</td><td>Further updates by end of 2026 <span class="tag fact">FACT</span>. Competitive clock: MIMRYLO approved Aug 2026.</td></tr>
+<tr><td>DISC-3405 (SCD)</td><td>Phase 1b</td><td>Initial data Q4 2026 <span class="tag fact">FACT</span>.</td></tr>
+</table>
+<div class="callout">
+<p><b>Regulatory read-through:</b> The CRL is a clean, specific rejection of the surrogate — not of the drug's pharmacology. That makes APOLLO a genuine second chance on a clinical endpoint the FDA has already blessed, rather than a re-litigation of the biomarker. The risk is executional (placebo behavior) rather than conceptual <span class="tag interp">INTERPRETATION</span>. Separately, the bitopertin program is the only one near revenue; selcodebart and DISC-3405 are both ≥1 pivotal trial away from any filing <span class="tag interp">INTERPRETATION</span>.</p>
+</div>
+</section>
+
+<section id="competition">
+<h2><span class="num">6</span>Competition — clinical differentiation only</h2>
+<p class="kicker">No marketing language. Mechanism, stage, and what actually differentiates.</p>
+
+<h3>EPP (bitopertin)</h3>
+<table>
+<tr><th>Competitor</th><th>Mechanism / form</th><th>Status</th><th>Clinical differentiation vs bitopertin</th></tr>
+<tr><td><b>Scenesse</b> (afamelanotide, Clinuvel)</td><td>MC1R agonist (α-MSH analogue); subcutaneous implant q2 months by trained HCP</td><td>FDA-approved 2019-10-08 to increase pain-free light exposure in <i>adults</i> with EPP; EU-approved 2014 <span class="tag fact">FACT</span></td><td>Only approved EPP therapy, but: implant procedure (not oral), adult-only label, photoprotective (does not lower PPIX). Bitopertin is oral, studied in ages 12+, and reduces the pathogenic metabolite — <i>if</i> approved, a different therapeutic proposition, not a me-too <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td><b>Dersimelagon</b> (MT-7117; now LEO Pharma, acquired from Tanabe)</td><td>Oral small-molecule MC1R agonist, once daily</td><td>INSPIRE Ph3 met primary endpoint (extended time to first prodromal symptoms vs placebo); NDA granted FDA Priority Review; PDUFA end of Feb 2027 <span class="tag fact">FACT</span>. Note: an earlier Ph3 program did not meet its primary endpoint (per 2024/25 EPP review) — INSPIRE (NCT06144840) is the positive study <span class="tag fact">FACT</span>.</td><td>Direct oral-competitor threat: if approved Feb 2027, it reaches market ~4 months before bitopertin's earliest FDA decision (mid-2027), with a completed positive Ph3 on a clinical endpoint. Differentiation would rest on disease modification (PPIX lowering) vs photoprotection — unproven as a commercial edge <span class="tag interp">INTERPRETATION</span>.</td></tr>
+</table>
+
+<h3>Anemia of myelofibrosis (selcodebart)</h3>
+<table>
+<tr><th>Competitor</th><th>Mechanism</th><th>Status</th><th>Clinical differentiation</th></tr>
+<tr><td><b>Momelotinib</b> (Ojjaara, GSK)</td><td>JAK1/2 + ACVR1 inhibitor</td><td>Approved for MF with anemia <span class="tag fact">FACT</span></td><td>Treats MF disease + anemia in one pill; ACVR1 inhibition also lowers hepcidin. Selcodebart is anemia-only and add-on/agnostic to JAKi background — complementary rather than substitutive; RALLY-MF showed responses with and without JAKi <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td><b>Luspatercept</b> (Reblozyl, BMS/Merck)</td><td>TGF-β ligand trap; late-stage erythroid maturation</td><td>Approved in MDS/β-thalassemia; Ph3 INDEPENDENCE in MF anemia <i>missed</i> primary RBC-TI endpoint (23.1% vs 13.3%, p=0.0674) at EHA 2026, though secondary signals were positive <span class="tag fact">FACT</span>; not FDA-approved for MF anemia</td><td>The INDEPENDENCE miss demonstrates how hard MF-anemia endpoints are — it lowers the bar selcodebart must clear comparatively, but also warns that regulators demand rigorous designs; selcodebart's single-arm data will face the same endpoint scrutiny at EoP2 <span class="tag interp">INTERPRETATION</span>.</td></tr>
+</table>
+
+<h3>Polycythemia vera (DISC-3405)</h3>
+<table>
+<tr><th>Competitor</th><th>Mechanism</th><th>Status</th><th>Clinical differentiation</th></tr>
+<tr><td><b>MIMRYLO</b> (rusfertide, Protagonist/Takeda)</td><td>Hepcidin mimetic peptide</td><td>FDA-approved 2026-08-28 for erythrocytosis in adult PV on VERIFY Ph3 (N=293): phlebotomy eligibility, Hct &lt;45% maintenance, fatigue — all met; broad label not restricted to second-line <span class="tag fact">FACT</span></td><td>Same iron-pathway logic, validated commercially — but now the entrenched competitor. DISC-3405's case rests on antibody pharmacology (dosing interval, durability, tolerability) vs a peptide; no comparative data exist and none should be inferred <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td><b>Besremi</b> (ropeginterferon alfa-2b); <b>Jakafi</b> (ruxolitinib)</td><td>Interferon; JAK1/2 inhibitor</td><td>Established PV therapies <span class="tag fact">FACT</span></td><td>Cytoreductive/systemic mechanisms with their own tolerability trade-offs; iron modulation is non-cytoreductive — a mechanistic alternative, not a head-to-head claim <span class="tag interp">INTERPRETATION</span>.</td></tr>
+</table>
+</section>
+
+<section id="financials">
+<h2><span class="num">7</span>Financials</h2>
+<p class="kicker">From the Q2 2026 10-Q (filed 2026-07-30) and company PRs. All figures in USD.</p>
+<table>
+<tr><th style="width:45%">Item</th><th>Value</th></tr>
+<tr><td>Cash, cash equivalents + marketable securities (2026-06-30)</td><td><b>$717.7M</b> ($98.7M cash + $619.1M marketable securities) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Company runway guidance</td><td>Funds operations <b>into 2029</b> <span class="tag fact">FACT</span> (company PR, Q2 2026)</td></tr>
+<tr><td>Long-term debt — Hercules (2026-06-30)</td><td>$59.3M net ($60M principal drawn of $200M facility); rate = max(8.25%, Prime+1.75%); interest-only to Nov 2028; matures Dec 1, 2029; 6.75% end-of-term charge; first-priority lien on all assets ex-IP; minimum-cash covenant from Jul 2028 (waived while mcap ≥$1.0B) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Additional Hercules capacity</td><td>$50M drawable by 2027-04-30 at sole discretion; +$65M on milestones; +$25M conditional <span class="tag fact">FACT</span></td></tr>
+<tr><td>Net loss — H1 2026</td><td>$123.0M (Q1 $63.5M + Q2 $59.5M) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Operating cash used — H1 2026</td><td>$106.4M (~$53M/quarter) <span class="tag fact">FACT</span></td></tr>
+<tr><td>R&amp;D / SG&amp;A — Q1 2026</td><td>$45.9M / $23.6M (Q2 breakdown not in PR excerpts) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Accumulated deficit (2026-06-30)</td><td>$633.2M <span class="tag fact">FACT</span></td></tr>
+<tr><td>Shares outstanding</td><td>38,345,666 (2026-06-30); 38,392,844 (2026-07-23) <span class="tag fact">FACT</span></td></tr>
+</table>
+<h3>Dilution history (all from SEC filings)</h3>
+<table>
+<tr><th>Raise</th><th>Terms</th><th>Net proceeds</th></tr>
+<tr><td>Jun 2024 underwritten offering</td><td>Terms in 10-K (XBRL-tagged) <span class="tag gap">GAP</span> — existence confirmed via filing</td><td><span class="tag gap">GAP</span></td></tr>
+<tr><td>Nov 2024 Cantor ATM agreement</td><td>At-the-market facility established <span class="tag fact">FACT</span></td><td>Undisclosed usage <span class="tag gap">GAP</span></td></tr>
+<tr><td>Jan 2025 underwritten offering</td><td>4,533,182 shares @ $55.00 (+181,818 pre-funded warrants @ $54.9999); Jefferies/Leerink/Stifel/Cantor <span class="tag fact">FACT</span></td><td>$243.4M <span class="tag fact">FACT</span></td></tr>
+<tr><td>Oct 2025 underwritten offering</td><td>2,619,049 shares @ $84.00 (+59,523 pre-funded warrants @ $83.9999); Jefferies/Leerink/Morgan Stanley/Cantor <span class="tag fact">FACT</span></td><td>$211.0M <span class="tag fact">FACT</span></td></tr>
+<tr><td>Hercules debt</td><td>$30M Nov 2024 + $30M Jun 2026 <span class="tag fact">FACT</span></td><td>$57.6M net borrowings through 2026-06-30 <span class="tag fact">FACT</span></td></tr>
+</table>
+<p class="fine">Pattern: the company raises opportunistically into strength (Oct 2025 at $84, near highs) and layers non-dilutive debt. Through 2026-06-30 it had received $941.8M from private/public equity sales cumulatively <span class="tag fact">FACT</span> (10-Q). The Oct 2025 raise at $84 vs today's ~$61 means the last financing cohort is underwater — a soft overhang on any future raise pricing <span class="tag interp">INTERPRETATION</span>.</p>
+</section>
+<section id="fdmc">
+<h2><span class="num">8</span>FDMC / EV — dilution-honest</h2>
+<p class="kicker">Using filed share counts, not the basic number.</p>
+<table>
+<tr><th style="width:45%">Component</th><th>Value &amp; source</th></tr>
+<tr><td>Common shares outstanding</td><td>38,392,844 (2026-07-23, 10-Q cover) <span class="tag fact">FACT</span></td></tr>
+<tr><td>Equity awards (options + RSUs + inducement grants)</td><td>~4,411,735 (2026-04-28 DEF 14A, as of 2025-12-31: 4,030,406 under plans + 381,329 inducement grants; WAEP $46.46 on the 2021 plan pool) <span class="tag fact">FACT</span>. H1 2026 grants/exercises shift this modestly — net exercises in H1 2026 were ~181K options + ~260K RSUs vested <span class="tag fact">FACT</span>; treat ~4.4M as the working figure <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td>Pre-funded warrants</td><td>59,523 (Oct 2025 offering) unexercised as of 2026-06-30 <span class="tag fact">FACT</span></td></tr>
+<tr><td><b>Fully-diluted shares (working)</b></td><td><b>~42.9M</b> <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Reference price</td><td>$61.18 (Finnhub, 2026-10-07) <span class="tag fact">FACT</span></td></tr>
+<tr><td><b>Fully-diluted market cap</b></td><td><b>~$2.63B</b> (42.9M × $61.18) <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td>Net cash</td><td>$717.7M cash/securities − $59.3M debt, net ≈ <b>$658M</b> <span class="tag fact">FACT</span></td></tr>
+<tr><td><b>Enterprise value</b></td><td><b>~$1.97B</b> (FDMC − net cash) <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+<div class="callout">
+<p><b>What the EV says:</b> ~$1.97B of enterprise value is the market's price for three clinical assets with no revenue: effectively the option value on APOLLO (the dominant term), plus selcodebart's MF data, plus DISC-3405's early PV/SCD signals, minus the CRL overhang. With ~$658M net cash, the cash alone covers roughly one-third of the fully-diluted market cap — downside is cushioned but not floored: a failed APOLLO would still strand most of the EV <span class="tag interp">INTERPRETATION</span>.</p>
+<p><b>Street context (for the takeout cap):</b> 13 analysts cover (MarketBeat, updated 2026-10-09): average target $110.18 (S&amp;P Global via stockanalysis: $103.17, median $100), range $83 (low) to <b>$153 (high)</b>; ratings skew Buy <span class="tag fact">FACT</span>. Stifel (Stephen Willey) maintained Buy, PT $111, on 2026-10-07 (TipRanks) <span class="tag fact">FACT</span>. Per the standing rule, no scenario in this dossier exceeds $153.</p>
+</div>
+</section>
+
+<section id="catalysts">
+<h2><span class="num">9</span>Catalyst / event map</h2>
+<p class="kicker">Every known upcoming event, tagged by date quality. Cross-checked against the local 2027 calendar dataset and Q4 2026 dossier (both carry IRON rows consistent with the below).</p>
+<div class="legend">
+  <span><span class="pill-dq hard">HARD</span> fixed date</span>
+  <span><span class="pill-dq guidance">GUIDANCE</span> company-guided window</span>
+  <span><span class="pill-dq inferred">INFERRED</span> inferred / typical timing</span>
+</div>
+<h3>Past (context)</h3>
+<div class="timeline">
+  <div class="tl-item past"><div class="dt">2026-02-13</div><div class="ev">FDA issues CRL for bitopertin NDA in EPP — stock −22%</div><div class="note">Surrogate (PPIX) rejected; APOLLO named as path to traditional approval.</div></div>
+  <div class="tl-item past"><div class="dt">2026-03-26</div><div class="ev">APOLLO completes enrollment (N=183)</div><div class="note">Expanded from 150 on demand.</div></div>
+  <div class="tl-item past"><div class="dt">Jun 2026</div><div class="ev">Type A meeting with FDA — alignment that successful APOLLO can support CRL response</div></div>
+  <div class="tl-item past"><div class="dt">2026-09-09/10</div><div class="ev">RESTORE-PV initial data at SOHO (DISC-3405, PV) — positive</div></div>
+</div>
+<h3>Upcoming</h3>
+<div class="timeline">
+  <div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>APOLLO Phase 3 topline — bitopertin in EPP/XLP.</b> THE binary: co-primaries on pain-free sunlight time + PPIX.</div><div class="note">Company-guided. ASH 2026 (Dec) is the natural venue if data are ready — <span class="pill-dq inferred">INFERRED</span> venue, guidance window.</div></div>
+  <div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Additional RALLY-MF data — selcodebart in MF anemia</b> (full/topline cut)</div><div class="note">Shapes the EoP2 discussion; second-most important readout of the quarter.</div></div>
+  <div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>End-of-Phase-2 FDA meeting — selcodebart, MF anemia</b></div><div class="note">Defines the registrational path (endpoint, design). By year-end per company.</div></div>
+  <div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>DISC-3405 sickle cell disease Phase 1b initial data</b></div><div class="note">Early proof-of-mechanism; not registrational.</div></div>
+  <div class="tl-item"><div class="dt">Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Further RESTORE-PV (DISC-3405, PV) updates</b></div><div class="note">Follow-on to the positive SOHO cut.</div></div>
+  <div class="tl-item"><div class="dt">End of 2026 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Bitopertin CRL response submission</b> (contingent on APOLLO success)</div></div>
+  <div class="tl-item"><div class="dt">End of Feb 2027 <span class="pill-dq hard">HARD</span></div><div class="ev"><b>Dersimelagon PDUFA — LEO Pharma (competitor event).</b> Oral MC1R agonist for EPP/XLP; Priority Review.</div><div class="note">Hard date per FDA. Approval would put an oral competitor on market ~4 months before bitopertin's earliest decision.</div></div>
+  <div class="tl-item"><div class="dt">Mid-2027 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>FDA decision on bitopertin CRL response</b></div><div class="note">The approval binary, contingent on APOLLO.</div></div>
+  <div class="tl-item"><div class="dt">2027 <span class="pill-dq guidance">GUIDANCE</span></div><div class="ev"><b>Selcodebart Phase 2 initial data — anemia of IBD</b></div></div>
+  <div class="tl-item"><div class="dt">2027 <span class="pill-dq inferred">INFERRED</span></div><div class="ev"><b>Potential pivotal-program starts</b> (selcodebart MF; DISC-3405 PV/SCD) — contingent on Q4 2026 readouts + FDA alignment</div><div class="note">Company: "potentially positioned to advance two more programs into pivotal-stage development in 2027."</div></div>
+</div>
+<div class="dq-audit"><b>Audit pass 2026-10-10:</b> no catalyst fell between the dossier as-of date (2026-10-07) and today. The APOLLO trial registry was updated 2026-10-09 with no posted results (reviewed 2026-10-10). The stock traded ~$62 on Oct 9 (TradeStie aggregator) vs the $61.18 reference — no material move. All upcoming items below remain pending.</div>
+<h3>Catalyst-by-catalyst breakdown</h3>
+<p class="kicker">What the event is, what "good" looks like, and what to watch — each tagged by date quality.</p>
+<table>
+<tr><th>Catalyst</th><th>Date</th><th>What "good" looks like</th><th>What to watch</th></tr>
+<tr><td><b>APOLLO Ph3 topline — bitopertin (EPP/XLP)</b></td><td>Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Both co-primaries hit: statistically significant separation on average monthly pain-free sunlight time (10:00–18:00, last treatment month) <i>plus</i> PPIX; clean safety</td><td>Placebo arm's sunlight-time gain — AURORA's failure mode; whether the win is on the <i>clinical</i> co-primary, not just PPIX; PGIC and phototoxic-reaction secondaries as tie-breakers</td></tr>
+<tr><td><b>RALLY-MF additional data — selcodebart (MF anemia)</b></td><td>Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Major response ~55–70% holds at larger N; durability extends; safety clean</td><td>High-burden cohort growth (was n=8 at the 2026-04-27 cut); JAKi-agnostic responses hold; shapes the EoP2 ask</td></tr>
+<tr><td><b>EoP2 FDA meeting — selcodebart, MF anemia</b></td><td>Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Agreed registrational endpoint + trial design; pivotal path defined</td><td>Whether FDA demands a large placebo-controlled pivotal (expensive, slow) — the design risk sits ahead, not behind</td></tr>
+<tr><td><b>DISC-3405 sickle cell disease Ph1b initial data</b></td><td>Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Hepcidin induction + iron-restriction signals; tolerability</td><td>Small n; proof-of-mechanism only — do not over-read</td></tr>
+<tr><td><b>RESTORE-PV further updates — DISC-3405</b></td><td>Q4 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Hct &lt;45% durability; phlebotomy-free rates hold or grow</td><td>Durability past 26 weeks; anemia watch — the hepcidin-induction therapeutic window is narrow (rusfertide label: anemia 16%)</td></tr>
+<tr><td><b>Q3 2026 earnings / business update</b></td><td>~2026-11-05 <span class="pill-dq inferred">INFERRED</span></td><td>Cash burn on plan; runway-into-2029 reiterated; any APOLLO timing color</td><td>Date is an aggregator estimate (TradeStie, Oct 2026) — company typically confirms ~2 weeks prior; not a binary</td></tr>
+<tr><td><b>Bitopertin CRL response submission</b></td><td>End of 2026 <span class="pill-dq guidance">GUIDANCE</span></td><td>Filed on schedule after a positive APOLLO</td><td>Fully contingent on APOLLO; assumes the Jun 2026 Type A alignment holds</td></tr>
+<tr><td><b>Dersimelagon PDUFA (LEO Pharma) — competitor</b></td><td>End of Feb 2027 <span class="pill-dq hard">HARD</span></td><td>N/A — competitor event; approval puts an oral EPP drug on market ~4 months before bitopertin's earliest decision</td><td>Label breadth (EPP+XLP? ages 12+?); LEO's commercial execution in a tiny patient population</td></tr>
+<tr><td><b>FDA decision — bitopertin CRL response</b></td><td>Mid-2027 <span class="pill-dq guidance">GUIDANCE</span></td><td>Traditional approval, ages 12+, EPP incl. XLP</td><td>Dersimelagon's Feb 2027 outcome sets the endpoint-approvability precedent (helps or hurts); adcomm possibility</td></tr>
+<tr><td><b>Selcodebart IBD Ph2 initial data</b></td><td>2027 <span class="pill-dq guidance">GUIDANCE</span></td><td>Hb responses in IBD anemia</td><td>New indication; early read</td></tr>
+<tr><td><b>Pivotal-program starts (selcodebart MF; DISC-3405)</b></td><td>2027 <span class="pill-dq inferred">INFERRED</span></td><td>Two programs advance to pivotal-stage per company ("potentially positioned to advance two more programs into pivotal-stage development in 2027")</td><td>Contingent on Q4 2026 data + FDA alignment; drives 2027–28 burn</td></tr>
+</table>
+<p class="fine">Through the hold-through-the-binary lens — the Q4 2026 cluster (APOLLO + RALLY-MF + EoP2 + SCD) is the trade; the mid-2027 FDA decision is the second leg of the same binary, not a commercial call.</p>
+</section>
+
+<section id="redflags">
+<h2><span class="num">10</span>Ranked red flags</h2>
+<p class="kicker">Ranked by potential impact on the thesis, not by recency.</p>
+<div class="flag"><span class="rank">#1</span><b>The CRL rejected the surrogate — APOLLO must win on the clinical endpoint.</b> The FDA found no association between % PPIX change and sunlight endpoints. AURORA already showed this exact failure mode (placebo beat expectations on sunlight time). If APOLLO repeats it, bitopertin has no regulatory path <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#2</span><b>Dersimelagon is ahead and could be approved first.</b> Positive Ph3 (INSPIRE), Priority Review, PDUFA end of Feb 2027, now owned by LEO Pharma with commercial muscle. Bitopertin's earliest approval is mid-2027 — a ~4-month gap that could become permanent share loss in a tiny patient population <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#3</span><b>Heavy short interest (~25.6%).</b> One-quarter of the float is short — the market is explicitly positioned for APOLLO disappointment and/or post-CRL overhang <span class="tag fact">FACT</span> (danelfin). Squeeze potential cuts both ways <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#4</span><b>Securities class-action investigation (Rosen Law, Oct 2026).</b> Alleges materially misleading business information around the CRL. Investigations often follow CRLs and frequently go nowhere — but they create headline risk into the binary and discovery overhang after it <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#5</span><b>Secured debt with teeth.</b> $60M Hercules term loan: 8.25%+ floating, first lien on all assets ex-IP, 6.75% end-of-term charge, minimum-cash covenant from Jul 2028. For a pre-revenue biotech, this is expensive, covenant-bound leverage — not a revolver <span class="tag fact">FACT</span>.</div>
+<div class="flag"><span class="rank">#6</span><b>Roche's economics bite on success.</b> Tiered royalties of high single-digits to high teens plus $15M approval milestone and $120M in sales milestones — bitopertin's margin stack is shared before the first dollar <span class="tag fact">FACT</span>.</div>
+<div class="flag"><span class="rank">#7</span><b>Serial dilution machine.</b> ~$941.8M raised in equity through Jun 2026; raises in Jun 2024, Jan 2025 ($55), Oct 2025 ($84), plus a Cantor ATM. The Oct 2025 cohort at $84 is underwater at ~$61 — future raises price off a damaged chart <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#8</span><b>Selcodebart's data are single-arm.</b> 56%/72% response rates with no control in a disease where the Ph3 competitor missed its primary. The EoP2 meeting could demand a large, expensive, placebo-controlled pivotal — or a design the data can't support <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#9</span><b>GlyT1 anemia liability.</b> Rat data: ~20% steady-state Hb reduction with reticulocyte iron inclusions. Human EPP data look clean so far, but chronic dosing in a broader population (and regulators) will watch hemoglobin <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#10</span><b>Insider selling cluster.</b> Multiple Form 144s filed Sep 3–11, 2026 plus an insider sale (~5,000 shares at ~$80, Aug 2026, retained ~52K). Planned-sale filings are routine, but the clustering ahead of the Q4 binary is poor optics <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#11</span><b>DISC-3405 chases an approved drug.</b> MIMRYLO's Aug 2026 approval with a broad PV label means DISC-3405 must differentiate as a follower on an antibody-vs-peptide story with no comparative data <span class="tag interp">INTERPRETATION</span>.</div>
+<div class="flag"><span class="rank">#12</span><b>Exec employment agreements re-done Jul 2026.</b> Amended/restated agreements for the CEO, CFO, CCO, CMO, COO — typically refreshes change-in-control severance ahead of binary outcomes. Standard governance, but note the timing <span class="tag fact">FACT</span> + <span class="tag interp">INTERPRETATION</span>.</div>
+</section>
+
+<section id="scenarios">
+<h2><span class="num">11</span>Bear / base / bull + scenario analyses</h2>
+<p class="kicker">Framed for a hold-through-the-binary investor. No DCF, no recommendation. The <b>soft scenario-implied levels</b> below are scenario arithmetic built from this dossier's own numbers (FD shares ~42.9M, net cash ~$658M → ~$15.34/sh cash value, reference price $61.18) — not price targets. Takeout scenarios capped at the street high of $153.</p>
+<div class="grid2">
+<div class="card"><h4>Bear — APOLLO misses the sunlight co-primary</h4><p>Placebo behavior repeats AURORA; PPIX separates but pain-free sunlight time doesn't. Bitopertin's regulatory path effectively ends (CRL response without a clinical win has no basis). Value collapses to: net cash (~$658M) + selcodebart option value + DISC-3405 option value, against a ~$2.6B FDMC. The class action gains momentum; dersimelagon's Feb 2027 approval (if it lands) closes the EPP window. Financing need re-emerges 2028 on a damaged chart <span class="tag interp">INTERPRETATION</span>.</p></div>
+<div class="card"><h4>Base — APOLLO hits both co-primaries, modestly</h4><p>Statistically significant but moderate effect on sunlight time; PPIX robust. CRL response submitted end-2026; FDA deliberates to mid-2027 with the dersimelagon precedent (approved Feb 2027) actually <i>helping</i> — it proves the endpoint is approvable. Selcodebart advances to a defined pivotal path at EoP2. Stock re-rates on de-risking but the EPP commercial duopoly caps out-year enthusiasm — which doesn't matter for the binary thesis: the binary is the trade <span class="tag interp">INTERPRETATION</span>.</p></div>
+</div>
+<div class="grid2" style="margin-top:16px">
+<div class="card"><h4>Bull — APOLLO hits big; pipeline converts</h4><p>Large, significant sunlight-time separation (HELIOS-like durability in a controlled setting) + PPIX; CRL response → approval mid-2027 as the first oral, disease-modifying EPP therapy for ages 12+ incl. XLP. RALLY-MF full data hold ~55–70% responses → clean EoP2 → pivotal MF program. DISC-3405 PV data deepen. The three-asset hematology platform + $718M cash + de-risked registrational paths make Disc a takeout candidate — capped at the street high of <b>$153</b> per the standing rule <span class="tag interp">INTERPRETATION</span>.</p></div>
+<div class="card"><h4>Scenario: APOLLO mixed (PPIX hit, sunlight miss)</h4><p>The most dangerous outcome: not a clean fail. Management argues PGIC/phototoxic-reaction secondaries; FDA holds the line from the CRL (no PPIX–sunlight association). Stock trades in limbo — too weak for approval, too active to kill — while cash burns and the class action simmers. This is the outcome to have a plan for, not the clean miss <span class="tag interp">INTERPRETATION</span>.</p></div>
+</div>
+<h3>Soft scenario-implied price levels <span class="tag soft">SOFT</span></h3>
+<p class="fine">Assumption-labeled scenario arithmetic only — not price targets, not a recommendation. Reference: FDMC ~$2.63B at $61.18 (2026-10-07). The $15.34/sh net-cash figure is arithmetic, not a price prediction.</p>
+<table>
+<tr><th>Scenario</th><th>Implied level</th><th>Key assumptions</th></tr>
+<tr><td><b>Bear — APOLLO misses the sunlight co-primary</b></td><td><b>$25–35</b> <span class="tag soft">SOFT</span></td><td>Bitopertin's regulatory path ends; EV $400–850M (cash + selcodebart/DISC-3405 option value) → FDMC $1.06–1.51B on ~42.9M FD shares <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Mixed — PPIX hit, sunlight miss</b></td><td><b>$40–55</b> <span class="tag soft">SOFT</span></td><td>Limbo outcome; EV $1.0–1.7B → FDMC $1.72–2.36B; cash burn continues with no approval path absent a clinical win <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Base — APOLLO hits both co-primaries, modestly</b></td><td><b>$95–115</b> <span class="tag soft">SOFT</span></td><td>CRL response by end-2026; FDA decision mid-2027; re-rate toward the street average (~$103–110); no takeout premium <span class="tag interp">INTERPRETATION</span></td></tr>
+<tr><td><b>Bull — APOLLO big win; pipeline converts</b></td><td><b>$130–153</b> <span class="tag soft">SOFT</span></td><td>Large, significant sunlight separation; approval mid-2027 (ages 12+, EPP incl. XLP); RALLY-MF holds → clean EoP2; DISC-3405 data deepen; takeout optionality; capped at the street high of $153 <span class="tag interp">INTERPRETATION</span></td></tr>
+</table>
+<div class="softbox">
+<p><b>How to read these:</b> the levels are linear in enterprise value against a fixed fully-diluted share count — they move with the APOLLO binary, not with commercial modeling (no revenue is modeled; there is none). A failed APOLLO strands most of the EV above the net-cash arithmetic floor. <span class="tag interp">INTERPRETATION</span></p>
+</div>
+<div class="callout">
+<p><b>Key swing factor, restated:</b> everything in this dossier — the CRL response, the mid-2027 decision, the platform premium, the takeout optionality — is a call option on APOLLO's sunlight-time co-primary separating from placebo. Size the position for the binary, not for the pipeline story <span class="tag interp">INTERPRETATION</span>.</p>
+</div>
+</section>
+
+<section id="management">
+<h2><span class="num">12</span>Management track record &amp; insider signals</h2>
+<p class="kicker">Who runs it, what they've done, and what insiders are doing with the stock.</p>
+<h3>Leadership</h3>
+<table>
+<tr><th>Person</th><th>Role</th><th>Track record</th></tr>
+<tr><td><b>John Quisel, J.D., Ph.D.</b></td><td>President &amp; CEO (since Feb 2020)</td><td>13+ years at Acceleron Pharma — General Counsel → SVP Corporate Development → EVP/Chief Business Officer; led the re-acquisition/in-licensing of sotatercept for pulmonary hypertension from BMS, the asset that drove Merck's $11.5B acquisition of Acceleron (2021); negotiated the luspatercept (Reblozyl) collaboration. Harvard (summa), Stanford MSc, MIT PhD biology, Harvard Law <span class="tag fact">FACT</span>. Rare combo: scientist-lawyer-dealmmaker; directly relevant to a company whose value is regulatory + BD optionality <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td>Jean Franchi</td><td>CFO</td><td>Exec team disclosed in 10-Q; background not independently verified for this dossier <span class="tag gap">GAP</span>.</td></tr>
+<tr><td>Pamela Stephenson, M.P.H.</td><td>Chief Commercial Officer</td><td>Commercial build-out pre-revenue (SG&amp;A ramp in 2026) <span class="tag interp">INTERPRETATION</span>.</td></tr>
+<tr><td>William Savage, M.D., Ph.D.</td><td>Chief Medical Officer</td><td>Leads the APOLLO/RALLY-MF/RESTORE-PV execution <span class="tag fact">FACT</span>.</td></tr>
+<tr><td>Jonathan Yu, M.B.A.</td><td>COO</td><td>Exec team disclosed in 10-Q <span class="tag fact">FACT</span>.</td></tr>
+</table>
+<h3>Insider signals</h3>
+<ul>
+<li>CEO John Quisel owns 226,064 shares (~$13.9M at current price) — meaningful skin in the game <span class="tag fact">FACT</span> (insidertrades.com, Oct 2026).</li>
+<li>Insider Rahul Khara sold 5,000 shares at ~$80 (~$400K) in Aug 2026, retaining ~52,324 shares — a trim, not an exit <span class="tag fact">FACT</span>.</li>
+<li>Cluster of Form 144 filings (planned-sale notices) Sep 3–11, 2026 — routine 10b5-1 mechanics are the benign read; the clustering into the Q4 binary is the cautious read <span class="tag interp">INTERPRETATION</span>.</li>
+<li>No open-market insider <i>buys</i> surfaced in the search window — absence of buying into the binary is a mild negative signal, not a verdict <span class="tag interp">INTERPRETATION</span>.</li>
+</ul>
+</section>
+
+<section id="references">
+<h2><span class="num">13</span>References, as-of date &amp; filings used</h2>
+<p class="kicker">As-of date: <b>2026-10-07</b>. Source order: SEC → FDA/labels → CT.gov → papers/conferences → company PRs/decks → trade press.</p>
+<h3>SEC filings (primary)</h3>
+<ul class="refs">
+<li>Form 10-Q, Q2 2026 (filed 2026-07-30; accession 0001193125-26-325034) — cash $717.7M, debt, share counts, Roche/AbbVie/Mabwell licenses, offerings, exec agreements.</li>
+<li>Form 10-K, FY2025 (filed 2026-02-26) — option tables (3,269,290 options @ $37.64 at 2025-12-31), Jan 2025 &amp; Oct 2025 offering terms.</li>
+<li>DEF 14A (2026-04-28) — equity plan table: 4,411,735 awards outstanding.</li>
+<li>Form 8-K 2026-02-13 (CRL); 8-K 2026-02-17; 8-K 2026-09-10 (RESTORE-PV); Forms 4/144 (insider activity Sep 2026).</li>
+</ul>
+<h3>Company (PRs / IR)</h3>
+<ul class="refs">
+<li>Disc Medicine IR — APOLLO enrollment completion (2026-03-26; N=183, co-primary endpoints); Type A meeting update (Jun 2026); Q1 &amp; Q2 2026 financial results &amp; business updates; RESTORE-PV SOHO PR (2026-09-09); EoP2 meeting Nov 2024 (accelerated-approval agreement); AURORA topline PR (2024-04-01); BEACON EHA 2023 PR.</li>
+<li>Drugs.com — bitopertin development timeline (NDA 2025-09-30; CRL 2026-02-13) — dossier typo fixed 2026-10-10.</li>
+</ul>
+<h3>Conferences / clinical</h3>
+<ul class="refs">
+<li>ASH Clinical News (2026) — RALLY-MF: hepcidin −87%, iron +150%, reticulocytes +110%; response durability 318 ± 235 days.</li>
+<li>OncLive (2026) — RALLY-MF SOHO update (56% major / 72% overall; TI rates by cohort); INDEPENDENCE luspatercept Ph3 miss (p=0.0674, EHA 2026).</li>
+<li>SOHO Insider / EHA 2026 — RALLY-MF cohort details.</li>
+</ul>
+<h3>Academic literature (mandatory)</h3>
+<ul class="refs">
+<li>J Clin Invest (2025/2026) — "Blocking extracellular glycine uptake mediated by GlyT1 mitigates protoporphyria" (JCI 197344): bitopertin lowers PPIX in EPP/XLP models without lowering heme.</li>
+<li>JCI Insight (2019) — bitopertin improves anemia in a β-thalassemia mouse model.</li>
+<li>Exp Hematol (2016) — GlyT1 inhibition in rats: microcytic hypochromic regenerative anemia, ~20% steady-state Hb reduction, reticulocyte mitochondrial iron inclusions.</li>
+<li>Cell Chem Biol-family repurposing paper (2021) — FECH-KO K562 screen identifying GlyT1/2 inhibitors for EPP.</li>
+<li>Wiley EPP review (2024/25) — afamelanotide/dersimelagon/bitopertin landscape; bitopertin safety in prior β-thalassemia &amp; schizophrenia trials.</li>
+<li>Babitt et al., Nature Genetics (2006) — hemojuvelin/BMP regulation of hepcidin (selcodebart biology).</li>
+<li>Du et al., Science (2008) — TMPRSS6/matriptase-2 suppresses hepcidin (DISC-3405 biology).</li>
+<li>Bugarski-Kirola et al., Biological Psychiatry (2017) — bitopertin Phase 3 failures in schizophrenia (Roche program history).</li>
+</ul>
+<h3>Competitive / regulatory</h3>
+<ul class="refs">
+<li>HCPlive (Sep 2026) — dersimelagon FDA Priority Review, PDUFA end of Feb 2027; LEO Pharma acquisition of worldwide rights from Tanabe.</li>
+<li>Protagonist PR via BioSpace/Morningstar (2026-08-28) — MIMRYLO (rusfertide) FDA approval for PV on VERIFY Ph3 (N=293).</li>
+<li>Drugs.com / FDA DailyMed — Scenesse (afamelanotide) FDA approval 2019-10-08 for EPP (adults); implant q2 months.</li>
+</ul>
+<h3>Market / other</h3>
+<ul class="refs">
+<li>Finnhub (via search, 2026-10-07) — price $61.18, 52-wk $40.00–$99.50, mcap ~$2.48B.</li>
+<li>MarketBeat / stockanalysis.com / Finviz (Sep–Oct 2026) — ~13 analysts, avg PT ~$101–110, high $153, low $79–83; 11 Buy / 1 Hold / 1 Sell.</li>
+<li>insidertrades.com (Aug–Oct 2026) — Khara sale; Quisel 226,064-share ownership.</li>
+<li>Rosen Law Firm PRs (Oct 2 &amp; 5, 2026) — securities class-action investigation re CRL.</li>
+<li>Local datasets: catalyst-calendar-2027/data.json (v16-0460, v16-0688) and q4-2026-dossier/dossier-v4.json — IRON rows cross-checked.</li>
+<li><b>Audit-pass additions (2026-10-10):</b> MarketBeat (updated 2026-10-09) — 13 analysts, avg PT $110.18, high $153, low $83; stockanalysis.com/S&amp;P Global — avg $103.17, median $100, 13 analysts "Strong Buy"; TipRanks (2026-10-07) — Stifel Nicolaus (Stephen Willey) maintained Buy, PT $111; TradeStie (updated 2026-10-09) — $62.06 (+2.12%), Q3 2026 earnings estimated ~Nov 5, 2026 (aggregator estimate, <span class="tag unver">UNVERIFIED</span>); merlintrader.com stock hub (reviewed 2026-10-10) — APOLLO trial registry updated 2026-10-09, 183 participants, status completed, no posted results; Drugs.com bitopertin history (crawled 2026-10-09) — NDA submitted 2025-09-30, CRL 2026-02-13.</li>
+</ul>
+<p class="fine"><b>Gaps disclosed:</b> APOLLO powering assumptions (in corporate deck, not pulled); Jun 2024 offering terms; Cantor ATM usage; Mabwell license asset mapping; selcodebart registrational design (pending EoP2); full HELIOS/RALLY-MF datasets beyond conference cuts. <b>Nothing in this dossier is invented</b> — numbers without a source above are labeled INTERPRETATION or GAP.</p>
+</section>
+</main>
+<button id="backTop" aria-label="Back to top">&#8593;</button>
+<footer>As of 2026-10-07 · Filings used: 10-Q for Q2 2026 (filed 2026-07-30), 10-K FY2025 (filed 2026-02-26), DEF 14A (2026-04-28), 8-Ks (CRL 2026-02-13; Type A meeting; RESTORE-PV 2026-09-10). <b>Audit pass 2026-10-10:</b> no catalyst dated 2026-10-07–2026-10-10 landed; NDA-date typo corrected (2025-09-30); street data refreshed; soft scenario levels, value-ranked pipeline, and catalyst-by-catalyst breakdown added. No personal data in this document.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var root = document.documentElement;
+  function label(b, t){ if(b){ b.innerHTML = (t === "dark" ? "&#9728;&#65039; Light" : "&#127769; Dark"); } }
+  function setTheme(t){
+    root.setAttribute("data-theme", t);
+    try { localStorage.setItem("iron-theme", t); } catch(e){}
+    label(document.getElementById("themeToggle"), t);
+  }
+  var saved = "light";
+  try { saved = localStorage.getItem("iron-theme") || "light"; } catch(e){}
+  setTheme(saved);
+  var tt = document.getElementById("themeToggle");
+  if (tt) tt.addEventListener("click", function(){
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
+  // Collapsible sections (wrap everything after each h2)
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main > section"));
+  sections.forEach(function(sec){
+    var h = sec.querySelector("h2"); if(!h) return;
+    var body = document.createElement("div"); body.className = "sec-body";
+    var rest = [];
+    sec.childNodes.forEach(function(n){ if(n !== h) rest.push(n); });
+    rest.forEach(function(n){ body.appendChild(n); });
+    sec.appendChild(body);
+    h.classList.add("collapsible");
+    h.innerHTML = '<span class="chev">&#9662;</span>' + h.innerHTML;
+    h.addEventListener("click", function(){ sec.classList.toggle("collapsed"); });
+  });
+  var ca = document.getElementById("collapseAll");
+  if (ca) ca.addEventListener("click", function(){
+    var anyOpen = sections.some(function(s){ return !s.classList.contains("collapsed"); });
+    sections.forEach(function(s){ s.classList.toggle("collapsed", anyOpen); });
+    ca.textContent = anyOpen ? "Expand all" : "Collapse all";
+  });
+
+  // Mobile: wrap tables in horizontal scrollers
+  Array.prototype.forEach.call(document.querySelectorAll("main table"), function(t){
+    var d = document.createElement("div"); d.className = "table-scroll";
+    t.parentNode.insertBefore(d, t); d.appendChild(t);
+  });
+
+  // Back to top
+  var btt = document.getElementById("backTop");
+  window.addEventListener("scroll", function(){
+    btt.style.display = (window.scrollY > 600) ? "block" : "none";
+  }, {passive:true});
+  btt.addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
+})();
+</script>
+</body>
+</html>
