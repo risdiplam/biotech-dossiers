@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biotech Dossiers — Deep-Dive Research Library</title>
+<style>
+:root{--bg:#ffffff;--ink:#1a1d21;--muted:#5f6b76;--line:#e2e6ea;--wash:#f4f6f8;--accent:#0e7c6b;--radius:10px}
+html[data-theme="dark"]{--bg:#121417;--ink:#e8eaed;--muted:#9aa4ae;--line:#2b3138;--wash:#1a1e22;--accent:#4fd1b5}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+.wrap{max-width:960px;margin:0 auto;padding:24px 20px 60px}
+header{text-align:center;margin:40px 0 32px}
+header h1{margin:0 0 8px;font-size:32px}
+header p{color:var(--muted);margin:0}
+.controls{display:flex;gap:12px;margin:24px 0;flex-wrap:wrap}
+.controls input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);color:var(--ink);font-size:15px}
+.theme-btn{padding:10px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--wash);color:var(--ink);cursor:pointer;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--wash);text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.card .ticker{font-size:22px;font-weight:800;color:var(--accent)}
+.card .company{font-size:15px;margin:4px 0;color:var(--ink)}
+.card .meta{font-size:13px;color:var(--muted);margin-top:8px}
+.card .catalyst{font-size:13px;margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:6px;border-left:3px solid var(--accent)}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;padding-top:24px;border-top:1px solid var(--line)}
+@media(max-width:600px){header h1{font-size:26px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Biotech Dossiers</h1>
+<p>Deep-dive research library — 18 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
+</header>
+<div class="controls">
+<input type="search" id="q" placeholder="Search tickers or companies…" aria-label="Search dossiers">
+<button class="theme-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+</div>
+<div class="grid" id="grid"></div>
+<footer>
+<p>Research as of October 2026. For educational purposes — not investment advice.<br>Scenario price ranges are illustrative, not predictions.</p>
+</footer>
+</div>
+<script>
+const D=[
+{t:"PEPG",c:"PepGen",d:"2026-10-10",cat:"FREEDOM2 10mg/kg DM1 data — Nov 2026"},
+{t:"CRBP",c:"Corbus Pharmaceuticals",d:"2026-10-10",cat:"TEMPO-1 progress; ObesityWeek Nov 14–17"},
+{t:"SLGL",c:"Sol-Gel Technologies",d:"2026-10-10",cat:"SGT-610 Ph3 Gorlin topline — late Nov 2026"},
+{t:"LTGO",c:"Latigo Biotherapeutics",d:"2026-10-10",cat:"Ph3 bunionectomy topline — 2H 2027"},
+{t:"HELP",c:"Helus Pharma",d:"2026-10-10",cat:"Oct 21 presentation"},
+{t:"IRON",c:"Disc Medicine",d:"2026-10-10",cat:"NDA timeline"},
+{t:"IMUX",c:"Immunic Inc",d:"2026-10-10",cat:"MS disability data"},
+{t:"SPRB",c:"Spruce Biosciences",d:"2026-10-10",cat:"TA-ERT BLA submission — Q4 2026"},
+{t:"HRMY",c:"Harmony Biosciences",d:"2026-10-10",cat:"Q3 earnings — early Nov"},
+{t:"PRAX",c:"Praxis Precision Medicines",d:"2026-10-10",cat:"Pipeline readouts"},
+{t:"AXSM",c:"Axsome Therapeutics",d:"2026-10-10",cat:"Commercial execution"},
+{t:"XENE",c:"Xenon Pharmaceuticals",d:"2026-10-10",cat:"Pipeline catalysts"},
+{t:"STOK",c:"Stoke Therapeutics",d:"2026-10-10",cat:"Regulatory updates"},
+{t:"OVID",c:"Ovid Therapeutics",d:"2026-10-10",cat:"Pipeline progress"},
+{t:"GLUE",c:"Monte Rosa Therapeutics",d:"2026-10-10",cat:"GFORCE-2 updates"},
+{t:"SLN",c:"Silence Therapeutics",d:"2026-10-10",cat:"Pipeline catalysts"},
+{t:"PHVS",c:"Pharvaris",d:"2026-10-10",cat:"RAPIDe-3 follow-through"},
+{t:"NKTR",c:"Nektar Therapeutics",d:"2026-10-10",cat:"Pipeline readouts"},
+];
+const grid=document.getElementById('grid'),q=document.getElementById('q');
+function render(f=""){
+f=f.toLowerCase();
+grid.innerHTML=D.filter(x=>(x.t+x.c).toLowerCase().includes(f)).map(x=>
+`<a class="card" href="${x.t}.html"><div class="ticker">${x.t}</div><div class="company">${x.c}</div><div class="meta">Updated ${x.d}</div><div class="catalyst">${x.cat}</div></a>`).join('')
+||'<p style="color:var(--muted)">No matches.</p>';
+}
+q.addEventListener('input',e=>render(e.target.value));
+render();
+// theme
+const b=document.getElementById('themeBtn');
+function setT(t){document.documentElement.dataset.theme=t;localStorage.setItem('dz-theme',t);b.textContent=t==='dark'?'☀️':'🌙';}
+setT(localStorage.getItem('dz-theme')||'light');
+b.onclick=()=>setT(document.documentElement.dataset.theme==='dark'?'light':'dark');
+</script>
+</body>
+</html>
