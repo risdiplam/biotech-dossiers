@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spruce Biosciences (SPRB) — Deep-Dive Investment Dossier</title>
+<style>
+  :root{
+    --bg:#0e1218; --panel:#161c26; --panel2:#1b2330; --line:#2a3444;
+    --text:#e9edf3; --muted:#9aa6b5; --dim:#6d7888;
+    --teal:#46d9c4; --teal-dim:#1e5a52;
+    --blue:#6aa8ff; --amber:#f0b429; --red:#ef6f6f; --green:#5cc98a; --gray:#8a93a1;
+    --navbg:rgba(14,18,24,.96);
+  }
+  [data-theme="light"]{
+    --bg:#f5f7fa; --panel:#ffffff; --panel2:#edf1f7; --line:#d9e1ec;
+    --text:#17202e; --muted:#4d5a6e; --dim:#7d8a9c;
+    --teal:#0b7c70; --teal-dim:#b8e8e0;
+    --blue:#1d4ed8; --amber:#9a5f00; --red:#c0392b; --green:#12784a; --gray:#5d6878;
+    --navbg:rgba(245,247,250,.97);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif; line-height:1.65; font-size:16px; transition:background .25s,color .25s}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 28px}
+  /* top nav */
+  nav{position:sticky; top:0; z-index:50; background:var(--navbg); border-bottom:1px solid var(--line); backdrop-filter:blur(6px)}
+  nav .inner{max-width:1120px; margin:0 auto; padding:8px 20px; display:flex; flex-wrap:wrap; gap:4px; align-items:center}
+  nav a{color:var(--muted); text-decoration:none; font-size:13px; padding:6px 10px; border-radius:6px; white-space:nowrap; min-height:44px; display:inline-flex; align-items:center}
+  nav a:hover{color:var(--text); background:var(--panel2)}
+  nav a.active{color:var(--teal); background:rgba(70,217,196,.08)}
+  nav .brand{font-weight:700; color:var(--text); font-size:14px; margin-right:10px; letter-spacing:.3px; min-height:44px; display:inline-flex; align-items:center}
+  .navbtn{background:var(--panel2); border:1px solid var(--line); color:var(--muted); border-radius:8px; font-size:13px; padding:6px 12px; min-height:44px; min-width:44px; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+  .navbtn:hover{color:var(--text); border-color:var(--teal)}
+  .navspacer{flex:1 1 auto}
+  /* header */
+  header{padding:56px 0 34px}
+  .kicker{color:var(--teal); font-size:13px; letter-spacing:2.5px; text-transform:uppercase; font-weight:600; margin-bottom:12px}
+  h1{font-size:40px; line-height:1.15; font-weight:750; letter-spacing:-.5px; margin-bottom:10px}
+  h1 .tick{color:var(--teal)}
+  .sub{color:var(--muted); font-size:17px; max-width:820px}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px}
+  .meta-chip{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:8px 14px; font-size:13px; color:var(--muted)}
+  .meta-chip b{color:var(--text); font-weight:600}
+  /* scope banner */
+  .scope{margin:30px 0; border:1px solid var(--amber); border-left:5px solid var(--amber); background:rgba(240,180,41,.06); border-radius:10px; padding:20px 24px}
+  .scope h3{color:var(--amber); font-size:15px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px}
+  .scope p{font-size:15px; color:var(--text)}
+  .scope .fine{color:var(--muted); font-size:13.5px; margin-top:8px}
+  /* sections */
+  section{padding:34px 0; border-top:1px solid var(--line)}
+  section:first-of-type{border-top:none}
+  h2{font-size:26px; font-weight:700; letter-spacing:-.3px; margin-bottom:6px; cursor:pointer; border-radius:8px; padding:6px 8px; margin-left:-8px; min-height:48px; display:flex; align-items:center}
+  h2:hover{background:var(--panel2)}
+  h2 .num{color:var(--dim); font-weight:500; margin-right:10px; font-size:20px}
+  h2 .chev{margin-left:auto; color:var(--teal); font-size:18px; min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto}
+  section.collapsed>*:not(h2){display:none}
+  section.collapsed h2 .chev{transform:rotate(-90deg)}
+  h2 .chev{transition:transform .2s}
+  .sec-sub{color:var(--muted); font-size:15px; margin-bottom:22px; max-width:860px}
+  h3{font-size:18px; font-weight:650; margin:26px 0 10px; color:var(--text)}
+  h4{font-size:15px; font-weight:650; margin:18px 0 8px; color:var(--teal)}
+  p{margin:10px 0; max-width:900px}
+  ul,ol{margin:10px 0 10px 22px; max-width:880px}
+  li{margin:6px 0}
+  /* evidence pills */
+  .pill{display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:1px; padding:2.5px 9px; border-radius:20px; vertical-align:middle; margin-right:8px; text-transform:uppercase}
+  .p-fact{background:rgba(106,168,255,.14); color:var(--blue); border:1px solid rgba(106,168,255,.4)}
+  .p-int{background:rgba(240,180,41,.12); color:var(--amber); border:1px solid rgba(240,180,41,.4)}
+  .p-gap{background:rgba(239,111,111,.12); color:var(--red); border:1px solid rgba(239,111,111,.4)}
+  .p-unv{background:rgba(138,147,161,.12); color:var(--gray); border:1px solid rgba(138,147,161,.4)}
+  .src{font-size:12.5px; color:var(--dim); margin-top:4px}
+  .src a{color:var(--dim); text-decoration:underline dotted}
+  .claim{margin:14px 0}
+  /* cards */
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:22px 24px; margin:18px 0}
+  .card.tight{padding:16px 20px}
+  .verdict{border:1px solid var(--teal); border-left:6px solid var(--teal); background:rgba(70,217,196,.05)}
+  .verdict h3{color:var(--teal); margin-top:0; font-size:14px; letter-spacing:1.5px; text-transform:uppercase}
+  .callout{border:1px solid var(--green); border-left:6px solid var(--green); background:rgba(92,201,138,.06); border-radius:10px; padding:18px 22px; margin:18px 0}
+  .callout h4{color:var(--green); margin:0 0 8px; font-size:13px; letter-spacing:1.5px; text-transform:uppercase}
+  .callout p, .callout li{font-size:14.5px}
+  /* tables */
+  .tbl-wrap{overflow-x:auto; margin:16px 0; border-radius:8px}
+  table{width:100%; border-collapse:collapse; margin:0; font-size:14px}
+  th{text-align:left; padding:10px 12px; background:var(--panel2); color:var(--muted); font-weight:600; font-size:12.5px; letter-spacing:.4px; text-transform:uppercase; border-bottom:1px solid var(--line)}
+  td{padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(127,140,160,.06)}
+  /* timeline */
+  .tl{position:relative; margin:20px 0 10px 8px; padding-left:30px}
+  .tl::before{content:""; position:absolute; left:8px; top:6px; bottom:6px; width:2px; background:var(--line)}
+  .tl-item{position:relative; margin:0 0 22px}
+  .tl-item::before{content:""; position:absolute; left:-27px; top:7px; width:10px; height:10px; border-radius:50%; background:var(--dim)}
+  .tl-item.hard::before{background:var(--green); box-shadow:0 0 0 4px rgba(92,201,138,.15)}
+  .tl-item.guidance::before{background:var(--amber); box-shadow:0 0 0 4px rgba(240,180,41,.15)}
+  .tl-item.inferred::before{background:var(--gray); box-shadow:0 0 0 4px rgba(138,147,161,.15)}
+  .tl-date{font-weight:700; font-size:15px}
+  .tl-title{font-weight:600; margin-top:2px}
+  .tl-desc{color:var(--muted); font-size:14px; margin-top:4px; max-width:840px}
+  .q{display:inline-block; font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; padding:2px 10px; border-radius:12px; margin-left:10px; vertical-align:middle}
+  .q.hard{background:rgba(92,201,138,.13); color:var(--green); border:1px solid rgba(92,201,138,.45)}
+  .q.guidance{background:rgba(240,180,41,.13); color:var(--amber); border:1px solid rgba(240,180,41,.45)}
+  .q.inferred{background:rgba(138,147,161,.13); color:var(--gray); border:1px solid rgba(138,147,161,.45)}
+  /* flags */
+  .flag{border:1px solid var(--line); border-radius:10px; padding:16px 20px; margin:12px 0; background:var(--panel)}
+  .flag .rank{display:inline-block; width:30px; height:30px; border-radius:8px; background:var(--panel2); border:1px solid var(--line); text-align:center; line-height:30px; font-weight:800; color:var(--red); margin-right:10px}
+  .flag h4{margin:0 0 6px; color:var(--text); display:inline; font-size:16px}
+  .flag p{font-size:14.5px; color:var(--muted)}
+  /* refs */
+  .refs{font-size:13.5px}
+  .refs li{margin:8px 0; color:var(--muted)}
+  .refs a{color:var(--blue); word-break:break-all}
+  footer{padding:40px 0 60px; color:var(--dim); font-size:13px; border-top:1px solid var(--line)}
+  .kpi{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:18px 0}
+  .kpi .k{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .kpi .k .v{font-size:22px; font-weight:750; color:var(--text)}
+  .kpi .k .l{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.45}
+  .note{background:rgba(106,168,255,.06); border:1px solid rgba(106,168,255,.25); border-radius:10px; padding:16px 20px; margin:16px 0; font-size:14px; color:var(--muted)}
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0}
+  .controls{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0}
+  .ctl-btn{background:var(--panel); border:1px solid var(--line); color:var(--muted); border-radius:8px; font-size:13px; padding:8px 14px; min-height:44px; cursor:pointer}
+  .ctl-btn:hover{color:var(--text); border-color:var(--teal)}
+  /* back to top */
+  #toTop{position:fixed; right:18px; bottom:18px; z-index:60; width:52px; height:52px; border-radius:50%; border:1px solid var(--teal); background:var(--panel); color:var(--teal); font-size:20px; cursor:pointer; display:none; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,.35)}
+  #toTop.show{display:flex}
+  #toTop:hover{background:var(--panel2)}
+  @media (max-width:760px){
+    nav .inner{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding:8px 12px}
+    nav a, nav .brand, .navbtn{flex:0 0 auto}
+    .navspacer{display:none}
+  }
+  @media (max-width:640px){
+    h1{font-size:30px}
+    .wrap{padding:0 18px}
+    table{min-width:620px}
+    .kpi{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+    .kpi .k .v{font-size:18px}
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="Dossier sections"><div class="inner">
+  <span class="brand">SPRB Dossier</span>
+  <a href="#identity">Identity</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Trials</a><a href="#regulatory">Regulatory</a><a href="#competition">Competition</a><a href="#financials">Financials</a><a href="#valuation">FDMC/EV</a><a href="#catalysts">Catalysts</a><a href="#risks">Red Flags</a><a href="#scenarios">Scenarios</a><a href="#management">Management</a><a href="#refs">References</a>
+  <span class="navspacer"></span>
+  <button class="navbtn" id="themeBtn" aria-label="Toggle dark or light mode" title="Dark / light mode">&#9790; Theme</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">Biotech Deep-Dive Dossier &middot; Sellside-Depth</div>
+  <h1>Spruce Biosciences <span class="tick">(Nasdaq: SPRB)</span></h1>
+  <p class="sub">A single-asset, late-stage rare-disease company built around tralesinidase alfa enzyme replacement therapy (TA-ERT) for Sanfilippo syndrome type B (MPS IIIB) — an ultra-rare, fatal pediatric neurodegenerative disease with no approved therapy. BLA submission guided for Q4 2026 on the accelerated-approval pathway.</p>
+  <div class="meta-row">
+    <div class="meta-chip">As of <b>October 10, 2026</b> <span style="font-size:11px">(audit refresh)</span></div>
+    <div class="meta-chip">Price <b>~$44.05</b> <span style="font-size:11px">(Finnhub, Oct 10 2026; −19% in past month)</span></div>
+    <div class="meta-chip">Market cap <b>~$121M basic / ~$128M FD</b></div>
+    <div class="meta-chip">Cash <b>$96.3M</b> <span style="font-size:11px">(Jun 30, 2026)</span></div>
+    <div class="meta-chip">Next catalyst <b>BLA submission, Q4 2026</b> <span style="font-size:11px">(guidance; still pending)</span></div>
+  </div>
+  <div class="controls" role="group" aria-label="Section display controls">
+    <button class="ctl-btn" id="expandAll">Expand all sections</button>
+    <button class="ctl-btn" id="collapseAll">Collapse all sections</button>
+  </div>
+  <div class="legend">
+    <span><span class="pill p-fact">Fact</span> verified from a cited source</span>
+    <span><span class="pill p-int">Interpretation</span> analyst judgment on facts</span>
+    <span><span class="pill p-gap">Gap</span> material unknown</span>
+    <span><span class="pill p-unv">Unverified</span> single-source / unconfirmed</span>
+  </div>
+  <div class="scope">
+    <h3>Scope correction — read first</h3>
+    <p><span class="pill p-fact">Fact</span> Spruce Biosciences' live program is <b>tralesinidase alfa enzyme replacement therapy (TA-ERT)</b> for <b>Sanfilippo syndrome type B (MPS IIIB)</b>. The legacy congenital adrenal hyperplasia program (<b>tildacerfont</b>) is <b>defunct</b> and is not covered as a live asset in this dossier — it appears only in the dilution/management history.</p>
+    <p class="fine">Sources: Q2 2026 business update (Aug 12, 2026) — TA-ERT is the sole development program; FY2025 10-K lists a Termination Agreement with Kaken Pharmaceutical (Mar 16, 2026) covering the legacy collaboration.</p>
+  </div>
+</header>
+
+<section id="identity">
+  <h2><span class="num">01</span>Identity &amp; Thesis Snapshot</h2>
+  <p class="sec-sub">What the company is, what the trade is, and the one variable that decides it.</p>
+
+  <div class="card verdict">
+    <h3>Dossier verdict — key swing factor</h3>
+    <p style="color:var(--text)"><span class="pill p-int">Interpretation</span> The entire binary is <b>whether the FDA accepts a single-arm efficacy package built on the CSF HS-NRE surrogate plus natural-history comparisons</b> and grants accelerated approval. Everything else — CMC, cash, the confirmatory trial, dilution — is subordinate. The agency has agreed to this pathway twice in writing (Type B meetings, Breakthrough Therapy Designation), and in September 2026 it approved the first-ever Sanfilippo therapy (Ultragenyx's Fayuvi for type <i>A</i>) on an analogous accelerated path — but a BLA for a <i>different</i> molecule with an <i>implanted ICV device</i> and a technology-transfer manufacturing story still has to survive review.</p>
+  </div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Spruce Biosciences, Inc. is a South San Francisco–based, late-stage biopharmaceutical company (Nasdaq: SPRB, Nasdaq Capital Market) whose sole development program is TA-ERT for MPS IIIB. It has no product revenue.
+  <div class="src">Source: Q2 2026 10-Q; company PRs.</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Corporate history in two chapters: (1) the original company developed tildacerfont for congenital adrenal hyperplasia, which failed; the stock collapsed and the company executed a <b>1-for-75 reverse split effective August 4, 2025</b> and relisted on Nasdaq in September 2025; (2) in late 2024 management acquired TA-ERT (originated by BioMarin as BMN 250) out of the Allievex bankruptcy estate and repositioned the company around it.
+  <div class="src">Sources: Form 4 footnotes / Q3 2025 PR (reverse split, relisting); independent research note (Dihora Capital, Jul 2026) for the Allievex/BioMarin asset history — <span class="pill p-unv">Unverified</span> as to the "bankruptcy purchase price" detail.</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Regulatory posture: FDA granted <b>Breakthrough Therapy Designation</b> (Oct 2025), plus Fast Track, Rare Pediatric Disease, and Orphan Drug designations (US; Orphan also in EU). The FDA has confirmed CSF HS-NRE is a surrogate <b>reasonably likely to predict clinical benefit</b> and can support accelerated approval. Two pre-BLA meetings were completed (announced Aug 24, 2026) with FDA finding the CMC comparability strategy "reasonable" and alignment on BLA content/format.
+  <div class="src">Sources: BTD PR (Oct 2025); pre-BLA PR (Aug 24, 2026); Q2 2026 business update.</div></div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> The bull case is unusually legible: first-and-only therapy for a fatal pediatric disease, regulator pre-aligned on the approval pathway, ~6 years of treated-patient data, and an approval that would also deliver a Priority Review Voucher (monetizable, historically ~$100–150M gross). The bear case is equally legible: the dataset is 22 open-label patients against natural history, delivered through a surgically implanted brain port, from a manufacturer that just completed a tech transfer — and the company has ~3 quarters of cash runway before it must raise again.</div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Recent price action: SPRB closed <b>~$44.05 on Oct 10, 2026</b> (Finnhub), down <b>−18.95% over the past month</b> and −49.4% year-to-date, trading well off its 52-week high of $240 (52-wk range now $30.03–$240 per Finnhub). <span class="pill p-int">Interpretation</span> The fade has occurred with no new company-specific news — consistent with pre-BLA waiting-room drift plus broader small-cap biotech weakness, not with a thesis-breaking event.
+  <div class="src">Source: Finnhub quote data (Oct 10, 2026); MarketBeat (YTD −49.4%).</div></div>
+</section>
+
+<section id="science">
+  <h2><span class="num">02</span>Science — Mechanism &amp; Why It Could Fail</h2>
+  <p class="sec-sub">Plain-language mechanism, grounded in the peer-reviewed literature — not just company slides.</p>
+
+  <h3>The disease</h3>
+  <div class="claim"><span class="pill p-fact">Fact</span> MPS IIIB (Sanfilippo syndrome type B) is caused by mutations in the <i>NAGLU</i> gene encoding alpha-N-acetylglucosaminidase, a lysosomal enzyme required to break down heparan sulfate (HS). Without it, HS — and specifically its non-reducing ends (HS-NRE) — accumulate to toxic levels in brain cells, driving progressive neurodegeneration: developmental regression, cognitive decline, behavioral disturbance, motor loss, and early death. Estimated US incidence is below 1 in 200,000; worldwide prevalence is estimated at roughly 500–1,000 people; median life expectancy is in the mid-teens.
+  <div class="src">Sources: Muschol et al., JCI (phase I/II paper, background section); company disease description (Jun 2026 PR); JCR/Medipal PR (Sep 11, 2026) for the 500–1,000 worldwide estimate.</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> There are currently <b>no FDA-approved therapies for MPS IIIB</b>; management is palliative. (The September 2026 FDA approval of Ultragenyx's Fayuvi/rebisufligene etisparvovec was for Sanfilippo type <i>A</i> — a different gene, different disease — and is a regulatory read-through, not a treatment for IIIB.)
+  <div class="src">Sources: Q2 2026 business update; Nature Reviews Drug Discovery news brief (Oct 5, 2026) on the Fayuvi approval.</div></div>
+
+  <h3>The drug</h3>
+  <div class="claim"><span class="pill p-fact">Fact</span> TA-ERT (tralesinidase alfa; formerly BMN 250) is a fusion protein of recombinant human NAGLU (rhNAGLU) with an insulin-like growth factor 2 (IGF2) peptide tag. The tag exists because naked rhNAGLU lacks the mannose-6-phosphate residues needed for efficient cellular uptake via the M6P receptor pathway — it is poorly absorbed by cells, including neurons. The IGF2 peptide binds the cation-independent mannose-6-phosphate receptor on cell surfaces, enabling internalization and lysosomal delivery. It is administered <b>intracerebroventricularly (ICV)</b> — infused through an implanted reservoir directly into the cerebrospinal fluid — because the enzyme cannot cross the blood-brain barrier from the bloodstream.
+  <div class="src">Source: company mechanism description (Jun 2026 long-term data PR); Muschol et al., JCI (background).</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Published clinical results (Muschol et al., <i>Journal of Clinical Investigation</i>; phase I/II, n=22, NCT02754076): in the Part 1 dose escalation (30, 100, 300 mg), the <b>300 mg</b> dose was required to normalize CSF and plasma HS and HS-NRE. In Part 2, 300 mg sustained HS/HS-NRE normalization and <b>stabilized cortical gray matter volume over 48 weeks</b>; hepatomegaly resolved and spleen volume fell in most patients. Significant correlations were reported between change in cognitive age-equivalent score and plasma drug exposure, plasma HS-NRE levels, and cortical gray matter volume. Peripheral drug-exposure data suggested a role for the <b>glymphatic system</b> in drug distribution.
+  <div class="src">Source: Muschol et al., JCI — abstract and results as indexed (jci.org/articles/view/165076). Funded by BioMarin and Allievex.</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Long-term data (company analysis presented at the 18th International MPS Symposium, Florence, June 4–7, 2026; previously at WORLD<i>Symposium</i> 2026): 22 patients with up to <b>6 years</b> of follow-up and ~6,000 ICV doses administered showed (i) rapid and durable normalization of CSF HS-NRE; (ii) stabilization of cognitive function (Bayley-III Cognitive Raw Score, BSID-C) vs. declines in untreated natural-history patients; (iii) stabilization of receptive/expressive communication and fine/gross motor skills (VABS-II) vs. natural-history decline; (iv) stabilization of cortical gray matter volume and normalization of liver/spleen volume; (v) a safety profile described as consistent with ICV administration.
+  <div class="src">Source: company PR (Jun 8, 2026) via BioSpace/Business Wire; presented by PI Nicole Muschol, M.D. (U. Hamburg-Eppendorf).</div></div>
+
+  <div class="callout">
+    <h4>Why it should work — the affirmative case, in plain English</h4>
+    <p><span class="pill p-int">Interpretation</span> built on the facts above. The biology is unusually direct: MPS IIIB is a single-enzyme deficiency, and TA-ERT <i>is</i> that enzyme. Replacing exactly the missing protein is the most straightforward fix in medicine — there is no pathway-level guesswork. Three design problems stood in the way of that simple idea, and each has a concrete engineering answer:</p>
+    <ol>
+      <li><b>Uptake:</b> naked NAGLU can't get into cells efficiently. The IGF2 tag hijacks the cell's own receptor (CI-M6PR) to drag the enzyme into lysosomes — the precise compartment where HS accumulates.</li>
+      <li><b>The blood-brain barrier:</b> IV enzyme never reaches the brain. ICV infusion bypasses the barrier entirely, delivering enzyme into the CSF that bathes the brain.</li>
+      <li><b>Dose:</b> the data show a biological gradient — 30 and 100 mg did not normalize HS-NRE; 300 mg did, and kept it normalized for years. That dose-response is the strongest internal signal that the effect is drug-driven, not noise.</li>
+    </ol>
+    <p>On top of that: the biomarker (CSF HS-NRE) normalizes <i>rapidly</i> and stays normalized for up to 6 years across ~6,000 doses; clinical stabilization tracks the biomarker; the FDA has twice agreed in writing that the surrogate is reasonably likely to predict benefit; and the agency just approved a Sanfilippo therapy on the same evidence architecture (Fayuvi, MPS IIIA, Sep 2026). The mechanism doesn't need a leap of faith — it needs the FDA to accept that what it already agreed to is actually true.</p>
+  </div>
+
+  <h3>Why it could fail — the honest scientific risks</h3>
+  <div class="card">
+  <ol>
+    <li><b>Surrogate ≠ clinical benefit (the core binary).</b> <span class="pill p-fact">Fact</span> The BLA rests on CSF HS-NRE normalization as a surrogate "reasonably likely to predict clinical benefit," with clinical outcomes benchmarked against <b>natural-history comparators, not a concurrent randomized control</b>. <span class="pill p-int">Interpretation</span> Natural-history comparisons are vulnerable to selection bias (trial patients enrolled younger/healthier), assessment bias (open-label developmental testing), and severity-mix effects (attenuated vs. severe phenotypes progress differently). The literature on neuropathic-MPS ERT development explicitly flags these methodological problems (see review, PMC7014430). The FDA has agreed to the framework twice — but agreement on a pathway is not agreement on the data.</li>
+    <li><b>Stabilization vs. improvement.</b> <span class="pill p-int">Interpretation</span> The claimed clinical effect is <i>stabilization</i> of cognition/behavior relative to decline — "stability itself is a clinically meaningful outcome" (PI Muschol). Regulators and payers sometimes discount stabilization claims from open-label studies; the confirmatory TrAnsform trial is the instrument that must convert stabilization into a controlled demonstration.</li>
+    <li><b>ICV delivery burden and device risk.</b> <span class="pill p-fact">Fact</span> Every weekly dose requires infusion through a surgically implanted ICV reservoir. Device-related adverse events (infection, malfunction) are an inherent risk class for this route. <span class="pill p-int">Interpretation</span> A weekly, lifelong, neurosurgically mediated regimen is the worst feasible delivery profile — it caps the commercial ceiling and gives any future IV (BBB-penetrating) or one-time gene therapy a structural convenience advantage, even if TA-ERT is first.</li>
+    <li><b>Immunogenicity.</b> <span class="pill p-fact">Fact</span> The JCI paper monitored anti-drug antibody response as a prespecified safety/PD variable. <span class="pill p-gap">Gap</span> The incidence, titers, and neutralizing character of ADAs — and any effect on efficacy — were not detailed in the materials reviewed.</li>
+    <li><b>Early-treatment dependence.</b> <span class="pill p-int">Interpretation</span> In neurodegenerative LSDs, benefit concentrates in patients treated before irreversible neuronal loss (cf. the MPS IIIB gene-therapy literature, Tardieu et al., <i>Lancet Neurol</i> 2017, where slowing of decline was clearest with early administration). The confirmatory trial enrolls ages 1–5 with severe disease — a population in which decline is rapid, which helps assay sensitivity, but also one in which late-enrolled children may already be past the point of rescue.</li>
+    <li><b>Manufacturing as a scientific risk.</b> <span class="pill p-fact">Fact</span> The BLA timeline slipped from 1H 2026 to Q4 2026 specifically to complete manufacturing readiness; a second PPQ batch is expected in Q4 2026 after tech transfer to a commercial-scale manufacturer. A biologic for ICV delivery made at a new site must prove comparability — the FDA called the comparability <i>strategy</i> "reasonable," not the <i>data</i> acceptable. <span class="pill p-gap">Gap</span> PPQ outcomes are undisclosed.</li>
+  </ol>
+  </div>
+
+  <h3>Academic literature consulted (beyond company materials)</h3>
+  <ul class="refs">
+    <li>Muschol N. et al. "A phase I/II study on intracerebroventricular tralesinidase alfa in patients with Sanfilippo syndrome type B." <i>Journal of Clinical Investigation</i>. (n=22; NCT02754076; funded by BioMarin/Allievex.) — <a href="https://www.jci.org/articles/view/165076/sd/3">jci.org</a></li>
+    <li>Tardieu M. et al. "Intracerebral gene therapy in children with mucopolysaccharidosis type IIIB syndrome: an uncontrolled phase 1/2 clinical trial." <i>Lancet Neurol.</i> 2017. (Historical MPS IIIB gene-therapy comparator; slowing of cognitive decline clearest with early treatment.) — via <a href="https://www.nature.com/articles/nrneurol.2017.110">Nature Reviews Neurology summary</a></li>
+    <li>"Novel Enzyme Replacement Therapies for Neuropathic Mucopolysaccharidoses." <i>Int. J. Mol. Sci.</i> (PMC7014430) — systematic review of BBB-delivery and trial-methodology challenges in neuronopathic MPS ERT. — <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7014430/">PMC7014430</a></li>
+    <li>"Safety, pharmacokinetics and CNS distribution of tralesinidase alfa administered via intracerebroventricular infusion to juvenile cynomolgus monkeys." <i>Toxicology Reports</i> — NHP safety/PK supporting the clinical ICV regimen. — via <a href="https://sanfilipponews.com/news/tralesinidase-alfa-doses-sanfilippo-type-b-found-safe-animals/">Sanfilippo News summary</a></li>
+  </ul>
+</section>
+
+<section id="pipeline">
+  <h2><span class="num">03</span>Pipeline Overview — Ranked by Value</h2>
+  <p class="sec-sub">One live program. Everything else is history. Ranked most valuable → least valuable.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Rank</th><th>Program</th><th>Indication</th><th>Stage</th><th>Value reasoning</th></tr></thead>
+    <tbody>
+      <tr><td><b>#1</b></td><td><b>Tralesinidase alfa (TA-ERT)</b> — rhNAGLU-IGF2 fusion, weekly ICV</td><td>MPS IIIB (Sanfilippo B)</td><td>Pre-BLA; confirmatory Ph study initiating</td><td><span class="pill p-int">Interpretation</span> <b>~100% of enterprise value.</b> Sole live asset: first-to-filing in an untreatable fatal pediatric disease, 6-year dataset, FDA pre-aligned on accelerated-approval pathway, Breakthrough designation, PRV eligibility. Every dollar of the ~$32–39M EV is option value on this program's approval.</td></tr>
+      <tr><td><b>#2</b></td><td><b>Tildacerfont</b> — CRF1 antagonist</td><td>Congenital adrenal hyperplasia</td><td>Discontinued</td><td><span class="pill p-fact">Fact</span> <b>Zero value.</b> Defunct — Kaken collaboration terminated (Termination Agreement, Mar 16, 2026, per FY2025 10-K exhibit list). No live development, no licensing value disclosed.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note"><span class="pill p-gap">Gap</span> No second pipeline asset, platform, or discovery program has been disclosed. This is a pure single-asset company; pipeline diversification is zero and any post-approval growth must come from TA-ERT lifecycle work (e.g., EU filing) or new business development.</div>
+</section>
+
+<section id="trials">
+  <h2><span class="num">04</span>Trial Design Deep Dive</h2>
+  <p class="sec-sub">Endpoints, design, and the statistical crux: developmental endpoints in an ultra-rare pediatric population.</p>
+
+  <h3>Completed / ongoing interventional studies (the BLA dataset)</h3>
+  <div class="claim"><span class="pill p-fact">Fact</span> <b>Study 201</b> (NCT02754076): phase I/II open-label, n=22 MPS IIIB patients. Part 1: dose escalation 30 → 100 → 300 mg ICV; 300 mg required for HS/HS-NRE normalization. Part 2: 300 mg with 48-week efficacy follow-up. <b>Studies 202 and 401</b>: open-label extensions providing up to 6 years of follow-up (~6,000 total ICV doses across the program).
+  <div class="src">Sources: Muschol et al., JCI; company Jun 2026 PR ("evaluated in three clinical studies… 201 and extension studies 202 and 401").</div></div>
+
+  <h3>Endpoints used</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Endpoint</th><th>What it measures</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><b>CSF HS-NRE</b> (heparan sulfate non-reducing ends in cerebrospinal fluid)</td><td>Biochemical disease activity — the pathogenic substrate</td><td><span class="pill p-fact">Fact</span> Surrogate endpoint; FDA-confirmed as reasonably likely to predict clinical benefit; basis of accelerated approval</td></tr>
+      <tr><td><b>BSID-C</b> — Bayley-III Cognitive Raw Score</td><td>Cognitive development (raw score, not age-normed, to avoid floor effects)</td><td>Key clinical outcome; stabilization vs. natural-history decline</td></tr>
+      <tr><td><b>VABS-II</b> — Vineland Adaptive Behavior Scales</td><td>Receptive/expressive communication, fine/gross motor</td><td>Supportive clinical outcome</td></tr>
+      <tr><td><b>Cortical gray matter volume</b> (MRI)</td><td>Brain atrophy / neuroanatomical preservation</td><td>Supportive biomarker; stabilized over 48 weeks at 300 mg (JCI)</td></tr>
+      <tr><td>Liver/spleen volume</td><td>Somatic disease burden</td><td>Normalized in most patients (JCI; Jun 2026 PR)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> The endpoint strategy is well-chosen for the disease: raw (not standardized) Bayley scores avoid the floor effects that plague age-normed scales in regressing children, and gray-matter volumetrics give an objective anatomical anchor to the behavioral data. But all clinical readouts come from an <b>open-label, single-arm</b> program benchmarked to natural history — there is no concurrent control, no randomization, and no pre-specified statistical hypothesis test with a p-value disclosed in the materials reviewed. <span class="pill p-gap">Gap</span> No formal statistical analysis plan, powering, or significance thresholds for the BLA efficacy package have been disclosed.</div>
+
+  <h3>TrAnsform — the FDA-requested confirmatory study</h3>
+  <div class="claim"><span class="pill p-fact">Fact</span> Design: randomized, single-blind, parallel-group, controlled, multicenter. Population: children 1–5 years with severe (non-attenuated) MPS IIIB confirmed by deficient NAGLU activity. Arms: weekly ICV TA-ERT vs. standard of care, n≈14 total. Primary objective: effect on cognition. Initiation guided "as early as Q4 2026," <b>while the BLA is under FDA review</b> — it is a condition of the accelerated-approval pathway. Standard-of-care participants who meet prespecified cognitive-decline criteria may cross over to TA-ERT.
+  <div class="src">Source: Q2 2026 business update (Aug 12, 2026); MPS3BStudy.com launch PR (Aug 26, 2026).</div></div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> The design is pragmatic and ethically constrained: n≈14 cannot be powered for subtle effects, so the study must rely on the rapid, predictable decline of severe early-childhood MPS IIIB to create assay sensitivity — and the crossover provision exists because withholding a potentially disease-modifying therapy from declining children would be unacceptable. <span class="pill p-gap">Gap</span> Randomization ratio, primary endpoint definition, follow-up duration, and statistical powering are undisclosed. A 14-patient study will take years to read out and will not resolve the BLA binary — it resolves the <i>confirmation</i> binary years later, with withdrawal of accelerated approval as the tail risk if it fails.</div>
+
+  <h3>Expanded Access Program (EAP)</h3>
+  <div class="claim"><span class="pill p-fact">Fact</span> Planned US open-label, single-arm EAP for ~10 children with attenuated or severe MPS IIIB who are ineligible for TrAnsform; weekly ICV dosing; start guided Q4 2026. Partially funded by a <b>$5.5M combined strategic investment</b> from Cure Sanfilippo Foundation and the National MPS Society.
+  <div class="src">Source: company PRs (Aug 2026).</div></div>
+</section>
+
+<section id="regulatory">
+  <h2><span class="num">05</span>Clinical / Regulatory Status &amp; Outlook</h2>
+  <p class="sec-sub">Where the BLA stands and what has to go right.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Milestone</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Type B FDA meetings on accelerated-approval path</td><td><span class="pill p-fact">Fact</span> Completed; positive (reported Mar 2026)</td></tr>
+      <tr><td>Breakthrough Therapy Designation</td><td><span class="pill p-fact">Fact</span> Granted Oct 2025</td></tr>
+      <tr><td>Surrogate agreement (CSF HS-NRE)</td><td><span class="pill p-fact">Fact</span> FDA confirmed reasonably likely to predict clinical benefit; re-confirmed in BTD context (company PRs, Oct 2025 &amp; Aug 2026)</td></tr>
+      <tr><td>Pre-BLA meetings (×2)</td><td><span class="pill p-fact">Fact</span> Completed; announced Aug 24, 2026 — CMC comparability strategy "reasonable"; alignment on BLA content/format</td></tr>
+      <tr><td>Manufacturing (tech transfer to commercial-scale manufacturer; PPQ batches)</td><td><span class="pill p-fact">Fact</span> In progress; second PPQ batch expected Q4 2026 <span class="pill p-gap">Gap</span> PPQ outcomes undisclosed; manufacturer unnamed</td></tr>
+      <tr><td>BLA submission</td><td><span class="pill p-fact">Fact</span> Guided Q4 2026 (slipped from 1H 2026 — manufacturing readiness cited); <b>still pending as of Oct 10, 2026</b></td></tr>
+      <tr><td>TrAnsform confirmatory initiation</td><td><span class="pill p-fact">Fact</span> Guided Q4 2026; FDA-requested as condition of accelerated approval</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> Regulatory de-risking is genuinely advanced for a company this size: two written FDA agreements on the surrogate, Breakthrough designation (intensive FDA interaction, rolling review eligibility), and completed pre-BLA meetings. The precedent set in September 2026 — FDA approval of Ultragenyx's Fayuvi for Sanfilippo type A on an accelerated path using CSF HS reduction plus neurodevelopmental data vs. natural history — demonstrates the agency's current willingness to approve Sanfilippo therapies on exactly this evidence architecture.</div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> Offsetting that: (1) the BLA has already slipped once for manufacturing — the single most common source of CRLs in recent accelerated-approval history; (2) the confirmatory trial must start <i>during</i> review, meaning any enrollment or site-activation stumble is visible to FDA in real time; (3) accelerated approval in the current political/regulatory climate carries withdrawal risk if confirmatory data disappoint (the TrAnsform readout is years away, so this is a long-tail overhang, not a near-term binary).</div>
+
+  <div class="claim"><span class="pill p-gap">Gap</span> No EU filing timeline has been disclosed; no AdCom expectation has been stated; priority-review eligibility (likely via the Rare Pediatric Disease PRV program, renewed through September 2029) is assumed but not confirmed in company materials reviewed.</div>
+</section>
+
+<section id="competition">
+  <h2><span class="num">06</span>Competition — Clinical Differentiation Only</h2>
+  <p class="sec-sub">No marketing language. What each program is, where it stands, and how it differs on clinically relevant dimensions.</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Program / Sponsor</th><th>Modality &amp; delivery</th><th>Stage (MPS IIIB)</th><th>Clinical differentiation vs. TA-ERT</th></tr></thead>
+    <tbody>
+      <tr><td><b>TA-ERT / Spruce (SPRB)</b></td><td>ERT: rhNAGLU-IGF2 fusion; weekly <b>ICV</b> via implanted reservoir</td><td>Pre-BLA (Q4 2026); n=22, up to 6-yr follow-up</td><td>Reference program. Most mature dataset; first-to-filing. Burden: weekly neurosurgical-route infusions, lifelong.</td></tr>
+      <tr><td><b>JR-446 / JCR Pharmaceuticals + Medipal</b></td><td>ERT: BBB-penetrating NAGLU via J-Brain Cargo; <b>intravenous</b></td><td><span class="pill p-fact">Fact</span> Global Ph I/II first patient dosed Sep 11, 2026; Japan Ph 1/2 (NCT06488924) recruiting</td><td>Different delivery paradigm: if IV BBB-penetrating ERT achieves CNS HS clearance, it structurally dominates ICV on convenience — but it is ~4+ years behind with no human efficacy data in IIIB. Not a near-term commercial threat; a lifecycle threat.</td></tr>
+      <tr><td><b>MPS IIIB gene therapy (academic / historical)</b></td><td>Intracerebral AAV (Tardieu et al., <i>Lancet Neurol</i> 2017, Ph 1/2)</td><td>Historical POC only</td><td>Showed slowing of cognitive decline, clearest with early treatment — supports the "early intervention matters" biology but is not an active competitive program at scale.</td></tr>
+      <tr><td><b>UX111 / Fayuvi (Ultragenyx)</b> — <i>MPS IIIA, not IIIB</i></td><td>One-time IV AAV9 gene therapy</td><td><span class="pill p-fact">Fact</span> FDA-approved Sep 2026 for Sanfilippo type A; priced ~$4M (BioSpace)</td><td><b>Not a competitor</b> (different gene/disease). Included as a <b>regulatory read-through</b>: FDA approved a Sanfilippo therapy on accelerated approval using CSF HS + neurodevelopmental data vs. natural history — the same evidence architecture Spruce is using.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="src">Sources: JCR/Medipal PR via BioSpace &amp; Business Wire (Sep 11, 2026); Nature Reviews Drug Discovery (Oct 5, 2026); BioSpace (Sep 2026, Fayuvi approval &amp; pricing).</div>
+  <div class="claim"><span class="pill p-int">Interpretation</span> TA-ERT's moat, if approved, is <b>time, not technology</b>: 6 years of data, an agreed surrogate, and orphan exclusivity (7 years US / 10 years EU) against a field where the nearest rival just dosed its first patient. The structural vulnerability is delivery — any future IV or one-time therapy that clears CNS HS has a permanent convenience edge over weekly ICV infusions, which is why the long-term commercial debate matters less than the approval binary for a hold-through-the-binary investor.</div>
+</section>
+
+<section id="financials">
+  <h2><span class="num">07</span>Financials — Cash, Burn, Runway, Dilution History</h2>
+  <p class="sec-sub">From the latest filings. Every number carries units, period, and source.</p>
+
+  <div class="kpi">
+    <div class="k"><div class="v">$96.3M</div><div class="l">Cash &amp; equivalents, Jun 30 2026 (10-Q)</div></div>
+    <div class="k"><div class="v">$16.5M</div><div class="l">Operating expenses, Q2 2026 (quarter)</div></div>
+    <div class="k"><div class="v">$28.5M</div><div class="l">Net loss, H1 2026 (6 months)</div></div>
+    <div class="k"><div class="v">H2 2027</div><div class="l">Company-guided cash runway (into 2H 2027)</div></div>
+  </div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Balance sheet (Q2 2026 10-Q, unaudited, period ended Jun 30, 2026): cash and cash equivalents <b>$96.295M</b> (vs. $48.906M at Dec 31, 2025); total assets $102.852M; debt — current portion $2.500M, non-current $4.591M (total principal $7.091M); warrant liability $3.323M; accumulated deficit $(317.729M); stockholders' equity $83.730M.
+  <div class="src">Source: Q2 2026 10-Q condensed balance sheet (via Q2 PR / biopharmawatch filing reproduction).</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> P&amp;L (Q2 2026): operating expenses <b>$16.5M</b> for the quarter; net loss <b>$16.2M</b> ($(6.68)/share); six-month net loss <b>$28.5M</b> ($(14.96)/share) vs. $16.1M in H1 2025. Zero revenue.
+  <div class="src">Source: Q2 2026 business update (Aug 12, 2026).</div></div>
+
+  <div class="claim"><span class="pill p-fact">Fact</span> Debt: on Jan 7, 2026 Spruce entered a loan facility with <b>Avenue Venture Opportunities Fund II, L.P. (Avenue Capital)</b> for up to <b>$50.0M</b> (42-month term); initial $15M tranche funded January 2026; three additional tranches (up to $35M) subject to regulatory/commercial milestones. Lender holds a warrant (the $3.323M warrant liability) and a conversion option on up to $4.0M of principal at 120% of the warrant exercise price.
+  <div class="src">Sources: 8-K (Jan 8, 2026); FY2025 10-K (filed Mar 9, 2026); stocktitan 8-K summary.</div></div>
+
+  <h3>Dilution history (reverse-split-adjusted)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Date</th><th>Event</th><th>Terms</th></tr></thead>
+    <tbody>
+      <tr><td>Aug 4, 2025</td><td><b>1-for-75 reverse split</b>; Nasdaq relisting Sep 2025</td><td><span class="pill p-fact">Fact</span> Every 75 shares → 1; option share counts/exercise prices adjusted proportionally (Form 4 footnotes)</td></tr>
+      <tr><td>Oct 2025</td><td><b>Private placement</b> (~$50M gross, $46.6M net)</td><td><span class="pill p-fact">Fact</span> 502,181 common shares + 233,144 pre-funded warrants at $68.00/share to institutional investors; pre-funded warrants exercised in full by Dec 31, 2025 (FY2025 10-K)</td></tr>
+      <tr><td>Jan 2026</td><td>Avenue Capital loan facility</td><td><span class="pill p-fact">Fact</span> Up to $50M; $15M drawn; lender warrant + conversion option (see above)</td></tr>
+      <tr><td>Apr 20–22, 2026</td><td><b>Underwritten public offering</b> (~$69M gross)</td><td><span class="pill p-fact">Fact</span> 1,150,000 shares + 50,000 pre-funded warrants at $50.00/share; 180,000-share greenshoe exercised in full; bookrunners Leerink, Guggenheim, Oppenheimer; co-managers Jones, Craig-Hallum (8-K)</td></tr>
+      <tr><td>Aug 2026</td><td>Foundation strategic investment</td><td><span class="pill p-fact">Fact</span> $5.5M combined from Cure Sanfilippo Foundation + National MPS Society — <b>non-dilutive to equity</b>; earmarked for the EAP</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="claim"><span class="pill p-int">Interpretation</span> The financing pattern is disciplined but relentless: two equity raises in six months (Oct 2025, Apr 2026) totaling ~$115M gross, each priced <i>below</i> the prior local high ($68 then $50). The shelf ($300M) and ATM ($75M, Jefferies) are already in place — the company has explicitly pre-positioned the tools for the next raise. With guided runway into H2 2027 and a likely approval decision around mid-2027, a pre-launch raise in 1H 2027 is the base-case assumption, not a tail risk.</div>
+</section>
+
+<section id="valuation">
+  <h2><span class="num">08</span>FDMC / EV — Dilution-Honest Math</h2>
+  <p class="sec-sub">Fully-diluted market cap and enterprise value. Every number carries units, period, and source.</p>
+
+  <h3>Share count build (as of latest disclosures)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Component</th><th>Shares</th><th>Source / tag</th></tr></thead>
+    <tbody>
+      <tr><td>Common outstanding</td><td><b>2,752,810</b></td><td><span class="pill p-fact">Fact</span> Q2 2026 10-Q (Jun 30, 2026)</td></tr>
+      <tr><td>Pre-funded warrants (Apr 2026 offering)</td><td>50,000</td><td><span class="pill p-fact">Fact</span> 8-K (Apr 22, 2026); $0.01 exercise</td></tr>
+      <tr><td>Pre-funded warrants (Oct 2025 PIPE)</td><td>0</td><td><span class="pill p-fact">Fact</span> Exercised in full by Dec 31, 2025 (FY2025 10-K)</td></tr>
+      <tr><td>Employee options / RSUs</td><td><span class="pill p-gap">Gap</span> not summed in materials reviewed</td><td>Form 4s show ongoing grants (e.g., CMO 13,000 options Jul 2026; CCO 11,000 RSUs Mar 2026; CEO option repricing Dec 2025)</td></tr>
+      <tr><td>Avenue Capital lender warrant + $4M conversion option</td><td><span class="pill p-gap">Gap</span> count/terms undisclosed in reviewed materials</td><td>Warrant liability $3.323M on Q2 balance sheet</td></tr>
+      <tr><td><b>Published fully-diluted estimate</b></td><td><b>~2,915,000</b></td><td><span class="pill p-unv">Unverified</span> independent research (Dihora Capital, Jul 2026)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Market cap &amp; enterprise value (as of Oct 10, 2026)</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Measure</th><th>Math</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Share price (reference)</td><td>Finnhub quote</td><td><b>~$44.05</b> <span style="color:var(--dim)">(Oct 10, 2026; 52-wk range $30.03–$240)</span></td></tr>
+      <tr><td>Basic market cap</td><td>2,752,810 × $44.05</td><td><b>~$121M</b></td></tr>
+      <tr><td>Fully-diluted market cap</td><td>~2,915,000 × $44.05</td><td><b>~$128M</b> <span class="pill p-unv">Unverified</span> (FD count per Dihora)</td></tr>
+      <tr><td>Net cash</td><td>$96.3M − $7.1M debt principal</td><td><b>~$89M</b></td></tr>
+      <tr><td><b>Enterprise value</b></td><td>FD mcap − net cash</td><td><b>~$32–39M</b> <span class="pill p-int">Interpretation</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-top:0">The dilution-honest through-binary count: ~5.3M shares</h4>
+    <p><span class="pill p-int">Interpretation</span> For scenario work, the honest share count is not today's 2.9M — it is the count <i>after the near-certain pre-launch financing</i>. Build: ~2.9M FD today + ~1.9M new shares from a modeled ~$100M raise at ~$52 (the independent-research scenario; actual price/terms unknown) + lender-warrant/option true-up ≈ <b>~5.3M fully-diluted, post-raise shares</b>. This is the share count used for the scenario frames in §11. It is a model, not a filing fact — but using today's count for upside math would be the dishonest version.</p>
+    <p class="src">Raise mechanics per Dihora Capital scenario (Jul 2026): $300M shelf + $75M ATM (Jefferies) already in place; company guided runway only into H2 2027.</p>
+  </div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> At ~$32–39M EV, the market is valuing the TA-ERT program itself at roughly one-third of one quarter's rare-disease revenue — i.e., pricing in a <b>high probability of BLA failure or rejection</b>. The independent research cited in this dossier estimates the market-implied approval probability at ~15% vs. a ~72% fundamental case. Whether that gap is opportunity or accurate pricing is exactly the surrogate-acceptance question in §1.</div>
+</section>
+
+<section id="catalysts">
+  <h2><span class="num">09</span>Catalyst / Event Map</h2>
+  <p class="sec-sub">Every known upcoming event, tagged by date quality — each with what the event is, what "good" looks like, and what to watch. Cross-checked against the local Q4-2026 and 2027 catalyst datasets.</p>
+  <div class="legend">
+    <span><span class="q hard">Hard</span> confirmed date</span>
+    <span><span class="q guidance">Guidance</span> company-guided window</span>
+    <span><span class="q inferred">Inferred</span> inferred from standard timelines</span>
+  </div>
+
+  <div class="note"><span class="pill p-fact">Fact</span> <b>Catalyst audit as of Oct 10, 2026:</b> no mapped catalyst has landed since the Oct 7 build — the BLA submission remains pending (guided Q4 2026). The only dated event that has already occurred was the H.C. Wainwright 28th Annual Global Investment Conference presentation (Sep 15, 2026) — an investor-marketing appearance, non-material. <span class="pill p-int">Interpretation</span> The stock's ~19% one-month fade happened with no new company news; it reads as pre-BLA waiting-room drift, not a thesis-breaking development.
+  <div class="src">Sources: stocktitan SPRB event feed (Sep 15 presentation); Finnhub price data (Oct 10, 2026).</div></div>
+
+  <h3>Catalyst breakdown — what each event is, what "good" looks like, what to watch</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Event</th><th>Date quality</th><th>What it is</th><th>What "good" looks like</th><th>What to watch</th></tr></thead>
+    <tbody>
+      <tr><td><b>Q3 2026 financial results</b></td><td><span class="q inferred">Inferred</span> ~mid-Nov 2026 (MarketBeat est. Nov 9; stockevents est. Nov 16)</td><td>Quarterly update; cash, burn, runway language</td><td>Cash still ~$80M+; runway language intact ("into H2 2027"); explicit BLA-on-track re-confirmation</td><td>Any softening of BLA timing; burn acceleration above ~$17M/quarter; ATM/shelf usage language</td></tr>
+      <tr><td><b>BLA submission for TA-ERT</b></td><td><span class="q guidance">Guidance</span> Q4 2026</td><td>The binary trigger: submission of the BLA seeking accelerated approval on CSF HS-NRE</td><td>Submission announced by year-end; no last-minute CMC stumble; rolling-review usage if BTD permits</td><td>Silence into late December = slippage risk (already slipped once, 1H→Q4 2026); watch for PPQ-batch commentary tied to it</td></tr>
+      <tr><td><b>Second PPQ batch</b></td><td><span class="q guidance">Guidance</span> Q4 2026</td><td>Process performance qualification at the new commercial-scale manufacturer post-tech-transfer</td><td>Batch completes on schedule; comparability vs. clinical material confirmed — the quiet gate for BLA acceptance</td><td>CMC is the #1 CRL driver in accelerated-approval biologics; FDA called the <i>strategy</i> reasonable, not the <i>data</i> acceptable</td></tr>
+      <tr><td><b>TrAnsform initiation</b></td><td><span class="q guidance">Guidance</span> Q4 2026 (~14 pts, randomized vs. SoC)</td><td>FDA-requested confirmatory study; must start while BLA is under review</td><td>First sites activated and enrolling during review; no FDA hold</td><td>Enrollment pace in an ultra-rare population; any site-activation stumble is visible to FDA in real time</td></tr>
+      <tr><td><b>EAP initiation</b></td><td><span class="q guidance">Guidance</span> Q4 2026 (~10 pts)</td><td>US open-label Expanded Access Program for TrAnsform-ineligible patients; $5.5M foundation-funded</td><td>Program opens; patients treated — a real-world safety/operational dataset begins accumulating</td><td>Device-related AE signal outside the controlled trial setting; enrollment speed as a demand proxy</td></tr>
+      <tr><td><b>FDA BLA acceptance + PDUFA date</b></td><td><span class="q inferred">Inferred</span> ~60 days post-submission</td><td>60-day filing review decides whether the BLA is accepted for substantive review</td><td>Acceptance announced; <b>priority review granted</b> (~6-month clock → decision ~mid-2027)</td><td>Refuse-to-file = thesis-killer; standard review (10-month clock) pushes the binary to late 2027 and strains cash</td></tr>
+      <tr><td><b>Financing event</b></td><td><span class="q inferred">Inferred</span> H1 2027 (high likelihood)</td><td>Pre-launch raise via $300M shelf / $75M ATM (Jefferies)</td><td>Raised <i>after</i> positive BLA news at a premium to today's price; smaller dilution than the ~$100M modeled</td><td>Priced well below current levels = the ~5.3M dilution-honest count turns optimistic; watch ATM dribble pre-announcement</td></tr>
+      <tr><td><b>FDA approval decision (PDUFA)</b></td><td><span class="q inferred">Inferred</span> ~mid-2027 (if priority review)</td><td>The terminal binary: accelerated approval (+ likely PRV) vs. CRL / refusal</td><td>Accelerated approval with clean label; PRV issued and monetized (~$100–150M gross historical range)</td><td>AdCom convened (not yet announced — a late addition would signal reviewer concern); CRL language on CMC vs. efficacy tells you which risk actually bit</td></tr>
+      <tr><td><b>JR-446 early read-throughs</b></td><td><span class="q inferred">Inferred</span> 2027–2028</td><td>JCR/Medipal IV BBB-penetrating competitor; first patient dosed Sep 11, 2026</td><td>Competitor stalls or shows weak CNS HS clearance — extends TA-ERT's first-mover window</td><td>Any human efficacy signal from an IV alternative permanently reframes TA-ERT's ICV burden as a commercial ceiling</td></tr>
+      <tr><td><b>TrAnsform readout</b></td><td><span class="q inferred">Inferred</span> 2028+</td><td>Confirmatory n≈14 study must verify clinical benefit post-approval</td><td>Cognition separation vs. standard of care — converts accelerated approval to full approval</td><td>Failure risks withdrawal of accelerated approval: the long-tail overhang that caps how far the bull case can run on approval alone</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Timeline view</h3>
+  <div class="tl">
+    <div class="tl-item guidance">
+      <div class="tl-date">Q4 2026 <span class="q guidance">Guidance</span></div>
+      <div class="tl-title">BLA submission for TA-ERT (MPS IIIB)</div>
+      <div class="tl-desc">The binary trigger. Company re-confirmed on track at two pre-BLA meetings (Aug 24, 2026) and in Q2 results (Aug 12, 2026). Seeking accelerated approval on CSF HS-NRE. Local Q4-2026 dossier carries this event (guidance). <b>Still pending as of Oct 10, 2026.</b></div>
+    </div>
+    <div class="tl-item guidance">
+      <div class="tl-date">Q4 2026 <span class="q guidance">Guidance</span></div>
+      <div class="tl-title">TrAnsform confirmatory study initiation (~14 patients)</div>
+      <div class="tl-desc">Randomized, single-blind vs. standard of care, ages 1–5, severe MPS IIIB; primary objective cognition. FDA-requested as a condition of accelerated approval; must start while BLA is under review.</div>
+    </div>
+    <div class="tl-item guidance">
+      <div class="tl-date">Q4 2026 <span class="q guidance">Guidance</span></div>
+      <div class="tl-title">Expanded Access Program initiation (~10 patients)</div>
+      <div class="tl-desc">US open-label EAP for attenuated/severe patients ineligible for TrAnsform; weekly ICV; partially funded by the $5.5M foundation investment. Registration via MPS3BStudy.com (launched Aug 26, 2026).</div>
+    </div>
+    <div class="tl-item guidance">
+      <div class="tl-date">Q4 2026 <span class="q guidance">Guidance</span></div>
+      <div class="tl-title">Second PPQ batch (commercial-scale manufacturing)</div>
+      <div class="tl-desc">Post-tech-transfer process performance qualification. CMC execution is the quiet gating item for BLA acceptance and approval.</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">~Mid-November 2026 <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">Q3 2026 financial results</div>
+      <div class="tl-desc">Standard quarterly cadence (Q2 reported Aug 12, 2026; MarketBeat estimates Nov 9, 2026). Watch: cash burn, runway language, any BLA-timing update.</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">~60 days post-submission <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">FDA BLA acceptance + PDUFA date assignment</div>
+      <div class="tl-desc">Filing acceptance review is 60 days. If priority review is granted (plausible via Breakthrough/Rare Pediatric Disease status — <span class="pill p-gap">Gap</span> not confirmed), the decision clock is ~6 months from submission → decision window roughly <b>mid-2027</b>.</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">H1 2027 <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">Financing event (high likelihood)</div>
+      <div class="tl-desc">Shelf ($300M) + ATM ($75M) in place; runway guided into H2 2027; pre-launch raise is the base case. Size, price, and timing are the open variables — and the main source of upside-count dilution.</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">~Mid-2027 <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">FDA approval decision (PDUFA)</div>
+      <div class="tl-desc">The terminal binary: accelerated approval (likely with PRV issuance) vs. CRL / refusal. No AdCom has been announced; <span class="pill p-gap">Gap</span> whether FDA convenes one is unknown.</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">2027–2028 <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">Competitor read-throughs: JR-446 Ph I/II progress; EU regulatory path</div>
+      <div class="tl-desc">JCR/Medipal's JR-446 dosed its first global Ph I/II patient Sep 11, 2026 — early data (if any disclosed) is a multi-year item. No EU MAA timeline disclosed for TA-ERT (<span class="pill p-gap">Gap</span>).</div>
+    </div>
+    <div class="tl-item inferred">
+      <div class="tl-date">2028+ <span class="q inferred">Inferred</span></div>
+      <div class="tl-title">TrAnsform confirmatory readout</div>
+      <div class="tl-desc">Long-tail overhang: accelerated approval must be confirmed by clinical benefit. A 14-patient study in a rapidly progressive population will take years; failure risks withdrawal.</div>
+    </div>
+  </div>
+  <div class="note"><span class="pill p-fact">Fact</span> Cross-check: the local Q4-2026 catalyst dataset (dossier-v4.json) carries exactly one SPRB event — the Q4 2026 BLA submission (guidance) — consistent with the map above. The 2027 calendar dataset (data.json) carries no SPRB rows as of the last build; the mid-2027 PDUFA inference above is new relative to those datasets.</div>
+</section>
+
+<section id="risks">
+  <h2><span class="num">10</span>Ranked Red Flags</h2>
+  <p class="sec-sub">Ordered by capacity to destroy the thesis, not by probability.</p>
+
+  <div class="flag"><span class="rank">1</span><h4>Single-arm surrogate package vs. FDA discretion</h4>
+  <p><span class="pill p-int">Interpretation</span> The BLA's efficacy case is 22 open-label patients, a biochemical surrogate, and natural-history comparisons. FDA has agreed to the framework in writing — but reviewers change, standards tighten, and accelerated-approval scrutiny is elevated. A refusal-to-file, AdCom, or CRL on the surrogate/clinical package is the thesis-killer. Partial mitigant: the Fayuvi (MPS IIIA) approval on the analogous evidence architecture, one month ago.</p></div>
+
+  <div class="flag"><span class="rank">2</span><h4>Manufacturing / CMC — the reason the BLA already slipped once</h4>
+  <p><span class="pill p-fact">Fact</span> Submission moved from 1H 2026 to Q4 2026 for manufacturing readiness; tech transfer to a new commercial-scale manufacturer; second PPQ batch due Q4 2026. <span class="pill p-int">Interpretation</span> CMC is the most common CRL driver in accelerated-approval biologics. FDA called the comparability <i>strategy</i> reasonable — the <i>data</i> are unreviewed and undisclosed.</p></div>
+
+  <div class="flag"><span class="rank">3</span><h4>Dilution is a near-certainty, and it's already pre-positioned</h4>
+  <p><span class="pill p-fact">Fact</span> $300M shelf + $75M ATM (Jefferies) in place; runway only into H2 2027; two raises in the last 12 months. <span class="pill p-int">Interpretation</span> A pre-launch raise in H1 2027 is the base case. The dilution-honest count (~5.3M) used in this dossier already assumes it — but a raise priced well below current levels would make even that count optimistic.</p></div>
+
+  <div class="flag"><span class="rank">4</span><h4>One asset, one shot — and management's first chapter failed</h4>
+  <p><span class="pill p-fact">Fact</span> The tildacerfont CAH program failed, the stock collapsed, and a 1-for-75 reverse split was required. <span class="pill p-int">Interpretation</span> The team demonstrated it can source and reposition an asset well (the TA-ERT acquisition and FDA alignment are genuinely good execution), but it has also demonstrated it can be wrong about a core program. There is no diversification if TA-ERT stumbles.</p></div>
+
+  <div class="flag"><span class="rank">5</span><h4>ICV delivery: weekly, invasive, lifelong</h4>
+  <p><span class="pill p-int">Interpretation</span> Device infection/malfunction risk, neurosurgical burden on families, and a permanent convenience disadvantage vs. any future IV or one-time therapy. ~6,000 administered doses with a "consistent with ICV administration" safety profile is reassuring but does not eliminate the class risk — and commercial uptake friction is real even if approval lands.</p></div>
+
+  <div class="flag"><span class="rank">6</span><h4>Natural-history comparator bias</h4>
+  <p><span class="pill p-int">Interpretation</span> Open-label developmental assessments against historical controls are exposed to enrollment selection, site heterogeneity (multi-country), and severity-mix effects. The JCI-reported correlations (cognition vs. exposure/HS-NRE/gray matter) strengthen the biological story, but correlation in n=22 is not a controlled efficacy demonstration.</p></div>
+
+  <div class="flag"><span class="rank">7</span><h4>Small-n efficacy dataset; "stabilization" as the claim</h4>
+  <p><span class="pill p-int">Interpretation</span> n=22 with up to 6-year follow-up is large for ultra-rare but small for regulators. The clinical claim is stabilization, not improvement — defensible in a rapidly fatal disease, but a narrower basis for approval and reimbursement than demonstrated gain.</p></div>
+
+  <div class="flag"><span class="rank">8</span><h4>JR-446 and the lifecycle threat</h4>
+  <p><span class="pill p-fact">Fact</span> JCR/Medipal's IV BBB-penetrating ERT dosed first patient Sep 2026. <span class="pill p-int">Interpretation</span> Years behind, no human efficacy data — not a 2027 problem. But if an IV therapy works, weekly ICV becomes the inferior regimen permanently. Orphan exclusivity (7y US/10y EU) delays but does not eliminate this.</p></div>
+
+  <div class="flag"><span class="rank">9</span><h4>Insider signals are neutral-to-soft, not bullish</h4>
+  <p><span class="pill p-fact">Fact</span> 2026 Form 4s show option/RSU awards (retention comp), a Dec 2025 CEO option repricing to $104.13, and one small CEO open-market purchase (~$1.2K, Jun 30, 2026). No meaningful insider buying into the story; no insider selling at the late-2025 highs either (per independent research — <span class="pill p-unv">Unverified</span>).</p></div>
+
+  <div class="flag"><span class="rank">10</span><h4>Takeout/max-value arithmetic is capped by the street</h4>
+  <p><span class="pill p-fact">Fact</span> 13 analysts cover the stock (MarketBeat); consensus PT ~$158, range $104–$283 (a second aggregator, tradestie, shows ~$148 avg as of Oct 10, 2026). <span class="pill p-int">Interpretation</span> Any takeout or max-value scenario must stay inside credible bounds — this dossier caps max-value framing at ~$120/share on the dilution-honest count (see §11), consistent with the standing methodology rule.</p></div>
+</section>
+
+<section id="scenarios">
+  <h2><span class="num">11</span>Bear / Base / Bull — Soft Scenario Price Targets</h2>
+  <p class="sec-sub">Scenario math on the dilution-honest ~5.3M share count. These are <b>soft, scenario-based value frames — not price targets, not a DCF, not a recommendation.</b> Each carries its assumptions explicitly.</p>
+
+  <div class="note"><span class="pill p-int">Interpretation</span> <b>How to read this section:</b> every number below is a scenario value, built from the dossier's own inputs (net cash, share counts, PRV range, street bounds). "Soft" means: change an assumption and the number moves. The base case is new in this refresh — the Oct 7 build framed the middle only qualitatively.</div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Scenario</th><th>Soft value (per share)</th><th>Implied EV</th><th>What has to happen — labeled assumptions</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Bear — rejection / CRL</b></td>
+        <td><b>~$30/share</b> <span class="pill p-int">Soft</span></td>
+        <td>~$0M program value (cash floor)</td>
+        <td>FDA rejects the surrogate package or issues a CMC-driven CRL the company cannot remediate within its cash window; TA-ERT value → ~0. Math: ~$89M net cash ÷ ~2.9M FD shares ≈ $30.7. <span class="pill p-int">Interpretation</span> The stock would likely trade <i>below</i> this for a period as the company keeps spending with no program.</td>
+      </tr>
+      <tr>
+        <td><b>Base — accelerated approval, diluted</b></td>
+        <td><b>~$70/share</b> <span class="pill p-int">Soft</span></td>
+        <td>~$369M</td>
+        <td>BLA accepted → priority review → accelerated approval ~mid-2027; PRV issued and sold for <b>~$100M gross</b> (inside the historical $100–150M range); a <b>~$100M pre-launch raise at ~$52</b> funds commercial build (→ ~5.3M FD shares); TrAnsform enrolls and runs. EV build: $89M net cash + $100M PRV + ~$180M franchise premium (~2× net cash for a first-in-disease rare-pediatric franchise with 7-yr orphan exclusivity) = ~$369M ÷ 5.3M ≈ $70.</td>
+      </tr>
+      <tr>
+        <td><b>Bull / max-value — approval + takeout or full re-rate</b></td>
+        <td><b>Capped at ~$120/share</b> <span class="pill p-int">Soft</span></td>
+        <td>~$636M</td>
+        <td>Clean approval, PRV monetized, and either a takeout by a rare-disease acquirer or a full re-rate to a commercial-stage orphan multiple. <span class="pill p-fact">Fact</span> Capped at ~$120 on the ~5.3M dilution-honest count per the standing methodology rule — inside the sell-side range ($104–$283; consensus ~$148–158). This is a ceiling for scenario discipline, not a target.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>What the current price implies</h3>
+  <div class="claim"><span class="pill p-int">Interpretation</span> At ~$44.05 with ~$89M net cash, the market values the TA-ERT program at ~$32–39M EV — effectively pricing approval odds in the mid-teens (independent research: ~15% implied vs. ~72% fundamental). The trade, in one line: <b>you are buying the gap between the market's implied rejection odds and the fundamental odds implied by two written FDA agreements plus a same-architecture precedent approval</b> — with a cash floor near $30, a base-case frame near $70, and a scenario ceiling near $120.</div>
+
+  <h3>Scenario sensitivities (what moves the frame)</h3>
+  <ul>
+    <li><b>PRV monetization:</b> <span class="pill p-unv">Unverified</span> historical PRV sale prices cluster ~$100–150M gross; independent research risk-adjusts to ~$83M PV. A PRV sale largely funds the launch without dilution — it is the single biggest mitigant to Red Flag #3. <span class="pill p-gap">Gap</span> PRV eligibility/issuance not confirmed in company materials.</li>
+    <li><b>Raise terms:</b> a $100M raise at $30 instead of $52 adds ~1.4M more shares than modeled — the ~5.3M count is sensitive to pre-launch price action. Conversely, a raise <i>after</i> positive BLA news at a premium shrinks dilution.</li>
+    <li><b>BioMarin economics:</b> <span class="pill p-unv">Unverified</span> ~10% royalty on sales plus milestones (per independent research; underlying license terms undisclosed) — a modest drag on peak economics, already reflected in the capped ceiling.</li>
+    <li><b>Confirmatory overhang:</b> TrAnsform must confirm clinical benefit post-approval; failure risks withdrawal. This caps how far the bull case can run on approval alone — the re-rate is staged, not instant.</li>
+    <li><b>Approval probability is the master variable:</b> the base-case frame assumes approval; at the market's ~15%-implied odds the expected value is far lower. This dossier does not assign its own approval probability — that judgment belongs to the reader.</li>
+  </ul>
+</section>
+
+<section id="management">
+  <h2><span class="num">12</span>Management Track Record &amp; Insider Signals</h2>
+  <p class="sec-sub">Who is running the binary, what they've done before, and what their own money is doing.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Person</th><th>Role</th><th>Background (as disclosed)</th></tr></thead>
+    <tbody>
+      <tr><td><b>Javier Szwarcberg, M.D., M.P.H.</b></td><td>Chief Executive Officer</td><td><span class="pill p-fact">Fact</span> Previously led drug development and portfolio strategy at <b>BioMarin</b> — the originator of TA-ERT (BMN 250) — plus senior roles at Ultragenyx and Horizon (per independent research; <span class="pill p-unv">Unverified</span> as a primary source). Hired into the CEO role to execute the TA-ERT pivot.</td></tr>
+      <tr><td><b>Samir Gharib</b></td><td>President &amp; CFO</td><td><span class="pill p-fact">Fact</span> Career biotech finance; prior CFO experience (per independent research).</td></tr>
+      <tr><td><b>Adrian Quartel, M.D., FFPM</b></td><td>Chief Medical Officer (from Jul 27, 2026)</td><td><span class="pill p-fact">Fact</span> 25+ years pharma; ex-CMO Zevra Therapeutics, Acer, Adamas; ex-BioMarin Group VP Global Medical Affairs — helped launch six rare-disease treatments including the ERTs Naglazyme, Vimizim, and <b>Brineura</b> (the ICV ERT benchmark). (Company PR, Aug 2026.)</td></tr>
+      <tr><td><b>Dale Hooks</b></td><td>Chief Commercial Officer (from Mar 2026)</td><td><span class="pill p-fact">Fact</span> ~35 years commercial, 21 product launches; building pre-launch commercial org. Granted 11,000 RSUs (inducement, 4-yr vest). (Company PR, Mar 9, 2026.)</td></tr>
+      <tr><td><b>Jessica Cohen Pfeffer, M.D.</b></td><td>VP, Clinical Development (2026)</td><td><span class="pill p-fact">Fact</span> Appointed alongside the CMO to support BLA submission and readiness. (Q2 2026 update.)</td></tr>
+      <tr><td><b>Michael Grey</b></td><td>Executive Chairman</td><td><span class="pill p-fact">Fact</span> Director; Form 4 filer (option repricing participant).</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="claim"><span class="pill p-int">Interpretation</span> This is an unusually credentialed team for a ~$130M company — the CEO knew the asset from inside BioMarin, and the CMO launched Brineura, the closest real-world analog (ICV ERT for a pediatric neurodegenerative LSD). The last 18 months of execution support the résumé: acquiring TA-ERT, securing two FDA pathway agreements, Breakthrough designation, two clean financings, a debt facility, and completed pre-BLA meetings. The offsetting datum is permanent: this same corporate entity's first chapter (tildacerfont/CAH) failed badly enough to require a 1-for-75 reverse split. Competence at repositioning is proven; competence at picking winners from scratch is not.</div>
+
+  <h3>Insider signals (Form 4s, 2025–2026)</h3>
+  <ul>
+    <li><span class="pill p-fact">Fact</span> Dec 11, 2025: one-time <b>option repricing</b> — options with exercise prices ≥$106.09 reset to <b>$104.13</b> (30-day VWAP), including 10,000 CEO options (previously $344.25). Vesting/expiry unchanged; one-year retention condition. <span class="pill p-int">Interpretation</span> Retention mechanics after a collapse, not a bullish signal.</li>
+    <li><span class="pill p-fact">Fact</span> Jun 30, 2026: CEO open-market purchase of 266 shares (~$1,205). <span class="pill p-int">Interpretation</span> Token-sized; not a signal.</li>
+    <li><span class="pill p-fact">Fact</span> 2026 grants are retention comp: CMO 13,000 options (Jul 2026), CCO 11,000 RSUs (Mar 2026), director annual grants.</li>
+    <li><span class="pill p-unv">Unverified</span> Independent research (Jul 2026) states there is no evidence of insider selling at the late-2025 highs (~$240); 91.7% institutional ownership per MarketBeat.</li>
+  </ul>
+  <div class="claim"><span class="pill p-int">Interpretation</span> Net insider signal: <b>neutral</b>. No executive is buying the story with personal capital in size — but none sold the top either, and the team is being paid to stay through the BLA. For a hold-through-the-binary holder, management alignment here is "adequate," not "conviction."</div>
+</section>
+
+<section id="refs">
+  <h2><span class="num">13</span>References, As-Of Date &amp; Filings Used</h2>
+  <p class="sec-sub">Source order observed: SEC filings → FDA/labels → CT.gov → papers/conferences → company PRs/decks → trade press.</p>
+
+  <div class="card tight">
+    <p style="margin:0"><b>Audit refresh (October 10, 2026):</b> market data updated to Oct 10 (Finnhub: ~$44.05, −18.95% one-month, 52-wk range $30.03–$240; mcap ~$121M basic / ~$128M FD). <b>No new company catalysts landed Oct 7–10</b> — BLA submission still pending (guided Q4 2026). Changes in this refresh: per-catalyst "what good looks like / what to watch" breakdown table added; catalyst audit note added; pipeline explicitly ranked by value; explicit "why it should work" affirmative case added to Science; <b>soft scenario price targets added for bear (~$30), base (~$70), and bull (capped ~$120)</b> with labeled assumptions; dark/light mode toggle, collapsible sections, back-to-top button, mobile tap-target and table-overflow fixes added.</p>
+  </div>
+
+  <h3>Filings used</h3>
+  <ul class="refs">
+    <li>Form 10-K, fiscal year ended Dec 31, 2025 (filed Mar 9, 2026) — PIPE terms, loan agreement, Kaken termination, exhibit list.</li>
+    <li>Form 10-Q, quarter ended Jun 30, 2026 (filed Aug 12, 2026) — cash $96.295M, 2,752,810 shares outstanding, debt and warrant liability, opex/net loss.</li>
+    <li>Form 8-K (Jan 8, 2026) — Avenue Capital $50M loan facility; conversion option and lender warrant terms.</li>
+    <li>Form 8-K (Apr 22, 2026) — underwritten offering: 1,150,000 shares + 50,000 pre-funded warrants at $50.00; 180,000 greenshoe exercised.</li>
+    <li>Form 4 filings (Dec 2025–Jul 2026) — option repricing, RSU vesting, executive grants.</li>
+    <li>ClinicalTrials.gov: NCT02754076 (Study 201, phase I/II ICV tralesinidase alfa); NCT06488924 (JCR JR-446, Japan Ph 1/2).</li>
+  </ul>
+
+  <h3>Key sources</h3>
+  <ul class="refs">
+    <li>Company PR: "Positive Pre-BLA Meetings with FDA… BLA on track for Q4 2026" (Aug 24, 2026) — <a href="https://www.stocktitan.net/news/SPRB/spruce-biosciences-announces-positive-pre-bla-meetings-with-fda-and-n84jewyc07wu.html">stocktitan.net</a></li>
+    <li>Company PR: Q2 2026 financial results &amp; corporate update (Aug 12, 2026) — <a href="https://www.businesswire.com/news/home/20260812480178/en/Spruce-Biosciences-Reports-Second-Quarter-2026-Financial-Results-and-Provides-Corporate-Updates">businesswire.com</a></li>
+    <li>Company PR: Long-term TA-ERT data at 18th International MPS Symposium (Jun 8, 2026) — <a href="https://www.businesswire.com/news/home/20260608285348/en/Spruce-Biosciences-Announces-Long-Term-Tralesinidase-Alfa-Enzyme-Replacement-Therapy-Data-in-Sanfilippo-Syndrome-Type-B-MPS-IIIB-Presented-at-the-18th-International-MPS-Symposium">businesswire.com</a></li>
+    <li>Company PR: Breakthrough Therapy Designation (Oct 2025) — <a href="https://markets.financialcontent.com/prnews.pressre/article/bizwire-2025-10-6-spruce-biosciences-receives-us-fda-breakthrough-therapy-designation-for-tralesinidase-alfa-enzyme-replacement-therapy-ta-ert-in-sanfilippo-syndrome-type-b-mps-iiib">financialcontent.com</a></li>
+    <li>Company PR: MPS3BStudy.com launch; TrAnsform &amp; EAP details (Aug 26, 2026) — <a href="https://www.morningstar.com/news/business-wire/20260826942671/spruce-biosciences-announces-launch-of-mps3bstudycom">morningstar.com</a></li>
+    <li>Company PR: Q3 2025 results; $50M PIPE terms; reverse split &amp; relisting (Nov 2025) — <a href="https://www.biospace.com/press-releases/spruce-biosciences-reports-third-quarter-2025-financial-results-and-provides-corporate-updates">biospace.com</a></li>
+    <li>Muschol N. et al., JCI — phase I/II ICV tralesinidase alfa in MPS IIIB — <a href="https://www.jci.org/articles/view/165076/sd/3">jci.org</a></li>
+    <li>Novel ERTs for neuropathic MPS — systematic review (PMC7014430) — <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7014430/">pmc.ncbi.nlm.nih.gov</a></li>
+    <li>Tardieu M. et al., Lancet Neurol. 2017 — intracerebral gene therapy, MPS IIIB Ph 1/2 (via <a href="https://www.nature.com/articles/nrneurol.2017.110">Nature Reviews Neurology</a>)</li>
+    <li>JCR/Medipal PR: JR-446 global Ph I/II first patient dosed (Sep 11, 2026) — <a href="https://www.biospace.com/press-releases/medipal-holdings-corporation-and-jcr-pharmaceuticals-dose-first-patient-in-global-phase-i-ii-trial-of-jr-446-for-mucopolysaccharidosis-type-iiib">biospace.com</a></li>
+    <li>Nature Reviews Drug Discovery news brief: FDA approval of Fayuvi for MPS IIIA (Oct 5, 2026) — <a href="https://www.nature.com/articles/d41573-026-00160-z">nature.com</a></li>
+    <li>BioSpace: "Ultragenyx wins FDA greenlight for first Sanfilippo therapy, priced at nearly $4M" (Sep 2026) — <a href="https://www.biospace.com/fda/ultragenyx-wins-fda-greenlight-for-first-sanfilippo-therapy-priced-at-nearly-4m">biospace.com</a></li>
+    <li>Dihora Capital — Spruce Biosciences (SPRB) research note, Adam Eminger, Jul 2026 (independent research; cited as secondary where marked) — <a href="https://www.dihoracapital.com/SPRB%20Report-Eminger-Jul2026.pdf">dihoracapital.com</a></li>
+    <li>Market data: Finnhub quote (Oct 10, 2026) — <a href="https://finnhub.io/?q=%22SPRB%22">finnhub.io</a>; MarketBeat analyst consensus (13 analysts, PT $158.33 avg, $104–$283 range) and Q3-2026 earnings estimate (Nov 9, 2026) — <a href="https://www.marketbeat.com/stocks/NASDAQ/SPRB/forecast/">marketbeat.com</a>; tradestie technical/analyst snapshot (Wall Street avg target $148.00, Oct 10, 2026) — <a href="https://tradestie.com/stocks/SPRB/buy-or-sell-now/">tradestie.com</a></li>
+    <li>Local datasets cross-checked: ~/workspace/research_notes/q4-2026-dossier/dossier-v4.json (1 SPRB event); ~/workspace/research_notes/catalyst-calendar-2027/data.json (0 SPRB rows).</li>
+  </ul>
+
+  <div class="card tight">
+    <p style="margin:0"><b>As-of date:</b> October 10, 2026 (built Oct 7, audited &amp; enhanced Oct 10). <b>Evidence discipline:</b> claims tagged FACT / INTERPRETATION / GAP / UNVERIFIED throughout; no dates, cash figures, enrollment numbers, endpoints, or p-values invented — undisclosed items are marked GAP. <b>Hard rules observed:</b> no DCF, no firm price target, no buy/sell recommendation; scenario values are explicitly labeled soft with their assumptions; no cross-trial head-to-head efficacy claims; max-value scenario capped at ~$120/share on the dilution-honest count per the standing methodology rule; commercial modeling kept lean per the hold-through-the-binary lens. This dossier contains no personal data and is written as a neutral third-party research document.</p>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer><div class="wrap">
+  Spruce Biosciences (SPRB) deep-dive dossier · As of October 10, 2026 (audited &amp; enhanced) · Single-file interactive HTML · For research purposes only — not investment advice.
+</div></footer>
+
+<button id="toTop" aria-label="Back to top" title="Back to top">&uarr;</button>
+
+<script>
+  // ---- theme toggle (persisted) ----
+  (function(){
+    var root=document.documentElement, btn=document.getElementById('themeBtn');
+    function icon(){ return root.getAttribute('data-theme')==='light' ? '&#9790; Theme' : '&#9788; Theme'; }
+    try{ var saved=localStorage.getItem('sprb-theme'); if(saved) root.setAttribute('data-theme',saved); }catch(e){}
+    btn.innerHTML=icon();
+    btn.addEventListener('click',function(){
+      var next=root.getAttribute('data-theme')==='light'?'dark':'light';
+      root.setAttribute('data-theme',next);
+      try{ localStorage.setItem('sprb-theme',next); }catch(e){}
+      btn.innerHTML=icon();
+    });
+  })();
+  // ---- collapsible sections ----
+  (function(){
+    var secs=[...document.querySelectorAll('section[id]')];
+    secs.forEach(function(s){
+      var h=s.querySelector('h2'); if(!h) return;
+      var chev=document.createElement('span'); chev.className='chev'; chev.innerHTML='&#9662;'; chev.setAttribute('aria-hidden','true');
+      h.appendChild(chev);
+      h.setAttribute('role','button'); h.setAttribute('tabindex','0');
+      h.setAttribute('aria-expanded','true');
+      h.setAttribute('title','Click to collapse / expand section');
+      function toggle(){
+        s.classList.toggle('collapsed');
+        h.setAttribute('aria-expanded', s.classList.contains('collapsed')?'false':'true');
+      }
+      h.addEventListener('click',toggle);
+      h.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }});
+    });
+    document.getElementById('expandAll').addEventListener('click',function(){
+      secs.forEach(function(s){ s.classList.remove('collapsed'); var h=s.querySelector('h2'); if(h) h.setAttribute('aria-expanded','true'); });
+    });
+    document.getElementById('collapseAll').addEventListener('click',function(){
+      secs.forEach(function(s){ s.classList.add('collapsed'); var h=s.querySelector('h2'); if(h) h.setAttribute('aria-expanded','false'); });
+    });
+  })();
+  // ---- back to top ----
+  (function(){
+    var b=document.getElementById('toTop');
+    window.addEventListener('scroll',function(){ b.classList.toggle('show',window.scrollY>600); },{passive:true});
+    b.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  })();
+  // ---- scrollspy ----
+  (function(){
+    var links=[...document.querySelectorAll('nav a[href^="#"]')];
+    var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));}).filter(Boolean);
+    var obs=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){
+        links.forEach(function(a){ a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id); });
+      }});
+    },{rootMargin:'-30% 0px -60% 0px'});
+    secs.forEach(function(s){obs.observe(s);});
+  })();
+</script>
+</body>
+</html>
