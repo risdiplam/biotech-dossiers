@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRAX — Praxis Precision Medicines: Deep-Dive Dossier (Oct 10, 2026)</title>
+<style>
+  :root{
+    --ink:#1a2332; --muted:#5b6b82; --line:#e2e8f0; --bg:#f7f9fc; --card:#ffffff;
+    --sidebg:#16324f; --head:#16324f; --sidelink:#c6d3e6; --sidehead:#ffffff;
+    --accent:#0e7c7b; --accent2:#b3560e; --strip:#f0f7f6; --thead:#eef3f9; --zebra:#fafcfe;
+    --tl-line:#c9d6e8;
+    --fact:#1d7a3a; --factbg:#e6f4ea; --factbd:#bfe3c9;
+    --interp:#a86a00; --interpbg:#fdf3e0; --interpbd:#f0d9a8;
+    --gap:#5b6b82; --gapbg:#edf0f4; --gapbd:#d3dae3;
+    --unver:#8b1e3f; --unverbg:#fbe9ef; --unverbd:#f0b9c9;
+    --pill-hard-bg:#16324f; --pill-hard-fg:#ffffff;
+    --pill-guid-bg:#e8f0fa; --pill-guid-fg:#16324f; --pill-guid-bd:#b9cfe8;
+    --pill-inf-bg:#f1ede6; --pill-inf-fg:#7a5c2e; --pill-inf-bd:#cbb98f;
+    --verdict-border:#0e7c7b; --red-border:#c0392b;
+    --btn-bg:#ffffff; --btn-bd:#c9d6e8; --btn-fg:#16324f;
+  }
+  [data-theme="dark"]{
+    --ink:#e8eef6; --muted:#9fb0c7; --line:#2b3b51; --bg:#0e1622; --card:#16202f;
+    --sidebg:#0a121d; --head:#d7e6f7; --sidelink:#a9bcd4; --sidehead:#ffffff;
+    --accent:#2fd6c4; --strip:#12261f; --thead:#1b2940; --zebra:#121c2b;
+    --tl-line:#2b3b51;
+    --fact:#8fe3a8; --factbg:#123024; --factbd:#1d5c3a;
+    --interp:#f2c063; --interpbg:#2e2410; --interpbd:#6b5220;
+    --gap:#a9bcd4; --gapbg:#1c2534; --gapbd:#3a4b64;
+    --unver:#f093a8; --unverbg:#331520; --unverbd:#6e2a3f;
+    --pill-hard-bg:#d7e6f7; --pill-hard-fg:#0e1622;
+    --pill-guid-bg:#1b2940; --pill-guid-fg:#bcd2ee; --pill-guid-bd:#3a557f;
+    --pill-inf-bg:#2b2416; --pill-inf-fg:#e3c98f; --pill-inf-bd:#6b5c33;
+    --verdict-border:#2fd6c4; --red-border:#e06666;
+    --btn-bg:#16202f; --btn-bd:#3a4b64; --btn-fg:#d7e6f7;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;overflow-x:hidden}
+  .wrap{display:flex;max-width:1280px;margin:0 auto;min-height:100vh}
+  nav{position:sticky;top:0;height:100vh;width:260px;flex:0 0 260px;background:var(--sidebg);color:var(--sidelink);padding:22px 14px;overflow-y:auto;font-size:13.5px}
+  nav h3{color:var(--sidehead);font-size:14px;margin:0 0 4px;letter-spacing:.5px}
+  nav .tick{font-size:26px;font-weight:800;color:var(--sidehead);margin-bottom:2px}
+  nav .asof{font-size:11.5px;color:#9fb0c7;margin-bottom:14px}
+  nav a{display:flex;align-items:center;color:var(--sidelink);text-decoration:none;padding:12px 10px;border-radius:6px;margin-bottom:2px;min-height:44px}
+  nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+  nav a.sec{font-weight:600;color:var(--sidehead);margin-top:8px}
+  main{flex:1;min-width:0;padding:36px 44px;max-width:980px}
+  header.hero{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 32px;margin-bottom:26px}
+  header.hero h1{margin:0 0 4px;font-size:30px;color:var(--head)}
+  header.hero .sub{color:var(--muted);font-size:15px}
+  .verdict{background:var(--strip);border-left:5px solid var(--verdict-border);border-radius:8px;padding:16px 20px;margin:22px 0}
+  .verdict b{color:var(--head)}
+  .takeaways{background:var(--card);border:2px solid var(--verdict-border);border-radius:10px;padding:18px 22px;margin:22px 0}
+  .takeaways h3{margin:0 0 8px;color:var(--head)}
+  .takeaways ul{margin:8px 0}
+  h2{font-size:22px;color:var(--head);border-bottom:2px solid var(--line);padding-bottom:8px;margin:38px 0 16px;position:relative;padding-right:52px}
+  h3{font-size:17px;color:var(--head);margin:24px 0 10px}
+  h4{font-size:15px;margin:18px 0 8px;color:var(--head)}
+  p{margin:10px 0}
+  .tscroll{overflow-x:auto;margin:14px 0;border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:var(--card);min-width:620px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--thead);color:var(--head);font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+  tr:nth-child(even) td{background:var(--zebra)}
+  .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+  .t-fact{background:var(--factbg);color:var(--fact);border:1px solid var(--factbd)}
+  .t-interp{background:var(--interpbg);color:var(--interp);border:1px solid var(--interpbd)}
+  .t-gap{background:var(--gapbg);color:var(--gap);border:1px solid var(--gapbd)}
+  .t-unver{background:var(--unverbg);color:var(--unver);border:1px solid var(--unverbd)}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+  .hard{background:var(--pill-hard-bg);color:var(--pill-hard-fg)}
+  .guidance{background:var(--pill-guid-bg);color:var(--pill-guid-fg);border:1px solid var(--pill-guid-bd)}
+  .inferred{background:var(--pill-inf-bg);color:var(--pill-inf-fg);border:1px dashed var(--pill-inf-bd)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:16px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .kpi{text-align:center;padding:14px}
+  .kpi .n{font-size:24px;font-weight:800;color:var(--head)}
+  .kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .redflag{border-left:5px solid var(--red-border)}
+  .scenario{border-top:4px solid var(--accent)}
+  .scenario.bear{border-top-color:#c0392b}
+  .scenario.bull{border-top-color:#1d7a3a}
+  [data-theme="dark"] .scenario.bull{border-top-color:#4ade80}
+  .refs{font-size:13px}
+  .refs li{margin-bottom:7px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;font-size:12.5px;color:var(--muted)}
+  .footnote{font-size:12.5px;color:var(--muted)}
+  code{background:var(--gapbg);padding:1px 6px;border-radius:4px;font-size:13px}
+  .toc-note{font-size:12px;color:#9fb0c7;margin-top:18px}
+  ul.tight li{margin-bottom:6px}
+  .sec-toggle{position:absolute;right:0;top:4px;width:44px;height:44px;border:1px solid var(--btn-bd);background:var(--btn-bg);color:var(--btn-fg);border-radius:8px;cursor:pointer;font-size:18px;line-height:1;padding:0}
+  .sec-toggle:hover{background:var(--thead)}
+  .sec-body.closed{display:none}
+  #themeToggle{position:fixed;top:14px;right:14px;z-index:1000;min-width:44px;min-height:44px;padding:10px 14px;border:1px solid var(--btn-bd);background:var(--btn-bg);color:var(--btn-fg);border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  #backTop{position:fixed;bottom:20px;right:20px;z-index:1000;width:52px;height:52px;border-radius:50%;border:1px solid var(--btn-bd);background:var(--btn-bg);color:var(--btn-fg);font-size:22px;cursor:pointer;display:none;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  #backTop.show{display:block}
+  .mobile-toc{display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:20px}
+  .mobile-toc summary{padding:14px 18px;min-height:44px;cursor:pointer;font-weight:700;color:var(--head);list-style:none}
+  .mobile-toc summary::-webkit-details-marker{display:none}
+  .mobile-toc .toc-links{padding:0 18px 14px}
+  .mobile-toc a{display:block;padding:11px 4px;color:var(--ink);text-decoration:none;border-top:1px solid var(--line);min-height:44px}
+  .callout{background:var(--strip);border:1px solid var(--line);border-left:5px solid var(--accent2);border-radius:8px;padding:14px 18px;margin:16px 0}
+  .rank-badge{display:inline-block;min-width:28px;text-align:center;font-weight:800;font-size:13px;color:var(--sidehead);background:var(--sidebg);border-radius:6px;padding:2px 6px;margin-right:6px}
+  @media(max-width:900px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    nav{display:none}
+    main{padding:20px 16px;max-width:100%}
+    header.hero{padding:20px}
+    header.hero h1{font-size:24px}
+    .mobile-toc{display:block}
+  }
+</style>
+</head>
+<body>
+<button id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false" title="Dark / light mode">&#9681; Theme</button>
+<button id="backTop" aria-label="Back to top" title="Back to top">&uarr;</button>
+<div class="wrap">
+<nav aria-label="Dossier contents">
+  <div class="tick">PRAX</div>
+  <h3>Praxis Precision Medicines, Inc.</h3>
+  <div class="asof">Deep-dive dossier &middot; As of Oct 10, 2026<br>Price ref: $259.86 (Oct 9, 2026 close)</div>
+  <a href="#s1" class="sec">1 &middot; Identity &amp; Thesis Snapshot</a>
+  <a href="#s2" class="sec">2 &middot; Science: MoA &amp; Why It Could Fail</a>
+  <a href="#s3" class="sec">3 &middot; Pipeline (Value-Ranked)</a>
+  <a href="#s4" class="sec">4 &middot; Trial Design Deep Dive</a>
+  <a href="#s5" class="sec">5 &middot; Clinical / Regulatory Status</a>
+  <a href="#s6" class="sec">6 &middot; Competition</a>
+  <a href="#s7" class="sec">7 &middot; Financials</a>
+  <a href="#s8" class="sec">8 &middot; FDMC / EV</a>
+  <a href="#s9" class="sec">9 &middot; Catalyst / Event Map</a>
+  <a href="#s10" class="sec">10 &middot; Ranked Red Flags</a>
+  <a href="#s11" class="sec">11 &middot; Bear / Base / Bull + Soft Targets</a>
+  <a href="#s12" class="sec">12 &middot; Management &amp; Insider Signals</a>
+  <a href="#s13" class="sec">13 &middot; References &amp; Filings</a>
+  <div class="toc-note">Evidence tags: <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> <span class="tag t-gap">GAP</span> <span class="tag t-unver">UNVERIFIED</span></div>
+</nav>
+<main>
+
+<header class="hero">
+  <h1>Praxis Precision Medicines, Inc. (Nasdaq: PRAX)</h1>
+  <div class="sub">Comprehensive deep-dive investment dossier &middot; CNS precision neuroscience &middot; As of October 10, 2026</div>
+  <div class="verdict">
+    <b>Dossier verdict &mdash; key swing factor:</b> the stock is a back-to-back regulatory binary: the relutrigine NDA (SCN2A/SCN8A developmental epileptic encephalopathies, PDUFA <b>December 27, 2026</b>) and the ulixacaltamide NDA (essential tremor, PDUFA <b>January 29, 2027</b>) land five weeks apart on a ~$7.2B basic market cap with zero revenue. The single largest swing factor is whether the FDA accepts the ulixacaltamide Essential3 package &mdash; a program already targeted by a detailed short-seller report alleging endpoint changes and optimistic missing-data handling &mdash; because that decision arbitrates the integrity debate over the company's lead commercial asset. <span class="tag t-interp">INTERPRETATION</span>
+  </div>
+  <div class="grid3">
+    <div class="card kpi"><div class="n">$259.86</div><div class="l">Close Oct 9, 2026 (Nasdaq) &middot; −7.2% since Oct 6</div></div>
+    <div class="card kpi"><div class="n">~$7.2B</div><div class="l">Basic mcap &middot; ~$8.2B fully diluted</div></div>
+    <div class="card kpi"><div class="n">2 NDAs</div><div class="l">Under FDA review &middot; both PDUFAs in ~80 days</div></div>
+  </div>
+</header>
+
+<details class="mobile-toc">
+  <summary>Contents &mdash; tap to expand</summary>
+  <div class="toc-links">
+    <a href="#s1">1 &middot; Identity &amp; Thesis Snapshot</a>
+    <a href="#s2">2 &middot; Science: MoA &amp; Why It Could Fail</a>
+    <a href="#s3">3 &middot; Pipeline (Value-Ranked)</a>
+    <a href="#s4">4 &middot; Trial Design Deep Dive</a>
+    <a href="#s5">5 &middot; Clinical / Regulatory Status</a>
+    <a href="#s6">6 &middot; Competition</a>
+    <a href="#s7">7 &middot; Financials</a>
+    <a href="#s8">8 &middot; FDMC / EV</a>
+    <a href="#s9">9 &middot; Catalyst / Event Map</a>
+    <a href="#s10">10 &middot; Ranked Red Flags</a>
+    <a href="#s11">11 &middot; Bear / Base / Bull + Soft Targets</a>
+    <a href="#s12">12 &middot; Management &amp; Insider Signals</a>
+    <a href="#s13">13 &middot; References &amp; Filings</a>
+  </div>
+</details>
+
+<div class="legend">
+  <span><span class="tag t-fact">FACT</span> = sourced from filings/PR/CT.gov/papers</span>
+  <span><span class="tag t-interp">INTERPRETATION</span> = analyst inference from facts</span>
+  <span><span class="tag t-gap">GAP</span> = not publicly disclosed / not verified</span>
+  <span><span class="tag t-unver">UNVERIFIED</span> = single weak source, treat with caution</span>
+</div>
+
+<div class="takeaways">
+  <h3>Key takeaways</h3>
+  <ul class="tight">
+    <li><b>Two PDUFAs, five weeks apart:</b> relutrigine (SCN2A/SCN8A DEEs) Dec 27, 2026; ulixacaltamide (essential tremor) Jan 29, 2027. Both NDAs accepted, no AdComs planned. <span class="tag t-fact">FACT</span></li>
+    <li><b>Ulixacaltamide is the value pillar</b> (first purpose-built ET drug in decades; ~7M US ET patients) but carries the Culper integrity overhang and a failed same-target predecessor. <span class="tag t-interp">INTERPRETATION</span></li>
+    <li><b>Q4 2026 EMERALD topline</b> (~200 pts, &gt;50 genotypes) tests whether relutrigine's persistent-current mechanism generalizes &mdash; the biggest clinical readout left in 2026. <span class="tag t-fact">FACT</span></li>
+    <li><b>Balance sheet is a non-issue near-term:</b> ~$1.4B cash at Jun 30, 2026; runway guided into 2028; no debt. <span class="tag t-fact">FACT</span></li>
+    <li><b>Price action is deteriorating into the binary:</b> −12.1% over 5 days, −23.3% over 1 month (finnhub); 33.8% below the $392.70 Aug 2026 high. <span class="tag t-fact">FACT</span></li>
+  </ul>
+</div>
+
+<h2 id="s1">1 &middot; Identity &amp; Thesis Snapshot</h2>
+<div class="card">
+<div class="tscroll">
+<table>
+<tr><th style="width:28%">Item</th><th>Detail</th></tr>
+<tr><td>Company</td><td>Praxis Precision Medicines, Inc. &mdash; Delaware corporation, HQ 99 High Street, 30th Floor, Boston, MA 02110 <span class="tag t-fact">FACT</span> (Q1 2026 10-Q)</td></tr>
+<tr><td>Listing</td><td>Nasdaq Global Select Market, ticker PRAX; Commission File No. 001-39620 <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Founded / IPO</td><td>Founded 2015; IPO on Nasdaq October 2020, raising ~$190M (~$170M per MarketBeat's offering record; IPO price $16&ndash;18, split-adjusted history) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Business</td><td>Clinical-stage biopharma translating genetic insights into CNS therapies for disorders of neuronal excitation&ndash;inhibition imbalance (epilepsy, movement disorders) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Platforms</td><td><b>Cerebrum&trade;</b> (small molecules) and <b>Solidus&trade;</b> (antisense oligonucleotides) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Revenue</td><td>$0 product revenue; FY2025 net loss $303.3M; H1 2026 net loss $176.3M <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Cash</td><td>~$1.4B cash, cash equivalents + marketable securities at Jun 30, 2026; runway guided into 2028 <span class="tag t-fact">FACT</span> (Q2 2026 PR). Est. ~$1.3B current after Q3 burn <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td>Street view</td><td>Consensus "Moderate Buy"; avg target $613.26 (20 analysts, MarketBeat, Oct 6, 2026); street high $826 (BTIG, Buy) <span class="tag t-fact">FACT</span>. Tradestie: "Strong Buy" consensus, avg $644 (19 analysts, Oct 9&ndash;10) <span class="tag t-unver">UNVERIFIED</span> (aggregator)</td></tr>
+<tr><td>Volatility profile</td><td>52-wk range $50.31&ndash;$392.70 (high Aug 20, 2026); 1-yr return +388%; beta ~2.8&ndash;2.9; short float 14.45% <span class="tag t-fact">FACT</span> (finnhub; MarketBeat)</td></tr>
+</table>
+</div>
+</div>
+<h3>Thesis in one paragraph</h3>
+<p>Praxis is attempting a rare pre-revenue double launch: two NDAs under FDA review (relutrigine for ultra-rare SCN2A/SCN8A developmental epileptic encephalopathies; ulixacaltamide for essential tremor, a ~7M-patient US population with no purpose-built drug approved in decades), a Phase 3 broad-DEE readout (EMERALD, Q4 2026) that could support a 2027 sNDA, and an ASO registrational program (elsunersen, EMBRAVE3, 2027) &mdash; all funded by ~$1.4B of cash raised across four public offerings since January 2024. <span class="tag t-interp">INTERPRETATION</span> The investment case is a concentrated clinical-regulatory binary, not a commercial story: valuation (~$7.2B basic / ~$8.2B fully diluted) already prices in substantial approval probability, and the next ~80 days (two PDUFAs five weeks apart) resolve most of the variance. <span class="tag t-interp">INTERPRETATION</span></p>
+
+<h2 id="s2">2 &middot; Science: Mechanism of Action &amp; Why It Could Fail</h2>
+
+<h3>2a &middot; Ulixacaltamide (PRAX-944) &mdash; selective T-type calcium-channel inhibitor, essential tremor</h3>
+<p><b>Plain-language MoA.</b> Essential tremor is thought to arise from pathological rhythmic "burst" firing of neurons in the cerebello-thalamo-cortical (CTC) circuit. T-type calcium channels (Ca<sub>V</sub>3.1/3.2/3.3) are low-voltage-activated channels that drive the rebound burst firing underlying these oscillations; they are densely expressed at every CTC node &mdash; deep cerebellar nuclei, Purkinje cells, ventral thalamic nuclei (including VIM, where burst firing recorded in ET patients correlates with tremor), and motor cortex. Ulixacaltamide is a highly selective small-molecule T-type calcium-channel blocker designed to suppress neuronal bursting in this circuit. <span class="tag t-fact">FACT</span> (company disclosures; review literature)</p>
+<p><b>Academic foundation.</b></p>
+<ul class="tight">
+<li>Park et al., <i>PNAS</i> 2010 (PMID 20498062): demonstrated that potentiation of Ca<sub>V</sub>3.1 T-type channels in the inferior olive drives tremor onset in the harmaline pharmacologic model of essential tremor; Ca<sub>V</sub>3.1 knockout mice lacked rhythmic burst discharges, and selective shRNA knockdown of Ca<sub>V</sub>3.1 in the inferior olive suppressed harmaline-induced tremor. <span class="tag t-fact">FACT</span></li>
+<li>Handforth et al., <i>Neuropharmacology</i> 2010 (PMID 20547167 / PMC3787716): five T-type calcium-channel antagonists (ethosuximide, zonisamide, ECN, KYS05064, NNC 55-0396) suppressed tremor &ge;50% in the harmaline model and &ge;70% in the GABA<sub>A</sub> &alpha;1-null model &mdash; <i>but</i> Ca<sub>V</sub>3.1-null mice exhibited as much tremor as wild-type, and two antagonists suppressed tremor equally in null mice, leading the authors to conclude "it is uncertain whether medications developed to block only the Ca<sub>V</sub>3.1 subtype would exhibit efficacy." <span class="tag t-fact">FACT</span> &mdash; this is a genuine scientific caveat for a subtype-selective blocker.</li>
+<li>Review literature (e.g., "T-type calcium channels as therapeutic targets in essential tremor and Parkinson's disease"): CACNA1G (Ca<sub>V</sub>3.1) variants reported in three ET families showed little-to-no functional change vs wild type; the traditional olivary model of ET is "increasingly in question," with the broader CTC network now centered in ET pathophysiology. <span class="tag t-fact">FACT</span></li>
+</ul>
+<p><b>Why it could fail.</b></p>
+<ul class="tight">
+<li><b>Mechanism graveyard in the same indication:</b> Jazz Pharmaceuticals' suvecaltamide &mdash; a highly selective, state-dependent T-type calcium-channel modulator &mdash; missed its primary endpoint (TETRAS modified composite at week 12) and key secondary (CGI-S) in a 420-patient Phase 2b (NCT05122650), reported June 2024, with placebo overperforming expectations. Sage/Biogen's SAGE-324 (GABA<sub>A</sub> PAM, different mechanism) also failed Phase 2 (KINETIC 2, n=147) in ET and was terminated July 2024. The short-seller report notes three same-mechanism early ET failures. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> Same-target precedent is negative; ulixacaltamide's differentiation rests on trial design (functional mADL endpoint) and molecule, not on a validated target.</li>
+<li><b>Prior miss by this drug:</b> the Phase 2b Essential1 trial (n=132) missed its primary mADL endpoint (LS mean difference &minus;1.58; 95% CI &minus;3.60 to 0.45; p=0.126, March 2023), with only nominal significance on TETRAS-ADL (p=0.026). The Phase 3 success came after endpoint/timing optimization (primary at week 8 rather than week 12). <span class="tag t-fact">FACT</span></li>
+<li><b>Durability unknown:</b> Study 2's randomized-withdrawal maintenance signal spans only 4 weeks in pre-selected responders; Study 1's primary is at week 8 of a 12-week trial. Long-term functional durability in a chronic, progressive, elderly disease is unproven. <span class="tag t-interp">INTERPRETATION</span></li>
+<li><b>Tolerability in the target population:</b> ~27&ndash;28% AE discontinuations and TEAEs including dizziness, "brain fog," cognitive complaints, and euphoric mood in an older, comorbid population &mdash; a plausible labeling and adherence headwind. <span class="tag t-fact">FACT</span> (NeurologyLive) <span class="tag t-interp">INTERPRETATION</span></li>
+</ul>
+
+<h3>2b &middot; Relutrigine (PRAX-562) &mdash; preferential persistent-sodium-current inhibitor, SCN2A/SCN8A DEEs</h3>
+<p><b>Plain-language MoA.</b> SCN2A and SCN8A encode the neuronal voltage-gated sodium channels Na<sub>V</sub>1.2 and Na<sub>V</sub>1.6. Gain-of-function variants increase a small but physiologically critical "persistent" sodium current (INaP) &mdash; channels that fail to fully inactivate and leak depolarizing current &mdash; producing neuronal hyperexcitability and severe early-onset epilepsy (developmental and epileptic encephalopathies). Relutrigine is a first-in-class small molecule that preferentially inhibits this persistent current with selectivity for disease-state (hyperexcitable) channels, rather than blocking the peak transient current that drives normal action potentials. <span class="tag t-fact">FACT</span> (company; AES abstract)</p>
+<p><b>Academic foundation.</b></p>
+<ul class="tight">
+<li>Veeramah/Meisler et al. (SCN8A discovery, <i>Am. J. Hum. Genet.</i> 2012): de novo heterozygous SCN8A missense (p.Asn1768Asp) caused a dramatic increase in persistent sodium current with incomplete inactivation and a dominant gain-of-function phenotype; knock-in mice recapitulated seizures and SUDEP &mdash; foundational evidence linking GoF persistent-current elevation to DEE. <span class="tag t-fact">FACT</span></li>
+<li>Children 2025 review (MDPI, "Precision Therapeutics in Lennox&ndash;Gastaut Syndrome"): standard sodium-channel blockers (carbamazepine, phenytoin) inhibit fast inactivation/transient currents but "do not significantly affect persistent sodium currents, which prolong neuronal depolarization and contribute to hyperexcitability"; blocking transient currents causes dose-dependent ataxia, sedation, and cognitive impairment. This is the mechanistic rationale for a persistent-current-preferential agent. <span class="tag t-fact">FACT</span></li>
+<li>AES abstract (Scott, Hughes, Kahlig et al., Praxis): PRAX-562 inhibits persistent INa with improved selectivity over peak INa vs carbamazepine and lamotrigine, with dose-dependent seizure inhibition up to complete control in SCN2A/SCN8A and other DEE mouse models. <span class="tag t-fact">FACT</span> (conference abstract, company-affiliated authors)</li>
+</ul>
+<p><b>Why it could fail.</b></p>
+<ul class="tight">
+<li><b>Thin registrational dataset:</b> the NDA rests substantially on a single n=51 cohort stopped early for efficacy &mdash; early stopping systematically inflates effect estimates, and the FDA's major-amendment extension (sensitivity analyses) signals the agency is probing the data's robustness. <span class="tag t-interp">INTERPRETATION</span></li>
+<li><b>Genetic heterogeneity:</b> EMERALD broadens to &gt;50 genetic etiologies; the precision rationale (GoF persistent-current) is strongest in SCN2A/SCN8A and dilutes across all-cause DEE. A positive EMBOLD does not de-risk EMERALD. <span class="tag t-interp">INTERPRETATION</span></li>
+<li><b>Small-population commercial and diagnostic friction</b> &mdash; kept lean per the clinical-binary focus: ultra-rare, pediatric, diagnosis-dependent; relevant only post-approval. <span class="tag t-interp">INTERPRETATION</span></li>
+</ul>
+
+<h3>2c &middot; Vormatrigine (PRAX-628) &mdash; functional-state sodium-channel modulator, focal onset seizures</h3>
+<p>Vormatrigine is a sodium-channel modulator designed for preferential activity at hyperexcitable (disease-state) channels &mdash; conceptually the adult-focal-epilepsy sibling of relutrigine's approach. <span class="tag t-fact">FACT</span> In the open-label RADIANT study it showed rapid, durable signals (56.3% median seizure-frequency reduction over 8 weeks; ~22% seizure-free in the final 28 days), but the randomized Phase 2/3 POWER1 trial <b>missed its primary endpoint</b> (percent change in monthly seizure frequency) in highly refractory patients, and POWER2 enrollment is paused pending program redesign. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> The randomized failure materially weakens the "functional-state selectivity differentiates in FOS" thesis; in a crowded generic anti-seizure-medication market, the bar for differentiation is high and now unmet on the primary endpoint.</p>
+
+<h3>2d &middot; Elsunersen (PRAX-222) &mdash; SCN2A-lowering antisense oligonucleotide</h3>
+<p>An intrathecally delivered ASO (Solidus&trade; platform, Ionis collaboration) that lowers SCN2A expression to counter gain-of-function SCN2A-DEE &mdash; a directly disease-targeted, potentially disease-modifying approach. EMBRAVE Part A showed a 77% sham-adjusted reduction in monthly seizures (p=0.015) sustained in open-label extension up to one year; FDA granted Breakthrough Therapy Designation (June 22, 2026); EMBRAVE3 is a streamlined single-arm registrational study (~30 patients, 24-week countable-motor-seizure endpoint) with topline expected 2027. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> Why it could fail: intrathecal delivery burden in infants/children, tiny single-arm registrational dataset, and ASO platform risk (no established clinical efficacy for Praxis's earlier ASO programs PRAX-080/-090/-100). The relutrigine small molecule, if approved, would also compete for the same SCN2A GoF patients.</p>
+
+<h2 id="s3">3 &middot; Pipeline Overview &mdash; Ranked by Value (Most &rarr; Least)</h2>
+<div class="card">
+<div class="tscroll">
+<table>
+<tr><th style="width:6%">Rank</th><th>Program</th><th>Mechanism</th><th>Indication</th><th>Stage (Oct 2026)</th><th>Why this rank</th></tr>
+<tr><td><span class="rank-badge">1</span></td><td><b>Ulixacaltamide</b> (PRAX-944)</td><td>Selective T-type Ca-channel inhibitor</td><td>Essential tremor (adult)</td><td>NDA under FDA review; PDUFA Jan 29, 2027 <span class="pill hard">hard</span>; BTD; no AdCom planned</td><td>Largest commercial prize: first purpose-built ET drug in decades for a ~7M US-patient population with no adequate therapy; nearest-term approval. Integrity overhang caps conviction. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">2</span></td><td><b>Relutrigine</b> (PRAX-562)</td><td>Preferential persistent-Na-current inhibitor</td><td>SCN2A/SCN8A DEEs (pediatric)</td><td>NDA under FDA review; PDUFA Dec 27, 2026 (extended 3 mo, major amendment) <span class="pill hard">hard</span>; BTD, ODD, RPDD; mid-cycle review clear, no AdCom</td><td>First targeted therapy for an ultra-rare indication with zero competition; small revenue but high strategic/valuation weight as the "cleaner" regulatory path; RPDD carries Priority Review Voucher optionality. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">3</span></td><td><b>Relutrigine &mdash; EMERALD</b></td><td>Same</td><td>Broad DEEs (&gt;50 genotypes)</td><td>Phase 3, ~200 enrolled (target exceeded)</td><td>Label-expansion leverage on relutrigine: a positive Q4 2026 readout multiplies the approved asset's patient base via 2027 sNDA. Dilution of the precision rationale is the risk. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">4</span></td><td><b>Elsunersen</b> (PRAX-222)</td><td>SCN2A-lowering ASO (intrathecal); Ionis collaboration</td><td>SCN2A GoF DEE (early seizure onset)</td><td>EMBRAVE3 registrational enrolling (single-arm, ~30 pts); BTD (Jun 2026), ODD, RPDD, EMA ODD + PRIME</td><td>Outranks vormatrigine: positive controlled Part A (77% sham-adjusted), BTD, and an FDA-aligned registrational path. ASO delivery/dataset risks remain. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">5</span></td><td><b>Vormatrigine</b> (PRAX-628)</td><td>Functional-state Na-channel modulator</td><td>Focal onset seizures; generalized epilepsy</td><td>POWER1 Ph2/3 missed primary (Jun 1, 2026); POWER2 enrollment paused; program under redesign</td><td>Pure option value after the randomized miss; any value requires a redesigned primary-endpoint win in a generic market. Timing and form of restart undisclosed. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">6</span></td><td>Ulixacaltamide transdermal</td><td>Iontophoretic patch (Remagine Labs collaboration, Jul 2026)</td><td>Essential tremor</td><td>Research collaboration; Praxis took equity stake in Remagine</td><td>Lifecycle extension of the #1 asset; preclinical, no value independent of oral ulixacaltamide's fate. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">7</span></td><td><b>PRAX-020</b></td><td>KCNT1 inhibitor</td><td>KCNT1-related epilepsy</td><td>KCNT1 rights regained from UCB effective May 31, 2026</td><td>Validated genetic target (KCNT1 gain-of-function epilepsy), but no clinical data; development plan not disclosed. <span class="tag t-unver">UNVERIFIED</span> detail via trade-press summary of August pipeline presentation</td></tr>
+<tr><td><span class="rank-badge">8</span></td><td><b>PRAX-050</b></td><td>Undisclosed movement-disorder mechanism</td><td>Movement disorder</td><td>Early research</td><td>No mechanism, no data; nominal option value. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td><span class="rank-badge">9</span></td><td><b>PRAX-080 / -090 / -100</b></td><td>ASOs: PCDH19 / SYNGAP1 / SCN2A loss-of-function</td><td>Genetic neurodevelopmental disorders</td><td>Earlier-stage ASO pipeline; no established clinical efficacy</td><td>Furthest from value realization; platform proof rests on elsunersen. <span class="tag t-interp">INTERPRETATION</span></td></tr>
+</table>
+</div>
+<p class="footnote">Rank is an analyst value ordering (expected commercial + regulatory value to the equity), not a company-stated priority. <span class="tag t-interp">INTERPRETATION</span> Status column as of company presentations / PRs through Oct 2, 2026.</p>
+</div>
+
+<h2 id="s4">4 &middot; Trial Design Deep Dive</h2>
+
+<h3>Essential3 &mdash; ulixacaltamide in essential tremor (NCT06087276), topline Oct 16, 2025</h3>
+<div class="card">
+<p><b>Design.</b> Two concurrently enrolled, decentralized US studies in adults with ET on &le;1 stable ET medication, randomized 2:1 to Study 1 or Study 2. <b>Study 1:</b> 12-week randomized, double-blind, placebo-controlled parallel-group trial (n=473 enrolled; primary analysis populations reported as n=199 ulixacaltamide / n=233 placebo in one summary), 1:1 randomization. <b>Primary endpoint:</b> change from baseline to <b>week 8</b> in Modified Activities of Daily Living 11 (mADL11; 0&ndash;33 scale, higher = greater tremor impact on daily function). <b>Study 2:</b> randomized-withdrawal design &mdash; 238 patients received 8 weeks open-label ulixacaltamide; the 80 responders (&ge;3-point mADL11 improvement) were re-randomized 1:1 (40/40) to continue drug or switch to placebo for 4 weeks; primary endpoint: maintenance of response. <span class="tag t-fact">FACT</span></p>
+<p><b>Statistical plan &amp; results (topline, company-reported).</b></p>
+<div class="tscroll">
+<table>
+<tr><th>Endpoint</th><th>Ulixacaltamide</th><th>Placebo</th><th>p-value</th></tr>
+<tr><td>Study 1 primary: mADL11 CFB at week 8</td><td>&minus;4.3</td><td>&minus;1.7</td><td>&lt;0.0001</td></tr>
+<tr><td>Study 1 key secondary: rate of disease improvement</td><td>&minus;4.0</td><td>&minus;1.7</td><td>&lt;0.0001</td></tr>
+<tr><td>Study 1: Patient Global Impression of Change (PGI-C)</td><td>3.3</td><td>3.9</td><td>&lt;0.0001</td></tr>
+<tr><td>Study 1: Clinician Global Impression of Severity CFB</td><td>&minus;0.41</td><td>&minus;0.12</td><td>0.0007</td></tr>
+<tr><td>Study 2 primary: maintenance of response (4-wk withdrawal)</td><td>55%</td><td>33%</td><td>0.0369</td></tr>
+<tr><td>Study 2 key secondary: rate of disease worsening</td><td colspan="2">favored ulixacaltamide</td><td>0.0042</td></tr>
+</table>
+</div>
+<p><b>Safety.</b> Generally well tolerated per company; no drug-related serious AEs. Most common TEAEs (&ge;10%): constipation, dizziness, euphoric mood, brain fog, headache, paraesthesia, insomnia. Discontinuations due to AEs ~27&ndash;28% across studies (NeurologyLive summary). <span class="tag t-fact">FACT</span> The short-seller report cites 35.6% all-cause dropout in the treatment arm vs 5.6% on placebo &mdash; a different metric (all-cause dropout vs AE discontinuation); both point to meaningful attrition. <span class="tag t-interp">INTERPRETATION</span></p>
+<p><b>Powering.</b> <span class="tag t-gap">GAP</span> &mdash; the company's topline releases did not disclose the pre-specified power assumptions, assumed effect size, or alpha-spending for the two-study program. Study 2's primary (n=80 re-randomized) was significant at p=0.0369, a margin that leaves limited room for sensitivity-analysis slippage at FDA review.</p>
+</div>
+
+<h3>EMBOLD &mdash; relutrigine in SCN2A/SCN8A DEEs, registrational cohort (AES, Dec 6, 2025)</h3>
+<div class="card">
+<p><b>Design.</b> Randomized, double-blind, placebo-controlled registrational cohort in pediatric SCN2A/SCN8A DEE patients; 16-week double-blind period. Primary endpoint: percent/absolute reduction in motor seizure frequency (log-transformed change from baseline, ANCOVA &mdash; the analysis method agreed with FDA). <span class="tag t-fact">FACT</span></p>
+<p><b>Results (n=51, company-reported).</b> 53% placebo-adjusted reduction in motor seizures over 16 weeks (p&lt;0.0002); 66% increase in motor seizure-free days (p=0.034); broad functional improvements across behavior, alertness, communication, overall status (p&le;0.002, caregiver/clinician measures); rapid, significant, and <i>increasing</i> seizure reduction over time; no drug-related serious AEs; treatment-related AEs predominantly mild&ndash;moderate. The independent Data Monitoring Committee recommended stopping early for efficacy. <span class="tag t-fact">FACT</span></p>
+<p><b>Prior cohort (Sep 2024, n=22: 15 drug / 7 placebo).</b> 46% placebo-adjusted monthly motor seizure reduction (LS mean log difference &minus;0.585, SE 0.259; ANCOVA p=0.0354); &gt;30% of relutrigine patients achieved seizure freedom in a 28-day window; open-label extension median 75&ndash;77% seizure-rate reduction with 5 patients seizure-free. <span class="tag t-fact">FACT</span></p>
+<p><b>Statistical caveats.</b> The registrational inference rests on a single small cohort with an early efficacy stop &mdash; the classic setup for effect-size inflation &mdash; and the FDA's request for additional sensitivity analyses (the major amendment extending PDUFA) indicates the agency is stress-testing exactly this fragility. <span class="tag t-interp">INTERPRETATION</span> Powering assumptions and interim alpha-spending boundaries were not disclosed publicly. <span class="tag t-gap">GAP</span></p>
+</div>
+
+<h3>EMERALD &mdash; relutrigine in broad DEEs (NCT07010471), Phase 3</h3>
+<div class="card">
+<p><b>Design</b> (AAN 2025 abstract; company updates). Multicenter, randomized, double-blind, placebo-controlled; ages 2&ndash;65 with DEE diagnosis and seizure onset &lt;12 years; &ge;4 motor seizures in 4-week baseline; 1:1 randomization to relutrigine (1 mg/kg/day starting, up to 1.5 mg/kg/day QD) or placebo; Part A 16-week double-blind, Part B 32-week open-label extension, plus safety follow-up; home/in-clinic assessment options. Target ~160; enrollment exceeded target at ~200 patients across &gt;50 genetic etiologies. Topline Q4 2026 (company guidance); if positive, supports sNDA in 2027. <span class="tag t-fact">FACT</span></p>
+</div>
+
+<h3>POWER1 &mdash; vormatrigine in focal onset seizures (NCT06999902), topline Jun 1, 2026</h3>
+<div class="card">
+<p><b>Design.</b> Phase 2/3, double-blind, randomized, multicenter; adults with FOS on 1&ndash;3 background anti-seizure medications; randomized to vormatrigine 20 mg QD for 6 weeks then 30 mg QD for 6 weeks, or placebo for 12 weeks. <b>Primary endpoint:</b> percent change in monthly seizure frequency from baseline &mdash; <b>not met</b>. Key secondary 50% responder rate met; seizure reduction more pronounced in the second half at 30 mg. Generally well tolerated; AE discontinuations &lt;10%; ~90% of the active arm entered the open-label extension. Enrollment in POWER2 paused for program reassessment. <span class="tag t-fact">FACT</span> (company 8-K/PR)</p>
+<p><b>RADIANT (open-label, vormatrigine, FOS + generalized epilepsy; AES Dec 2025).</b> 56.3% median seizure-frequency reduction over 8 weeks; ~22% seizure-free in the final 28 days; company reported median reduction "reaching 100% for patients continuing through 16 weeks" &mdash; a conditional, completer-only framing. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> Open-label completer analyses cannot be compared to randomized results; the POWER1 primary miss is the dispositive randomized evidence.</p>
+</div>
+
+<h3>EMBRAVE / EMBRAVE3 &mdash; elsunersen in SCN2A GoF DEE</h3>
+<div class="card">
+<p><b>EMBRAVE Part A:</b> 77% sham-adjusted reduction in monthly seizures (p=0.015), benefit sustained in open-label extension up to one year, with broad improvements in severely affected children (company-reported, June 2026). <b>EMBRAVE3:</b> pivotal single-arm registrational study (~30 patients), 24-week countable-motor-seizure endpoint, pathway aligned with FDA; enrolling; topline expected 2027. <span class="tag t-fact">FACT</span></p>
+</div>
+
+<h2 id="s5">5 &middot; Clinical / Regulatory Status &amp; Outlook</h2>
+<div class="card">
+<div class="tscroll">
+<table>
+<tr><th>Milestone</th><th>Status</th><th>Date</th></tr>
+<tr><td>Relutrigine NDA submitted (SCN2A/SCN8A DEEs)</td><td>Filed; FDA extended review 3 months after major amendment (additional sensitivity analyses of existing data; no new studies requested; no safety/manufacturing concerns cited)</td><td>PDUFA <b>Dec 27, 2026</b> <span class="pill hard">hard</span></td></tr>
+<tr><td>Ulixacaltamide NDA submitted (essential tremor)</td><td>Filed early 2026; accepted Apr 14, 2026; FDA indicated no AdCom currently planned; pre-NDA meeting Dec 4, 2025 reached alignment on content</td><td>PDUFA <b>Jan 29, 2027</b> <span class="pill hard">hard</span></td></tr>
+<tr><td>Relutrigine mid-cycle review</td><td>Completed Aug 2026; no major safety/efficacy concerns identified per company; no AdCom planned</td><td>Aug 2026 <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Ulixacaltamide mid-cycle review</td><td>Completed; FDA found no efficacy-related significant issues to date per company; no AdCom planned</td><td>Q2 2026 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>FDA BIMO inspections (both NDAs)</td><td>Concluded with no Form 483 observations <span class="tag t-fact">FACT</span> (StockTitan Rhea-AI summary of company disclosures)</td><td>2026</td></tr>
+<tr><td>Designations</td><td>Relutrigine: FDA BTD (Jul 17, 2025, pediatric SCN2A/SCN8A DEE), ODD, Rare Pediatric Disease Designation (SCN2A, SCN8A, Dravet), EMA ODD. Ulixacaltamide: FDA BTD (disclosed Jul 2026). Elsunersen: FDA BTD (Jun 22, 2026), ODD, RPDD, EMA ODD + PRIME.</td><td>&mdash;</td></tr>
+<tr><td>Launch preparation</td><td>Company reports hiring commercial/medical leadership, building inventory, patient-support program, payer engagement for relutrigine; 14 new employees onboarded Oct 1, 2026 (3,478 inducement RSUs, routine)</td><td>Ongoing <span class="tag t-fact">FACT</span></td></tr>
+</table>
+</div>
+<p><b>Outlook.</b> <span class="tag t-interp">INTERPRETATION</span> The regulatory setup is unusually clean on process (both NDAs accepted, no AdComs, relutrigine mid-cycle clear, BIMO inspections with no 483s) and unusually concentrated on outcome: two approval decisions five weeks apart will re-rate the equity in either direction. The relutrigine extension is the more ambiguous signal &mdash; benign per company disclosure (sensitivity analyses only), but it confirms the FDA is scrutinizing a small, early-stopped dataset. The ulixacaltamide review is the higher-stakes read: FDA acceptance of the NDA post-Culper is a modest positive, but the agency has the short report's specific claims (endpoint timing, imputation, dropout) in the public domain and the review will test them.</p>
+</div>
+
+<h2 id="s6">6 &middot; Competition: Clinical Differentiation Only</h2>
+
+<h3>Essential tremor</h3>
+<div class="card">
+<p><b>Approved / established.</b> Propranolol &mdash; the only drug FDA-approved for essential tremor (1967, originally a coronary-disease beta blocker); effective in only ~50% of patients with high discontinuation from limited efficacy and poor tolerability <span class="tag t-fact">FACT</span> (Nature industry feature). Primidone (off-label standard), topiramate, gabapentin &mdash; all generic, all repurposed. Device options: deep brain stimulation (VIM) and MR-guided focused ultrasound &mdash; invasive or lesional, reserved for severe/refractory patients. <span class="tag t-fact">FACT</span></p>
+<p><b>Failed investigational (clinical differentiation context).</b></p>
+<ul class="tight">
+<li><b>Suvecaltamide (Jazz/Cavion)</b> &mdash; highly selective, state-dependent T-type calcium-channel modulator; Phase 2b (n=420) missed primary (TETRAS modified composite, week 12) and key secondary (CGI-S) at 30 mg vs placebo; placebo overperformed; well tolerated. Program future undecided; Jazz acquired Cavion for $52.5M upfront (2019). <span class="tag t-fact">FACT</span> &mdash; the closest mechanistic comp, and it failed on a tremor-severity scale rather than a functional ADL scale.</li>
+<li><b>SAGE-324/BIIB124 (Sage/Biogen)</b> &mdash; GABA<sub>A</sub> positive allosteric modulator; Phase 2 KINETIC 2 (n=147) showed no significant dose-response on TETRAS-PS Item 4 at day 91; ET development terminated July 2024. Different mechanism; relevant as evidence of ET's high trial-failure rate. <span class="tag t-fact">FACT</span></li>
+<li><b>CX-8998 (Cavion)</b> &mdash; earlier T-type blocker; failed in early ET work (cited in short report; detailed results not re-verified here). <span class="tag t-unver">UNVERIFIED</span></li>
+</ul>
+<p><b>Differentiation summary.</b> If approved, ulixacaltamide would be the first purpose-built ET pharmacotherapy in decades and the only agent with registrational data on a functional (ADL-based) primary endpoint rather than a tremor-severity scale &mdash; a clinically meaningful distinction for a disease defined by functional disability. <span class="tag t-interp">INTERPRETATION</span> No cross-trial efficacy comparisons are made here: the failed programs used different endpoints (TETRAS), populations, and durations.</p>
+</div>
+
+<h3>SCN2A/SCN8A developmental epileptic encephalopathies</h3>
+<div class="card">
+<p><b>No approved targeted therapy</b> exists for SCN2A- or SCN8A-DEE. <span class="tag t-fact">FACT</span> Standard care is empiric polypharmacy with broad anti-seizure medications. The mechanistically adjacent class &mdash; conventional sodium-channel blockers (carbamazepine, phenytoin, lamotrigine) &mdash; inhibits transient/peak sodium current and carries dose-dependent ataxia, sedation, and cognitive impairment; per the reviewed literature they do not meaningfully inhibit the persistent current that GoF variants elevate. <span class="tag t-fact">FACT</span> (MDPI review) Relutrigine's clinical differentiation, if the data hold, is persistent-current preference with selectivity for hyperexcitable channels &mdash; a mechanism no approved or late-stage competitor currently occupies in DEE. <span class="tag t-interp">INTERPRETATION</span> Elsunersen (Praxis's own ASO) is the only targeted rival in SCN2A GoF, but it is intrathecal, earlier-stage, and internal to the same company.</p>
+</div>
+
+<h3>Focal onset seizures (vormatrigine)</h3>
+<div class="card">
+<p>A large, crowded, predominantly generic market (levetiracetam, lacosamide, brivaracetam, cenobamate, perampanel, and others). Newer branded entrants compete on incremental efficacy/tolerability. Following the POWER1 primary miss and POWER2 pause, vormatrigine has no demonstrated randomized differentiation; any future path requires a redesigned trial showing a primary-endpoint win. <span class="tag t-interp">INTERPRETATION</span> Kept lean: this program is currently option value, not a valuation pillar.</p>
+</div>
+
+<h2 id="s7">7 &middot; Financials</h2>
+<div class="card">
+<h3>Cash, burn, runway</h3>
+<div class="tscroll">
+<table>
+<tr><th>Item</th><th>Value</th><th>Source / period</th></tr>
+<tr><td>Cash, cash equivalents + marketable securities</td><td><b>$1.4B</b> ($1,447.8M at Mar 31, 2026; ~$1.4B at Jun 30, 2026)</td><td>Q2 2026 PR (Jun 30, 2026); Q1 2026 10-Q <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Estimated cash, current (Oct 10, 2026)</td><td><b>~$1.3B</b></td><td>Jun 30 balance less ~$80M est. Q3 operating cash use <span class="tag t-interp">INTERPRETATION</span></td></tr>
+<tr><td>Cash at Dec 31, 2025</td><td>$926.1M</td><td>Q4/FY2025 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Runway guidance</td><td>Into 2028</td><td>Company guidance, Q2 2026 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Q2 2026 R&amp;D</td><td>$69.4M (vs $63.0M Q2 2025)</td><td>Q2 2026 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Q2 2026 G&amp;A</td><td>$27.5M (vs $13.1M Q2 2025; +$7.2M professional, +$6.3M personnel &mdash; commercial build)</td><td>Q2 2026 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Q2 2026 operating expenses</td><td>$96.9M (vs $76.0M Q2 2025); operating cash use $78M (vs $55M Q2 2025)</td><td>Benzinga via ad-hoc-news, Oct 6, 2026 <span class="tag t-fact">FACT</span> (trade press)</td></tr>
+<tr><td>Q2 2026 net loss</td><td>$83.7M incl. $11.3M stock-based comp; EPS &minus;$2.87 (consensus &minus;$3.67, a $0.80 beat)</td><td>Q2 2026 PR; MarketBeat <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Q1 2026 net loss</td><td>$92.6M</td><td>Q1 2026 10-Q <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>H1 2026 net loss</td><td>$176.3M</td><td>Q2 2026 PR <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>FY2025 net loss / operating cash flow</td><td>&minus;$303.3M / &minus;$249.1M</td><td>FY2025 results <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Q1 2026 program spend</td><td>Ulixacaltamide $19.1M; vormatrigine $20.5M; relutrigine $12.9M; elsunersen $3.2M; other early $3.2M</td><td>Q1 2026 10-Q segment note <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Debt</td><td>None disclosed; total liabilities $50.2M (all current) at Mar 31, 2026</td><td>Q1 2026 10-Q <span class="tag t-fact">FACT</span></td></tr>
+</table>
+</div>
+<p class="footnote">$2.4B aggregate net proceeds raised from equity financings from inception through Mar 31, 2026. <span class="tag t-fact">FACT</span> (Q1 2026 10-Q)</p>
+<h3>Dilution history</h3>
+<div class="tscroll">
+<table>
+<tr><th>Financing</th><th>Shares</th><th>Price/share</th><th>Net proceeds</th></tr>
+<tr><td>IPO, Oct 2020</td><td>10,000,000 (split-adjusted for 1-for-15, Nov 2023)</td><td>$16.00&ndash;$18.00</td><td>~$170&ndash;190M <span class="tag t-fact">FACT</span> (MarketBeat / company)</td></tr>
+<tr><td>Jan 2024 public offering</td><td>3,802,025 common + 1,056,725 pre-funded warrants</td><td>$35.50</td><td>~$161.6M <span class="tag t-fact">FACT</span> (10-Q; history summary)</td></tr>
+<tr><td>Apr 2024 public offering</td><td>3,849,558 common + 221,238 pre-funded warrants</td><td>$56.50</td><td>~$215.8M <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Oct 2025 public offering</td><td>3,527,072 common + 318,470 pre-funded warrants</td><td>$157.00</td><td>$567.1M <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>2025 ATM sales</td><td>Undisclosed</td><td>&mdash;</td><td>Undisclosed <span class="tag t-gap">GAP</span></td></tr>
+<tr><td>Jan 2026 public offering</td><td>2,543,800 common (incl. 331,800 overallotment)</td><td>$260.00</td><td>$621.2M (gross ~$661M) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Oct 2026 inducement RSUs</td><td>3,478 RSUs to 14 new employees</td><td>&mdash;</td><td>Routine; negligible dilution <span class="tag t-fact">FACT</span> (GlobeNewswire, Oct 2, 2026)</td></tr>
+</table>
+</div>
+<p class="footnote">Shares outstanding: 25.2M (Dec 31, 2025) &rarr; 27,859,514 (Mar 31, 2026) &rarr; 27,878,774 (May 4, 2026) &rarr; 27.9M (Jun 30, 2026). <span class="tag t-fact">FACT</span> Pre-funded warrants: none expired; Jan-2024 series partially exercised in 2025 (200,355 via cashless); all three series' remaining warrants outstanding at Mar 31, 2026. <span class="tag t-fact">FACT</span></p>
+</div>
+
+<h2 id="s8">8 &middot; FDMC / EV (Dilution-Honest)</h2>
+<div class="card">
+<p>Reference price: <b>$259.86</b> (Nasdaq close, Oct 9, 2026). Share counts from Q1 2026 10-Q (period ended Mar 31, 2026). <span class="tag t-fact">FACT</span></p>
+<div class="tscroll">
+<table>
+<tr><th>Component</th><th>Shares</th><th>Detail</th></tr>
+<tr><td>Common outstanding</td><td>27,878,774</td><td>As of May 4, 2026 (27,859,514 at Mar 31, 2026) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Pre-funded warrants (Jan 2024 / Apr 2024 / Oct 2025)</td><td>1,243,933</td><td>704,225 + 221,238 + 318,470; economically outstanding (treated as outstanding for EPS) <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Stock options outstanding</td><td>1,946,616</td><td>Wtd-avg exercise $101.08; intrinsic value $454.1M at Mar 31, 2026 &mdash; deeply in the money at $259.86 <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Unvested RSUs + PSUs (max)</td><td>636,178</td><td>504,376 RSUs + 131,802 PSUs at max payout; PSUs tied to clinical/regulatory/commercial targets through Dec 31, 2027 <span class="tag t-fact">FACT</span></td></tr>
+<tr><td><b>Fully-diluted share count</b></td><td><b>&asymp; 31,705,500 (~31.7M)</b></td><td>Excludes authorized-but-ungranted pools (2020 plan 1.42M, ESPP 0.53M, Inducement 0.94M &asymp; 2.9M) <span class="tag t-interp">INTERPRETATION</span></td></tr>
+</table>
+</div>
+<div class="grid2" style="margin-top:14px">
+<div class="card kpi"><div class="n">~$7.24B</div><div class="l">Basic mcap (27.88M &times; $259.86)</div></div>
+<div class="card kpi"><div class="n">~$8.24B</div><div class="l">Fully-diluted mcap (31.7M &times; $259.86)</div></div>
+<div class="card kpi"><div class="n">~$5.8B</div><div class="l">Basic EV (mcap &minus; ~$1.4B net cash, ~nil debt)</div></div>
+<div class="card kpi"><div class="n">~$6.8B</div><div class="l">FD EV (FD mcap &minus; ~$1.4B net cash)</div></div>
+</div>
+<p class="footnote">EV uses Jun 30, 2026 cash (~$1.4B) against Oct 9, 2026 price &mdash; a mixed-date construct; cash has declined with burn since June (est. ~$1.3B current). No preferred stock, convertibles, or debt outstanding. <span class="tag t-fact">FACT</span> Options are the largest hidden-dilution item: ~7% of basic shares, nearly all in the money, with $46.4M unrecognized comp cost remaining. <span class="tag t-interp">INTERPRETATION</span></p>
+</div>
+
+<h2 id="s9">9 &middot; Catalyst / Event Map</h2>
+<p>Date quality: <span class="pill hard">hard</span> = fixed regulatory/calendar date &middot; <span class="pill guidance">guidance</span> = company-guided window &middot; <span class="pill inferred">inferred</span> = analyst inference, not company-stated. <b>Staleness check (Oct 10, 2026): no known PRAX catalyst dated before today is still outstanding &mdash; every listed event is ahead.</b> <span class="tag t-fact">FACT</span></p>
+<div class="card">
+<div class="tscroll">
+<table>
+<tr><th>Event</th><th>Date</th><th>Quality</th><th>What "good" looks like</th><th>What to watch</th></tr>
+<tr>
+<td><b>Q3 2026 earnings report</b></td>
+<td>November 11, 2026</td>
+<td><span class="pill hard">hard</span></td>
+<td>Routine: cash burn in line (~$75&ndash;90M/quarter), runway reaffirmed into 2028, launch-prep spend framed as investment. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>EMERALD enrollment completion; any POWER-program redesign disclosure; relutrigine commercial-readiness details; cash trajectory. <span class="tag t-fact">FACT</span> (date per market calendar)</td>
+</tr>
+<tr>
+<td><b>EMERALD Phase 3 topline</b> &mdash; relutrigine, broad DEEs (~200 patients, &gt;50 genetic etiologies)</td>
+<td>Q4 2026</td>
+<td><span class="pill guidance">guidance</span></td>
+<td>Statistically significant motor-seizure reduction on the 16-week placebo-controlled primary; signal across genotypes (not just SCN2A/SCN8A); supports 2027 sNDA. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Overall p-value and effect size vs EMBOLD's 53%; pre-specified subgroup behavior by etiology; whether a mixed result still supports sNDA filing; AE profile in a broader, older population (ages 2&ndash;65). <span class="tag t-fact">FACT</span></td>
+</tr>
+<tr>
+<td><b>FDA PDUFA: relutrigine NDA</b> (SCN2A/SCN8A DEEs) &mdash; extended 3 mo via major amendment</td>
+<td>December 27, 2026</td>
+<td><span class="pill hard">hard</span></td>
+<td>Full approval on the EMBOLD dataset; RPDD converts to a Priority Review Voucher (historically monetizable, ~$100M range <span class="tag t-unver">UNVERIFIED</span> &mdash; award depends on meeting statutory criteria); clean label, no REMS. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Any late-cycle FDA communication; label scope (seizure types covered); whether approval is conditional on EMERALD; PRV award confirmation. First commercial launch. <span class="tag t-fact">FACT</span></td>
+</tr>
+<tr>
+<td><b>FDA PDUFA: ulixacaltamide NDA</b> (essential tremor) &mdash; the integrity-debate arbiter</td>
+<td>January 29, 2027</td>
+<td><span class="pill hard">hard</span></td>
+<td>Approval validating the Essential3 package and functionally rebutting Culper's endpoint/imputation claims; label without major tolerability restrictions. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>CRL risk tied to the dropout/imputation debate (35.6% vs 5.6% all-cause dropout per Culper); Study 2's thin p=0.0369 margin under sensitivity analysis; label caveats (dizziness, cognition, euphoric mood); any last-minute AdCom reversal (none currently planned). <span class="tag t-fact">FACT</span></td>
+</tr>
+<tr>
+<td><b>EMBRAVE3 topline</b> &mdash; elsunersen, SCN2A GoF DEE (single-arm, ~30 patients, 24-week endpoint)</td>
+<td>2027</td>
+<td><span class="pill guidance">guidance</span></td>
+<td>Seizure reduction comparable to Part A's 77% sham-adjusted signal with durable benefit; confirms ASO platform and registrational viability. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Responder distribution in a tiny single-arm study; durability through 24 weeks; intrathecal tolerability in infants; overlap competition from approved relutrigine in SCN2A GoF. <span class="tag t-fact">FACT</span></td>
+</tr>
+<tr>
+<td><b>Potential EMERALD sNDA</b> (conditional on positive Q4 2026 readout)</td>
+<td>2027</td>
+<td><span class="pill guidance">guidance</span></td>
+<td>Company files sNDA expanding relutrigine to broad DEEs, multiplying the addressable population. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Company-stated conditional path only; timing depends on EMERALD data maturity and FDA alignment. <span class="tag t-fact">FACT</span></td>
+</tr>
+<tr>
+<td><b>Vormatrigine POWER program redesign update</b></td>
+<td>2026&ndash;2027</td>
+<td><span class="pill inferred">inferred</span></td>
+<td>A credible redesigned trial (enriched population, revised endpoint/dose) that re-opens the broad-epilepsy pillar. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Timing and form of any restart not disclosed; watch Q3 earnings call for the first signal. <span class="tag t-gap">GAP</span></td>
+</tr>
+<tr>
+<td><b>Early-stage ASO development-candidate nominations</b></td>
+<td>2026 (remainder)</td>
+<td><span class="pill guidance">guidance</span></td>
+<td>Candidates nominated per Q2 PR ("on track &hellip; in 2026"), keeping the Solidus pipeline moving. <span class="tag t-interp">INTERPRETATION</span></td>
+<td>Which programs (PCDH19 / SYNGAP1 / SCN2A-LoF) advance; any IND-enabling timelines. <span class="tag t-fact">FACT</span></td>
+</tr>
+</table>
+</div>
+<p class="footnote">Earnings date per market-calendar aggregators. No other PRAX events appeared in the internal 2027 catalyst calendar or Q4 2026 dossier datasets beyond those listed.</p>
+</div>
+
+<h2 id="s10">10 &middot; Ranked Red Flags</h2>
+<div class="card redflag"><h4>1. Culper Research short report &mdash; unresolved integrity allegations on the lead asset (Nov 2025)</h4>
+<p>Culper alleged Praxis "engineered" the Essential3 results via a last-minute, unapproved primary-endpoint change (12 weeks &rarr; 8 weeks), optimistic imputation for ~36% treatment-arm dropouts (35.6% vs 5.6% placebo all-cause dropout per Culper), and a "half-baked" tipping-point analysis; claimed an independent DMC recommended stopping Study 1 for futility in early 2025 and that three same-mechanism drugs failed in ET. Praxis rebutted via a Nov 24, 2025 fireside chat with external experts; shareholder law firms announced investigations. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> NDA acceptance (Apr 2026) is a partial counter-signal, but acceptance &ne; approval, and the PDUFA review is where these specific claims get tested. This is the #1 swing factor for the stock.</p></div>
+<div class="card redflag"><h4>2. Essential1 (Phase 2b) missed its primary endpoint</h4>
+<p>The same drug on a similar functional endpoint: mADL LS-mean difference &minus;1.58 (95% CI &minus;3.60 to 0.45; p=0.126), March 2023. Phase 3 succeeded after endpoint/timing refinement &mdash; a legitimate development path, but it means the registrational win is the <i>second</i> attempt on a re-optimized endpoint, which is exactly the pattern short-sellers flag. <span class="tag t-fact">FACT</span></p></div>
+<div class="card redflag"><h4>3. Same-target precedent failed: suvecaltamide Phase 2b (Jazz, Jun 2024)</h4>
+<p>A highly selective, state-dependent T-type calcium-channel modulator missed primary and key secondary in 420 ET patients, with placebo overperformance. Academic literature adds a mechanistic caveat (Ca<sub>V</sub>3.1-null mice tremor equivalence; uncertainty over subtype-selective blockade). Ulixacaltamide's edge is trial design (functional endpoint) and molecule &mdash; not a de-risked target. <span class="tag t-fact">FACT</span></p></div>
+<div class="card redflag"><h4>4. POWER1 primary miss + POWER2 pause (vormatrigine, Jun 2026)</h4>
+<p>The broad-epilepsy pillar's registrational trial failed its primary endpoint in highly refractory FOS; the program is in redesign with no disclosed restart timeline. The stock's epilepsy diversification narrative now rests almost entirely on relutrigine. <span class="tag t-fact">FACT</span></p></div>
+<div class="card redflag"><h4>5. Tolerability signal in an elderly population</h4>
+<p>~27&ndash;28% AE discontinuations; TEAEs include dizziness, "brain fog"/cognitive complaints, and euphoric mood &mdash; a CNS-active profile in older, comorbid ET patients that could constrain labeling, adherence, and payer positioning even if approved. <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card redflag"><h4>6. Valuation prices in success with zero revenue</h4>
+<p>~$7.2B basic / ~$8.2B FD mcap (~$5.8B / ~$6.8B EV) against $0 revenue and ~$80M+ quarterly burn. The Dec 2026 + Jan 2027 PDUFAs are five weeks apart &mdash; concentrated, correlated regulatory risk. A CRL on either would force a severe re-rating; cash into 2028 limits near-term financing risk but not valuation risk. <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card redflag"><h4>7. Thin registrational datasets for relutrigine</h4>
+<p>NDA anchored on n=51 with an early efficacy stop (effect-inflation risk); the FDA's major-amendment extension confirms the agency is probing robustness. EMERALD's broad-DEE expansion (&gt;50 genotypes) dilutes the precision rationale. <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card redflag"><h4>8. Insider selling with zero buying; elevated short interest</h4>
+<p>$0 insider buying vs ~$11.1M selling in the last 12 months (incl. GC sales Nov 2025 and a director's 10b5-1 sales Jun 2026); insider ownership 3.0%; short float 14.45%; beta ~2.8&ndash;2.9. <span class="tag t-fact">FACT</span> Sales appear routine/plan-based, but the complete absence of buying ahead of two PDUFAs is notable. <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card redflag"><h4>9. Litigation/regulatory overhang</h4>
+<p>Shareholder law-firm investigations announced post-Culper; any FDA complete response letter would likely revive them. <span class="tag t-fact">FACT</span></p></div>
+<div class="card redflag"><h4>10. Commercial-execution risk (kept lean)</h4>
+<p>Pre-revenue company building two launches simultaneously; G&amp;A doubled YoY on commercial build. Relevant only in approval scenarios. <span class="tag t-interp">INTERPRETATION</span></p></div>
+
+<h2 id="s11">11 &middot; Bear / Base / Bull Scenarios + Soft Price Framework</h2>
+<div class="callout">
+  <b>Soft scenario prices (not a recommendation, not a DCF).</b> These are illustrative, scenario-based share prices built from the dossier's own EV math, with every assumption labeled. They are <i>not</i> price targets and carry no buy/sell implication. <span class="tag t-interp">INTERPRETATION</span>
+</div>
+<div class="card">
+<h3>Shared assumptions (apply to all scenarios)</h3>
+<ul class="tight">
+<li>Fully-diluted share count &asymp; 31.7M (Section 8); net cash &asymp; <b>$1.3B</b> est. current (~$1.4B Jun 30 less est. Q3 burn); ~nil debt. <span class="tag t-interp">INTERPRETATION</span></li>
+<li>Valuation = (scenario pipeline EV + net cash) &divide; 31.7M FD shares. No discounting, no probability weighting inside a scenario, no new financing dilution. <span class="tag t-interp">INTERPRETATION</span></li>
+<li>Sensitivity: every &plusmn;$1B of EV moves the soft price by &asymp; &plusmn;$31.5/share on the FD basis. <span class="tag t-interp">INTERPRETATION</span></li>
+<li><b>Bull case is capped at the sell-side consensus average ($613.26, MarketBeat, 20 analysts)</b> &mdash; the max-value framing does not overshoot the street average (street high $826 BTIG noted as the outlier bound). <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span></li>
+</ul>
+<div class="tscroll">
+<table>
+<tr><th>Scenario</th><th>Pipeline EV build</th><th>Equity (EV + $1.3B cash)</th><th>Soft price</th><th>vs $259.86</th></tr>
+<tr><td><b>Bear &mdash; regulatory rejection(s)</b></td><td>Residual option value $2.0B (EMBRAVE3 + EMERALD retry + early ASO)</td><td>$3.3B</td><td><b>&asymp; $105</b></td><td>&minus;60%</td></tr>
+<tr><td><b>Base &mdash; split decision</b></td><td>Ulixacaltamide approved w/ caveats $5.0B + relutrigine approved $1.2B (incl. PRV) + EMERALD mixed / elsunersen pipeline $1.8B = $8.0B</td><td>$9.3B</td><td><b>&asymp; $295</b></td><td>+14%</td></tr>
+<tr><td><b>Bull &mdash; double approval + EMERALD hit</b></td><td>Implied by cap: &asymp; $18.1B EV</td><td>$19.4B</td><td><b>&asymp; $610</b> (capped at $613 consensus avg)</td><td>+135%</td></tr>
+</table>
+</div>
+<p class="footnote">The base case's modest +14% upside reflects that substantial approval probability is already priced in at ~$8.2B FD: the market is paying for the double approval, so a mere split decision re-rates only mildly upward while any CRL re-rates violently downward &mdash; the classic binary skew. <span class="tag t-interp">INTERPRETATION</span></p>
+</div>
+<div class="grid3">
+<div class="card scenario bear"><h3>Bear &mdash; regulatory rejection(s) &middot; soft ~$105</h3>
+<p>CRL on ulixacaltamide (FDA echoes Culper's data-integrity concerns) and/or relutrigine (small early-stopped dataset fails robustness bar); EMERALD misses in broad DEE; vormatrigine remains sidelined. Equity re-rates toward cash + pipeline option value; financing eventually needed despite 2028 runway as burn continues. <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card scenario"><h3>Base &mdash; split decision &middot; soft ~$295</h3>
+<p>Relutrigine approved Dec 2026 on strong EMBOLD data + clean mid-cycle review (ultra-rare, BTD-backed, first targeted therapy &mdash; the cleaner regulatory path); ulixacaltamide approved Jan 2027 with labeling/tolerability caveats <i>or</i> a CRL requiring additional work; EMERALD mixed (signal in genetic subsets, noise in broad population); elsunersen EMBRAVE3 2027 becomes the next binary; vormatrigine deprioritized. Company becomes a commercial-stage rare-neurology + ET-launch story with execution risk. <span class="tag t-interp">INTERPRETATION</span></p></div>
+<div class="card scenario bull"><h3>Bull &mdash; double approval + EMERALD hit &middot; soft ~$610 (capped)</h3>
+<p>Both NDAs approved on time; EMERALD positive Q4 2026 supporting 2027 sNDA; ulixacaltamide launches as the first purpose-built ET drug in decades; elsunersen BTD path intact. Max-value framing capped at the ~$613 consensus-average sell-side target (street high $826 noted as the outlier bound). <span class="tag t-interp">INTERPRETATION</span></p></div>
+</div>
+<h3>What decides it (in order)</h3>
+<ol>
+<li><b>Jan 29, 2027 ulixacaltamide PDUFA</b> &mdash; arbitrates the integrity debate; the single largest variance driver.</li>
+<li><b>Dec 27, 2026 relutrigine PDUFA</b> &mdash; tests whether a small, early-stopped dataset clears the FDA's robustness bar.</li>
+<li><b>Q4 2026 EMERALD topline</b> &mdash; tests mechanism generalizability across &gt;50 DEE genotypes.</li>
+<li><b>2027 EMBRAVE3</b> &mdash; ASO platform validation; next binary after the PDUFAs.</li>
+<li><b>Vormatrigine redesign</b> &mdash; currently option value; a credible restart would re-open the broad-epilepsy pillar.</li>
+</ol>
+
+<h2 id="s12">12 &middot; Management Track Record &amp; Insider Signals</h2>
+<div class="card">
+<h3>Leadership</h3>
+<div class="tscroll">
+<table>
+<tr><th>Name</th><th>Role</th><th>Background</th></tr>
+<tr><td>Marcio Souza</td><td>President &amp; CEO, director (since Apr 2020)</td><td>Ex-PTC Therapeutics COO (2017&ndash;2020) and SVP Head of Product Strategy; prior roles at NPS Pharmaceuticals, Shire Human Genetic Therapies, Sanofi Genzyme. Degree in pharmacy/biochemistry (Univ. of S&atilde;o Paulo), MBA (Funda&ccedil;&atilde;o Dom Cabral). Commercial/orphan-drug background; no prior CEO approval track record disclosed. <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Steven Petrou, PhD</td><td>President of R&amp;D (promoted Feb 2026); co-founder</td><td>Florey Institute (Melbourne); recognized leader in ion-channel neuropathies and genetic-epilepsy animal models. <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Megan Sniecinski</td><td>Chief Operating Officer (promoted Feb 2026)</td><td>Internal promotion alongside Q4 2025 results. <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Timothy Kelly</td><td>CFO &amp; Treasurer</td><td>Company officer (listed in company key-management disclosures). <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Orrin Devinsky, MD</td><td>Head of Clinical Strategy (appointed Feb 2026)</td><td>Described by company as a global epilepsy leader. <span class="tag t-fact">FACT</span></td></tr>
+<tr><td>Alex Nemiroff</td><td>General Counsel (since Jun 2020)</td><td>Founder of RogCon Inc., Praxis's SCN2A licensor (related-party license, Sep 2019). <span class="tag t-fact">FACT</span> (Q1 2026 10-Q)</td></tr>
+</table>
+</div>
+<p><b>Founders:</b> Kiran Reddy, MD (Blackstone Life Sciences; ex-Biogen corporate strategy, Third Rock Ventures; neurologist, Harvard/MGH); David Goldstein, PhD (Columbia, Institute for Genomic Medicine; Epi4K epilepsy genetics); Steven Petrou, PhD. <span class="tag t-fact">FACT</span> (company launch disclosures)</p>
+<p><b>Track record under Souza (2020&ndash;2026).</b> Positive: IPO ($190M), four follow-on financings raising ~$2.4B net, Essential3 execution to two positive Phase 3 studies, two NDAs accepted, three Breakthrough designations, EMBOLD early efficacy stop, $1.4B cash with runway into 2028. Negative: Essential1 Phase 2b primary miss (2023), POWER1 Phase 2/3 primary miss (2026) with POWER2 paused, Culper short report and integrity overhang, ~34% drawdown from August 2026 highs ($392.70 &rarr; $259.86). <span class="tag t-fact">FACT</span> <span class="tag t-interp">INTERPRETATION</span> A financing-and-execution-strong but clinically mixed record: the team has repeatedly funded and advanced the pipeline, but two of its four late-stage programs have now missed a primary endpoint at least once.</p>
+<h3>Insider &amp; ownership signals</h3>
+<ul class="tight">
+<li>Insider ownership 3.0%; institutions 67.84%; short float 14.45%. <span class="tag t-fact">FACT</span></li>
+<li>Last 12 months: <b>$0 insider buying</b> vs ~$11.1M selling. Director Jill DeSimone exercised options and sold 11,600 shares (~$311 avg, ~$3.6M) on Jun 24, 2026 under a Rule 10b5-1 plan adopted Mar 25, 2026; retains ~10,900 shares. GC Alex Nemiroff sold 25,130 shares (~$193, ~$4.9M) on Nov 20, 2025 and 8,239 (~$80) Nov 2024. Lauren Mastrocola sold 13,600 (~$192, ~$2.6M) Nov 20, 2025. <span class="tag t-fact">FACT</span> (Form 4-derived aggregators)</li>
+<li>No open-market insider purchases in the last 12 months; the only buy on record is a small 2023 director purchase (966 shares @ $26.25). <span class="tag t-fact">FACT</span></li>
+<li>Oct 2, 2026: routine inducement RSU grants (3,478 shares to 14 new employees, Nasdaq Listing Rule 5635(c)(4)) &mdash; hiring continues into the launch build. <span class="tag t-fact">FACT</span> (GlobeNewswire)</li>
+<li><span class="tag t-interp">INTERPRETATION</span> The sales look like routine diversification/10b5-1 execution rather than distress selling, but zero buying into two PDUFAs is a soft negative signal; the high short float (14.45%) reflects active two-way positioning into the binary.</li>
+</ul>
+</div>
+
+<h2 id="s13">13 &middot; References, As-of Date &amp; Filings Used</h2>
+<div class="card">
+<p><b>As-of date:</b> October 10, 2026. Price/market references use the October 9, 2026 Nasdaq close ($259.86) unless noted. <span class="tag t-fact">FACT</span></p>
+<p><b>Filings used:</b> Form 10-Q for the quarterly period ended March 31, 2026 (filed May 2026); Q2 2026 corporate-update press release (Aug 6, 2026); Q4/FY2025 results press release (Feb 2026); Form 8-Ks (Dec 2025 EMBOLD; Jun 1, 2026 POWER1; Jun 29, 2026 relutrigine PDUFA extension); Oct 2, 2026 inducement-grant press release (GlobeNewswire); proxy-derived executive biographies. Q3 2026 10-Q not yet filed (expected Nov 11, 2026). <span class="tag t-fact">FACT</span></p>
+<h3>References</h3>
+<ol class="refs">
+<li>Praxis Precision Medicines, Form 10-Q, quarterly period ended March 31, 2026 (share counts, reserved shares, financings, segment spend, RogCon related party).</li>
+<li>Praxis Precision Medicines, "Provides Corporate Update and Reports Second Quarter 2026 Financial Results," GlobeNewswire, Aug 6, 2026 (cash $1.4B, runway into 2028, 27.9M shares, EMBRAVE3/EMERALD status).</li>
+<li>Praxis Precision Medicines, "Announces Extension Period for Relutrigine &hellip; PDUFA December 27, 2026," GlobeNewswire, Jun 29, 2026.</li>
+<li>Praxis Precision Medicines, "Provides Vormatrigine Program Update" (POWER1), GlobeNewswire, Jun 1, 2026.</li>
+<li>Praxis Precision Medicines, "Announces Inducement Grants Under Nasdaq Listing Rule 5635(c)(4)" (3,478 RSUs, 14 employees), GlobeNewswire, Oct 2, 2026.</li>
+<li>Praxis Precision Medicines, "Announces Positive Topline Results from Two Pivotal Phase 3 Studies of Ulixacaltamide HCl in the Essential3 Program," GlobeNewswire, Oct 16, 2025.</li>
+<li>Praxis Precision Medicines, "Announces FDA Acceptance of NDA for Ulixacaltamide HCl in Essential Tremor" (PDUFA Jan 29, 2027), GlobeNewswire, Apr 14, 2026.</li>
+<li>Praxis Precision Medicines, "Receives FDA Breakthrough Therapy Designation for Elsunersen," GlobeNewswire, Jun 22, 2026 (EMBRAVE Part A: 77% sham-adjusted reduction, p=0.015).</li>
+<li>Praxis Precision Medicines, "Announces Positive Results from EMBOLD Study for Relutrigine" (53% placebo-adjusted reduction, p&lt;0.0002), Dec 4&ndash;8, 2025; AES 2025 presentations.</li>
+<li>Praxis Precision Medicines, "Announces Topline Results from the Essential1 Study of Ulixacaltamide" (primary p=0.126), Mar 3, 2023.</li>
+<li>NeurologyLive, "FDA Extends Relutrigine Review, Delays PDUFA to December," Sep 2026 (EMBOLD n=51 details; mid-cycle review; EMERALD ~200 patients).</li>
+<li>NeurologyLive, "Praxis Submits NDAs for Ulixacaltamide in Essential Tremor and Relutrigine in SCN2A/SCN8A DEEs," Feb 2026 (Essential3 safety: TEAEs, ~27&ndash;28% AE discontinuations).</li>
+<li>NeurologyAdvisor, "Ulixacaltamide Improves Daily Function in Patients With Essential Tremor," Oct 2025 (Essential3 design: NCT06087276, n=473/238, endpoints).</li>
+<li>Neurology (AAN), "EMERALD: A Phase 3, Randomized, Multi-center, Double-blind, Placebo-controlled Clinical Trial &hellip; (P11-10.009)," 2026 (design, NCT07010471).</li>
+<li>Park Y-G et al., "Ca(V)3.1 is a tremor rhythm pacemaker in the inferior olive," <i>PNAS</i> 107(23):10731&ndash;10736, 2010 (PMID 20498062).</li>
+<li>Handforth A et al., "T-type calcium channel antagonists suppress tremor in two mouse models of essential tremor," <i>Neuropharmacology</i>, 2010 (PMID 20547167; caveat on Ca<sub>V</sub>3.1-selective blockade).</li>
+<li>"T-type calcium channels as therapeutic targets in essential tremor and Parkinson's disease" (review; CACNA1G variants, CTC-network framing).</li>
+<li>Veeramah KR, Meisler MH et al., SCN8A p.Asn1768Asp discovery &mdash; de novo GoF with increased persistent sodium current (<i>Am. J. Hum. Genet.</i> 2012).</li>
+<li>"Precision Therapeutics in Lennox&ndash;Gastaut Syndrome," <i>Children</i> (MDPI) 2025 (SCN2A/SCN8A GoF vs LoF; persistent-current rationale vs conventional SCBs).</li>
+<li>AES abstract: Scott, Hughes, Kahlig et al., "PRAX-562 is a Well-Tolerated Novel Persistent Sodium Current Blocker&hellip;" (aesnet.org).</li>
+<li>Fierce Biotech / Nasdaq (RTTNews), "Jazz Pharmaceuticals' suvecaltamide fails Phase 2b essential tremor trial," Jun 2024 (NCT05122650).</li>
+<li>Clinical Trials Arena / FirstWord Pharma, "Sage and Biogen discontinue SAGE-324 in essential tremor after KINETIC 2 failure," Jul 2024.</li>
+<li>Culper Research short report on PRAX (Nov 2025) &mdash; allegations summarized via Stocktwits, ainvest, Simply Wall St, ts2.tech coverage; company rebuttal fireside chat Nov 24, 2025.</li>
+<li>Benzinga via ad-hoc-news.de, "Praxis Precision Medicines stock fell 1.21 percent as Q2 costs rose," Oct 6, 2026 (Q2 op. expenses $96.9M; operating cash use $78M).</li>
+<li>Finnhub / M1 / stockinvest.us market data, Oct 9&ndash;10, 2026 (price $259.86, mcap ~$7.3&ndash;7.8B, 5-day &minus;12.06%, 1-month &minus;23.25%, 1-yr +388%, beta 2.86, 52-wk $50.31&ndash;$392.70).</li>
+<li>MarketBeat PRAX data (price, mcap, consensus Moderate Buy, avg target $613.26, BTIG $826) and Tradestie (Strong Buy, avg $644, 19 analysts), Oct 6&ndash;10, 2026.</li>
+<li>InsiderTrades / StockTitan Form 4 summaries (DeSimone, Nemiroff, Mastrocola transactions; 3.0% insider ownership); StockTitan Rhea-AI summary (BIMO inspections, no 483s).</li>
+<li>Internal datasets: 2027 biotech catalyst calendar data.json (record v16-0192, ulixacaltamide PDUFA); Q4 2026 catalyst dossier v4 (relutrigine PDUFA, EMERALD).</li>
+</ol>
+<p class="footnote">Evidence discipline: claims are tagged <span class="tag t-fact">FACT</span> / <span class="tag t-interp">INTERPRETATION</span> / <span class="tag t-gap">GAP</span> / <span class="tag t-unver">UNVERIFIED</span> throughout. Soft scenario prices are illustrative and carry no recommendation. No cross-trial head-to-head efficacy claims are made. This document contains no personal information and is suitable for distribution.</p>
+</div>
+
+</main>
+</div>
+<script>
+(function(){
+  "use strict";
+  /* Theme toggle */
+  var root=document.documentElement, btn=document.getElementById('themeToggle');
+  function setTheme(t,store){
+    root.setAttribute('data-theme',t);
+    btn.setAttribute('aria-pressed',String(t==='dark'));
+    btn.innerHTML=(t==='dark'?'&#9788;':'&#9681;')+' Theme';
+    if(store){try{localStorage.setItem('prax-theme',t);}catch(e){}}
+  }
+  var saved=null;
+  try{saved=localStorage.getItem('prax-theme');}catch(e){}
+  setTheme(saved==='dark'?'dark':'light',false);
+  btn.addEventListener('click',function(){
+    setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark',true);
+  });
+  /* Collapsible sections */
+  var h2s=document.querySelectorAll('main > h2');
+  h2s.forEach(function(h){
+    var t=document.createElement('button');
+    t.className='sec-toggle';
+    t.setAttribute('aria-expanded','true');
+    t.setAttribute('aria-label','Collapse section');
+    t.textContent='\u25BE';
+    h.appendChild(t);
+    var wrap=document.createElement('div');
+    wrap.className='sec-body';
+    var n=h.nextSibling;
+    while(n && !(n.nodeType===1 && n.tagName==='H2')){
+      var nxt=n.nextSibling;
+      wrap.appendChild(n);
+      n=nxt;
+    }
+    h.parentNode.insertBefore(wrap,h.nextSibling);
+    t.addEventListener('click',function(){
+      var closed=wrap.classList.toggle('closed');
+      t.setAttribute('aria-expanded',String(!closed));
+      t.setAttribute('aria-label',closed?'Expand section':'Collapse section');
+      t.textContent=closed?'\u25B8':'\u25BE';
+    });
+  });
+  /* Back to top */
+  var btt=document.getElementById('backTop');
+  window.addEventListener('scroll',function(){
+    btt.classList.toggle('show',window.scrollY>600);
+  },{passive:true});
+  btt.addEventListener('click',function(){
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+</script>
+</body>
+</html>
