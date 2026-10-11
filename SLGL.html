@@ -3,168 +3,354 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SLGL — Deep-Dive Dossier, Merged Edition (Oct 10, 2026)</title>
 <style>
-:root{--bg:#f7f8fa;--card:#fff;--paper:#fff;--ink:#1b2430;--mut:#5d6b7e;--muted:#5d6b7e;
---line:#e3e8ef;--acc:#0f5fa8;--acc2:#0a3d6b;--forest:#0f5fa8;--mint:#e3eef9;--amber:#9a6a00;
---hard:#b3261e;--guid:#9a6a00;--inf:#5b5b5b;--f:#1b7a3d;--i:#9a6a00;--g:#7a3d9a;--u:#a05a00;}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
-header.top{position:sticky;top:0;z-index:50;background:var(--acc2);color:#fff;padding:14px 22px}
-header.top h1{margin:0;font-size:20px;font-weight:700}
-header.top p{margin:2px 0 0;font-size:12.5px;color:#c9d6e6}
-.layout{display:flex;max-width:1280px;margin:0 auto;align-items:flex-start}
-nav.side{position:sticky;top:76px;width:236px;flex:0 0 236px;margin:22px 0 22px 22px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px}
-nav.side b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:2px 0 8px}
-nav.side a{display:block;padding:5px 8px;border-radius:6px;color:var(--ink)}
-nav.side a:hover{background:#eef3fa}
-nav.side a.active{background:#e3eef9;color:var(--acc2);font-weight:600}
-main{flex:1;min-width:0;margin:22px}
-section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-bottom:18px}
-section.card h2{margin:0 0 4px;font-size:19px;color:var(--acc2);border-bottom:2px solid var(--acc);padding-bottom:8px}
-section.card h3{margin:18px 0 6px;font-size:15.5px;color:#223}
-section.card h4{margin:14px 0 4px;font-size:14px;color:#334}
+
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:last-child{padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  
 .kv{display:grid;grid-template-columns:180px 1fr;gap:4px 14px;font-size:14px}
-.kv dt{color:var(--mut)}.kv dd{margin:0}
-table{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0}
-th{background:#eef3fa;text-align:left;padding:8px 10px;border-bottom:2px solid var(--line)}
-td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
 tr:last-child td{border-bottom:none}
-.tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 8px;border-radius:20px;margin-right:6px;vertical-align:middle;white-space:nowrap}
-.tag.F{background:#dff0e5;color:var(--f)}.tag.I{background:#fdf3d7;color:var(--i)}
-.tag.G{background:#efe2f7;color:var(--g)}.tag.U{background:#f6e3cf;color:var(--u)}
-.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;color:#fff;margin-left:8px;vertical-align:middle}
-.pill.hard{background:var(--hard)}.pill.guid{background:var(--guid)}.pill.inf{background:var(--inf)}
-.note{font-size:12.5px;color:var(--mut);background:#f2f5f9;border-left:3px solid var(--acc);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
-.warn{font-size:13px;background:#fdf0ef;border-left:3px solid var(--hard);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
-ul.tight li,ol.tight li{margin-bottom:6px}
+.note{font-size:12.5px;color:var(--muted);background:#f2f5f9;border-left:3px solid var(--teal);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
+.warn{font-size:13px;background:#fdf0ef;border-left:3px solid var(--red);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
+ul.tight li, ol.tight li{margin-bottom:6px}
 .tl{position:relative;margin:14px 0 4px;padding-left:26px}
 .tl:before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:#c8d4e2}
 .tl .ev{position:relative;margin-bottom:16px}
-.tl .ev:before{content:"";position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--acc)}
+.tl .ev:before{content:"";position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--teal)}
 .ev .when{font-weight:700;font-size:13.5px}
-.ev .what{font-size:14px}.ev .ctx{font-size:12.5px;color:var(--mut)}
+.ev .what{font-size:14px}
+.ev .ctx{font-size:12.5px;color:var(--muted)}
 .ev .src{font-size:12px}
-footer{font-size:12.5px;color:var(--mut);padding:20px 24px;text-align:center}
-.badge{display:inline-block;background:var(--acc);color:#fff;font-size:11px;font-weight:700;border-radius:4px;padding:2px 8px;margin-left:8px}
-/* ticker strip */
-.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--raised);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:14px 0}
 .strip .m{padding:13px 16px;border-right:1px solid var(--line)}
 .strip .m:last-child{border-right:0}
-.strip .m span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);display:block}
-.strip .m b{font-size:19px;display:block;margin-top:2px;color:var(--acc2)}
-.strip .m small{font-size:11.5px;color:var(--mut)}
-/* price chart card */
-.price-chart-card{margin:14px 0 0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px}
+.strip .m span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block}
+.strip .m b{font-size:19px;display:block;margin-top:2px;color:var(--teal-dark)}
+.strip .m small{font-size:11.5px;color:var(--muted)}
+.price-chart-card{margin:14px 0 0;background:var(--raised);border:1px solid var(--line);border-radius:10px;padding:22px 24px}
 .price-chart-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
 .price-chart-heading{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
 .price-chart-heading h3{font-size:1.2rem;margin:0}
-.latest-close{font-size:1.8rem;font-weight:700;color:var(--acc);letter-spacing:-.03em}
-.price-chart-meta{font-size:.68rem;color:var(--mut);margin-top:4px}
+.latest-close{font-size:1.8rem;font-weight:700;color:var(--teal);letter-spacing:-.03em}
+.price-chart-meta{font-size:.68rem;color:var(--muted);margin-top:4px}
 .range-controls{display:flex;gap:6px;flex-wrap:wrap}
-.range-controls button{border:1px solid var(--line);background:var(--card);color:var(--mut);padding:8px 12px;cursor:pointer;font-size:.7rem;font-weight:600;border-radius:6px}
+.range-controls button{border:1px solid var(--line);background:var(--raised);color:var(--muted);padding:8px 12px;cursor:pointer;font-size:.7rem;font-weight:600;border-radius:6px}
 .range-controls button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .price-stats{display:flex;gap:30px;flex-wrap:wrap;margin:16px 0 10px}
 .price-stat b{display:block;font-size:1.05rem}
-.price-stat span{font-size:.64rem;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.price-stat span{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .price-chart-shell{height:300px;position:relative;width:100%}
 .price-chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
 .price-chart-tooltip{position:absolute;z-index:3;display:none;background:var(--ink);color:#fff;padding:8px 10px;font-size:.72rem;pointer-events:none;border-radius:4px;transform:translate(-50%,-115%);white-space:nowrap}
-.price-chart-caption{font-size:.74rem;color:var(--mut);border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
-/* verdict box */
-.verdict{background:var(--acc2);color:#fff;border-radius:10px;padding:20px 22px;margin:14px 0}
+.price-chart-caption{font-size:.74rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+.verdict{background:var(--teal-dark);color:#fff;border-radius:10px;padding:20px 22px;margin:14px 0}
 .verdict .eyebrow{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#a9c4e2}
 .verdict h3{margin:6px 0 8px;font-size:1.35rem}
 .verdict p{margin:0;color:#d7e2f0;font-size:14px}
-/* pathway flow */
 .path{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
 .step{background:#f2f5f9;border:1px solid var(--line);border-radius:8px;padding:10px 8px;text-align:center;font-size:12px}
-.step .n{font-size:10px;color:var(--mut);font-weight:700;display:block;margin-bottom:3px}
-.step b{display:block;font-size:12.5px;color:var(--acc2);margin-bottom:3px}
-/* scorecard */
+.step .n{font-size:10px;color:var(--muted);font-weight:700;display:block;margin-bottom:3px}
+.step b{display:block;font-size:12.5px;color:var(--teal-dark);margin-bottom:3px}
 .score3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:12px 0}
 .score3 .col{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px}
 .score3 .col h4{margin:0 0 8px;font-size:14px}
-.col.good h4{color:var(--f)}.col.amb h4{color:var(--i)}.col.bad h4{color:var(--hard)}
+.col.good h4{color:var(--teal)}
+.col.amb h4{color:var(--orange)}
+.col.bad h4{color:var(--red)}
 .score3 ul{margin:0;padding-left:18px;font-size:13px}
 .score3 li{margin-bottom:6px}
-/* stat boxes */
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
 .stats3 .s{background:#f2f5f9;border:1px solid var(--line);border-radius:8px;padding:12px 14px;text-align:center}
-.stats3 .s b{font-size:26px;color:var(--acc2);display:block}
-.stats3 .s span{font-size:12px;color:var(--mut)}
-.callout{background:#eef3fa;border-left:3px solid var(--acc);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13.5px;margin:12px 0}
-@media(max-width:900px){.layout{flex-direction:column}nav.side{position:static;width:auto;margin:14px}.kv{grid-template-columns:1fr}.strip{grid-template-columns:1fr 1fr}.strip .m{border-bottom:1px solid var(--line)}.path{grid-template-columns:1fr 1fr}.score3{grid-template-columns:1fr}.stats3{grid-template-columns:1fr}}
-
-/* ---- audit pass additions (Oct 10, 2026) ---- */
+.stats3 .s b{font-size:26px;color:var(--teal-dark);display:block}
+.stats3 .s span{font-size:12px;color:var(--muted)}
+.callout{background:#eef3fa;border-left:3px solid var(--teal);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13.5px;margin:12px 0}
 #themeBtn{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;min-width:44px;min-height:44px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
 #themeBtn:hover{background:rgba(255,255,255,.25)}
-#toTop{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--acc);color:#fff;border:none;font-size:22px;line-height:1;cursor:pointer;display:none;z-index:80;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#toTop{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--teal);color:#fff;border:none;font-size:22px;line-height:1;cursor:pointer;display:none;z-index:80;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 #toTop.show{display:block}
-section.card>h2{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ctoggle{flex:0 0 auto;width:44px;height:44px;min-width:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--mut);font-size:16px;cursor:pointer}
-section.card.collapsed>:not(h2){display:none}
+.ctoggle{flex:0 0 auto;width:44px;height:44px;min-width:44px;border-radius:8px;border:1px solid var(--line);background:var(--raised);color:var(--muted);font-size:16px;cursor:pointer}
 .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0}
 .tblwrap table{min-width:640px;margin:0}
-.kol{background:#fdf3f2;border:1px solid #eec4bf;border-left:5px solid var(--hard);border-radius:8px;padding:14px 16px;margin:0 0 14px}
+.kol{background:#fdf3f2;border:1px solid #eec4bf;border-left:5px solid var(--red);border-radius:8px;padding:14px 16px;margin:0 0 14px}
 .kol h3{margin:0 0 6px;font-size:16px}
 .kol p{margin:6px 0;font-size:13.5px}
 .range-controls button{min-height:44px;min-width:56px}
-nav.side a{min-height:44px;display:flex;align-items:center}
-/* dark theme */
 [data-theme="dark"]{--bg:#0d131a;--card:#151d27;--paper:#151d27;--ink:#e8edf3;--mut:#9fadc0;--muted:#9fadc0;--line:#2a3542;--acc:#7db3f0;--acc2:#bcd6f5;--forest:#7db3f0;--mint:#1b2940;--amber:#d9a545;--hard:#c1504a;--guid:#c08c2d;--inf:#757575;--f:#57c98d;--i:#d9a545;--g:#c49ae8;--u:#eda75f}
-[data-theme="dark"] header.top{background:#0a2a52}
-[data-theme="dark"] th{background:#1b2532}
-[data-theme="dark"] .note,[data-theme="dark"] .callout{background:#1b2532}
+[data-theme="dark"] .note, [data-theme="dark"] .callout{background:#1b2532}
 [data-theme="dark"] .warn{background:#2b1a17}
 [data-theme="dark"] .verdict{background:#0a2a52}
 [data-theme="dark"] .verdict p{color:#cfddf0}
-[data-theme="dark"] .step,[data-theme="dark"] .stats3 .s{background:#1b2532}
+[data-theme="dark"] .step, [data-theme="dark"] .stats3 .s{background:#1b2532}
 [data-theme="dark"] .score3 .col{background:#151d27}
-[data-theme="dark"] section.card h3{color:#cdd8e4}
-[data-theme="dark"] section.card h4{color:#bcc8d8}
-[data-theme="dark"] nav.side a:hover{background:#1e2937}
-[data-theme="dark"] nav.side a.active{background:#1e2f47}
-[data-theme="dark"] .range-controls button{border-color:var(--line);background:var(--card);color:var(--mut)}
-[data-theme="dark"] .tag.F{background:#123a24;color:#7ddba0}
-[data-theme="dark"] .tag.I{background:#3a2f10;color:#e8c15c}
-[data-theme="dark"] .tag.G{background:#2c1d3d;color:#c9a0ec}
-[data-theme="dark"] .tag.U{background:#3a2812;color:#eda75f}
-[data-theme="dark"] .pill.inf{background:#5f5f5f}
-[data-theme="dark"] .badge{background:#0a2a52;color:#cfe2fa}
+[data-theme="dark"] .range-controls button{border-color:var(--line);background:var(--raised);color:var(--muted)}
 [data-theme="dark"] .kol{background:#2b1a17;border-color:#5a2f2a}
 [data-theme="dark"] .price-chart-tooltip{background:#0d131a;color:#fff}
-@media(max-width:900px){nav.side{display:grid;grid-template-columns:1fr 1fr;gap:4px}nav.side b{grid-column:1/-1}}
+
+/* ---- file-specific component styles, remapped to PEPG tokens ---- */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:14px 0}
+th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+td{vertical-align:top;padding:10px 8px;border-bottom:1px solid var(--line)}
+tr:nth-child(even) td{background:var(--surface)}
+.tablewrap,.tscroll,.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0}
+.src{font-size:12px;color:var(--muted)}
+@media(max-width:620px){
+  .grid2,.grid3,.score3,.stats3,.strip,.kv{grid-template-columns:minmax(0,1fr)}
+}
 
 </style></head>
 <body>
-<header class="top">
-<h1>SLGL — Sol-Gel Technologies Ltd. <span class="badge">DEEP-DIVE DOSSIER · MERGED EDITION</span></h1>
-<p>As of October 10, 2026 · Merges the September 16, 2026 original with the October 7, 2026 refresh · Audited and enhanced October 10, 2026 · Neutral third-party research · No recommendation, no DCF · §12 carries soft scenario-based levels only</p>
-<button id="themeBtn" type="button" aria-pressed="false" title="Toggle dark / light mode">&#9789; Dark</button>
-</header>
-<div class="layout">
-<nav class="side"><b>Contents</b>
-<a href="#identity">1 · Identity &amp; thesis</a>
-<a href="#science">2 · Science: MoA &amp; why it fails</a>
-<a href="#pipeline">3 · Pipeline</a>
-<a href="#trial">4 · Trial design &amp; prior-Phase-3 forensic</a>
-<a href="#scorecard">5 · Readout scorecard</a>
-<a href="#reg">6 · Clinical / regulatory</a>
-<a href="#comp">7 · Competition</a>
-<a href="#fin">8 · Financials</a>
-<a href="#val">9 · FDMC / EV</a>
-<a href="#cat">10 · Catalyst &amp; event map</a>
-<a href="#flags">11 · Ranked red flags</a>
-<a href="#scen">12 · Bear / base / bull</a>
-<a href="#mgmt">13 · Management &amp; insider signals</a>
-<a href="#openq">14 · Open questions</a>
-<a href="#refs">15 · References &amp; as-of</a>
-</nav>
+
+
+<div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">SLGL</span><span class="stamp">Sol-Gel Technologies Ltd. · Nasdaq · As of October 10, 2026 · merged edition</span></div>
+        <h1>Sol-Gel Technologies Ltd.</h1>
+        <p class="hero-dek">Merged edition — September 16, 2026 original + October 7, 2026 refresh · Audited and enhanced October 10, 2026 · Neutral third-party research · No recommendation, no DCF · §12 carries soft scenario-based levels only</p>
+      </div>
+      <div class="hero-quote">
+        <div class="quote-price">$71.77</div>
+        <div class="quote-label">Nasdaq close · Oct 9, 2026</div>
+        <div class="quote-meta">~$235M basic mcap · ~$44–46M est. cash (Oct 2026)</div>
+      </div>
+    </div>
+  </header>
+<div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#identity">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trial">Trial</a><a href="#scorecard">Scorecard</a><a href="#reg">Regulatory</a><a href="#comp">Landscape</a><a href="#fin">Financials</a><a href="#val">Valuation</a><a href="#cat">Catalysts</a><a href="#flags">Risks</a><a href="#scen">Scenarios</a><a href="#mgmt">People</a><a href="#openq">Open</a><a href="#refs">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+    </nav>
+  </div>
 <main>
-<section class="card" id="identity">
-<h2>1 · Identity &amp; thesis snapshot</h2>
-<div class="kol"><h3>&#9203; 4 days out: KOL Investor Day — Wed, Oct 14, 2026, 12:00 p.m. ET (New York) <span class="pill hard">HARD</span></h3>
-<p><span class="tag F">FACT</span>Webcast KOL event with the Gorlin Syndrome Alliance (Julie Breneiser, PA-C), Ervin Epstein Jr., MD, Kavita Sarin, MD, PhD (Stanford), and Elizabeth Billingsley, MD (Penn State) — disease burden + unmet need. Source: company PR Sept 30, 2026 (GlobeNewswire).</p>
+<section id="identity">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The same drug failed one Phase 3 already</h2></div></div>
+<div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="kol"><h3>&#9203; 4 days out: KOL Investor Day — Wed, Oct 14, 2026, 12:00 p.m. ET (New York) <span class="date-tag hard">HARD</span></h3>
+<p><span class="ev fact">FACT</span>Webcast KOL event with the Gorlin Syndrome Alliance (Julie Breneiser, PA-C), Ervin Epstein Jr., MD, Kavita Sarin, MD, PhD (Stanford), and Elizabeth Billingsley, MD (Penn State) — disease burden + unmet need. Source: company PR Sept 30, 2026 (GlobeNewswire).</p>
 <p><b>What to watch:</b></p>
 <ul class="tight" style="margin-top:0">
 <li><b>Disease-burden framing vs the trial population</b> — do the KOLs anchor expectations to the severe, high-burden Gorlin patients (the PTCH1-positive, &ge;10-facial-BCC enriched trial cohort) or to the broader ~10,000-patient population? The readout only covers the enriched cohort.</li>
@@ -179,20 +365,20 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <div class="strip">
 <div class="m"><span>Nasdaq · SLGL</span><b>$71.77</b><small>Oct 9, 2026 close (Friday) · Finnhub / MarketBeat / Webull</small></div>
 <div class="m"><span>Basic market cap</span><b>~$235.0M</b><small>3,273,999 shares (Jun-30-2026 6-K)</small></div>
-<div class="m"><span>Cash + securities</span><b>$49.3M &rarr; ~$45M est.</b><small>Jun 30, 2026 disclosed; Oct 2026 est. from ~$1.4M/mo burn <span class="tag I">INTERPRETATION</span></small></div>
+<div class="m"><span>Cash + securities</span><b>$49.3M &rarr; ~$45M est.</b><small>Jun 30, 2026 disclosed; Oct 2026 est. from ~$1.4M/mo burn <span class="ev interp">INTERPRETATION</span></small></div>
 <div class="m"><span>Next defining event</span><b>Oct 14 KOL Day</b><small>4 days out · Phase 3 topline late Nov 2026 · guidance</small></div>
 </div>
 <dl class="kv">
-<dt>Company</dt><dd><span class="tag F">FACT</span>Sol-Gel Technologies Ltd., Ness Ziona, Israel; foreign private issuer listed on Nasdaq as SLGL. Self-described as a dermatology company focused on rare and severe skin conditions. Sources: 20-F (FY2025, filed 2026-03-19); Q2 2026 6-K (filed 2026-08-20).</dd>
-<dt>Core asset</dt><dd><span class="tag F">FACT</span>SGT-610 (patidegib gel, 2%) — topical hedgehog-pathway inhibitor for prevention of new basal-cell carcinoma (BCC) lesions in adults with Gorlin syndrome. Acquired from PellePharm, Inc. in January 2023 (upfront $4.7M; up to $6.0M development/NDA milestones; up to $64.0M commercial milestones; single-digit royalties). Source: company PR via BioSpace, 2023-01-27.</dd>
-<dt>Control</dt><dd><span class="tag F">FACT</span>M. Arkin Dermatology Ltd., solely beneficially owned by Moshe "Mori" Arkin (Executive Chairman and interim CEO), held <b>~65% of voting power as of March 18, 2026</b> (20-F FY2025) — a pre-offering figure. After the March 2026 public offering, an April 15, 2026 Schedule 13D/A showed <b>~56.9% combined beneficial ownership</b>: the $33M pre-data raise diluted the controller alongside everyone else. The 20-F states non-affiliated investors have "very limited, if any, influence on corporate actions." Insiders overall ~66.5% (trade-press estimate, Oct 2026). <span class="tag I">INTERPRETATION</span>The two builds' control figures (~65% vs ~56.9%) reflect different as-of dates bracketing the offering, not a disagreement — both are presented here with dates. Source: 20-F FY2025; Arkin Schedule 13D/A.</dd>
-<dt>The binary</dt><dd><span class="tag I">INTERPRETATION</span>SGT-610-01 (NCT06050122) Phase 3 topline expected <b>late November 2026</b> (company guidance). Primary endpoint: number of new facial BCCs at Month 12, patidegib 2% BID vs vehicle. This is a <b>re-run</b>: the identical molecule and indication already ran a full Phase 3 (Pelle-926-301, n=174, completed Dec 2020) that produced "not sufficiently convincing" data — Leo Pharma declined its option to acquire PellePharm (MedWatch, 2021), and Sol-Gel redesigned the trial before re-running it.</dd>
-<dt>Key swing factor</dt><dd><span class="tag I">INTERPRETATION</span>Whether the redesign — a confirmed PTCH1-positive population with ≥10 facial BCCs at baseline, and a primary endpoint of <i>all</i> new facial BCCs rather than only surgically-eligible BCCs — fixes whatever sank Pelle-926-301. The prior trial's full topline was never published in a peer-reviewed venue; what exists is the registry's posted arm-level result table (see §4 forensic).</dd>
-<dt>What must go right</dt><dd><span class="tag I">INTERPRETATION</span><b>Signal, size, and cleanliness.</b> A pre-specified ITT win on new facial BCCs, with a clinically meaningful reduction that plausibly lowers surgery burden (the SEB secondary should corroborate), plus the absence of systemic HHI-class toxicity.</dd>
-<dt>What can break it</dt><dd><span class="tag I">INTERPRETATION</span><b>Low events or a trivial win.</b> A quiet vehicle arm can starve power. A nominal p-value attached to only a 10–20% reduction could still fail the clinical and regulatory test.</dd>
+<dt>Company</dt><dd><span class="ev fact">FACT</span>Sol-Gel Technologies Ltd., Ness Ziona, Israel; foreign private issuer listed on Nasdaq as SLGL. Self-described as a dermatology company focused on rare and severe skin conditions. Sources: 20-F (FY2025, filed 2026-03-19); Q2 2026 6-K (filed 2026-08-20).</dd>
+<dt>Core asset</dt><dd><span class="ev fact">FACT</span>SGT-610 (patidegib gel, 2%) — topical hedgehog-pathway inhibitor for prevention of new basal-cell carcinoma (BCC) lesions in adults with Gorlin syndrome. Acquired from PellePharm, Inc. in January 2023 (upfront $4.7M; up to $6.0M development/NDA milestones; up to $64.0M commercial milestones; single-digit royalties). Source: company PR via BioSpace, 2023-01-27.</dd>
+<dt>Control</dt><dd><span class="ev fact">FACT</span>M. Arkin Dermatology Ltd., solely beneficially owned by Moshe "Mori" Arkin (Executive Chairman and interim CEO), held <b>~65% of voting power as of March 18, 2026</b> (20-F FY2025) — a pre-offering figure. After the March 2026 public offering, an April 15, 2026 Schedule 13D/A showed <b>~56.9% combined beneficial ownership</b>: the $33M pre-data raise diluted the controller alongside everyone else. The 20-F states non-affiliated investors have "very limited, if any, influence on corporate actions." Insiders overall ~66.5% (trade-press estimate, Oct 2026). <span class="ev interp">INTERPRETATION</span>The two builds' control figures (~65% vs ~56.9%) reflect different as-of dates bracketing the offering, not a disagreement — both are presented here with dates. Source: 20-F FY2025; Arkin Schedule 13D/A.</dd>
+<dt>The binary</dt><dd><span class="ev interp">INTERPRETATION</span>SGT-610-01 (NCT06050122) Phase 3 topline expected <b>late November 2026</b> (company guidance). Primary endpoint: number of new facial BCCs at Month 12, patidegib 2% BID vs vehicle. This is a <b>re-run</b>: the identical molecule and indication already ran a full Phase 3 (Pelle-926-301, n=174, completed Dec 2020) that produced "not sufficiently convincing" data — Leo Pharma declined its option to acquire PellePharm (MedWatch, 2021), and Sol-Gel redesigned the trial before re-running it.</dd>
+<dt>Key swing factor</dt><dd><span class="ev interp">INTERPRETATION</span>Whether the redesign — a confirmed PTCH1-positive population with ≥10 facial BCCs at baseline, and a primary endpoint of <i>all</i> new facial BCCs rather than only surgically-eligible BCCs — fixes whatever sank Pelle-926-301. The prior trial's full topline was never published in a peer-reviewed venue; what exists is the registry's posted arm-level result table (see §4 forensic).</dd>
+<dt>What must go right</dt><dd><span class="ev interp">INTERPRETATION</span><b>Signal, size, and cleanliness.</b> A pre-specified ITT win on new facial BCCs, with a clinically meaningful reduction that plausibly lowers surgery burden (the SEB secondary should corroborate), plus the absence of systemic HHI-class toxicity.</dd>
+<dt>What can break it</dt><dd><span class="ev interp">INTERPRETATION</span><b>Low events or a trivial win.</b> A quiet vehicle arm can starve power. A nominal p-value attached to only a 10–20% reduction could still fail the clinical and regulatory test.</dd>
 </dl>
 <div class="warn"><b>Single-asset + concentrated-control + re-run-after-failure:</b> this combination is the central risk frame for everything below. Arkin's control means minority shareholders cannot block a dilutive financing, a distressed asset sale, or a take-under — and equally that Arkin's deep pockets are the backstop if the trial fails.</div>
-<div class="callout"><b>Bottom line on the "3–5×" outcome narrative:</b> the cap table can amplify a positive surprise, but no trial evidence supports a return multiple. Treat it as a liquidity-and-expectations narrative, not a probability-weighted conclusion. <span class="tag U">UNVERIFIED</span>Analyst targets are not clinical evidence.</div>
+<div class="callout"><b>Bottom line on the "3–5×" outcome narrative:</b> the cap table can amplify a positive surprise, but no trial evidence supports a return multiple. Treat it as a liquidity-and-expectations narrative, not a probability-weighted conclusion. <span class="ev unverified">UNVERIFIED</span>Analyst targets are not clinical evidence.</div>
 <div class="price-chart-card" aria-label="SLGL one-year share-price history">
 <div class="price-chart-top">
 <div><div class="price-chart-heading"><h3>SLGL daily close</h3><span class="latest-close" id="latestClose">$64.40</span></div><div class="price-chart-meta">USD · FIXED SERIES · DATA AS OF 2026-09-16 · LATEST CLOSE IN SERIES 2026-09-15 · DATED SNAPSHOT — newest close $71.77 (Oct 9) is in the ticker strip above</div></div>
@@ -203,8 +389,8 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <div class="price-chart-caption">Dated build-time snapshot, not a live quote. Range windows use calendar-month offsets from the latest close in the series; line scale starts above zero. Source: Finnhub instrument data. Carried forward from the September 16 build unchanged.</div>
 </div>
 </section>
-<section class="card" id="science">
-<h2>2 · Science: mechanism of action &amp; why it could fail</h2>
+<section id="science">
+<div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>The hedgehog pathway in five steps—and where topical delivery fits</h2></div></div>
 <h3>The pathway in five steps</h3>
 <div class="path">
 <div class="step"><span class="n">01</span><b>PTCH1 loss</b>A germline loss-of-function mutation removes the pathway's normal brake.</div>
@@ -215,46 +401,46 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 </div>
 <h3>Plain-language mechanism</h3>
 <ul class="tight">
-<li><span class="tag F">FACT</span>Gorlin syndrome (basal cell nevus syndrome) is an autosomal-dominant disorder caused in most patients by a germline loss-of-function mutation in <i>PTCH1</i>, a tumor-suppressor gene encoding the PATCHED1 receptor. Prevalence cited by the company as ~1 in 27,000–31,000 in the U.S. (~10,000 U.S. patients). Sources: company PR (BioSpace, 2023-11); PellePharm/Business Wire PR (2020-01-08).</li>
-<li><span class="tag F">FACT</span>Normally PTCH1 restrains SMO (Smoothened). When PTCH1 is defective, SMO is released and the hedgehog (HH) signaling pathway turns on constitutively, driving GLI1-mediated transcription and uncontrolled proliferation of basal cells — i.e., basal cell carcinomas. Source: Tang et al., NEJM 2012; company explainer (BioSpace).</li>
-<li><span class="tag F">FACT</span>Patidegib is a small-molecule <b>SMO inhibitor</b> (licensed from Infinity Pharmaceuticals) formulated as a <b>2% topical gel applied to the face twice daily</b>. It is designed to block SMO locally, re-silencing the pathway in skin without systemic hedgehog blockade. Source: BioSpace company PRs; Cosio et al., Int J Mol Sci 2021 ("Patidegib in Dermatology").</li>
-<li><span class="tag F">FACT</span>Oral hedgehog inhibitors (vismodegib/Erivedge, sonidegib/Odomzo) validate the target in Gorlin: Tang et al. (NEJM 2012, n=42 BCNS patients) showed vismodegib cut the mean annual rate of new surgically-eligible BCCs to <b>2 vs 29 on placebo (p&lt;.001)</b> and shrank existing lesions (mean −65% vs −11%, p=.003). But <b>54% of vismodegib patients discontinued within the study due to adverse events</b> (muscle cramps, dysgeusia/taste loss, alopecia, weight loss) and tumors re-grew after withdrawal. The NEJM authors concluded class-effect toxicity "is unlikely to be ameliorated by altering the chemical structure" — the rationale for a topical route. Sources: NEJM 2012; Healio summary.</li>
-<li><span class="tag F">FACT</span>Topical patidegib avoided systemic side effects in Phase 2: circulating drug levels were &gt;500-fold lower than with oral dosing; rates of cramps, taste loss and hair loss were no different from placebo/vehicle (Epstein/ACMS presentation, via MDedge; PellePharm PR via BioSpace, 2018). Phase 2 Gorlin data (n=17, 26 weeks, 2%/4%/vehicle BID): 2% gel reduced SEB tumor count 51.29% from baseline (4%: 26.63%), and clinical clearance of 12/45 SEBs (27%) vs 0/16 vehicle (p=0.02). Prevention signal: 0.4 new SEBs in 6 months (patidegib, ITT, p=0.096) / 0.3 (PP, p=0.008) vs 1.4 vehicle. Sources: Cosio et al., IJMS 2021; BioSpace NORD presentation PR (2018); Lear et al., Br J Dermatol 2025 (peer-reviewed Phase 2 report, PMID 39545486).</li>
+<li><span class="ev fact">FACT</span>Gorlin syndrome (basal cell nevus syndrome) is an autosomal-dominant disorder caused in most patients by a germline loss-of-function mutation in <i>PTCH1</i>, a tumor-suppressor gene encoding the PATCHED1 receptor. Prevalence cited by the company as ~1 in 27,000–31,000 in the U.S. (~10,000 U.S. patients). Sources: company PR (BioSpace, 2023-11); PellePharm/Business Wire PR (2020-01-08).</li>
+<li><span class="ev fact">FACT</span>Normally PTCH1 restrains SMO (Smoothened). When PTCH1 is defective, SMO is released and the hedgehog (HH) signaling pathway turns on constitutively, driving GLI1-mediated transcription and uncontrolled proliferation of basal cells — i.e., basal cell carcinomas. Source: Tang et al., NEJM 2012; company explainer (BioSpace).</li>
+<li><span class="ev fact">FACT</span>Patidegib is a small-molecule <b>SMO inhibitor</b> (licensed from Infinity Pharmaceuticals) formulated as a <b>2% topical gel applied to the face twice daily</b>. It is designed to block SMO locally, re-silencing the pathway in skin without systemic hedgehog blockade. Source: BioSpace company PRs; Cosio et al., Int J Mol Sci 2021 ("Patidegib in Dermatology").</li>
+<li><span class="ev fact">FACT</span>Oral hedgehog inhibitors (vismodegib/Erivedge, sonidegib/Odomzo) validate the target in Gorlin: Tang et al. (NEJM 2012, n=42 BCNS patients) showed vismodegib cut the mean annual rate of new surgically-eligible BCCs to <b>2 vs 29 on placebo (p&lt;.001)</b> and shrank existing lesions (mean −65% vs −11%, p=.003). But <b>54% of vismodegib patients discontinued within the study due to adverse events</b> (muscle cramps, dysgeusia/taste loss, alopecia, weight loss) and tumors re-grew after withdrawal. The NEJM authors concluded class-effect toxicity "is unlikely to be ameliorated by altering the chemical structure" — the rationale for a topical route. Sources: NEJM 2012; Healio summary.</li>
+<li><span class="ev fact">FACT</span>Topical patidegib avoided systemic side effects in Phase 2: circulating drug levels were &gt;500-fold lower than with oral dosing; rates of cramps, taste loss and hair loss were no different from placebo/vehicle (Epstein/ACMS presentation, via MDedge; PellePharm PR via BioSpace, 2018). Phase 2 Gorlin data (n=17, 26 weeks, 2%/4%/vehicle BID): 2% gel reduced SEB tumor count 51.29% from baseline (4%: 26.63%), and clinical clearance of 12/45 SEBs (27%) vs 0/16 vehicle (p=0.02). Prevention signal: 0.4 new SEBs in 6 months (patidegib, ITT, p=0.096) / 0.3 (PP, p=0.008) vs 1.4 vehicle. Sources: Cosio et al., IJMS 2021; BioSpace NORD presentation PR (2018); Lear et al., Br J Dermatol 2025 (peer-reviewed Phase 2 report, PMID 39545486).</li>
 </ul>
 <h3>Why it should work — the affirmative case</h3>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>Target validated in this exact disease.</b> Oral vismodegib in Gorlin patients (Tang, NEJM 2012, n=42) cut the mean annual rate of new SEBs to 2 vs 29 on placebo (p&lt;.001) — proof that SMO blockade prevents new BCCs in Gorlin biology, not just in cell lines.</li>
-<li><span class="tag F">FACT</span><b>Topical delivery avoids the class toxicity that killed chronic oral use.</b> Phase 2 showed &gt;500-fold lower systemic exposure vs oral dosing and no excess cramps, taste loss, or alopecia vs vehicle — the pharmacologic rationale for the topical route (Cosio, IJMS 2021).</li>
-<li><span class="tag F">FACT</span><b>Molecular target engagement confirmed.</b> The 2% gel reduced GLI1 mRNA &minus;56.3% — downstream pathway silencing in skin, not just clinical correlation (Cosio, IJMS 2021).</li>
-<li><span class="tag I">INTERPRETATION</span><b>The redesign directly targets the suspected failure modes.</b> Confirmed PTCH1-positive enrollment removes phenocopies whose BCCs are not hedgehog-driven; counting <i>all</i> new facial BCCs (rather than surgically-eligible only) multiplies the event rate and should raise statistical power per patient.</li>
+<li><span class="ev fact">FACT</span><b>Target validated in this exact disease.</b> Oral vismodegib in Gorlin patients (Tang, NEJM 2012, n=42) cut the mean annual rate of new SEBs to 2 vs 29 on placebo (p&lt;.001) — proof that SMO blockade prevents new BCCs in Gorlin biology, not just in cell lines.</li>
+<li><span class="ev fact">FACT</span><b>Topical delivery avoids the class toxicity that killed chronic oral use.</b> Phase 2 showed &gt;500-fold lower systemic exposure vs oral dosing and no excess cramps, taste loss, or alopecia vs vehicle — the pharmacologic rationale for the topical route (Cosio, IJMS 2021).</li>
+<li><span class="ev fact">FACT</span><b>Molecular target engagement confirmed.</b> The 2% gel reduced GLI1 mRNA &minus;56.3% — downstream pathway silencing in skin, not just clinical correlation (Cosio, IJMS 2021).</li>
+<li><span class="ev interp">INTERPRETATION</span><b>The redesign directly targets the suspected failure modes.</b> Confirmed PTCH1-positive enrollment removes phenocopies whose BCCs are not hedgehog-driven; counting <i>all</i> new facial BCCs (rather than surgically-eligible only) multiplies the event rate and should raise statistical power per patient.</li>
 </ul>
 <h3>Disease burden — why prevention would matter</h3>
 <ul class="tight">
-<li><span class="tag F">FACT</span>A US registry cohort reported a <b>median 160 lifetime BCCs at mean age 53</b>. Severe patients may undergo <b>up to 30 surgeries per year</b>, making prevention clinically meaningful — not cosmetic. Source: Kim et al., JAAD Int 2026 (BCC burden in Korean Gorlin patients) and registry data cited in the original build.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Population uncertainty:</b> the widely cited "~10,000 US patients" is not precise — published prevalence spans roughly 1 in 31,000 to 1 in 256,000 across geographies, and diagnosed-and-treatment-seeking prevalence is unknown. The ~10,000 figure should not be treated as a commercial denominator.</li>
+<li><span class="ev fact">FACT</span>A US registry cohort reported a <b>median 160 lifetime BCCs at mean age 53</b>. Severe patients may undergo <b>up to 30 surgeries per year</b>, making prevention clinically meaningful — not cosmetic. Source: Kim et al., JAAD Int 2026 (BCC burden in Korean Gorlin patients) and registry data cited in the original build.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Population uncertainty:</b> the widely cited "~10,000 US patients" is not precise — published prevalence spans roughly 1 in 31,000 to 1 in 256,000 across geographies, and diagnosed-and-treatment-seeking prevalence is unknown. The ~10,000 figure should not be treated as a commercial denominator.</li>
 </ul>
 <h3>Why it could fail — the bear case on the biology</h3>
 <ol class="tight">
-<li><span class="tag I">INTERPRETATION</span><b>Prevention is a harder endpoint than treatment.</b> Phase 2's statistically significant wins were on shrinkage/clearance of <i>existing</i> SEBs — but the Phase 3 primary endpoint is the <i>count of new</i> BCCs over 12 months. A topical drug must be present in clinically invisible micro-lesions for a full year, with BID adherence, to move that count. Prevention of <i>de novo</i> lesions is biologically distinct from shrinking established ones.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Downstream resistance exists.</b> The IJMS review notes possible common resistance mechanisms between vismodegib and patidegib, including downstream alterations (GLI gain-of-function, SUFU loss-of-function, acquired SMO mutations) that bypass SMO blockade entirely. Tumors harboring these will not respond to patidegib at any dose.</li>
-<li><span class="tag F">FACT</span><b>The 4%-gel underperformance is a cautionary datum, not a reassurance.</b> In Phase 2, 2% outperformed 4% clinically (51.29% vs 26.63% tumor-count reduction) and molecularly (GLI1 mRNA −56.3% best with 2% QD); the 4% arm also had worse adherence (missed ~50 days vs 2 days) and mild local irritation. Source: Cosio et al., IJMS 2021; MDedge. <span class="tag I">INTERPRETATION</span>The sponsor's story — an adherence artifact in a 17-patient trial — may be true, but it also means the dose/exposure-response curve is shallow and noisy; there is no clean "more drug = more effect" anchor.</li>
-<li><span class="tag F">FACT</span><b>Oral patidegib itself has a mixed record.</b> Per the IJMS review, systemic patidegib showed efficacy in treatment-naïve stage I–III cutaneous BCC but "stage IV disease and not-naïve patients did not show any benefit." Prior systemic hedgehog-inhibitor exposure is an exclusion in SGT-610-01, limiting generalizability if it works.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Local tolerability over 12 months is unproven at this scale.</b> Phase 2 ran 26 weeks in 17 patients; SGT-610-01 runs 12 months in 113. The Q2 2026 company update disclosed 10/113 (~9%) discontinued — "considerably below our original assumptions," but the blinded arm-level breakdown is unknown, and any local irritation could drive differential adherence in a vehicle-controlled blinded design.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Recurrence after stopping topical patidegib has never been published.</b> Oral vismodegib's tumors re-grew after withdrawal (NEJM 2012); whether chronic facial SMO inhibition must be lifetime therapy — and is safe that way — is unknown.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Prevention is a harder endpoint than treatment.</b> Phase 2's statistically significant wins were on shrinkage/clearance of <i>existing</i> SEBs — but the Phase 3 primary endpoint is the <i>count of new</i> BCCs over 12 months. A topical drug must be present in clinically invisible micro-lesions for a full year, with BID adherence, to move that count. Prevention of <i>de novo</i> lesions is biologically distinct from shrinking established ones.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Downstream resistance exists.</b> The IJMS review notes possible common resistance mechanisms between vismodegib and patidegib, including downstream alterations (GLI gain-of-function, SUFU loss-of-function, acquired SMO mutations) that bypass SMO blockade entirely. Tumors harboring these will not respond to patidegib at any dose.</li>
+<li><span class="ev fact">FACT</span><b>The 4%-gel underperformance is a cautionary datum, not a reassurance.</b> In Phase 2, 2% outperformed 4% clinically (51.29% vs 26.63% tumor-count reduction) and molecularly (GLI1 mRNA −56.3% best with 2% QD); the 4% arm also had worse adherence (missed ~50 days vs 2 days) and mild local irritation. Source: Cosio et al., IJMS 2021; MDedge. <span class="ev interp">INTERPRETATION</span>The sponsor's story — an adherence artifact in a 17-patient trial — may be true, but it also means the dose/exposure-response curve is shallow and noisy; there is no clean "more drug = more effect" anchor.</li>
+<li><span class="ev fact">FACT</span><b>Oral patidegib itself has a mixed record.</b> Per the IJMS review, systemic patidegib showed efficacy in treatment-naïve stage I–III cutaneous BCC but "stage IV disease and not-naïve patients did not show any benefit." Prior systemic hedgehog-inhibitor exposure is an exclusion in SGT-610-01, limiting generalizability if it works.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Local tolerability over 12 months is unproven at this scale.</b> Phase 2 ran 26 weeks in 17 patients; SGT-610-01 runs 12 months in 113. The Q2 2026 company update disclosed 10/113 (~9%) discontinued — "considerably below our original assumptions," but the blinded arm-level breakdown is unknown, and any local irritation could drive differential adherence in a vehicle-controlled blinded design.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Recurrence after stopping topical patidegib has never been published.</b> Oral vismodegib's tumors re-grew after withdrawal (NEJM 2012); whether chronic facial SMO inhibition must be lifetime therapy — and is safe that way — is unknown.</li>
 </ol>
 </section>
-<section class="card" id="pipeline">
-<h2>3 · Pipeline</h2>
+<section id="pipeline">
+<div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>One asset, ~100% of enterprise value</h2></div></div>
 <div class="note"><b>Ranked by share of enterprise value, descending.</b> One asset, with conditional branches. Everything beyond SGT-610 Gorlin depends on validating topical hedgehog inhibition.</div>
 <div class="tblwrap"><table>
 <tr><th>#</th><th>Asset</th><th>Indication</th><th>Stage</th><th>Share of value</th><th>Status / next</th></tr>
-<tr><td><b>1</b></td><td>SGT-610 (patidegib gel 2%)</td><td>Gorlin syndrome — prevention of new facial BCCs</td><td>Phase 3 (SGT-610-01, NCT06050122)</td><td><b>~100% of EV</b></td><td><span class="tag F">FACT</span>LPLV Sept 17, 2026; 113 enrolled, 102 completed 12 months; topline late Nov 2026 (guidance). FDA Orphan + Breakthrough designations. Source: company PR 2026-09-17; CT.gov.</td></tr>
-<tr><td><b>2</b></td><td>SGT-610 (patidegib gel)</td><td>High-frequency BCC, non-Gorlin (HF-BCC)</td><td>Proof-of-concept, single-center open-label</td><td>Franchise option — only if Gorlin validates</td><td><span class="tag F">FACT</span>Enrollment expected early Oct 2026 (~20 subjects &ge;18, facial/head-and-neck HF-BCC, BID up to 12 months); readout ~late 2027; pivotal registration study anticipated late 2027 / H1 2028. Source: Q2 2026 6-K PR. <span class="tag I">INTERPRETATION</span>The much larger sporadic population — the real commercial leg on a Gorlin win.</td></tr>
-<tr><td><b>3</b></td><td>TWYNEO / EPSOLAY royalties (Galderma; US rights sold to Mayne)</td><td>Acne / rosacea</td><td>Marketed</td><td>Downside cushion only (~$2&ndash;3M/yr run-rate)</td><td><span class="tag F">FACT</span>$16.7M one-time IP gain (2025); ~$0.6M/quarter royalties (Q2 2026); new-territory launches expected 2026&ndash;2027. Source: Q2 2026 6-K PR.</td></tr>
-<tr><td><b>4</b></td><td>SGT-610 (patidegib gel)</td><td>Neo-adjuvant BCC (ahead of Mohs surgery)</td><td>Early study</td><td>Supporting data only — no standalone value</td><td><span class="tag F">FACT</span>Small study expected to begin Oct 2026. Not a readout de-risker for Gorlin. Source: September 16 build (company-guided).</td></tr>
-<tr><td><b>5</b></td><td>OKC program (intra-cystic injectable HHI)</td><td>Odontogenic keratocysts in Gorlin syndrome</td><td>Provisional patent filed</td><td>~Zero — pre-research</td><td><span class="tag F">FACT</span>Company "evaluating the economic feasibility"; Gorlin Syndrome Alliance leadership "enthusiastically received" the concept. Source: Q2 2026 6-K PR. <span class="tag I">INTERPRETATION</span>Pre-research; no value assigned in a disciplined model.</td></tr>
-<tr><td><b>6</b></td><td>SGT-210 (topical erlotinib)</td><td>Darier disease / rare keratodermas</td><td><span class="tag U">STATUS DISPUTED</span></td><td>~Zero until confirmed</td><td>Sep 16 build: discontinued Dec 2025 (did not differentiate from vehicle). Oct 7: no 2026 company disclosure confirming. <b>New (Oct 10):</b> third-party profiles still list SGT-210 as an active investigational candidate — TipRanks company boilerplate ("advancing SGT-210"), Morningstar pipeline page, MarketBeat FDA-events page (past-two-year regulatory activity incl. SGT-210). <span class="tag I">INTERPRETATION</span>Third-party weight now leans toward still-active, but a 2026 <i>company</i> statement is still missing — treated as unresolved (see §14).</td></tr>
-<tr><td><b>7</b></td><td>SGT-310 / SGT-510</td><td>Psoriasis</td><td>Suspended 2023; seeking out-license</td><td>Zero</td><td><span class="tag F">FACT</span>Suspended because "the market has turned more crowded and competitive." Source: acquisition PR (BioSpace, 2023-01-27).</td></tr>
+<tr><td><b>1</b></td><td>SGT-610 (patidegib gel 2%)</td><td>Gorlin syndrome — prevention of new facial BCCs</td><td>Phase 3 (SGT-610-01, NCT06050122)</td><td><b>~100% of EV</b></td><td><span class="ev fact">FACT</span>LPLV Sept 17, 2026; 113 enrolled, 102 completed 12 months; topline late Nov 2026 (guidance). FDA Orphan + Breakthrough designations. Source: company PR 2026-09-17; CT.gov.</td></tr>
+<tr><td><b>2</b></td><td>SGT-610 (patidegib gel)</td><td>High-frequency BCC, non-Gorlin (HF-BCC)</td><td>Proof-of-concept, single-center open-label</td><td>Franchise option — only if Gorlin validates</td><td><span class="ev fact">FACT</span>Enrollment expected early Oct 2026 (~20 subjects &ge;18, facial/head-and-neck HF-BCC, BID up to 12 months); readout ~late 2027; pivotal registration study anticipated late 2027 / H1 2028. Source: Q2 2026 6-K PR. <span class="ev interp">INTERPRETATION</span>The much larger sporadic population — the real commercial leg on a Gorlin win.</td></tr>
+<tr><td><b>3</b></td><td>TWYNEO / EPSOLAY royalties (Galderma; US rights sold to Mayne)</td><td>Acne / rosacea</td><td>Marketed</td><td>Downside cushion only (~$2&ndash;3M/yr run-rate)</td><td><span class="ev fact">FACT</span>$16.7M one-time IP gain (2025); ~$0.6M/quarter royalties (Q2 2026); new-territory launches expected 2026&ndash;2027. Source: Q2 2026 6-K PR.</td></tr>
+<tr><td><b>4</b></td><td>SGT-610 (patidegib gel)</td><td>Neo-adjuvant BCC (ahead of Mohs surgery)</td><td>Early study</td><td>Supporting data only — no standalone value</td><td><span class="ev fact">FACT</span>Small study expected to begin Oct 2026. Not a readout de-risker for Gorlin. Source: September 16 build (company-guided).</td></tr>
+<tr><td><b>5</b></td><td>OKC program (intra-cystic injectable HHI)</td><td>Odontogenic keratocysts in Gorlin syndrome</td><td>Provisional patent filed</td><td>~Zero — pre-research</td><td><span class="ev fact">FACT</span>Company "evaluating the economic feasibility"; Gorlin Syndrome Alliance leadership "enthusiastically received" the concept. Source: Q2 2026 6-K PR. <span class="ev interp">INTERPRETATION</span>Pre-research; no value assigned in a disciplined model.</td></tr>
+<tr><td><b>6</b></td><td>SGT-210 (topical erlotinib)</td><td>Darier disease / rare keratodermas</td><td><span class="ev unverified">STATUS DISPUTED</span></td><td>~Zero until confirmed</td><td>Sep 16 build: discontinued Dec 2025 (did not differentiate from vehicle). Oct 7: no 2026 company disclosure confirming. <b>New (Oct 10):</b> third-party profiles still list SGT-210 as an active investigational candidate — TipRanks company boilerplate ("advancing SGT-210"), Morningstar pipeline page, MarketBeat FDA-events page (past-two-year regulatory activity incl. SGT-210). <span class="ev interp">INTERPRETATION</span>Third-party weight now leans toward still-active, but a 2026 <i>company</i> statement is still missing — treated as unresolved (see §14).</td></tr>
+<tr><td><b>7</b></td><td>SGT-310 / SGT-510</td><td>Psoriasis</td><td>Suspended 2023; seeking out-license</td><td>Zero</td><td><span class="ev fact">FACT</span>Suspended because "the market has turned more crowded and competitive." Source: acquisition PR (BioSpace, 2023-01-27).</td></tr>
 </table></div>
 <div class="stats3">
 <div class="s"><b>n=17</b><span>Phase 2 (26 weeks) — wins were post-hoc / treatment, not prevention</span></div>
@@ -262,40 +448,40 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <div class="s"><b>n=113</b><span>Current Phase 3 (SGT-610-01) — completed; topline late Nov 2026</span></div>
 </div>
 </section>
-<section class="card" id="trial">
-<h2>4 · Trial design deep dive — SGT-610-01 and the prior Phase 3 forensic</h2>
+<section id="trial">
+<div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>SGT-610-01 and the prior Phase 3 forensic</h2></div></div>
 <h3>SGT-610-01 (current; NCT06050122)</h3>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>Design:</b> multicenter, randomized, double-blind, quadruple-masked (participant, care provider, investigator, outcomes assessor), vehicle-controlled, parallel assignment; sponsor Sol-Gel Technologies. Intervention: patidegib gel 2% (w/w) BID to the face × 12 months vs vehicle. <b>Status: COMPLETED</b> (primary completion actual 2026-08-20; study completion 2026-09-14; ran 2024-03-17 → 2026-09-14). Source: CT.gov API record, retrieved Oct 7, 2026. <span class="tag I">INTERPRETATION</span>The Sep 16 build described the trial as "active, not recruiting"; the Oct 7 CT.gov retrieval confirms completion — newer data used.</li>
-<li><span class="tag F">FACT</span><b>Enrollment:</b> 113 actual (company reported; planned ~140 per company). 102 completed 12 months; 10 discontinued (~9%). All parties remain blinded through database lock. 6 on-site + 8 remote visits (14 total). Source: company PRs 2026-08-20 / 2026-09-17.</li>
-<li><span class="tag F">FACT</span><b>Primary endpoint:</b> number of <b>new BCCs on the face at Month 12</b>, patidegib vs vehicle, as assessed by the CPRB (central photography review). Secondary (per company PR): number of new <i>surgically eligible</i> BCCs (SEBCCs). CT.gov's retrieved record lists primary outcomes only. Sources: CT.gov; company PR 2026-09-17.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Merge note — endpoint correction:</b> the Sep 16 build described the primary as "new facial nSEBs (surgically eligible BCCs)." The current CT.gov record (retrieved Oct 7, 2026) clarifies the primary counts <i>all</i> new facial BCCs; SEBCCs are a secondary. The newer registry record is used here, and the Sep 16 readout-scorecard language below is adjusted accordingly.</li>
-<li><span class="tag F">FACT</span><b>Key enrichment criteria (the redesign):</b> (1) confirmed <i>PTCH1</i> mutation required; (2) ≥10 BCCs on the face at randomization. Mandatory dermoscopy; stratified by sex, age, and baseline facial burden. Contrast with Pelle-926-301 below. Source: CT.gov eligibility (retrieved Oct 7, 2026).</li>
-<li><span class="tag G">GAP</span>Statistical analysis plan details — count model (e.g., negative-binomial vs ANCOVA), handling of missing data for the 11 non-completers, multiplicity on secondaries, assumed effect size and powering — are not in the public CT.gov record or company PRs reviewed.</li>
-<li><span class="tag I">INTERPRETATION</span>With n=113 and a count endpoint, power is sensitive to the vehicle-arm event rate; the enrichment (≥10 facial BCCs at baseline) is designed to raise that rate. The small n keeps the trial fragile to placebo-rate variability.</li>
+<li><span class="ev fact">FACT</span><b>Design:</b> multicenter, randomized, double-blind, quadruple-masked (participant, care provider, investigator, outcomes assessor), vehicle-controlled, parallel assignment; sponsor Sol-Gel Technologies. Intervention: patidegib gel 2% (w/w) BID to the face × 12 months vs vehicle. <b>Status: COMPLETED</b> (primary completion actual 2026-08-20; study completion 2026-09-14; ran 2024-03-17 → 2026-09-14). Source: CT.gov API record, retrieved Oct 7, 2026. <span class="ev interp">INTERPRETATION</span>The Sep 16 build described the trial as "active, not recruiting"; the Oct 7 CT.gov retrieval confirms completion — newer data used.</li>
+<li><span class="ev fact">FACT</span><b>Enrollment:</b> 113 actual (company reported; planned ~140 per company). 102 completed 12 months; 10 discontinued (~9%). All parties remain blinded through database lock. 6 on-site + 8 remote visits (14 total). Source: company PRs 2026-08-20 / 2026-09-17.</li>
+<li><span class="ev fact">FACT</span><b>Primary endpoint:</b> number of <b>new BCCs on the face at Month 12</b>, patidegib vs vehicle, as assessed by the CPRB (central photography review). Secondary (per company PR): number of new <i>surgically eligible</i> BCCs (SEBCCs). CT.gov's retrieved record lists primary outcomes only. Sources: CT.gov; company PR 2026-09-17.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Merge note — endpoint correction:</b> the Sep 16 build described the primary as "new facial nSEBs (surgically eligible BCCs)." The current CT.gov record (retrieved Oct 7, 2026) clarifies the primary counts <i>all</i> new facial BCCs; SEBCCs are a secondary. The newer registry record is used here, and the Sep 16 readout-scorecard language below is adjusted accordingly.</li>
+<li><span class="ev fact">FACT</span><b>Key enrichment criteria (the redesign):</b> (1) confirmed <i>PTCH1</i> mutation required; (2) ≥10 BCCs on the face at randomization. Mandatory dermoscopy; stratified by sex, age, and baseline facial burden. Contrast with Pelle-926-301 below. Source: CT.gov eligibility (retrieved Oct 7, 2026).</li>
+<li><span class="ev gap">GAP</span>Statistical analysis plan details — count model (e.g., negative-binomial vs ANCOVA), handling of missing data for the 11 non-completers, multiplicity on secondaries, assumed effect size and powering — are not in the public CT.gov record or company PRs reviewed.</li>
+<li><span class="ev interp">INTERPRETATION</span>With n=113 and a count endpoint, power is sensitive to the vehicle-arm event rate; the enrichment (≥10 facial BCCs at baseline) is designed to raise that rate. The small n keeps the trial fragile to placebo-rate variability.</li>
 </ul>
 <h3>Forensic: the prior Phase 3 (Pelle-926-301 / NCT03703310)</h3>
 <div class="tblwrap"><table>
 <tr><th>Feature</th><th>Pelle-926-301 (PellePharm; completed Dec 2020)</th><th>SGT-610-01 (Sol-Gel; completed Sep 2026)</th></tr>
-<tr><td>Sponsor / era</td><td><span class="tag F">FACT</span>PellePharm, Inc.; global (US, UK, EU — ~50 sites); start Feb 2019, est. completion Dec 2020. Source: CT.gov record mirror.</td><td><span class="tag F">FACT</span>Sol-Gel Technologies; ~40 centers in North America/UK/Europe planned; started Mar 2024. Source: CT.gov; BioSpace 2023-11.</td></tr>
-<tr><td>Size</td><td><span class="tag F">FACT</span><b>174 enrolled</b> (vs ~150 planned). Source: CT.gov mirror.</td><td><span class="tag F">FACT</span><b>113 enrolled, 102 completers</b>. Source: company PR 2026-09-17.</td></tr>
-<tr><td>Primary endpoint</td><td><span class="tag F">FACT</span>Number of <b>new surgically eligible BCCs (SEBs) per participant</b>, baseline → Month 12. Secondaries included <i>total</i> new BCCs at months 6/9/12, % with ≥2 / ≥1 facial new BCCs, aBCCdex symptom score. Source: CT.gov mirror.</td><td><span class="tag F">FACT</span>Number of <b>new BCCs on the face at Month 12</b> (all BCCs, not just SEBs). SEBCC count demoted to secondary. Sources: CT.gov; company PR 2026-09-17.</td></tr>
-<tr><td>Population</td><td><span class="tag F">FACT</span>Symptomatic Gorlin per clinical criteria (Kimonis); <b>no PTCH1-mutation requirement</b>; required 10 BCCs (≥3 facial) in prior 24 months + ≥2 facial BCCs &lt;5mm at baseline. Source: CT.gov mirror eligibility.</td><td><span class="tag F">FACT</span><b>Confirmed PTCH1 mutation</b> + <b>≥10 facial BCCs at baseline</b>. Source: CT.gov eligibility.</td></tr>
-<tr><td>Posted outcome</td><td><span class="tag F">FACT</span>Per the posted results on the NCT03703310 registry record: mean new BCCs at Month 12 were <b>2.84 (patidegib, SD 3.39) vs 4.03 (vehicle, SD 4.76)</b> — a calculated ~29.5% relative reduction. <b>No p-values or confidence intervals were posted</b>; SDs were larger than means. Leo Pharma declined its option to acquire PellePharm after "not sufficiently convincing" data (MedWatch, Sep 2021). <span class="tag I">INTERPRETATION</span>The Oct 7 build characterized the prior topline as "never publicly disclosed" — overstated: the registry carries arm-level mean counts. What was never disclosed is any inferential statistic or peer-reviewed publication. The granular Sep 16 figures are used here.</td><td><span class="tag G">GAP</span>Topline expected late Nov 2026; blinded as of Oct 7, 2026.</td></tr>
+<tr><td>Sponsor / era</td><td><span class="ev fact">FACT</span>PellePharm, Inc.; global (US, UK, EU — ~50 sites); start Feb 2019, est. completion Dec 2020. Source: CT.gov record mirror.</td><td><span class="ev fact">FACT</span>Sol-Gel Technologies; ~40 centers in North America/UK/Europe planned; started Mar 2024. Source: CT.gov; BioSpace 2023-11.</td></tr>
+<tr><td>Size</td><td><span class="ev fact">FACT</span><b>174 enrolled</b> (vs ~150 planned). Source: CT.gov mirror.</td><td><span class="ev fact">FACT</span><b>113 enrolled, 102 completers</b>. Source: company PR 2026-09-17.</td></tr>
+<tr><td>Primary endpoint</td><td><span class="ev fact">FACT</span>Number of <b>new surgically eligible BCCs (SEBs) per participant</b>, baseline → Month 12. Secondaries included <i>total</i> new BCCs at months 6/9/12, % with ≥2 / ≥1 facial new BCCs, aBCCdex symptom score. Source: CT.gov mirror.</td><td><span class="ev fact">FACT</span>Number of <b>new BCCs on the face at Month 12</b> (all BCCs, not just SEBs). SEBCC count demoted to secondary. Sources: CT.gov; company PR 2026-09-17.</td></tr>
+<tr><td>Population</td><td><span class="ev fact">FACT</span>Symptomatic Gorlin per clinical criteria (Kimonis); <b>no PTCH1-mutation requirement</b>; required 10 BCCs (≥3 facial) in prior 24 months + ≥2 facial BCCs &lt;5mm at baseline. Source: CT.gov mirror eligibility.</td><td><span class="ev fact">FACT</span><b>Confirmed PTCH1 mutation</b> + <b>≥10 facial BCCs at baseline</b>. Source: CT.gov eligibility.</td></tr>
+<tr><td>Posted outcome</td><td><span class="ev fact">FACT</span>Per the posted results on the NCT03703310 registry record: mean new BCCs at Month 12 were <b>2.84 (patidegib, SD 3.39) vs 4.03 (vehicle, SD 4.76)</b> — a calculated ~29.5% relative reduction. <b>No p-values or confidence intervals were posted</b>; SDs were larger than means. Leo Pharma declined its option to acquire PellePharm after "not sufficiently convincing" data (MedWatch, Sep 2021). <span class="ev interp">INTERPRETATION</span>The Oct 7 build characterized the prior topline as "never publicly disclosed" — overstated: the registry carries arm-level mean counts. What was never disclosed is any inferential statistic or peer-reviewed publication. The granular Sep 16 figures are used here.</td><td><span class="ev gap">GAP</span>Topline expected late Nov 2026; blinded as of Oct 7, 2026.</td></tr>
 </table></div>
 <h3>What the redesign tells us about why the first trial failed</h3>
 <ul class="tight">
-<li><span class="tag I">INTERPRETATION</span><b>The endpoint swap is the tell.</b> The prior trial's primary was new <i>surgically eligible</i> BCCs — a harder, rarer event (Phase 2 prevention signal: the vehicle arm generated only ~1.4 new SEBs in 6 months, i.e., ~3/year). Counting <i>all</i> new facial BCCs multiplies the event rate, improving statistical power per patient. The sponsor's implicit admission: the first trial was underpowered on its chosen endpoint.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Enrichment addresses two dilution risks at once.</b> Requiring confirmed PTCH1 mutation removes phenocopies/somatic-dominant patients whose BCCs are not hedgehog-driven and would dilute a treatment signal; requiring ≥10 facial BCCs at baseline selects high event-rate patients (more statistical information per subject) — at the cost of generalizability to milder Gorlin, which is the bulk of the population behind the company's ">$300M/yr" framing.</li>
-<li><span class="tag F">FACT</span>Company's stated modifications (acquisition PR, Jan 2023): "selecting patients positive for the PTCH1 mutation (in contrast to the previous study which included symptomatic patients without testing them for the mutation), as well as a requirement for a higher minimum number of BCCs at baseline." Source: BioSpace/globenewswire.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Caveat:</b> redesigning after seeing failed-trial data is legitimate but raises the post-hoc-optimization concern: the new design is tuned to the <i>old</i> trial's failure mode. If the old failure was endpoint noise rather than biology, the fix works; if patidegib simply doesn't prevent <i>de novo</i> BCCs robustly, a richer endpoint just measures the null more precisely. The 113-patient size (below the ~140 planned) also trims power margin.</li>
-<li><span class="tag I">INTERPRETATION</span><b>What success needs:</b> a statistically significant reduction in 12-month new-facial-BCC count with an acceptable local-safety profile and no systemic hedgehog signals. Because SEBs are now a secondary, a "win on primary, miss on SEBs" creates a regulatory gray zone (label relevance vs clinical meaningfulness) — and a "miss on primary, win on SEBs" is a failed trial by the pre-specified hierarchy.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>The endpoint swap is the tell.</b> The prior trial's primary was new <i>surgically eligible</i> BCCs — a harder, rarer event (Phase 2 prevention signal: the vehicle arm generated only ~1.4 new SEBs in 6 months, i.e., ~3/year). Counting <i>all</i> new facial BCCs multiplies the event rate, improving statistical power per patient. The sponsor's implicit admission: the first trial was underpowered on its chosen endpoint.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Enrichment addresses two dilution risks at once.</b> Requiring confirmed PTCH1 mutation removes phenocopies/somatic-dominant patients whose BCCs are not hedgehog-driven and would dilute a treatment signal; requiring ≥10 facial BCCs at baseline selects high event-rate patients (more statistical information per subject) — at the cost of generalizability to milder Gorlin, which is the bulk of the population behind the company's ">$300M/yr" framing.</li>
+<li><span class="ev fact">FACT</span>Company's stated modifications (acquisition PR, Jan 2023): "selecting patients positive for the PTCH1 mutation (in contrast to the previous study which included symptomatic patients without testing them for the mutation), as well as a requirement for a higher minimum number of BCCs at baseline." Source: BioSpace/globenewswire.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Caveat:</b> redesigning after seeing failed-trial data is legitimate but raises the post-hoc-optimization concern: the new design is tuned to the <i>old</i> trial's failure mode. If the old failure was endpoint noise rather than biology, the fix works; if patidegib simply doesn't prevent <i>de novo</i> BCCs robustly, a richer endpoint just measures the null more precisely. The 113-patient size (below the ~140 planned) also trims power margin.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>What success needs:</b> a statistically significant reduction in 12-month new-facial-BCC count with an acceptable local-safety profile and no systemic hedgehog signals. Because SEBs are now a secondary, a "win on primary, miss on SEBs" creates a regulatory gray zone (label relevance vs clinical meaningfulness) — and a "miss on primary, win on SEBs" is a failed trial by the pre-specified hierarchy.</li>
 </ul>
 <div class="warn"><b>Critical unresolved item:</b> without the statistical analysis plan, this dossier cannot independently assess power. The trial's outcome depends not only on n, but on the vehicle-arm event rate, count dispersion, missing-data handling, and the estimand.</div>
 </section>
-<section class="card" id="scorecard">
-<h2>5 · Readout scorecard — read the release in this order</h2>
-<div class="note"><span class="tag I">INTERPRETATION</span>A p-value alone will not settle this. The quality of the win depends on magnitude, analysis population, event rate, robustness, and tolerability. Carried forward from the September 16 build, adjusted for the corrected primary endpoint (all new facial BCCs; SEBCCs secondary).</div>
+<section id="scorecard">
+<div class="section-head"><div class="section-num">05 / CLINICAL</div><div><h2>What a convincing win looks like</h2></div></div>
+<div class="note"><span class="ev interp">INTERPRETATION</span>A p-value alone will not settle this. The quality of the win depends on magnitude, analysis population, event rate, robustness, and tolerability. Carried forward from the September 16 build, adjusted for the corrected primary endpoint (all new facial BCCs; SEBCCs secondary).</div>
 <div class="score3">
 <div class="col good"><h4>Convincing positive</h4><ul>
 <li>Pre-specified ITT primary reaches statistical significance.</li>
@@ -336,32 +522,32 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <li><b>What did FDA already agree?</b> Single-trial sufficiency after the prior failure remains unverified.</li>
 </ol>
 </section>
-<section class="card" id="reg">
-<h2>6 · Clinical / regulatory status &amp; outlook</h2>
+<section id="reg">
+<div class="section-head"><div class="section-num">06 / REGULATORY</div><div><h2>Breakthrough designation is access, not evidence</h2></div></div>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>Designations:</b> SGT-610 holds FDA <b>Orphan Drug</b> and <b>Breakthrough Therapy</b> designations for Gorlin syndrome (plus EMA orphan per PellePharm 2020 PR). These expedite interaction and (orphan) 7-year exclusivity if approved; they are not evidence of efficacy. Sources: company PRs; BioSpace.</li>
-<li><span class="tag F">FACT</span><b>Trial status:</b> LPLV achieved Sept 17, 2026 → database lock → statistical analysis → topline late Nov 2026. Company, investigators, and patients remain blinded. Source: company PR 2026-09-17.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Regulatory path on a win:</b> single pivotal Phase 3 + breakthrough designation → pre-NDA meeting, likely NDA filing in 2027. Key regulatory risk: FDA may view a single n=113 trial with a central-photography endpoint as thin — photography-based BCC counting has inter-reader variability, and lesion adjudication rules were not publicly detailed. A second confirmatory study is a plausible FDA ask on a borderline result.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Regulatory path on a miss:</b> program effectively over for Gorlin. The molecule would have failed two Phase 3s; the HF-BCC PoC (~20 pts, data ~2027) and OKC injectable are pre-commercial and would not justify the current enterprise value alone.</li>
-<li><span class="tag G">GAP</span>No FDA SPA (Special Protocol Assessment) for SGT-610-01 has been disclosed in sources reviewed; whether FDA agreed the endpoint/design supports approval is unknown.</li>
-<li><span class="tag F">FACT</span><b>Commercial posture:</b> the company states it will retain full U.S. rights and commercialize via a third-party commercialization-services organization (small focused field force to dermatologists/Mohs surgeons/genetics centers) — "cost-effective," no internal sales build. Market-access/distribution/patient-support planning is proceeding in parallel with Phase 3. Source: Q2 2026 6-K PR.</li>
-<li><span class="tag I">INTERPRETATION</span>Commercial discussion is intentionally lean per standing practice: the binary, not the launch, is what is being underwritten.</li>
+<li><span class="ev fact">FACT</span><b>Designations:</b> SGT-610 holds FDA <b>Orphan Drug</b> and <b>Breakthrough Therapy</b> designations for Gorlin syndrome (plus EMA orphan per PellePharm 2020 PR). These expedite interaction and (orphan) 7-year exclusivity if approved; they are not evidence of efficacy. Sources: company PRs; BioSpace.</li>
+<li><span class="ev fact">FACT</span><b>Trial status:</b> LPLV achieved Sept 17, 2026 → database lock → statistical analysis → topline late Nov 2026. Company, investigators, and patients remain blinded. Source: company PR 2026-09-17.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Regulatory path on a win:</b> single pivotal Phase 3 + breakthrough designation → pre-NDA meeting, likely NDA filing in 2027. Key regulatory risk: FDA may view a single n=113 trial with a central-photography endpoint as thin — photography-based BCC counting has inter-reader variability, and lesion adjudication rules were not publicly detailed. A second confirmatory study is a plausible FDA ask on a borderline result.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Regulatory path on a miss:</b> program effectively over for Gorlin. The molecule would have failed two Phase 3s; the HF-BCC PoC (~20 pts, data ~2027) and OKC injectable are pre-commercial and would not justify the current enterprise value alone.</li>
+<li><span class="ev gap">GAP</span>No FDA SPA (Special Protocol Assessment) for SGT-610-01 has been disclosed in sources reviewed; whether FDA agreed the endpoint/design supports approval is unknown.</li>
+<li><span class="ev fact">FACT</span><b>Commercial posture:</b> the company states it will retain full U.S. rights and commercialize via a third-party commercialization-services organization (small focused field force to dermatologists/Mohs surgeons/genetics centers) — "cost-effective," no internal sales build. Market-access/distribution/patient-support planning is proceeding in parallel with Phase 3. Source: Q2 2026 6-K PR.</li>
+<li><span class="ev interp">INTERPRETATION</span>Commercial discussion is intentionally lean per standing practice: the binary, not the launch, is what is being underwritten.</li>
 </ul>
-<div class="warn"><b>Embryofetal risk class overhang.</b> <span class="tag F">FACT</span>Systemic hedgehog inhibitors carry embryofetal toxicity (vismodegib has a boxed warning); SGT-610-01 required stringent contraception (CT.gov criteria reference pregnancy prevention). <span class="tag I">INTERPRETATION</span>Any detectable systemic absorption in the safety database invites restrictive labeling — and the trial's contraception burden also limits the real-world chronic-use population (young women with Gorlin).</div>
+<div class="warn"><b>Embryofetal risk class overhang.</b> <span class="ev fact">FACT</span>Systemic hedgehog inhibitors carry embryofetal toxicity (vismodegib has a boxed warning); SGT-610-01 required stringent contraception (CT.gov criteria reference pregnancy prevention). <span class="ev interp">INTERPRETATION</span>Any detectable systemic absorption in the safety database invites restrictive labeling — and the trial's contraception burden also limits the real-world chronic-use population (young women with Gorlin).</div>
 </section>
-<section class="card" id="comp">
-<h2>7 · Competition — clinical differentiation only</h2>
+<section id="comp">
+<div class="section-head"><div class="section-num">07 / LANDSCAPE</div><div><h2>No approved drug prevents BCCs in Gorlin</h2></div></div>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>Standard of care today:</b> surveillance + surgical excision (incl. Mohs). Severe Gorlin patients may undergo dozens of surgeries per year, with scarring/disfigurement. No FDA-approved topical or systemic drug is labeled for <i>prevention</i> of BCCs in Gorlin syndrome. Sources: company PRs; Tang/NEJM 2012.</li>
-<li><span class="tag F">FACT</span><b>Systemic hedgehog inhibitors</b> — vismodegib (Erivedge, Genentech/Roche) and sonidegib (Odomzo, Sun Pharma): approved for locally advanced/metastatic BCC (not Gorlin prevention). In BCNS (Tang, NEJM 2012, n=42), vismodegib reduced new SEBs (2 vs 29/year vs placebo, p&lt;.001) and shrank existing lesions — but 54% discontinued for class AEs and tumors re-grew off drug. Sonidegib's BOLT trial was in advanced BCC with a similar class-AE profile.</li>
-<li><span class="tag I">INTERPRETATION</span>Clinical differentiation for SGT-610 is <b>route-and-tolerability, not mechanism novelty</b>: same SMO target, topical delivery avoiding systemic class toxicities. If systemic exposure with topical turns out non-trivial, the differentiation collapses. <b>No active Gorlin drug rival was identified</b> — near-term clinical competition is effectively empty.</li>
-<li><span class="tag F">FACT</span><b>Topical field therapies</b> (imiquimod, 5-fluorouracil): used off-label/for superficial BCC treatment, not Gorlin prevention; local inflammatory AEs; no prevention claim.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Commercial limitations even on a win:</b> the trial does not address whole-body BCC burden (face-only application), durability after stopping, or every surgically relevant manifestation of Gorlin syndrome.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Moat on a win:</b> first topical prevention therapy for Gorlin + orphan exclusivity (7 yrs US) + breakthrough momentum + enriched PTCH1 label. Weaknesses: label would be narrow (adults, PTCH1+, facial application); ultra-rare population (~10k US per company); no IP moat detailed in sources reviewed. <span class="tag G">GAP</span>Patent estate not verified.</li>
+<li><span class="ev fact">FACT</span><b>Standard of care today:</b> surveillance + surgical excision (incl. Mohs). Severe Gorlin patients may undergo dozens of surgeries per year, with scarring/disfigurement. No FDA-approved topical or systemic drug is labeled for <i>prevention</i> of BCCs in Gorlin syndrome. Sources: company PRs; Tang/NEJM 2012.</li>
+<li><span class="ev fact">FACT</span><b>Systemic hedgehog inhibitors</b> — vismodegib (Erivedge, Genentech/Roche) and sonidegib (Odomzo, Sun Pharma): approved for locally advanced/metastatic BCC (not Gorlin prevention). In BCNS (Tang, NEJM 2012, n=42), vismodegib reduced new SEBs (2 vs 29/year vs placebo, p&lt;.001) and shrank existing lesions — but 54% discontinued for class AEs and tumors re-grew off drug. Sonidegib's BOLT trial was in advanced BCC with a similar class-AE profile.</li>
+<li><span class="ev interp">INTERPRETATION</span>Clinical differentiation for SGT-610 is <b>route-and-tolerability, not mechanism novelty</b>: same SMO target, topical delivery avoiding systemic class toxicities. If systemic exposure with topical turns out non-trivial, the differentiation collapses. <b>No active Gorlin drug rival was identified</b> — near-term clinical competition is effectively empty.</li>
+<li><span class="ev fact">FACT</span><b>Topical field therapies</b> (imiquimod, 5-fluorouracil): used off-label/for superficial BCC treatment, not Gorlin prevention; local inflammatory AEs; no prevention claim.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Commercial limitations even on a win:</b> the trial does not address whole-body BCC burden (face-only application), durability after stopping, or every surgically relevant manifestation of Gorlin syndrome.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Moat on a win:</b> first topical prevention therapy for Gorlin + orphan exclusivity (7 yrs US) + breakthrough momentum + enriched PTCH1 label. Weaknesses: label would be narrow (adults, PTCH1+, facial application); ultra-rare population (~10k US per company); no IP moat detailed in sources reviewed. <span class="ev gap">GAP</span>Patent estate not verified.</li>
 </ul>
 </section>
-<section class="card" id="fin">
-<h2>8 · Financials</h2>
+<section id="fin">
+<div class="section-head"><div class="section-num">08 / FINANCIALS</div><div><h2>Lean spend, cash to the readout</h2></div></div>
 <div class="note">Sol-Gel is a foreign private issuer; fiscal year ends Dec 31. All figures USD thousands unless noted. Sources: 20-F FY2025 (filed 2026-03-19); Q2 2026 6-K (filed 2026-08-20). Cash figures as of June 30, 2026 are ~3 months stale as of this dossier.</div>
 <div class="tblwrap"><table>
 <tr><th>Item (period)</th><th>Value</th><th>Source</th></tr>
@@ -379,97 +565,97 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 </table></div>
 <h3>Dilution history &amp; capital structure</h3>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>1-for-10 reverse share split</b> (retroactively applied in all 20-F share figures). 2,786,158 shares outstanding at Dec 31, 2025 → <b>3,273,999 at Jun 30, 2026</b> (+487,841, +17.5% in one half). <span class="tag I">INTERPRETATION</span>The Sep 16 build's 3.245M figure was the post-offering count from the March 424B5 era; the 3,273,999 figure (Jun 30 6-K) is the latest disclosed and is used throughout.</li>
-<li><span class="tag F">FACT</span><b>H1 2026 financing:</b> public offering gross $33.1M (costs $2.2M) + $1.5M option exercises = $32.3M net financing cash flow. This is what lifted cash from $24.0M → $49.3M. Source: Q2 2026 6-K cash-flow statement.</li>
-<li><span class="tag I">INTERPRETATION</span>The Arkin-controlled company funded the runway past the readout via a pre-data raise — standard, and it removes financing-overhang risk into the binary, at the cost of ~17.5% dilution.</li>
-<li><span class="tag F">FACT</span><b>Warrants (Jan 2023):</b> 256,000 to Armistice Capital + 200,000 to M. Arkin Dermatology Ltd., each at <b>$58.50/share</b> (per POS AM, Aug 2026, cap table as of Dec 31, 2025). <span class="tag G">GAP</span>Exercise status at Jun 30, 2026 not confirmed in reviewed sources; the 487,841-share H1 increase may include warrant/option exercises beyond the public offering — exact decomposition not disclosed.</li>
-<li><span class="tag F">FACT</span><b>Options:</b> 19,858 outstanding at Dec 31, 2025, weighted-average exercise $76.98 (POS AM); 117,331 shares reserved for future issuance under the 2024 Plan. <span class="tag G">GAP</span>Post-H1-exercise option count unknown ($1.5M of exercises occurred in H1).</li>
+<li><span class="ev fact">FACT</span><b>1-for-10 reverse share split</b> (retroactively applied in all 20-F share figures). 2,786,158 shares outstanding at Dec 31, 2025 → <b>3,273,999 at Jun 30, 2026</b> (+487,841, +17.5% in one half). <span class="ev interp">INTERPRETATION</span>The Sep 16 build's 3.245M figure was the post-offering count from the March 424B5 era; the 3,273,999 figure (Jun 30 6-K) is the latest disclosed and is used throughout.</li>
+<li><span class="ev fact">FACT</span><b>H1 2026 financing:</b> public offering gross $33.1M (costs $2.2M) + $1.5M option exercises = $32.3M net financing cash flow. This is what lifted cash from $24.0M → $49.3M. Source: Q2 2026 6-K cash-flow statement.</li>
+<li><span class="ev interp">INTERPRETATION</span>The Arkin-controlled company funded the runway past the readout via a pre-data raise — standard, and it removes financing-overhang risk into the binary, at the cost of ~17.5% dilution.</li>
+<li><span class="ev fact">FACT</span><b>Warrants (Jan 2023):</b> 256,000 to Armistice Capital + 200,000 to M. Arkin Dermatology Ltd., each at <b>$58.50/share</b> (per POS AM, Aug 2026, cap table as of Dec 31, 2025). <span class="ev gap">GAP</span>Exercise status at Jun 30, 2026 not confirmed in reviewed sources; the 487,841-share H1 increase may include warrant/option exercises beyond the public offering — exact decomposition not disclosed.</li>
+<li><span class="ev fact">FACT</span><b>Options:</b> 19,858 outstanding at Dec 31, 2025, weighted-average exercise $76.98 (POS AM); 117,331 shares reserved for future issuance under the 2024 Plan. <span class="ev gap">GAP</span>Post-H1-exercise option count unknown ($1.5M of exercises occurred in H1).</li>
 </ul>
 </section>
-<section class="card" id="val">
-<h2>9 · FDMC / EV (dilution-honest)</h2>
+<section id="val">
+<div class="section-head"><div class="section-num">09 / VALUATION</div><div><h2>Dilution-honest: 3.27M shares</h2></div></div>
 <div class="note">As-of: share price <b>$71.77</b> (Oct 9, 2026 close — Friday; Finnhub, MarketBeat, Webull all agree). Share count 3,273,999 (Jun 30, 2026 6-K — latest disclosed). Cash $49.3M (Jun 30, 2026 — ~3.5 months stale; est. ~$44&ndash;46M Oct 2026 at ~$1.4M/mo H1 burn). Debt ≈ nil (lease/retirement liabilities only).</div>
 <div class="tblwrap"><table>
 <tr><th>Component</th><th>Shares / value</th><th>Note</th></tr>
-<tr><td>Basic shares outstanding</td><td>3,273,999</td><td><span class="tag F">FACT</span>Jun 30, 2026 6-K</td></tr>
+<tr><td>Basic shares outstanding</td><td>3,273,999</td><td><span class="ev fact">FACT</span>Jun 30, 2026 6-K</td></tr>
 <tr><td>Basic market cap @ $71.77</td><td>&asymp; $235.0M</td><td>Finnhub / Webull consistent (234.6&ndash;235.0M)</td></tr>
-<tr><td>+ options (known, Dec 31, 2025)</td><td>+19,858 @ avg $76.98</td><td><span class="tag G">GAP</span>H1 exercises ($1.5M) reduced this; exact remainder unknown</td></tr>
-<tr><td>+ warrants Armistice / Arkin Dermatology</td><td>+256,000 / +200,000 @ $58.50</td><td><span class="tag G">GAP</span>exercise status at Jun 30, 2026 unknown; may already be partly in the 3.27M</td></tr>
+<tr><td>+ options (known, Dec 31, 2025)</td><td>+19,858 @ avg $76.98</td><td><span class="ev gap">GAP</span>H1 exercises ($1.5M) reduced this; exact remainder unknown</td></tr>
+<tr><td>+ warrants Armistice / Arkin Dermatology</td><td>+256,000 / +200,000 @ $58.50</td><td><span class="ev gap">GAP</span>exercise status at Jun 30, 2026 unknown; may already be partly in the 3.27M</td></tr>
 <tr><td>Fully-diluted shares (honest upper bound)</td><td>&asymp; 3.75M (excl. 117k 2024-Plan reserve)</td><td>warrants ITM at $71.77 (~$13.27/share intrinsic); options near-the-money</td></tr>
 <tr><td>Fully-diluted market cap @ $71.77</td><td>&asymp; $269M</td><td></td></tr>
 <tr><td>&minus; cash &amp; securities</td><td>&minus; $49.3M</td><td>Jun 30, 2026; current figure est. lower (~$44&ndash;46M)</td></tr>
 <tr><td><b>Enterprise value (FD)</b></td><td><b>&asymp; $220M</b> (&asymp;$228M all-in incl. reserve)</td><td>vs ~$49M cash &rarr; ~$170M of binary option value priced into the readout</td></tr>
 </table></div>
-<div class="note"><span class="tag I">INTERPRETATION</span>The Sep 16 build's ~3.84M fully-diluted figure (incl. ~137K options/reserved) reconciles with this ~3.75M (+117k reserve) within rounding. <b>On failure,</b> the stub is roughly declining cash (~$44&ndash;46M est. Oct 2026) + Galderma royalties (~$2&ndash;3M/yr) + pipeline optionality — most of the ~$220M FD EV evaporates. <b>On success,</b> the street's published targets frame the ceiling: Mizuho $285 (Outperform, Jun 24, 2026), HC Wainwright $110 (Buy, Jul 20, 2026), consensus average $197.50 (MarketBeat, Oct 2026; Weiss sell noted). TipRanks' KOL-day coverage notes a recent Buy with a $195 PT (analyst unidentified in the snippet — <span class="tag U">UNVERIFIED</span>). Per standing discipline, any takeout/maximum-value framing stays within that range — <b>capped at the $197.50 average</b>, not the $285 high. Sell-side research was not independently verified (paywalled); figures per trade-press summaries.</div>
+<div class="note"><span class="ev interp">INTERPRETATION</span>The Sep 16 build's ~3.84M fully-diluted figure (incl. ~137K options/reserved) reconciles with this ~3.75M (+117k reserve) within rounding. <b>On failure,</b> the stub is roughly declining cash (~$44&ndash;46M est. Oct 2026) + Galderma royalties (~$2&ndash;3M/yr) + pipeline optionality — most of the ~$220M FD EV evaporates. <b>On success,</b> the street's published targets frame the ceiling: Mizuho $285 (Outperform, Jun 24, 2026), HC Wainwright $110 (Buy, Jul 20, 2026), consensus average $197.50 (MarketBeat, Oct 2026; Weiss sell noted). TipRanks' KOL-day coverage notes a recent Buy with a $195 PT (analyst unidentified in the snippet — <span class="ev unverified">UNVERIFIED</span>). Per standing discipline, any takeout/maximum-value framing stays within that range — <b>capped at the $197.50 average</b>, not the $285 high. Sell-side research was not independently verified (paywalled); figures per trade-press summaries.</div>
 </section>
-<section class="card" id="cat">
-<h2>10 · Catalyst &amp; event map</h2>
-<div class="note"><b>Tagging:</b> <span class="pill hard">HARD</span> announced with a fixed date &nbsp; <span class="pill guid">GUIDANCE</span> company-guided window &nbsp; <span class="pill inf">INFERRED</span> estimated, not company-announced.</div>
+<section id="cat">
+<div class="section-head"><div class="section-num">10 / CATALYSTS</div><div><h2>Late-November topline is the binary</h2></div></div>
+<div class="note"><b>Tagging:</b> <span class="date-tag hard">HARD</span> announced with a fixed date &nbsp; <span class="date-tag guidance">GUIDANCE</span> company-guided window &nbsp; <span class="date-tag inferred">INFERRED</span> estimated, not company-announced.</div>
 <div class="tblwrap"><table>
 <tr><th>Date</th><th>Event</th><th>Quality</th><th>What to watch</th></tr>
-<tr><td><b>Wed Oct 14, 2026</b><br>12:00 p.m. ET, New York</td><td><b>KOL Investor Day (SGT-610)</b> — Gorlin Syndrome Alliance (Julie Breneiser, PA-C), Ervin Epstein Jr., MD, Kavita Sarin, MD, PhD (Stanford), Elizabeth Billingsley, MD (Penn State); webcast via IR site. <span class="tag F">FACT</span> Source: company PR Sept 30, 2026.</td><td><span class="pill hard">HARD</span></td><td><b>4 days out.</b> Disease-burden framing vs trial population; management tone on "late November" timing; regulatory/commercial hints; HF-BCC/OKC mentions. <b>No efficacy data</b> — trial remains blinded (per Sept 17 PR).</td></tr>
-<tr><td>Early Oct 2026</td><td><b>HF-BCC proof-of-concept enrollment begins</b> — ~20 non-Gorlin subjects &ge;18 with facial/head-and-neck high-frequency BCC; single-center open-label; patidegib BID up to 12 months; readout ~late 2027. <span class="tag F">FACT</span> Source: Q2 2026 6-K PR (Aug 20, 2026).</td><td><span class="pill guid">GUIDANCE</span></td><td><b>Window now open</b> (as of Oct 10) — watch for a "first patient enrolled" PR. Secondary binary; informs pivotal HF-BCC design.</td></tr>
-<tr><td>Oct 2026</td><td><b>Neo-adjuvant BCC study begins</b> — small pre-Mohs topical patidegib study. <span class="tag F">FACT</span> Source: September 16 build (company-guided).</td><td><span class="pill guid">GUIDANCE</span></td><td>Not a readout de-risker for Gorlin; supporting data only.</td></tr>
-<tr><td><b>Tue Nov 17, 2026</b><br>New York</td><td><b>Annual shareholder meeting</b> — auditor reappointment; director re-elections; Arkin interim-CEO tenure extended 3 years from Jan 1, 2027; name-change authority (Sol-Gel Therapeutics / Dermatology Ltd.); <b>increase registered share capital</b>. Source: TipRanks company-announcement coverage of Oct 6 announcement (<span class="tag U">UNVERIFIED</span> — secondary; proxy not reviewed).</td><td><span class="pill hard">HARD</span></td><td><b>New since Oct 7.</b> The share-capital increase is a dilution-authorization flag — read the proxy for size/terms. Falls ~1 week before the topline window.</td></tr>
-<tr><td>Thu Nov 19, 2026 (est.)<br>before market open</td><td><b>Q3 2026 financial results / 6-K</b> — cash update (~5 months past the $49.3M June figure); R&amp;D spend into database lock; HF-BCC enrollment update.</td><td><span class="pill inf">INFERRED</span></td><td>Date is a MarketBeat estimate from reporting cadence — the company has not announced it. Lands inside the topline window.</td></tr>
-<tr><td><b>Late Nov 2026</b></td><td><b>SGT-610-01 Phase 3 topline — THE binary.</b> Primary: number of new facial BCCs at Month 12 (patidegib 2% BID vs vehicle, n=113). Secondaries: new SEBCCs. Database lock &rarr; analysis &rarr; topline. Blinded as of Oct 7, 2026. <span class="tag F">FACT</span> Source: company PRs Aug 20 / Sept 17, 2026; CT.gov (COMPLETED, primary completion Aug 20, 2026).</td><td><span class="pill guid">GUIDANCE</span></td><td>Read via the §5 scorecard, in order: ITT effect size &rarr; vehicle event rate &rarr; robustness &rarr; safety by arm &rarr; SEB secondary.</td></tr>
-<tr><td>2027 (unscheduled)</td><td><b>Pre-NDA / NDA filing (Gorlin)</b> — only on a positive topline. Breakthrough designation supports priority interaction. <span class="tag G">GAP</span> No filing guidance disclosed; inferred sequencing.</td><td><span class="pill inf">INFERRED</span></td><td>Depends entirely on result quality.</td></tr>
-<tr><td>Late 2027 / H1 2028</td><td><b>Pivotal HF-BCC registration study start</b> — conditional on HF-BCC PoC signal; the sporadic-BCC franchise leg. <span class="tag F">FACT</span> Source: Q2 2026 6-K PR guidance.</td><td><span class="pill guid">GUIDANCE</span></td><td>Second leg of a patidegib franchise on a Gorlin win.</td></tr>
-<tr><td>Q1 2028</td><td><b>Cash runway boundary (company guidance).</b> Post-readout: approval/financing path (win) or distressed restructuring (miss). <span class="tag F">FACT</span> Source: Q2 2026 6-K PR: cash funds requirements "into the first quarter of 2028."</td><td><span class="pill guid">GUIDANCE</span></td><td>Becomes binding if FDA asks for a second study.</td></tr>
+<tr><td><b>Wed Oct 14, 2026</b><br>12:00 p.m. ET, New York</td><td><b>KOL Investor Day (SGT-610)</b> — Gorlin Syndrome Alliance (Julie Breneiser, PA-C), Ervin Epstein Jr., MD, Kavita Sarin, MD, PhD (Stanford), Elizabeth Billingsley, MD (Penn State); webcast via IR site. <span class="ev fact">FACT</span> Source: company PR Sept 30, 2026.</td><td><span class="date-tag hard">HARD</span></td><td><b>4 days out.</b> Disease-burden framing vs trial population; management tone on "late November" timing; regulatory/commercial hints; HF-BCC/OKC mentions. <b>No efficacy data</b> — trial remains blinded (per Sept 17 PR).</td></tr>
+<tr><td>Early Oct 2026</td><td><b>HF-BCC proof-of-concept enrollment begins</b> — ~20 non-Gorlin subjects &ge;18 with facial/head-and-neck high-frequency BCC; single-center open-label; patidegib BID up to 12 months; readout ~late 2027. <span class="ev fact">FACT</span> Source: Q2 2026 6-K PR (Aug 20, 2026).</td><td><span class="date-tag guidance">GUIDANCE</span></td><td><b>Window now open</b> (as of Oct 10) — watch for a "first patient enrolled" PR. Secondary binary; informs pivotal HF-BCC design.</td></tr>
+<tr><td>Oct 2026</td><td><b>Neo-adjuvant BCC study begins</b> — small pre-Mohs topical patidegib study. <span class="ev fact">FACT</span> Source: September 16 build (company-guided).</td><td><span class="date-tag guidance">GUIDANCE</span></td><td>Not a readout de-risker for Gorlin; supporting data only.</td></tr>
+<tr><td><b>Tue Nov 17, 2026</b><br>New York</td><td><b>Annual shareholder meeting</b> — auditor reappointment; director re-elections; Arkin interim-CEO tenure extended 3 years from Jan 1, 2027; name-change authority (Sol-Gel Therapeutics / Dermatology Ltd.); <b>increase registered share capital</b>. Source: TipRanks company-announcement coverage of Oct 6 announcement (<span class="ev unverified">UNVERIFIED</span> — secondary; proxy not reviewed).</td><td><span class="date-tag hard">HARD</span></td><td><b>New since Oct 7.</b> The share-capital increase is a dilution-authorization flag — read the proxy for size/terms. Falls ~1 week before the topline window.</td></tr>
+<tr><td>Thu Nov 19, 2026 (est.)<br>before market open</td><td><b>Q3 2026 financial results / 6-K</b> — cash update (~5 months past the $49.3M June figure); R&amp;D spend into database lock; HF-BCC enrollment update.</td><td><span class="date-tag inferred">INFERRED</span></td><td>Date is a MarketBeat estimate from reporting cadence — the company has not announced it. Lands inside the topline window.</td></tr>
+<tr><td><b>Late Nov 2026</b></td><td><b>SGT-610-01 Phase 3 topline — THE binary.</b> Primary: number of new facial BCCs at Month 12 (patidegib 2% BID vs vehicle, n=113). Secondaries: new SEBCCs. Database lock &rarr; analysis &rarr; topline. Blinded as of Oct 7, 2026. <span class="ev fact">FACT</span> Source: company PRs Aug 20 / Sept 17, 2026; CT.gov (COMPLETED, primary completion Aug 20, 2026).</td><td><span class="date-tag guidance">GUIDANCE</span></td><td>Read via the §5 scorecard, in order: ITT effect size &rarr; vehicle event rate &rarr; robustness &rarr; safety by arm &rarr; SEB secondary.</td></tr>
+<tr><td>2027 (unscheduled)</td><td><b>Pre-NDA / NDA filing (Gorlin)</b> — only on a positive topline. Breakthrough designation supports priority interaction. <span class="ev gap">GAP</span> No filing guidance disclosed; inferred sequencing.</td><td><span class="date-tag inferred">INFERRED</span></td><td>Depends entirely on result quality.</td></tr>
+<tr><td>Late 2027 / H1 2028</td><td><b>Pivotal HF-BCC registration study start</b> — conditional on HF-BCC PoC signal; the sporadic-BCC franchise leg. <span class="ev fact">FACT</span> Source: Q2 2026 6-K PR guidance.</td><td><span class="date-tag guidance">GUIDANCE</span></td><td>Second leg of a patidegib franchise on a Gorlin win.</td></tr>
+<tr><td>Q1 2028</td><td><b>Cash runway boundary (company guidance).</b> Post-readout: approval/financing path (win) or distressed restructuring (miss). <span class="ev fact">FACT</span> Source: Q2 2026 6-K PR: cash funds requirements "into the first quarter of 2028."</td><td><span class="date-tag guidance">GUIDANCE</span></td><td>Becomes binding if FDA asks for a second study.</td></tr>
 </table></div>
-<div class="note"><b>Stale-data check (Oct 10, 2026):</b> no catalyst dated before today has passed unrecorded — LPLV (Sept 17), the KOL-day announcement (Sept 30), and the shareholder-meeting announcement (Oct 6) are all disclosed events; the "early Oct" enrollment window is open now, not past. Remaining unknown: FDA meeting / NDA timing (<span class="tag G">GAP</span> — no verified post-readout regulatory timeline).</div>
+<div class="note"><b>Stale-data check (Oct 10, 2026):</b> no catalyst dated before today has passed unrecorded — LPLV (Sept 17), the KOL-day announcement (Sept 30), and the shareholder-meeting announcement (Oct 6) are all disclosed events; the "early Oct" enrollment window is open now, not past. Remaining unknown: FDA meeting / NDA timing (<span class="ev gap">GAP</span> — no verified post-readout regulatory timeline).</div>
 </section>
-<section class="card" id="flags">
-<h2>11 · Ranked red flags</h2>
+<section id="flags">
+<div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2></div></div>
 <div class="note">Merged and re-ranked from both builds' risk lists; duplicates removed. What can permanently impair the thesis.</div>
 <ol class="tight">
-<li><span class="tag F">FACT</span><b>The same drug already failed one Phase 3 in this indication.</b> Pelle-926-301 (n=174, primary: new SEBs/year) produced data Leo Pharma found "not sufficiently convincing"; full inferential statistics were never published. <span class="tag I">INTERPRETATION</span>Re-running a failed trial with a redesigned endpoint is legitimate — but the "positive" Phase 2 → Phase 3 translation already failed once, and the fixes are untested.</li>
-<li><span class="tag F">FACT</span><b>~57–65% Arkin control.</b> ~65% of voting power pre-offering (20-F, Mar 18, 2026); ~56.9% combined beneficial ownership post-offering (13D/A, Apr 15, 2026); the 20-F risk language states minority investors have "very limited, if any, influence." <span class="tag I">INTERPRETATION</span>Protects against hostile action but enables dilutive raises, related-party terms, or a take-under without minority recourse. The 200,000 warrants held by M. Arkin Dermatology @ $58.50 (Jan 2023) are a related-party overhang.</li>
-<li><span class="tag F">FACT</span><b>Small, fragile trial.</b> n=113 (vs ~140 planned); 11 dropouts; count endpoint powered on the vehicle-arm event rate, which is unobserved and blinded. <span class="tag I">INTERPRETATION</span>Count endpoints in small trials are high-variance; a low vehicle event rate (better-than-expected natural history, sunscreen adherence, seasonal effects) can sink the trial without the drug being ineffective.</li>
-<li><span class="tag F">FACT</span><b>Endpoint is prevention, but the strong Phase 2 signal was treatment.</b> Phase 2's p&lt;0.05 wins were on clearance/shrinkage of existing SEBs; the prevention signal (new SEBs) was p=0.096 ITT, p=0.008 PP (BioSpace, 2018). <span class="tag I">INTERPRETATION</span>The Phase 3 asks the drug to do the thing it showed most weakly in Phase 2.</li>
-<li><span class="tag F">FACT</span><b>Endpoint starvation has killed prior patidegib studies.</b> Low blinded event rates terminated two prior patidegib studies (NCT04155190 HF-BCC; NCT04308395 open-label extension — registry statuses). <span class="tag I">INTERPRETATION</span>A quiet vehicle arm can overwhelm even a real effect.</li>
-<li><span class="tag G">GAP</span><b>No published full results for the prior attempt; no public SAP for this one.</b> No peer-reviewed paper for Pelle-926-301 (only posted registry means, no p-values/CIs); SAP/powering for SGT-610-01 not public; no disclosed SPA. Outside investors cannot independently stress-test the statistics.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Enrichment narrows the label and the market.</b> PTCH1-positive + ≥10 facial BCCs selects the severe tail; the company's &gt;$300M/yr market framing likely assumes broader uptake. A win in a narrow population with an orphan price may still underwhelm the current ~$220M FD EV.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Class biology caps the ceiling.</b> SMO resistance (GLI/SUFU/SMO bypass), rebound after discontinuation, face-only exposure, and the embryofetal toxicity class overhang (vismodegib boxed warning; stringent contraception required in SGT-610-01) limit the therapeutic and commercial ceiling.</li>
-<li><span class="tag F">FACT</span><b>Dilution.</b> Current cash reaches the readout, not a launch. 456K warrants at $58.50 and future financing can materially expand the tiny share count. <span class="tag I">INTERPRETATION</span>On a borderline win, a dilutive raise — easy for a ~57–65% controller to execute — is the base case; runway into Q1 2028 becomes binding if FDA asks for a second study.</li>
-<li><span class="tag F">FACT</span><b>Thin-float mechanics.</b> 3.27M basic shares; 52-week range $28.81–$97.97 (Finnhub, Oct 9, 2026); short interest ~13% and rising (122,206 shares as of Sept 15, 2026, +65% from Aug 31 — aggregator, <span class="tag U">UNVERIFIED</span>). <span class="tag I">INTERPRETATION</span>The market is actively betting against the re-run; extreme gap risk in either direction into the binary.</li>
-<li><span class="tag F">FACT</span><b>Single-asset concentration.</b> SGT-210's status is disputed, OKC is a provisional patent, Galderma royalties are ~$0.6M/quarter. A Phase 3 miss strands ~$44–46M est. cash against a ~$220M FD EV.</li>
-<li><span class="tag F">FACT</span><b>Commercial execution by a micro-cap with no sales force.</b> Plan is outsourced commercialization (Q2 2026 PR) — capital-light but unproven, for a chronic-use orphan topical requiring payer coverage and dermatologist behavior change.</li>
+<li><span class="ev fact">FACT</span><b>The same drug already failed one Phase 3 in this indication.</b> Pelle-926-301 (n=174, primary: new SEBs/year) produced data Leo Pharma found "not sufficiently convincing"; full inferential statistics were never published. <span class="ev interp">INTERPRETATION</span>Re-running a failed trial with a redesigned endpoint is legitimate — but the "positive" Phase 2 → Phase 3 translation already failed once, and the fixes are untested.</li>
+<li><span class="ev fact">FACT</span><b>~57–65% Arkin control.</b> ~65% of voting power pre-offering (20-F, Mar 18, 2026); ~56.9% combined beneficial ownership post-offering (13D/A, Apr 15, 2026); the 20-F risk language states minority investors have "very limited, if any, influence." <span class="ev interp">INTERPRETATION</span>Protects against hostile action but enables dilutive raises, related-party terms, or a take-under without minority recourse. The 200,000 warrants held by M. Arkin Dermatology @ $58.50 (Jan 2023) are a related-party overhang.</li>
+<li><span class="ev fact">FACT</span><b>Small, fragile trial.</b> n=113 (vs ~140 planned); 11 dropouts; count endpoint powered on the vehicle-arm event rate, which is unobserved and blinded. <span class="ev interp">INTERPRETATION</span>Count endpoints in small trials are high-variance; a low vehicle event rate (better-than-expected natural history, sunscreen adherence, seasonal effects) can sink the trial without the drug being ineffective.</li>
+<li><span class="ev fact">FACT</span><b>Endpoint is prevention, but the strong Phase 2 signal was treatment.</b> Phase 2's p&lt;0.05 wins were on clearance/shrinkage of existing SEBs; the prevention signal (new SEBs) was p=0.096 ITT, p=0.008 PP (BioSpace, 2018). <span class="ev interp">INTERPRETATION</span>The Phase 3 asks the drug to do the thing it showed most weakly in Phase 2.</li>
+<li><span class="ev fact">FACT</span><b>Endpoint starvation has killed prior patidegib studies.</b> Low blinded event rates terminated two prior patidegib studies (NCT04155190 HF-BCC; NCT04308395 open-label extension — registry statuses). <span class="ev interp">INTERPRETATION</span>A quiet vehicle arm can overwhelm even a real effect.</li>
+<li><span class="ev gap">GAP</span><b>No published full results for the prior attempt; no public SAP for this one.</b> No peer-reviewed paper for Pelle-926-301 (only posted registry means, no p-values/CIs); SAP/powering for SGT-610-01 not public; no disclosed SPA. Outside investors cannot independently stress-test the statistics.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Enrichment narrows the label and the market.</b> PTCH1-positive + ≥10 facial BCCs selects the severe tail; the company's &gt;$300M/yr market framing likely assumes broader uptake. A win in a narrow population with an orphan price may still underwhelm the current ~$220M FD EV.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Class biology caps the ceiling.</b> SMO resistance (GLI/SUFU/SMO bypass), rebound after discontinuation, face-only exposure, and the embryofetal toxicity class overhang (vismodegib boxed warning; stringent contraception required in SGT-610-01) limit the therapeutic and commercial ceiling.</li>
+<li><span class="ev fact">FACT</span><b>Dilution.</b> Current cash reaches the readout, not a launch. 456K warrants at $58.50 and future financing can materially expand the tiny share count. <span class="ev interp">INTERPRETATION</span>On a borderline win, a dilutive raise — easy for a ~57–65% controller to execute — is the base case; runway into Q1 2028 becomes binding if FDA asks for a second study.</li>
+<li><span class="ev fact">FACT</span><b>Thin-float mechanics.</b> 3.27M basic shares; 52-week range $28.81–$97.97 (Finnhub, Oct 9, 2026); short interest ~13% and rising (122,206 shares as of Sept 15, 2026, +65% from Aug 31 — aggregator, <span class="ev unverified">UNVERIFIED</span>). <span class="ev interp">INTERPRETATION</span>The market is actively betting against the re-run; extreme gap risk in either direction into the binary.</li>
+<li><span class="ev fact">FACT</span><b>Single-asset concentration.</b> SGT-210's status is disputed, OKC is a provisional patent, Galderma royalties are ~$0.6M/quarter. A Phase 3 miss strands ~$44–46M est. cash against a ~$220M FD EV.</li>
+<li><span class="ev fact">FACT</span><b>Commercial execution by a micro-cap with no sales force.</b> Plan is outsourced commercialization (Q2 2026 PR) — capital-light but unproven, for a chronic-use orphan topical requiring payer coverage and dermatologist behavior change.</li>
 </ol>
 </section>
-<section class="card" id="scen">
-<h2>12 · Bear / base / bull &amp; scenario analyses</h2>
+<section id="scen">
+<div class="section-head"><div class="section-num">12 / SCENARIOS</div><div><h2>Bear, base, bull—with soft scenario levels</h2></div></div>
 <div class="note">No DCF, no recommendation. Scenarios are outcome sketches for a holder-through-the-binary; the table below adds <b>SOFT</b> scenario-based levels — derived arithmetic on disclosed figures, <b>not</b> a price target. The middle case is the hardest: trial success, regulatory acceptance, and commercial success are separate gates. Valuation context uses only the street's published $110–$285 range (avg $197.50), with any takeout framing capped at the $197.50 average.</div>
 <div class="tblwrap"><table>
 <tr><th>Scenario</th><th>Clinical outcome</th><th>Company path</th><th>Key evidence to confirm</th></tr>
-<tr><td><b>Bear — Phase 3 misses (primary not met)</b></td><td><span class="tag I">INTERPRETATION</span>FD EV (~$220M) collapses toward cash + stub: ~$44–46M est. cash (declining), Galderma royalties (~$2–3M/yr run-rate), SGT-210/OKC/HF-BCC optionality. Arkin's control makes a take-under or distressed asset sale the likely endgame rather than an orderly wind-down; minority has no blocking power.</td><td>Wind-down / take-under by controller; HF-BCC only hope</td><td>Topline PR late Nov 2026: p-value, arm counts, safety</td></tr>
-<tr><td><b>Base — mixed / borderline result</b></td><td><span class="tag I">INTERPRETATION</span>Primary met with modest effect size, or primary met but SEB secondary missed (the regulatory gray zone). FDA path lengthens (second study ask / advisory committee), runway to Q1 2028 becomes binding, and a dilutive raise — easy for a 57–65% controller to execute — follows. The HF-BCC PoC becomes the swing asset for 2027. The stock may remain trapped between approval optionality and another trial.</td><td>Second study or restricted path; dilutive raise likely</td><td>Effect size + SEB secondary; FDA meeting minutes (if disclosed)</td></tr>
-<tr><td><b>Bull — clean Phase 3 win</b></td><td><span class="tag I">INTERPRETATION</span>Statistically and clinically meaningful reduction in new facial BCCs, clean local safety, no systemic signal → pre-NDA meeting, NDA in 2027, first topical prevention therapy for Gorlin. Orphan + breakthrough support priority review. Franchise optionality: HF-BCC pivotal (late 2027/H1 2028) in the much larger sporadic population, OKC injectable. Takeout interest plausible (dermatology strategics); any maximum-value framing stays ≤ the street's $197.50 average target.</td><td>NDA 2027; HF-BCC pivotal; takeout candidate (capped ≤$197.50 avg street target)</td><td>Topline + full data at dermatology congress; NDA acceptance</td></tr>
+<tr><td><b>Bear — Phase 3 misses (primary not met)</b></td><td><span class="ev interp">INTERPRETATION</span>FD EV (~$220M) collapses toward cash + stub: ~$44–46M est. cash (declining), Galderma royalties (~$2–3M/yr run-rate), SGT-210/OKC/HF-BCC optionality. Arkin's control makes a take-under or distressed asset sale the likely endgame rather than an orderly wind-down; minority has no blocking power.</td><td>Wind-down / take-under by controller; HF-BCC only hope</td><td>Topline PR late Nov 2026: p-value, arm counts, safety</td></tr>
+<tr><td><b>Base — mixed / borderline result</b></td><td><span class="ev interp">INTERPRETATION</span>Primary met with modest effect size, or primary met but SEB secondary missed (the regulatory gray zone). FDA path lengthens (second study ask / advisory committee), runway to Q1 2028 becomes binding, and a dilutive raise — easy for a 57–65% controller to execute — follows. The HF-BCC PoC becomes the swing asset for 2027. The stock may remain trapped between approval optionality and another trial.</td><td>Second study or restricted path; dilutive raise likely</td><td>Effect size + SEB secondary; FDA meeting minutes (if disclosed)</td></tr>
+<tr><td><b>Bull — clean Phase 3 win</b></td><td><span class="ev interp">INTERPRETATION</span>Statistically and clinically meaningful reduction in new facial BCCs, clean local safety, no systemic signal → pre-NDA meeting, NDA in 2027, first topical prevention therapy for Gorlin. Orphan + breakthrough support priority review. Franchise optionality: HF-BCC pivotal (late 2027/H1 2028) in the much larger sporadic population, OKC injectable. Takeout interest plausible (dermatology strategics); any maximum-value framing stays ≤ the street's $197.50 average target.</td><td>NDA 2027; HF-BCC pivotal; takeout candidate (capped ≤$197.50 avg street target)</td><td>Topline + full data at dermatology congress; NDA acceptance</td></tr>
 </table></div>
 
 <h3>Soft scenario levels (scenario-based — not a price target)</h3>
 <div class="tblwrap"><table>
 <tr><th>Scenario</th><th>Soft level / share</th><th>Implied FD EV</th><th>Assumptions</th></tr>
-<tr><td><b>Bear — Phase 3 misses</b></td><td><b>~$11–14</b></td><td>~$0–10M (stub)</td><td><span class="tag I">INTERPRETATION</span>Cash ~$44–46M est. Oct 2026 (Jun 30: $49.3M, less ~$1.4M/mo burn); FD shares ~3.75M incl. warrants; Galderma royalties / OKC / HF-BCC ≈ zero in distress; no asset-sale premium. $12.50 × 3.75M ≈ $47M FD mcap ≈ the cash stub. Take-under by the controller is the likely endgame.</td></tr>
-<tr><td><b>Base — mixed / borderline</b></td><td><b>~$50–85</b></td><td>~$140–275M</td><td><span class="tag I">INTERPRETATION</span>Primary met with modest effect, or SEB-secondary gray zone; FDA path lengthens (second-study ask plausible); dilutive raise at a discount likely — easy for a 57–65% controller to execute; 2027 swing asset = HF-BCC PoC. Stock trapped between approval optionality and another trial, near today's ~$72.</td></tr>
-<tr><td><b>Bull — clean win</b></td><td><b>~$150–197</b> (cap $197.50)</td><td>~$520–695M</td><td><span class="tag I">INTERPRETATION</span>Statistically + clinically meaningful ITT win (≥~40% relative reduction), clean local safety, single pivotal accepted, NDA 2027, no second study; HF-BCC franchise + takeout optionality. Capped at the street's $197.50 average per standing discipline — not the $285 high.</td></tr>
+<tr><td><b>Bear — Phase 3 misses</b></td><td><b>~$11–14</b></td><td>~$0–10M (stub)</td><td><span class="ev interp">INTERPRETATION</span>Cash ~$44–46M est. Oct 2026 (Jun 30: $49.3M, less ~$1.4M/mo burn); FD shares ~3.75M incl. warrants; Galderma royalties / OKC / HF-BCC ≈ zero in distress; no asset-sale premium. $12.50 × 3.75M ≈ $47M FD mcap ≈ the cash stub. Take-under by the controller is the likely endgame.</td></tr>
+<tr><td><b>Base — mixed / borderline</b></td><td><b>~$50–85</b></td><td>~$140–275M</td><td><span class="ev interp">INTERPRETATION</span>Primary met with modest effect, or SEB-secondary gray zone; FDA path lengthens (second-study ask plausible); dilutive raise at a discount likely — easy for a 57–65% controller to execute; 2027 swing asset = HF-BCC PoC. Stock trapped between approval optionality and another trial, near today's ~$72.</td></tr>
+<tr><td><b>Bull — clean win</b></td><td><b>~$150–197</b> (cap $197.50)</td><td>~$520–695M</td><td><span class="ev interp">INTERPRETATION</span>Statistically + clinically meaningful ITT win (≥~40% relative reduction), clean local safety, single pivotal accepted, NDA 2027, no second study; HF-BCC franchise + takeout optionality. Capped at the street's $197.50 average per standing discipline — not the $285 high.</td></tr>
 </table></div>
-<div class="note"><span class="tag I">INTERPRETATION</span><b>Math check:</b> FD ~3.75M shares × $71.77 ≈ $269M FD mcap → ~$220M FD EV today. Bear $12.50 × 3.75M ≈ $47M ≈ cash stub (EV ≈ 0). Bull $175 × 3.75M ≈ $656M FD mcap → ~$610M FD EV ≈ 2.8× current FD EV for a de-risked first-in-class orphan asset with franchise optionality — and the $197.50 cap keeps the top inside the street's published range. These are arithmetic sketches on disclosed inputs: treat as scenario anchors, not targets.</div>
+<div class="note"><span class="ev interp">INTERPRETATION</span><b>Math check:</b> FD ~3.75M shares × $71.77 ≈ $269M FD mcap → ~$220M FD EV today. Bear $12.50 × 3.75M ≈ $47M ≈ cash stub (EV ≈ 0). Bull $175 × 3.75M ≈ $656M FD mcap → ~$610M FD EV ≈ 2.8× current FD EV for a de-risked first-in-class orphan asset with franchise optionality — and the $197.50 cap keeps the top inside the street's published range. These are arithmetic sketches on disclosed inputs: treat as scenario anchors, not targets.</div>
 <div class="callout"><b>The core underwriting question:</b> did Sol-Gel select the patients who can reveal patidegib's effect — or did it select a narrower population for a drug whose effect is still too small?</div>
 </section>
-<section class="card" id="mgmt">
-<h2>13 · Management track record &amp; insider signals</h2>
+<section id="mgmt">
+<div class="section-head"><div class="section-num">13 / PEOPLE</div><div><h2>Management and insider signals</h2></div></div>
 <ul class="tight">
-<li><span class="tag F">FACT</span><b>Moshe "Mori" Arkin — Executive Chairman and interim CEO (since Jan 1, 2025).</b> Took over Agis Industries at 19; built it into a leading generics/dermatology company; sold to Perrigo in 2005 (~$818M per company bios; $390M per Wikipedia — figure varies by source). Founded Arkin Holdings (2009); ~$1–1.5B healthcare portfolio across ~20 companies (UroGen, Keros, etc.). Assumed the CEO role without compensation, "transitioning away from most of his other business activities." Predecessor CEO Dr. Alon Seri-Levy stepped down Dec 31, 2024, retained as consultant ≥1 year. CFO Eyal Ben-Or (ex-Mobileye, KPMG Israel) appointed Jul 2024. Sources: 20-F FY2025; BioSpace (Jul 2024 / Q2 2024 PR); Lutris Pharma PR.</li>
-<li><span class="tag I">INTERPRETATION</span><b>Track record:</b> Arkin is a genuine pharma builder with a realized exit and deep dermatology operating history — the strongest management credential in the file. Counterpoint: he is 73–74, a controlling owner-operator rather than a hired biotech CEO, and the interim-CEO structure concentrates governance risk further.</li>
-<li><span class="tag F">FACT</span><b>Nov 17, 2026 annual meeting agenda (announced Oct 6, 2026):</b> reappoint Kesselman &amp; Kesselman as independent auditor for 2026; re-elect four directors and two external directors; extend Arkin's interim-CEO tenure <b>three more years from Jan 1, 2027</b>; authorize a rename to Sol-Gel Therapeutics Ltd. / Sol-Gel Dermatology Ltd. (or similar) within 12 months; <b>increase registered share capital</b>. Source: TipRanks company-announcement coverage (<span class="tag U">UNVERIFIED</span> — secondary summary; proxy statement not reviewed). <span class="tag I">INTERPRETATION</span>The capital increase is balance-sheet flexibility for post-readout financings — read the proxy for size and terms. The CEO extension + rename signal the controller is planning around a post-readout company, not a wind-down.</li>
-<li><span class="tag F">FACT</span><b>Insider buying:</b> Opaleye Management Inc. bought 35,113 shares @ $69.32 on Aug 28, 2026 (~$2.43M) &rarr; 520,000 shares, then 1,493 @ $65.94 on Sep 11 (~$98k) &rarr; <b>540,000 shares</b>. 90-day insider buying ~53.7&ndash;54.0k shares (~$3.70&ndash;3.72M, per aggregator summaries); insiders own ~66.5% overall. Opaleye's Mar 23, 2026 13G/A had shown ~14.2% post-offering ownership. Sources: MarketBeat/Transcript Daily/Zolmax summaries of SEC filings, Oct 2026 (<span class="tag U">UNVERIFIED</span> — aggregator summaries; filings not re-pulled); Opaleye Schedule 13G/A.</li>
-<li><span class="tag I">INTERPRETATION</span>Net insider buying into the binary is a positive signal, though in a ~57–65%-controlled name most "insider" flow is the controller's circle — informative but not independent validation.</li>
-<li><span class="tag F">FACT</span><b>Capital allocation:</b> the H1 2026 $33M public offering (pre-data, at ~$68 implied) funded runway past the readout — a disciplined, non-desperate raise. The 2023 PellePharm acquisition terms ($4.7M upfront, milestones/royalties) were modest — Sol-Gel did not overpay for the failed asset.</li>
+<li><span class="ev fact">FACT</span><b>Moshe "Mori" Arkin — Executive Chairman and interim CEO (since Jan 1, 2025).</b> Took over Agis Industries at 19; built it into a leading generics/dermatology company; sold to Perrigo in 2005 (~$818M per company bios; $390M per Wikipedia — figure varies by source). Founded Arkin Holdings (2009); ~$1–1.5B healthcare portfolio across ~20 companies (UroGen, Keros, etc.). Assumed the CEO role without compensation, "transitioning away from most of his other business activities." Predecessor CEO Dr. Alon Seri-Levy stepped down Dec 31, 2024, retained as consultant ≥1 year. CFO Eyal Ben-Or (ex-Mobileye, KPMG Israel) appointed Jul 2024. Sources: 20-F FY2025; BioSpace (Jul 2024 / Q2 2024 PR); Lutris Pharma PR.</li>
+<li><span class="ev interp">INTERPRETATION</span><b>Track record:</b> Arkin is a genuine pharma builder with a realized exit and deep dermatology operating history — the strongest management credential in the file. Counterpoint: he is 73–74, a controlling owner-operator rather than a hired biotech CEO, and the interim-CEO structure concentrates governance risk further.</li>
+<li><span class="ev fact">FACT</span><b>Nov 17, 2026 annual meeting agenda (announced Oct 6, 2026):</b> reappoint Kesselman &amp; Kesselman as independent auditor for 2026; re-elect four directors and two external directors; extend Arkin's interim-CEO tenure <b>three more years from Jan 1, 2027</b>; authorize a rename to Sol-Gel Therapeutics Ltd. / Sol-Gel Dermatology Ltd. (or similar) within 12 months; <b>increase registered share capital</b>. Source: TipRanks company-announcement coverage (<span class="ev unverified">UNVERIFIED</span> — secondary summary; proxy statement not reviewed). <span class="ev interp">INTERPRETATION</span>The capital increase is balance-sheet flexibility for post-readout financings — read the proxy for size and terms. The CEO extension + rename signal the controller is planning around a post-readout company, not a wind-down.</li>
+<li><span class="ev fact">FACT</span><b>Insider buying:</b> Opaleye Management Inc. bought 35,113 shares @ $69.32 on Aug 28, 2026 (~$2.43M) &rarr; 520,000 shares, then 1,493 @ $65.94 on Sep 11 (~$98k) &rarr; <b>540,000 shares</b>. 90-day insider buying ~53.7&ndash;54.0k shares (~$3.70&ndash;3.72M, per aggregator summaries); insiders own ~66.5% overall. Opaleye's Mar 23, 2026 13G/A had shown ~14.2% post-offering ownership. Sources: MarketBeat/Transcript Daily/Zolmax summaries of SEC filings, Oct 2026 (<span class="ev unverified">UNVERIFIED</span> — aggregator summaries; filings not re-pulled); Opaleye Schedule 13G/A.</li>
+<li><span class="ev interp">INTERPRETATION</span>Net insider buying into the binary is a positive signal, though in a ~57–65%-controlled name most "insider" flow is the controller's circle — informative but not independent validation.</li>
+<li><span class="ev fact">FACT</span><b>Capital allocation:</b> the H1 2026 $33M public offering (pre-data, at ~$68 implied) funded runway past the readout — a disciplined, non-desperate raise. The 2023 PellePharm acquisition terms ($4.7M upfront, milestones/royalties) were modest — Sol-Gel did not overpay for the failed asset.</li>
 </ul>
 </section>
-<section class="card" id="openq">
-<h2>14 · Open questions</h2>
+<section id="openq">
+<div class="section-head"><div class="section-num">14 / OPEN</div><div><h2>The evidence that would change the view</h2></div></div>
 <div class="note">What the public record cannot answer yet — carried forward and updated from the September 16 build.</div>
 <ul class="tight">
 <li><b>Trial statistics and enrollment.</b> Power assumptions, alpha, count model, missing-data handling, and interim analyses are not public. The registry estimate was ~140 participants while the company reported 113 enrolled; whether enrollment closed short of plan and why remains unresolved.</li>
@@ -480,8 +666,8 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <li><b>SGT-210 status.</b> New merge item: the two builds disagree (discontinued per Sep 16; unconfirmed per Oct 7's 2026-disclosure review). Re-verification against a 2026 company disclosure is pending.</li>
 </ul>
 </section>
-<section class="card" id="refs">
-<h2>15 · References, filings used, as-of</h2>
+<section id="refs">
+<div class="section-head"><div class="section-num">15 / SOURCES</div><div><h2>Sourcebook</h2></div></div>
 <div class="note"><b>As-of date: October 10, 2026.</b> Share price $71.77 = Oct 9, 2026 close, Friday (Finnhub, MarketBeat, Webull — latest session); $64.40 = Sep 15, 2026 close (Sep 16 build's chart series). Cash figures as of Jun 30, 2026 (latest disclosed); Oct 2026 cash is an estimate from stated burn (~$1.4M/mo). The Oct 14 KOL Investor Day and Nov 17 shareholder meeting are confirmed as announced via secondary coverage; no efficacy data is expected at the KOL day (trial blinded).</div>
 <h3>Filings used (SEC EDGAR, CIK 0001684693)</h3>
 <ul class="tight">
@@ -518,7 +704,7 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <li>Annual shareholder meeting announcement (Oct 6, 2026 — via TipRanks/Reuters company-announcement coverage; primary proxy statement pending review)</li>
 <li>Q2 2026 results (2026-08-20); LPLV (2026-09-17; 113 enrolled/102 completed; blinded); KOL Investor Day (2026-09-30; Oct 14, 2026)</li>
 <li>First-patient-screened PR (Nov 2023; ~140 pts planned, ~40 centers)</li>
-<li>PellePharm NORD 2018 poster release — company-reported Phase 2 ITT/per-protocol data (<span class="tag U">UNVERIFIED</span> beyond company reporting)</li>
+<li>PellePharm NORD 2018 poster release — company-reported Phase 2 ITT/per-protocol data (<span class="ev unverified">UNVERIFIED</span> beyond company reporting)</li>
 </ul>
 <h3>Trade press</h3>
 <ul class="tight">
@@ -527,12 +713,12 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <li>Fierce Biotech — Phase 2 topline coverage (per-protocol and molecular-endpoint caveats); Phase 3-readiness coverage</li>
 <li>Dermatology Times (Sept 2026) — LPLV summary; BioSpace — company PRs; Healio — NEJM summary; MDedge/ACMS — Phase 2 presentation (2% vs 4% adherence; &gt;500× lower systemic exposure)</li>
 </ul>
-<h3>Market data (secondary, <span class="tag U">UNVERIFIED</span> beyond aggregators)</h3>
+<h3>Market data (secondary, <span class="ev unverified">UNVERIFIED</span> beyond aggregators)</h3>
 <ul class="tight">
 <li>Finnhub / Webull / MarketBeat (Oct 9, 2026: $71.77 close, ~$235M basic mcap, 52wk range $28.81–$97.97, 3.27M shares)</li>
 <li>MarketBeat (consensus Moderate Buy, avg target $197.50 across 6 analysts: Mizuho $285 Outperform Jun 24, 2026; HC Wainwright $110 Buy Jul 20, 2026; Weiss sell Sep 1; insider 66.51%; Opaleye Aug-28 purchase 35,113 @ $69.32; Opaleye Sep-11 purchase 1,493 @ $65.94 &rarr; 540,000 shares). HC Wainwright raised Q3 2026 EPS est. to ($1.54) from ($1.71) on Oct 6; Q3 earnings estimated Thu Nov 19, 2026 (before market open)</li>
 <li>Zacks (Oct 8, 2026): upgraded to Zacks Rank #2 (Buy) on estimate revisions — quant-driven, not fundamental research</li>
-<li>TipRanks company-announcement coverage: KOL Investor Day (Sep 30, 2026; notes "most recent analyst rating: Buy, $195 PT" — analyst unidentified, <span class="tag U">UNVERIFIED</span>) and annual shareholder meeting (Oct 6, 2026: Nov 17 meeting, Arkin 3-yr CEO extension, name-change authority, share-capital increase)</li>
+<li>TipRanks company-announcement coverage: KOL Investor Day (Sep 30, 2026; notes "most recent analyst rating: Buy, $195 PT" — analyst unidentified, <span class="ev unverified">UNVERIFIED</span>) and annual shareholder meeting (Oct 6, 2026: Nov 17 meeting, Arkin 3-yr CEO extension, name-change authority, share-capital increase)</li>
 <li>thelincolnianonline (short interest 122,206 shares, ~13%, Sept 15, 2026, +65% from Aug 31)</li>
 </ul>
 <h3>Internal datasets checked</h3>
@@ -541,12 +727,18 @@ nav.side a{min-height:44px;display:flex;align-items:center}
 <li><i>research_notes/catalyst-calendar-2027/data.json</i> (0 SLGL rows)</li>
 </ul>
 <h3>Evidence-discipline log</h3>
-<div class="note"><span class="tag F">FACT</span> = SEC filing, CT.gov, peer-reviewed paper, or company PR. <span class="tag I">INTERPRETATION</span> = labeled inference. <span class="tag G">GAP</span> = sought but not found in reviewed sources (SGT-610-01 SAP/powering; SPA status; warrant exercise status at Jun 30, 2026; post-H1 option count; SGT-210 current status — third-party profiles lean active, no 2026 company statement; patent estate; Nov 17 meeting proxy details). <span class="tag U">UNVERIFIED</span> = aggregator-only market figures or company-reported Phase 2 data beyond the peer-reviewed record. No dates, cash figures, enrollment counts, endpoints, or p-values were invented; every number above carries units, population/timepoint, and source. Where the two merged builds contradicted each other, the resolution is stated inline (§1 control figures, §4 primary endpoint, §4 prior-trial topline, §8 share count, §9 FD reconciliation, §3 SGT-210).</div>
+<div class="note"><span class="ev fact">FACT</span> = SEC filing, CT.gov, peer-reviewed paper, or company PR. <span class="ev interp">INTERPRETATION</span> = labeled inference. <span class="ev gap">GAP</span> = sought but not found in reviewed sources (SGT-610-01 SAP/powering; SPA status; warrant exercise status at Jun 30, 2026; post-H1 option count; SGT-210 current status — third-party profiles lean active, no 2026 company statement; patent estate; Nov 17 meeting proxy details). <span class="ev unverified">UNVERIFIED</span> = aggregator-only market figures or company-reported Phase 2 data beyond the peer-reviewed record. No dates, cash figures, enrollment counts, endpoints, or p-values were invented; every number above carries units, population/timepoint, and source. Where the two merged builds contradicted each other, the resolution is stated inline (§1 control figures, §4 primary endpoint, §4 prior-trial topline, §8 share count, §9 FD reconciliation, §3 SGT-210).</div>
 <div class="note">This dossier is a neutral research document. It contains no formal price target (only soft scenario-based levels in §12, labeled SOFT), no DCF, no buy/sell recommendation, and no cross-trial head-to-head efficacy claims. It identifies no individual user and contains zero personal data. Market data are a dated snapshot; the page does not refresh. Cross-trial figures are contextual — not head-to-head comparisons. Research use only.</div>
 </section>
 </main>
-</div>
 <footer>SLGL deep-dive dossier · merged edition · audited &amp; enhanced October 10, 2026 · Sources: SEC EDGAR (CIK 0001684693), ClinicalTrials.gov, peer-reviewed literature, company disclosures, trade press</footer>
+
+
+
+
+
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
 <script>
 (function(){
 const priceSeries=[["2025-09-02",23.7],["2025-09-03",23.4],["2025-09-04",28],["2025-09-05",27.96],["2025-09-08",27.55],["2025-09-09",25.9276],["2025-09-10",23.95],["2025-09-11",24.08],["2025-09-12",24.81],["2025-09-15",23.98],["2025-09-16",24.15],["2025-09-17",24.35],["2025-09-18",26.5677],["2025-09-19",30.5],["2025-09-22",28.01],["2025-09-23",28.81],["2025-09-24",27.8],["2025-09-25",27.99],["2025-09-26",28.99],["2025-09-29",28.74],["2025-09-30",29.15],["2025-10-01",29.5],["2025-10-02",29.5],["2025-10-03",34.8],["2025-10-06",42.9],["2025-10-07",40.99],["2025-10-08",39.32],["2025-10-09",39.65],["2025-10-10",38.99],["2025-10-13",39.95],["2025-10-14",39.75],["2025-10-15",41.76],["2025-10-16",40.51],["2025-10-17",40.6],["2025-10-20",39.83],["2025-10-21",40],["2025-10-22",39.1],["2025-10-23",39.9],["2025-10-24",39],["2025-10-27",39.81],["2025-10-28",36.85],["2025-10-29",37],["2025-10-30",37],["2025-10-31",34.5],["2025-11-03",35.5],["2025-11-04",33.5],["2025-11-05",32.7],["2025-11-06",32.005],["2025-11-07",30.6346],["2025-11-10",32.43],["2025-11-11",31.8817],["2025-11-12",31.5],["2025-11-13",35.575],["2025-11-14",34],["2025-11-17",36],["2025-11-18",35.4],["2025-11-19",36.04],["2025-11-20",35.75],["2025-11-21",36.65],["2025-11-24",41.76],["2025-11-25",40.385],["2025-11-26",40.69],["2025-11-28",42.415],["2025-12-01",38.67],["2025-12-02",38.7263],["2025-12-03",39.78],["2025-12-04",40.7],["2025-12-05",40.5],["2025-12-08",41.99],["2025-12-09",40.125],["2025-12-10",42.3],["2025-12-11",42.3],["2025-12-12",39.01],["2025-12-15",42.77],["2025-12-16",42.125],["2025-12-17",41.15],["2025-12-18",42.75],["2025-12-19",42.16],["2025-12-22",42.16],["2025-12-23",43.17],["2025-12-24",43.53],["2025-12-26",41.85],["2025-12-29",44.54],["2025-12-30",42.46],["2025-12-31",42.14],["2026-01-02",42.15],["2026-01-05",44.19],["2026-01-06",45.96],["2026-01-07",53.24],["2026-01-08",55.68],["2026-01-09",58],["2026-01-12",62.99],["2026-01-13",62.94],["2026-01-14",67.79],["2026-01-15",68.31],["2026-01-16",69.5],["2026-01-20",72.1],["2026-01-21",63.01],["2026-01-22",57.5],["2026-01-23",58.44],["2026-01-26",57.34],["2026-01-27",59],["2026-01-28",63.5],["2026-01-29",60.85],["2026-01-30",64.22],["2026-02-02",64.505],["2026-02-03",66.1],["2026-02-04",65.95],["2026-02-05",64.7],["2026-02-06",65.78],["2026-02-09",65.27],["2026-02-10",65],["2026-02-11",66.1],["2026-02-12",76.12],["2026-02-13",67.2],["2026-02-17",73.8],["2026-02-18",81.01],["2026-02-19",80.85],["2026-02-20",83.98],["2026-02-23",80.9],["2026-02-24",87.63],["2026-02-25",90.12],["2026-02-26",89.15],["2026-02-27",91.68],["2026-03-02",91.58],["2026-03-03",97.97],["2026-03-04",88.4],["2026-03-05",79],["2026-03-06",81.645],["2026-03-09",84.99],["2026-03-10",88.7],["2026-03-11",94.29],["2026-03-12",85.31],["2026-03-13",83.97],["2026-03-16",76.04],["2026-03-17",79.7475],["2026-03-18",75.34],["2026-03-19",81.71],["2026-03-20",72.97],["2026-03-23",66.2],["2026-03-24",80.01],["2026-03-25",79.07],["2026-03-26",77.75],["2026-03-27",79.2],["2026-03-30",68.54],["2026-03-31",79.22],["2026-04-01",83.5],["2026-04-02",79.46],["2026-04-06",74.34],["2026-04-07",71.11],["2026-04-08",74.5],["2026-04-09",72.02],["2026-04-10",74.86],["2026-04-13",74.41],["2026-04-14",76.5],["2026-04-15",79.8],["2026-04-16",75.32],["2026-04-17",73.87],["2026-04-20",70],["2026-04-21",75.89],["2026-04-22",73.48],["2026-04-23",72.3],["2026-04-24",74.83],["2026-04-27",77],["2026-04-28",70.915],["2026-04-29",71.4],["2026-04-30",74.04],["2026-05-01",75.61],["2026-05-04",77.7],["2026-05-05",73.77],["2026-05-06",71.4],["2026-05-07",69.54],["2026-05-08",70.86],["2026-05-11",69.98],["2026-05-12",67.21],["2026-05-13",73.05],["2026-05-14",68.68],["2026-05-15",72.72],["2026-05-18",68.35],["2026-05-19",63.31],["2026-05-20",65.29],["2026-05-21",68.31],["2026-05-22",76.73],["2026-05-26",74.5],["2026-05-27",73.8],["2026-05-28",75.28],["2026-05-29",73.86],["2026-06-01",70.4],["2026-06-02",73.73],["2026-06-03",71.5],["2026-06-04",74.37],["2026-06-05",77.98],["2026-06-08",80],["2026-06-09",76.22],["2026-06-10",73.5],["2026-06-11",75.3],["2026-06-12",73.44],["2026-06-15",73.82],["2026-06-16",72.87],["2026-06-17",70.36],["2026-06-18",74.46],["2026-06-22",73.8],["2026-06-23",71.26],["2026-06-24",73.4],["2026-06-25",72.67],["2026-06-26",73.5],["2026-06-29",74.41],["2026-06-30",74.14],["2026-07-01",71.99],["2026-07-02",74.01],["2026-07-06",74.12],["2026-07-07",78.44],["2026-07-08",74.76],["2026-07-09",76.36],["2026-07-10",73.95],["2026-07-13",73.91],["2026-07-14",75.39],["2026-07-15",77.215],["2026-07-16",78.08],["2026-07-17",83.2],["2026-07-20",80.1],["2026-07-21",89.74],["2026-07-22",84.3],["2026-07-23",80.55],["2026-07-24",81.96],["2026-07-27",79.83],["2026-07-28",83.07],["2026-07-29",82.545],["2026-07-30",85.19],["2026-07-31",82.25],["2026-08-03",81.99],["2026-08-04",84.495],["2026-08-05",88],["2026-08-06",86.9],["2026-08-07",88],["2026-08-10",84.74],["2026-08-11",77.92],["2026-08-12",71.5],["2026-08-13",84.04],["2026-08-14",84.69],["2026-08-17",83.01],["2026-08-18",79.33],["2026-08-19",78.59],["2026-08-20",78.495],["2026-08-21",77.73],["2026-08-24",77.39],["2026-08-25",81.72],["2026-08-26",79.43],["2026-08-27",72.57],["2026-08-28",68.81],["2026-08-31",69.1],["2026-09-01",69.52],["2026-09-02",70.43],["2026-09-03",70.1],["2026-09-04",69.52],["2026-09-08",69.37],["2026-09-09",69.18],["2026-09-10",66.79],["2026-09-11",65.94],["2026-09-14",65.18],["2026-09-15",64.4]];
@@ -594,25 +786,31 @@ const secs=[].slice.call(document.querySelectorAll('main section[id]'));
 const links=[].slice.call(document.querySelectorAll('nav.side a'));
 if('IntersectionObserver' in window){const ob=new IntersectionObserver(function(es){const vis=es.filter(function(e){return e.isIntersecting}).sort(function(a,b){return b.intersectionRatio-a.intersectionRatio})[0];if(!vis)return;links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+vis.target.id)})},{rootMargin:'-20% 0px -65% 0px',threshold:[0,.2,.5]});secs.forEach(function(s){ob.observe(s)})}
 })();
-</script>
-<button id="toTop" type="button" aria-label="Back to top">&uarr;</button>
-
-<script>
+</script><script>
 (function(){
-var root=document.documentElement,btn=document.getElementById('themeBtn');
-function setTheme(t){root.setAttribute('data-theme',t);btn.innerHTML=t==='dark'?'&#9788; Light':'&#9789; Dark';btn.setAttribute('aria-pressed',t==='dark'?'true':'false')}
-btn.addEventListener('click',function(){setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark')});
-if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){setTheme('dark')}else{setTheme('light')}
-var toTop=document.getElementById('toTop');
-window.addEventListener('scroll',function(){toTop.classList.toggle('show',window.scrollY>600)},{passive:true});
-toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
-document.querySelectorAll('main section.card').forEach(function(sec){
-var h2=sec.querySelector('h2');if(!h2)return;
-var b=document.createElement('button');b.className='ctoggle';b.type='button';
-b.setAttribute('aria-expanded','true');b.setAttribute('aria-label','Collapse section');b.innerHTML='&#8722;';
-b.addEventListener('click',function(){var c=sec.classList.toggle('collapsed');b.setAttribute('aria-expanded',c?'false':'true');b.innerHTML=c?'&#43;':'&#8722;';b.setAttribute('aria-label',c?'Expand section':'Collapse section')});
-h2.appendChild(b);
+"use strict";
+/* Theme toggle - shared biotech-theme key */
+var themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'\u2600 Light mode':'\u25d0 Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t);}catch(e){}}
+var startTheme='light';
+try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark';}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+/* Collapsible sections */
+document.querySelectorAll('main > section').forEach(function(sec){
+  var head=sec.querySelector('.section-head');if(!head)return;
+  var body=document.createElement('div');body.className='section-body';
+  var n=head.nextSibling;while(n){var nx=n.nextSibling;body.appendChild(n);n=nx;}
+  sec.appendChild(body);
+  var btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';
+  btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='\u2212';
+  btn.addEventListener('click',function(){var c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'\u2212';btn.setAttribute('aria-expanded',c?'false':'true');btn.setAttribute('aria-label',c?'Expand section':'Collapse section');});
+  head.appendChild(btn);
 });
+/* Back to top */
+var toTop=document.getElementById('toTop');
+function onScroll(){if(window.scrollY>600){toTop.classList.add('show');}else{toTop.classList.remove('show');}}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
 })();
-</script>
-</body></html>
+</script></body></html>
