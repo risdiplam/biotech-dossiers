@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NKTR — Nektar Therapeutics — Deep-Dive Dossier (October 2026)</title>
+<title>NKTR — Nektar Therapeutics · Deep-Dive Dossier · 2026-10-11</title>
 <style>
     :root{
       --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
@@ -265,6 +265,8 @@
     .titem .tdate{font-weight:750;color:var(--ink);font-size:14.5px}
     .titem .tbody{font-size:14.5px}
 
+  /* phone overflow fix: wide tables scroll inside their own box */
+  @media(max-width:620px){main table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}}
   </style>
 </head>
 <body>
@@ -272,7 +274,7 @@
   <header class="hero">
     <div class="hero-grid">
       <div>
-        <div class="ticker-line"><span class="ticker">NASDAQ · NKTR</span><span class="stamp">Deep-dive dossier · October 7, 2026 · audited October 10, 2026</span></div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · NKTR</span><span class="stamp">Deep-dive dossier · October 11, 2026</span></div>
         <h1>A Treg-selective IL-2 with a billion in cash—and a contested dataset.</h1>
         <p class="hero-dek">Comprehensive clinical, financial, and catalyst review of rezpegaldesleukin, a Treg-stimulating IL-2 conjugate in Phase 3 for atopic dermatitis and entering Phase 3 for alopecia areata. Prepared as a neutral third-party research document.</p>
       </div>
@@ -451,31 +453,32 @@
 <h3>Dilution history</h3>
 <ul class="tight">
 <li><span class="ev fact">FACT</span><strong>April 2026:</strong> upsized underwritten offering — 3,532,609 shares at $92.00 + full 529,891-share greenshoe = <strong>4,062,500 shares</strong>; gross $373.75M, net ~$350M. Post-offering basic shares: 33,742,147. Underwriters: Jefferies, TD Cowen, Piper Sandler, Citigroup. <span class="src">[R6]</span></li>
+<li><span class="ev fact">FACT</span><strong>February 2026:</strong> underwritten offering — <strong>7,637,931 shares</strong> (incl. full 1,034,482-share underwriters' option) + <strong>293,103 pre-funded warrants</strong> at $58.00; gross ~$460M; closed Feb 13, 2026. <span class="src">[<a href="https://www.newportnewstimes.com/online_features/press_releases/nektar-therapeutics-announces-closing-of-460-million-public-offering-including-full-exercise-of-underwriters-option/article_cfc5b321-1d25-5b3c-be00-9dfa6e247782.html">closing PR, Feb 13, 2026</a>]</span></li>
 <li><span class="ev fact">FACT</span><strong>Sep 2025–Jan 2026:</strong> ATM sales of 673,725 shares at $58.55 weighted-average → ~$39.4M net. <span class="src">[R6]</span></li>
 <li><span class="ev fact">FACT</span><strong>June 9, 2025:</strong> 1-for-15 reverse split (all per-share figures retrospectively adjusted). <span class="src">[R7]</span></li>
 <li><span class="ev fact">FACT</span>Weighted-average basic shares: ~14.1M (Q2 2025) → 18.9M (Q3 2025) → ~33M+ (post-April 2026) — roughly a <strong>2.3× share-count expansion in twelve months</strong>, the price of funding Phase 3 without a partner. <span class="src">[R4, R20]</span></li>
-<li><span class="ev fact">FACT</span>April 2026 prospectus also discloses <strong>293,103 pre-funded warrants</strong> outstanding (exercise $0.0001) as of April 1, 2026 — economically equivalent to common shares. <span class="src">[R6]</span></li>
+<li><span class="ev fact">FACT</span>April 2026 prospectus also discloses <strong>293,103 pre-funded warrants</strong> outstanding (exercise $0.0001) as of April 1, 2026 — issued in the February 2026 offering, economically equivalent to common shares. Total raised since Sep 2025: ~$870M gross (ATM ~$39M net + Feb ~$460M + Apr $374M). <span class="src">[R6]</span></li>
 </ul>
 <p><span class="ev interp">INTERPRETATION</span>The balance sheet is the bull case's armor: $1.0B net cash funds the AD Phase 3 program to first data with no near-term financing overhang — the April raise was deliberately pre-emptive. But the trajectory matters: at a guided-increasing burn (H2 2026 alone ~$200M), the cash covers the <em>first</em> AD readout (mid-2028), not the full AA Phase 3 (850 pts, 52-week primary, data likely 2028–29) plus a second AA confirmatory trial if required. A financing event between the AD readout and AA data is plausible if timelines slip.</p>
 </section>
 
 <section id="fdmc">
-      <div class="section-head"><div class="section-num">08 / VALUATION</div><div><h2>Dilution-honest: 37M fully-diluted shares</h2></div></div><p><span class="ev fact">FACT</span>Dilution-honest share count built from the April 2026 prospectus (as of April 1, 2026) plus disclosed inducement grants through July 2026. Price: $41.17 (Oct 9, 2026 close). Cash: $1,023.4M (Jun 30, 2026). <span class="src">[R6, R3, R4]</span></p>
+      <div class="section-head"><div class="section-num">08 / VALUATION</div><div><h2>Dilution-honest: ~34.2M fully-diluted shares</h2></div></div><p><span class="ev fact">FACT</span>Dilution-honest share count built from the April 2026 prospectus (as of April 1, 2026) plus disclosed inducement grants through July 2026. Price: $41.17 (Oct 9, 2026 close). Cash: $1,023.4M (Jun 30, 2026). <span class="src">[R6, R3, R4]</span></p>
 <table>
 <tr><th>Component</th><th>Shares</th><th>Source / note</th></tr>
-<tr><td>Basic common outstanding</td><td class="num">~33.80M</td><td>33,742,147 post-April offering + ~65k inducement grants (Jun–Jul 2026) <span class="src">[R6, R21]</span></td></tr>
+<tr><td>Basic common outstanding</td><td class="num">~33.74M</td><td>33,742,147 post-April offering (the ~65k Jun–Jul 2026 inducement grants are options and RSUs, counted in the rows below) <span class="src">[R6, R21]</span></td></tr>
 <tr><td>Stock options outstanding</td><td class="num">~2.39M</td><td>2,326,369 @ $58.70 WAEP (Apr 1, 2026) + ~61k inducements <span class="src">[R6, R21]</span></td></tr>
 <tr><td>RSUs / performance RSUs</td><td class="num">~0.21M</td><td>198,331 (Apr 1, 2026) + ~9k inducements <span class="src">[R6, R21]</span></td></tr>
-<tr><td>Pre-funded warrants</td><td class="num">0.29M</td><td>293,103 @ $0.0001 — economically common <span class="src">[R6]</span></td></tr>
-<tr><td><strong>Fully-diluted shares</strong></td><td class="num"><strong>~36.7M</strong></td><td>Treasury-stock method not applied (options mostly out-of-the-money); conservative count</td></tr>
+<tr><td>Pre-funded warrants</td><td class="num">0.29M</td><td>293,103 @ $0.0001 (Feb 2026 offering) — economically common <span class="src">[R6]</span></td></tr>
+<tr><td><strong>Fully-diluted shares</strong></td><td class="num"><strong>~34.24M</strong></td><td>Common + RSUs + pre-funded warrants; options by the treasury method add 0 at $41.17 (WAEP $58.70, out of the money). Counting every option in full would give ~36.6M.</td></tr>
 </table>
 <div class="kgrid">
   <div class="kbox"><div class="k">Basic market cap</div><div class="v num">~$1.39B</div><div class="d">33.8M × $41.17 (Finnhub quotes ~$1.41B on its own share count)</div></div>
-  <div class="kbox"><div class="k">Fully-diluted market cap</div><div class="v num">~$1.51B</div><div class="d">36.7M × $41.17</div></div>
+  <div class="kbox"><div class="k">Fully-diluted market cap</div><div class="v num">~$1.41B</div><div class="d">34.24M × $41.17</div></div>
   <div class="kbox"><div class="k">Net cash</div><div class="v num">$1,023.4M</div><div class="d">Zero debt (Jun 30, 2026)</div></div>
-  <div class="kbox"><div class="k">Enterprise value (FD)</div><div class="v num">~$0.49B</div><div class="d">$1.51B − $1.02B; basic EV ~$0.37B</div></div>
+  <div class="kbox"><div class="k">Enterprise value (FD)</div><div class="v num">~$0.39B</div><div class="d">$1.41B − $1.02B; basic EV ~$0.37B</div></div>
 </div>
-<p><span class="ev interp">INTERPRETATION</span>On a dilution-honest basis the market ascribes roughly <strong>$490M of enterprise value to rezpegaldesleukin</strong> — i.e., the market prices the AD Phase 3 program, the AA option, and the T1D option at less than half the cash on hand. That is either a distressed-valuation opportunity on a de-risked Phase 2b asset, or the market's verdict that the AA miss, the ISR profile, and the long wait to mid-2028 justify a steep discount. Note the options overhang (WAEP $58.70, ~43% above current price) is a real future dilution vector if the stock re-rates.</p>
+<p><span class="ev interp">INTERPRETATION</span>On a dilution-honest basis the market ascribes roughly <strong>$390M of enterprise value to rezpegaldesleukin</strong> — i.e., the market prices the AD Phase 3 program, the AA option, and the T1D option at well under half the cash on hand. That is either a distressed-valuation opportunity on a de-risked Phase 2b asset, or the market's verdict that the AA miss, the ISR profile, and the long wait to mid-2028 justify a steep discount. Note the options overhang (WAEP $58.70, ~43% above current price) is a real future dilution vector if the stock re-rates.</p>
 </section>
 <section id="catalysts">
       <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>No near-term binary—AD data is a 2028 event</h2></div></div><p>Date quality: <span class="date-tag hard">hard</span> fixed calendar date · <span class="date-tag guidance">guidance</span> company-guided window · <span class="date-tag inferred">inferred</span> estimated from program timelines.</p>
@@ -493,7 +496,7 @@
 <tr><td><strong>ZENITH-AD first Phase 3 topline</strong> — AD-1/AD-2, IGA 0/1 at Week 24 (US) / IGA 0/1 + EASI-75 ex-US</td><td class="num">Mid-2028</td><td><span class="date-tag guidance">guidance</span></td><td><strong>The binary.</strong> Statistically significant IGA 0/1 delta at Week 24 with a Phase-2b-consistent effect size; maintenance re-randomization supports q4w/q12w dosing <span class="src">[R5, R4]</span></td><td>Placebo IGA 0/1 drift above ~10–12% compresses the delta; AD-3 (treatment-experienced, no prior data) reads alongside — a second, harder binary inside the same readout</td></tr>
 <tr><td><strong>ZENITH-AA topline</strong> — SALT≤20 at Week 52</td><td class="num">2028–2029</td><td><span class="date-tag guidance">guidance</span> / <span class="date-tag inferred">inferred</span></td><td>Significant SALT≤20 separation at Week 52 with durability data confirming the Phase 2b off-treatment thesis <span class="src">[R2]</span></td><td>Data likely lands after AD readout; a miss here after an AD win still leaves a viable single-indication company</td></tr>
 <tr><td><strong>AD BLA submission</strong></td><td class="num">2029</td><td><span class="date-tag guidance">guidance</span></td><td>Accepted filing with Fast Track rolling-review mechanics; AA BLA follows if ZENITH-AA positive <span class="src">[R5, R2]</span></td><td>FDA questions around the AA package (post-hoc primary rescue) if AA BLA is attempted on one study</td></tr>
-<tr><td><strong>Lilly $90M award — collection</strong></td><td class="num">Ongoing</td><td><span class="date-tag inferred">inferred</span></td><td>Cash received in full: ~$2.45 per FD share of non-dilutive capital <span class="src">[R17]</span></td><td>Subject to post-trial proceedings and potential appeal — timing and final amount not fixed; do not model as certain</td></tr>
+<tr><td><strong>Lilly $90M award — collection</strong></td><td class="num">Ongoing</td><td><span class="date-tag inferred">inferred</span></td><td>Cash received in full: ~$2.6 per FD share of non-dilutive capital <span class="src">[R17]</span></td><td>Subject to post-trial proceedings and potential appeal — timing and final amount not fixed; do not model as certain</td></tr>
 <tr><td><strong>Potential financing</strong></td><td class="num">2028–2029</td><td><span class="date-tag inferred">inferred</span></td><td>Not needed before the AD readout (runway into Q3 2028); if AD wins, a raise into strength funds AA completion + BLA prep</td><td>Management's pattern is pre-emptive dilution (April 2026 at $92); any raise between the AD readout and AA data is plausible if timelines slip</td></tr>
 </table>
 <p><span class="ev interp">INTERPRETATION</span>The calendar is back-loaded: nothing binary before mid-2028. The 2027 events are progress markers (AA start, T1D data, enrollment), not value inflections. This is a "buy the cash, wait 20 months" setup — dead money risk is real if sentiment drifts, but the cash floor limits fundamental downside into the readout.</p>
@@ -516,41 +519,41 @@
 </section>
 
 <section id="scenarios">
-      <div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Bear, base, bull—with soft price anchors</h2></div></div><p><em>No recommendation is offered. Targets below are <strong>soft and scenario-based</strong> — arithmetic on this dossier's own figures (36.7M fully-diluted shares; $1,023.4M cash at Jun 30, 2026), not a DCF. Bear and base are valued at the mid-2028 readout date on the same burn path; the bull is a takeout valued on the standing sell-side cap. The takeout/max-value case is capped at the top published sell-side price target of <strong>$185</strong> (HC Wainwright, Buy, Oct 2026) — it is not exceeded. <span class="src">[R8]</span></em></p>
+      <div class="section-head"><div class="section-num">11 / SCENARIOS</div><div><h2>Bear, base, bull—with soft price anchors</h2></div></div><p><em>No recommendation is offered. Targets below are <strong>soft and scenario-based</strong> — arithmetic on this dossier's own figures (34.24M shares plus options by the treasury method at each scenario price; $1,023.4M cash at Jun 30, 2026, burned to the readout), not a DCF. Bear and base are valued at the mid-2028 readout date on the same burn path; the bull is a takeout valued on the standing sell-side cap. The takeout/max-value case is capped at the top published sell-side price target of <strong>$185</strong> (HC Wainwright, Buy, Oct 2026) — it is not exceeded. <span class="src">[R8]</span></em></p>
 
 <div class="callout">
 <h4>Soft scenario targets — summary</h4>
 <table>
 <tr><th>Scenario</th><th>Soft target (per FD share)</th><th>Implied FD equity</th><th>Core assumption</th></tr>
-<tr><td><strong>Bear</strong></td><td class="num"><strong>~$7</strong></td><td class="num">~$0.26B</td><td>AD Phase 3 fails; equity ≈ est. cash at readout (~$240M) + ~$20M AA/T1D salvage (Lilly $90M award excluded — collection uncertain)</td></tr>
-<tr><td><strong>Base</strong></td><td class="num"><strong>~$88</strong></td><td class="num">~$3.24B</td><td>AD wins per Phase 2b, AA a coin flip; AD EV $2.6B + AA option $0.3B + T1D $0.1B + est. readout cash $0.24B</td></tr>
-<tr><td><strong>Bull</strong></td><td class="num"><strong>~$185</strong></td><td class="num">~$6.8B</td><td>AD + AA Phase 3 both win; strategic takeout at the standing-rule cap (top sell-side PT)</td></tr>
+<tr><td><strong>Bear</strong></td><td class="num"><strong>~$7.60</strong></td><td class="num">~$0.26B</td><td>AD Phase 3 fails; equity ≈ est. cash at readout (~$240M) + ~$20M AA/T1D salvage (Lilly $90M award excluded — collection uncertain)</td></tr>
+<tr><td><strong>Base</strong></td><td class="num"><strong>~$92</strong></td><td class="num">~$3.24B</td><td>AD wins per Phase 2b, AA a coin flip; AD EV $2.6B + AA option $0.3B + T1D $0.1B + est. readout cash $0.24B</td></tr>
+<tr><td><strong>Bull</strong></td><td class="num"><strong>~$185</strong></td><td class="num">~$6.6B</td><td>AD + AA Phase 3 both win; strategic takeout at the standing-rule cap (top sell-side PT)</td></tr>
 </table>
-<p style="margin:6px 0 0" class="src">Arithmetic: 36.7M FD shares throughout. Bear $260M ÷ 36.7M ≈ $7.1; base $3.24B ÷ 36.7M ≈ $88.3; bull $185 × 36.7M ≈ $6.79B. Assumptions are labeled per scenario below.</p>
+<p style="margin:6px 0 0" class="src">Arithmetic (treasury method: 2.39M options at $58.70 WAEP add 2.39M × (1 − 58.70/P) only above the strike): bear $260M ÷ 34.24M (options out of the money) ≈ $7.59; base $3.24B ÷ 35.11M (34.24M + 0.87M option shares at P ≈ $92.3) ≈ $92.3; bull $185 × 35.87M (34.24M + 1.63M option shares) ≈ $6.64B. Assumptions are labeled per scenario below.</p>
 </div>
 
-<h3>Bear — AD Phase 3 fails (or placebo overwhelms) → soft target ~$7</h3>
-<p><span class="ev interp">INTERPRETATION</span><strong>Assumptions:</strong> ZENITH-AD misses (e.g., IGA 0/1 delta collapses on placebo drift, or the Treg mechanism proves indication-limited as in SLE). YE2026 cash ~$827M (midpoint of $815–840M guide); 2027 burn ~$390M (carrying forward the dossier's own H2-2026 quarterly rate of ~$98M, with the ZENITH-AA start adding cost); H1 2028 burn ~$195M → est. cash at the mid-2028 readout ≈ <strong>~$240M</strong>. The pipeline's registrational value goes to ~zero and the equity reverts toward that cash plus ~$20M of AA/T1D salvage → <strong>~$260M ÷ 36.7M ≈ $7/share</strong>. The $90M Lilly award (+~$2.45/FD share) is excluded from the headline number — collection is subject to post-trial proceedings and appeal and is not modeled as certain <span class="src">[R17]</span>; if received, bear equity ≈ $350M ≈ ~$9.6/share. Key signposts: no interim futility disclosure is planned, so this scenario crystallizes at the mid-2028 readout with no early warning.</p>
+<h3>Bear — AD Phase 3 fails (or placebo overwhelms) → soft target ~$7.60</h3>
+<p><span class="ev interp">INTERPRETATION</span><strong>Assumptions:</strong> ZENITH-AD misses (e.g., IGA 0/1 delta collapses on placebo drift, or the Treg mechanism proves indication-limited as in SLE). YE2026 cash ~$827M (midpoint of $815–840M guide); 2027 burn ~$390M (carrying forward the dossier's own H2-2026 quarterly rate of ~$98M, with the ZENITH-AA start adding cost); H1 2028 burn ~$195M → est. cash at the mid-2028 readout ≈ <strong>~$240M</strong>. The pipeline's registrational value goes to ~zero and the equity reverts toward that cash plus ~$20M of AA/T1D salvage → <strong>~$260M ÷ 34.24M ≈ $7.60/share</strong> (options are out of the money in this case). The $90M Lilly award (+~$2.6/share) is excluded from the headline number — collection is subject to post-trial proceedings and appeal and is not modeled as certain <span class="src">[R17]</span>; if received, bear equity ≈ $350M ≈ ~$10.2/share. Key signposts: no interim futility disclosure is planned, so this scenario crystallizes at the mid-2028 readout with no early warning.</p>
 
-<h3>Base — AD Phase 3 succeeds broadly per Phase 2b; AA mixed → soft target ~$88</h3>
-<p><span class="ev interp">INTERPRETATION</span><strong>Assumptions:</strong> AD-1/AD-2 replicate the Phase 2b effect (IGA 0/1 and EASI-75 significant at Week 24; maintenance data supports q4w/q12w labeling); AD-3 in treatment-experienced patients is directionally positive or neutral. BLA 2029 stays on track. Component values: AD program EV <strong>$2.6B</strong> (deliberately below the consensus-PT-implied EV of ~$4B, reflecting single-asset and placebo-drift risk), AA option <strong>$0.3B</strong> (contested Phase 2b, coin-flip Phase 3), T1D option <strong>$0.1B</strong>, plus est. cash at the mid-2028 readout <strong>~$0.24B</strong> (same burn path as the bear scenario) → <strong>~$3.24B ÷ 36.7M ≈ $88/share</strong>. The $90M Lilly award is excluded (collection uncertain); if received, add ~$2.45/share. The AA Phase 3 (850 pts, 52-week primary) remains the expensive second binary; commercial-phase value is deliberately not modeled (buy-and-hold-through-the-binary frame).</p>
+<h3>Base — AD Phase 3 succeeds broadly per Phase 2b; AA mixed → soft target ~$92</h3>
+<p><span class="ev interp">INTERPRETATION</span><strong>Assumptions:</strong> AD-1/AD-2 replicate the Phase 2b effect (IGA 0/1 and EASI-75 significant at Week 24; maintenance data supports q4w/q12w labeling); AD-3 in treatment-experienced patients is directionally positive or neutral. BLA 2029 stays on track. Component values: AD program EV <strong>$2.6B</strong> (deliberately below the consensus-PT-implied EV of ~$4B, reflecting single-asset and placebo-drift risk), AA option <strong>$0.3B</strong> (contested Phase 2b, coin-flip Phase 3), T1D option <strong>$0.1B</strong>, plus est. cash at the mid-2028 readout <strong>~$0.24B</strong> (same burn path as the bear scenario) → <strong>~$3.24B ÷ 35.11M ≈ $92/share</strong> (34.24M + 0.87M treasury-method option shares). The $90M Lilly award is excluded (collection uncertain); if received, add ~$2.6/share. The AA Phase 3 (850 pts, 52-week primary) remains the expensive second binary; commercial-phase value is deliberately not modeled (buy-and-hold-through-the-binary frame).</p>
 
 <h3>Bull — both AD and AA Phase 3 win; takeout → soft target ~$185 (capped)</h3>
-<p><span class="ev interp">INTERPRETATION</span>AD succeeds and ZENITH-AA confirms the durability thesis (SALT≤20 at Week 52 with off-treatment maintenance) — rezpeg becomes the only Treg mechanism with registrational wins in two dermatology indications, wholly owned, with Fast Track designations and a quarterly-maintenance profile. This requires ZENITH-AA to succeed where the Phase 2b primary missed in the pre-specified analysis (red flag #1) — the single biggest swing factor in this scenario. A strategic acquirer (dermatology or immunology franchise) is the natural endgame; <strong>maximum takeout value is capped at the top sell-side target of $185/share on ~36.7M fully-diluted shares (≈$6.8B FD equity value)</strong>, consistent with the standing rule that takeout scenarios must not overshoot published sell-side targets. <span class="src">[R8]</span></p>
+<p><span class="ev interp">INTERPRETATION</span>AD succeeds and ZENITH-AA confirms the durability thesis (SALT≤20 at Week 52 with off-treatment maintenance) — rezpeg becomes the only Treg mechanism with registrational wins in two dermatology indications, wholly owned, with Fast Track designations and a quarterly-maintenance profile. This requires ZENITH-AA to succeed where the Phase 2b primary missed in the pre-specified analysis (red flag #1) — the single biggest swing factor in this scenario. A strategic acquirer (dermatology or immunology franchise) is the natural endgame; <strong>maximum takeout value is capped at the top sell-side target of $185/share on ~35.9M fully-diluted shares at that price (≈$6.6B FD equity value)</strong>, consistent with the standing rule that takeout scenarios must not overshoot published sell-side targets. <span class="src">[R8]</span></p>
 
 <h3>Scenario signposts to watch</h3>
 <ul class="tight">
 <li><strong>Enrollment pace</strong> on ZENITH-AD (earnings calls) — slippage pushes the mid-2028 readout right, into a financing window.</li>
 <li><strong>ZENITH-AA initiation</strong> (early 2027 guided) — confirms the AA bet is real and sizes the 2027–29 burn.</li>
 <li><strong>T1D 2027 data</strong> — first human efficacy signal for rezpeg outside dermatology; positive C-peptide data would validate the "pipeline in a product" claim.</li>
-<li><strong>Lilly $90M collection</strong> — ~$2.45/FD-share of non-dilutive cash if received in full.</li>
+<li><strong>Lilly $90M collection</strong> — ~$2.6/FD-share of non-dilutive cash if received in full.</li>
 <li><strong>Competitor readouts</strong> — amlitelimab/rocatinlimab Phase 3 data reframes the durability narrative for or against rezpeg.</li>
 </ul>
 </section>
 <section id="management">
       <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management and insider signals</h2></div></div><table>
 <tr><th>Person</th><th>Role</th><th>Record</th></tr>
-<tr><td><strong>Howard W. Robin</strong></td><td>President &amp; CEO (since 2007), director</td><td><span class="ev fact">FACT</span>Led Nektar through the bempegaldesleukin/BMS collapse (2022) and the Lilly split (2023, incl. 60% workforce reduction), then re-centered the company on rezpeg and raised ~$390M (ATM + April 2026 offering) to fund Phase 3 without a partner. Sued Lilly over mishandled rezpeg data — jury awarded $90M (~Sept 2026). <span class="src">[R11, R17, R6]</span> <span class="ev interp">INTERPRETATION</span> — Resilience and capital-raising execution are proven; pivotal-trial picking (bempeg, ISLAND lupus) is not.</td></tr>
+<tr><td><strong>Howard W. Robin</strong></td><td>President &amp; CEO (since 2007), director</td><td><span class="ev fact">FACT</span>Led Nektar through the bempegaldesleukin/BMS collapse (2022) and the Lilly split (2023, incl. 60% workforce reduction), then re-centered the company on rezpeg and raised ~$870M gross (ATM + February and April 2026 offerings) to fund Phase 3 without a partner. Sued Lilly over mishandled rezpeg data — jury awarded $90M (~Sept 2026). <span class="src">[R11, R17, R6]</span> <span class="ev interp">INTERPRETATION</span> — Resilience and capital-raising execution are proven; pivotal-trial picking (bempeg, ISLAND lupus) is not.</td></tr>
 <tr><td><strong>Jonathan Zalevsky, Ph.D.</strong></td><td>Chief R&amp;D Officer</td><td><span class="ev fact">FACT</span>Scientific lead on the rezpeg program; 16,500 performance-based options vested July 2026 after the compensation committee certified performance conditions met — a milestone-linked insider signal. <span class="src">[R21]</span></td></tr>
 <tr><td><strong>Linda Rubinstein</strong></td><td>CFO</td><td><span class="ev fact">FACT</span>Oversees the $1.02B cash position; guided runway into Q3 2028 and YE2026 cash of $815–840M. <span class="src">[R4]</span></td></tr>
 </table>
@@ -564,7 +567,7 @@
 </section>
 
 <section id="references">
-      <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2></div></div><p><strong>As-of date: October 10, 2026</strong> (dossier built October 7, 2026; audited and enhanced October 10, 2026). Share price $41.17 (Finnhub, Oct 9, 2026 close — latest trading day). Financial figures from the Q2 2026 Form 10-Q (quarter ended June 30, 2026) unless otherwise noted.</p>
+      <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2></div></div><p><strong>As-of date: October 11, 2026</strong> (dossier built October 7, 2026; updated October 10–11, 2026). Share price $41.17 (Finnhub, Oct 9, 2026 close — latest trading day). Financial figures from the Q2 2026 Form 10-Q (quarter ended June 30, 2026) unless otherwise noted.</p>
 <h3>Filings &amp; company disclosures used</h3>
 <ul class="tight">
 <li>Form 10-Q for Q2 2026 (quarter ended June 30, 2026; filed August 2026) — cash, burn, revenue, share counts</li>
@@ -583,7 +586,7 @@
 <div class="ref">[R6] Nektar Therapeutics Form 424B5 prospectus supplement, filed April 21, 2026 — 4,062,500 shares at $92.00 (incl. greenshoe), 29,679,647 shares outstanding Apr 1, 2026; 2,326,369 options @ $58.70 WAEP; 198,331 RSUs; 293,103 pre-funded warrants; ATM sales 673,725 shares @ $58.55. <a href="https://www.stocktitan.net/sec-filings/NKTR/424b5-nektar-therapeutics-prospectus-supplement-debt-securities-60699d69fee3.html">stocktitan.net</a></div>
 <div class="ref">[R7] MarketBeat — NKTR 1-for-15 reverse split effective June 9, 2025; Q3 2025 weighted-average shares 18,946,559 (split-adjusted). <a href="https://www.marketbeat.com/stocks/NASDAQ/NKTR/">marketbeat.com</a></div>
 <div class="ref">[R8] MarketBeat / American Banking News / Zolmax, October 2026 — consensus "Moderate Buy," avg PT $138.50; HC Wainwright $185 Buy (reaffirmed Oct 4, 2026); BTIG Buy (reaffirmed Oct 9, 2026); Canaccord $153 Buy; JPMorgan $65 Neutral; Wedbush $50 Neutral (cut Sept 23, 2026); insiders 2.50%, institutions 75.88%. <a href="https://www.americanbankingnews.com/2026/10/04/nektar-therapeutics-nktr-buy-rating-reaffirmed-at-hc-wainwright.html">americanbankingnews.com</a> · <a href="https://www.thecerbatgem.com/2026/10/09/nektar-therapeutics-nktr-buy-rating-reaffirmed-at-btig-research.html">thecerbatgem.com (BTIG reaffirm, Oct 9)</a></div>
-<div class="ref">[R9] Nature Communications 15 (2022), s41467-022-31130-9 — IL-2 mutein engineering: weakening IL-2Rβ engagement to force IL-2Rα-dependent Treg selectivity. <a href="https://www.nature.com/articles/s41467-022-31130-9">nature.com</a></div>
+<div class="ref">[R9] Nature Communications 13 (2022), s41467-022-31130-9 — IL-2 mutein engineering: weakening IL-2Rβ engagement to force IL-2Rα-dependent Treg selectivity. <a href="https://www.nature.com/articles/s41467-022-31130-9">nature.com</a></div>
 <div class="ref">[R10] Academic literature: Klatzmann D. &amp; Abbas A.K., <em>Nat Rev Immunol</em> 15:283–294 (2015); Castela E. et al., <em>JAMA Dermatol</em> 150:748–751 (2014); Hartemann A. et al. (DILT1D/DILfrequency), <em>Nat Commun</em> (2022); He J. et al., <em>Ann Rheum Dis</em> 79:141–149 (2020); Humrich J.Y. et al. (LUPIL-2), <em>Ann Rheum Dis</em> 81:1685–1694 (2022); Koreth J. et al., <em>NEJM</em> 365:2055–2066 (2011).</div>
 <div class="ref">[R11] Fierce Biotech, April 2023 — Lilly returns rezpeg rights after Phase 2 ISLAND lupus failure (Feb 2023); Pharmaphorum/Techtarget, Aug 2023 — Nektar sues Lilly over mishandled Phase 1b data; 60% workforce reduction. <a href="https://www.fiercebiotech.com/biotech/after-gathering-enough-nektar-lilly-hands-backs-rights-immunology-med-post-lupus-fail">fiercebiotech.com</a></div>
 <div class="ref">[R12] Nektar/TrialNet collaboration (Feb 2025) and CTV registry record — NIH-sponsored Phase 2 RESET T1D, n=66, 2:1, q14d × 26 wks, MMTT C-peptide AUC at 12 months, ages 8–45; company guides initial data 2027; registry est. primary completion May 2028. <a href="https://ctv.veeva.com/study/rezpegaldesleukin-nktr-358-in-new-onset-type-1-diabetes-mellitus">ctv.veeva.com</a></div>
@@ -598,14 +601,15 @@
 <div class="ref">[R21] StockTitan NKTR Form 4 summaries — June 2026 inducement grants (20,500 options @ $60.98 + 3,900 RSUs); July 2026 inducement grants (36,000 options @ $64.84); Zalevsky 16,500 performance-option vesting certified July 23, 2026. <a href="https://www.stocktitan.net/news/NKTR/nektar-therapeutics-reports-inducement-grants-under-nasdaq-listing-b11plyiz8a5n.html">stocktitan.net</a></div>
 <div class="ref">[R22] Motley Fool / SEC Form 4, June 2026 — CEO Howard Robin open-market sale of 20,000 shares (~$1.22M at ~$60.75), 26.6% of direct holdings; Aug 18, 2026 tax-withholding sale of 418 shares. <a href="https://www.fool.com/coverage/filings/2026/06/24/president-ceo-sells-nktr-20000-shares-for-12-million/">fool.com</a></div>
 <div class="ref">[R23] TradingView NKTR earnings calendar — next quarterly earnings report scheduled November 5, 2026 (company-confirmed date). <a href="https://www.tradingview.com/symbols/NASDAQ-NKTR/?offer_id=10&aff_id=2588">tradingview.com</a></div>
-<p class="src" style="margin-top:18px">Local catalyst datasets consulted: <span class="num">~/workspace/research_notes/catalyst-calendar-2027/data.json</span> (1 NKTR event: T1D Phase 2 data expected 2027, guidance) and <span class="num">~/workspace/research_notes/q4-2026-dossier/dossier-v4.json</span> (0 NKTR events). Additional NKTR events in this dossier were derived from company guidance and program timelines as labeled.</p>
+<p class="src" style="margin-top:18px">Catalyst list cross-checked against the public <a href="https://risdiplam.github.io/biotech-catalyst-calendar/">2027 Biotech Catalyst Calendar</a> (1 NKTR event: T1D Phase 2 data expected 2027, guidance). Additional NKTR events in this dossier were derived from company guidance and program timelines as labeled.</p>
 </section>
 
 </main>
 
 <footer>
-<p>This document is an independent research summary compiled from public filings, peer-reviewed literature, and company disclosures, audited and enhanced as of October 10, 2026. It contains no buy/sell recommendation. Scenario price targets are explicitly labeled "soft" and scenario-based — simplified arithmetic on the dossier's own figures, not a DCF, and the maximum-value case is capped at the top published sell-side price target ($185, HC Wainwright). Evidence labels (FACT / INTERPRETATION / GAP / UNVERIFIED) reflect the compiler's assessment of source strength at the time of writing.</p>
+<p>This document is an independent research summary compiled from public filings, peer-reviewed literature, and company disclosures, as of October 11, 2026. It contains no buy/sell recommendation. Scenario price targets are explicitly labeled "soft" and scenario-based — simplified arithmetic on the dossier's own figures, not a DCF, and the maximum-value case is capped at the top published sell-side price target ($185, HC Wainwright). Evidence labels (FACT / INTERPRETATION / GAP / UNVERIFIED) reflect the compiler's assessment of source strength at the time of writing.</p>
 </footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
 <script>
     /* Theme toggle */
     const themeBtn=document.getElementById('themeToggle');
@@ -637,6 +641,5 @@
     window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
     toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
   </script>
-  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
 </body>
 </html>
