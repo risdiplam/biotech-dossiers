@@ -55,7 +55,7 @@
     section:first-child{margin-top:0}
     section.collapsed .section-body{display:none}
     .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
-    .section-head>div:last-child{padding-right:52px}
+    .section-head>div:nth-child(2){padding-right:52px}
     .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
     .collapse-btn:hover{background:var(--mint)}
     .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
@@ -217,7 +217,7 @@
       main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
       .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
       .collapse-btn{width:44px;height:44px}
-      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:last-child{padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
       .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
       .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
       .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
@@ -321,7 +321,7 @@ tr:nth-child(even) td{background:var(--surface)}
 <div class="jump-wrap">
     <nav class="jump" aria-label="Jump to section">
       <a href="#s1">Frame</a><a href="#s2">Science</a><a href="#s3">Pipeline</a><a href="#s4">Trials</a><a href="#s5">Regulatory</a><a href="#s6">Landscape</a><a href="#s7">Financials</a><a href="#s8">Valuation</a><a href="#s9">Catalysts</a><a href="#s10">Risks</a><a href="#s11">Scenarios</a><a href="#s12">People</a><a href="#s13">Sources</a>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">◐ Dark mode</button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
     </nav>
   </div>
 <main>
@@ -784,7 +784,7 @@ tr:nth-child(even) td{background:var(--surface)}
 "use strict";
 /* Theme toggle - shared biotech-theme key */
 var themeBtn=document.getElementById('themeToggle');
-function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent=t==='dark'?'\u2600 Light mode':'\u25d0 Dark mode';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t);}catch(e){}}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t);}catch(e){}}
 var startTheme='light';
 try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark';}
 applyTheme(startTheme);
