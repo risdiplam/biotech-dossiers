@@ -32,7 +32,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;paddi
 <div class="wrap">
 <header>
 <h1>Biotech Dossiers</h1>
-<p>Deep-dive research library — 18 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
+<p>Deep-dive research library — 23 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
 </header>
 <div class="controls">
 <input type="search" id="q" placeholder="Search tickers or companies…" aria-label="Search dossiers">
@@ -46,22 +46,27 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;paddi
 <script>
 const D=[
 {t:"PEPG",c:"PepGen",d:"2026-10-11",cat:"FREEDOM2 10mg/kg DM1 data — Nov 2026 [guidance]",sc:"Bear $0.55–1.05 / Base $3.10–3.80 / Bull $7.35–9.90"},
-{t:"CRBP",c:"Corbus Pharmaceuticals",d:"2026-10-11",cat:"ObesityWeek late-breaker (full CANYON-1 data) — Nov 14–17, 2026 [hard]",sc:"Bear $1.60 / Base $10 / Bull $27"},
-{t:"SLGL",c:"Sol-Gel Technologies",d:"2026-10-11",cat:"SGT-610 Ph3 Gorlin topline — late Nov 2026 [guidance]; KOL day Oct 14",sc:"Bear $13–16 / Base $56–92 / Bull $157–197"},
-{t:"LTGO",c:"Latigo Biotherapeutics",d:"2026-10-11",cat:"Onzotrigine Ph3 bunionectomy topline — 2H 2027 [guidance]",sc:"Bear $4.40 / Base $24 / Bull $73"},
+{t:"CRBP",c:"Corbus Pharmaceuticals",d:"2026-10-16",cat:"ObesityWeek late-breaker (full CANYON-1 data) — Nov 14–17, 2026 [hard]",sc:"Bear $1.60 / Base $10 / Bull $27"},
+{t:"SLGL",c:"Sol-Gel Technologies",d:"2026-10-16",cat:"SGT-610 Ph3 Gorlin topline — late Nov 2026 [guidance{t:"EWTX",c:"Edgewise Therapeutics",d:"2026-10-16",cat:"EDG-7500 Ph3 initiation + Servier Becker topline — Q4 2026 [guidance]",sc:"Bear $14–19 / Base $32–42 / Bull $56–68"},
+{t:"LXEO",c:"Lexeo Therapeutics",d:"2026-10-16",cat:"LX2020 12-mo high-dose PKP2 data — Q4 2026 [guidance]",sc:"Bear $0.90–1.50 / Base $4.50–6.35 / Bull $10–13.05"},
+{t:"ZURA",c:"Zura Bio",d:"2026-10-16",cat:"TibuSHIELD hidradenitis suppurativa topline — Q4 2026 [guidance]",sc:"Bear $0.50–1.00 / Base $4–5.50 / Bull $11–15"},
+{t:"BLSM",c:"BlossomHill Therapeutics",d:"2026-10-16",cat:"BH-30643 end-of-Phase 1 FDA meeting — Q4 2026 [guidance]",sc:"Bear $4–6 / Base $16–22 / Bull $30–40"},
+{t:"CTNM",c:"Contineum Therapeutics",d:"2026-10-16",cat:"PROPEL-IPF topline — mid/H2 2028 [guidance]",sc:"Bear $1.75–2.50 / Base $7.50–9.50 / Bull $19–25"},
+]; KOL day Oct 14",sc:"Bear $13–16 / Base $56–92 / Bull $157–197"},
+{t:"LTGO",c:"Latigo Biotherapeutics",d:"2026-10-16",cat:"Onzotrigine Ph3 bunionectomy topline — 2H 2027 [guidance]",sc:"Bear $4.40 / Base $24 / Bull $73"},
 {t:"HELP",c:"Helus Pharma",d:"2026-10-11",cat:"HLP003 APPROACH pivotal — Q4 2026 binary; Oct 21 presentation",sc:"Bear $1 / Base $19 / Bull $60–68"},
-{t:"IRON",c:"Disc Medicine",d:"2026-10-11",cat:"Bitopertin APOLLO Ph3 topline — Q4 2026 [guidance]",sc:"Bear $24–35 / Mixed $40–55 / Base $95–115 / Bull $130–153"},
-{t:"IMUX",c:"Immunic Inc",d:"2026-10-11",cat:"Vidofludimus ENSURE-1/2 Ph3 topline — by end of 2026 [guidance]",sc:"Bear $2.15 / Base $27 / Bull $56"},
-{t:"SPRB",c:"Spruce Biosciences",d:"2026-10-11",cat:"TA-ERT BLA submission — Q4 2026 [guidance]",sc:"Bear $23 / Base $80 / Bull $120"},
-{t:"HRMY",c:"Harmony Biosciences",d:"2026-10-11",cat:"Pitolisant patent trial closing arguments — Oct 22, 2026 [hard]",sc:"Bear $31 / Base $45 / Bull $70"},
+{t:"IRON",c:"Disc Medicine",d:"2026-10-16",cat:"Bitopertin APOLLO Ph3 topline — Q4 2026 [guidance]",sc:"Bear $24–35 / Mixed $40–55 / Base $95–115 / Bull $130–153"},
+{t:"IMUX",c:"Immunic Inc",d:"2026-10-16",cat:"Vidofludimus ENSURE-1/2 Ph3 topline — by end of 2026 [guidance]",sc:"Bear $2.15 / Base $27 / Bull $56"},
+{t:"SPRB",c:"Spruce Biosciences",d:"2026-10-16",cat:"TA-ERT BLA submission — Q4 2026 [guidance]",sc:"Bear $23 / Base $80 / Bull $120"},
+{t:"HRMY",c:"Harmony Biosciences",d:"2026-10-16",cat:"Pitolisant patent trial closing arguments — Oct 22, 2026 [hard]; CEO transition Jan 1, 2027",sc:"Bear $31 / Base $45 / Bull $70"},
 {t:"PRAX",c:"Praxis Precision Medicines",d:"2026-10-11",cat:"Relutrigine PDUFA — Dec 27, 2026 [hard]; ulixacaltamide PDUFA next",sc:"Bear $107 / Base $296 / Bull $613"},
-{t:"AXSM",c:"Axsome Therapeutics",d:"2026-10-11",cat:"AXS-05 ENGAGE (BED) Ph3 topline — Q4 2026 [guidance]; AXS-12 PDUFA May 1, 2027",sc:"Bear $89 / Base $179 / Bull $236"},
+{t:"AXSM",c:"Axsome Therapeutics",d:"2026-10-16",cat:"Q3 earnings — Nov 2, 2026 [hard]; AXS-05 ENGAGE (BED) Ph3 topline — Q4 2026 [guidance]; AXS-12 PDUFA May 1, 2027",sc:"Bear $89 / Base $179 / Bull $236"},
 {t:"XENE",c:"Xenon Pharmaceuticals",d:"2026-10-11",cat:"Azetukalner X-NOVA2 (MDD) topline — Q1 2027 [guidance]",sc:"Bear $22 / Base $68 / Bull $90"},
-{t:"STOK",c:"Stoke Therapeutics",d:"2026-10-11",cat:"Zorevunersen EMPEROR Ph3 topline — Q3 2027 [guidance]",sc:"Bear $4 / Base $43 / Bull $58"},
-{t:"OVID",c:"Ovid Therapeutics",d:"2026-10-11",cat:"OV329 photosensitivity proof-of-mechanism data — near YE 2026 [guidance]",sc:"Bear $0.30 / Base $4.15 / Bull $8"},
+{t:"STOK",c:"Stoke Therapeutics",d:"2026-10-16",cat:"Zorevunersen EMPEROR Ph3 topline — Q3 2027 [guidance]",sc:"Bear $4 / Base $43 / Bull $58"},
+{t:"OVID",c:"Ovid Therapeutics",d:"2026-10-16",cat:"OV329 photosensitivity proof-of-mechanism data — near YE 2026 [guidance]",sc:"Bear $0.30 / Base $4.15 / Bull $8"},
 {t:"GLUE",c:"Monte Rosa Therapeutics",d:"2026-10-11",cat:"MRT-2359 Ph1/2 update — by YE 2026 [guidance]",sc:"Bear $5.15 / Base $11.60 / Bull $22.50"},
-{t:"SLN",c:"Silence Therapeutics",d:"2026-10-11",cat:"Divesiran end-of-Ph2 FDA meeting — by YE 2026; Ph3 PV start 1H 2027 [guidance]",sc:"Bear $5.65 / Base $18.30 / Bull $50.50"},
-{t:"PHVS",c:"Pharvaris",d:"2026-10-11",cat:"Deucrictibant (HAE attacks) PDUFA — Apr 23, 2027 [hard]",sc:"Bear $8.30 / Base $48.60 / Bull $73.60"},
+{t:"SLN",c:"Silence Therapeutics",d:"2026-10-16",cat:"Divesiran end-of-Ph2 FDA meeting — by YE 2026; Ph3 PV start 1H 2027 [guidance]",sc:"Bear $5.65 / Base $18.30 / Bull $50.50"},
+{t:"PHVS",c:"Pharvaris",d:"2026-10-16",cat:"Deucrictibant (HAE attacks) PDUFA — Apr 23, 2027 [hard]",sc:"Bear $8.30 / Base $48.60 / Bull $73.60"},
 {t:"NKTR",c:"Nektar Therapeutics",d:"2026-10-11",cat:"Rezpeg ZENITH-AD Ph3 topline — mid-2028 [guidance]",sc:"Bear $7.60 / Base $92 / Bull $185"},
 ];
 const grid=document.getElementById('grid'),q=document.getElementById('q');

@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>BlossomHill Therapeutics (BLSM) Deep-Dive Dossier · As of Oct 16, 2026</title>
+<style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  
+    /* BLSM supplemental: generic blocks reused from sibling dossiers */
+    table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--raised);box-shadow:var(--shadow);margin-top:16px}
+    th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px;border-bottom:2px solid var(--ink)}
+    td{vertical-align:top;padding:11px 10px;border-bottom:1px solid var(--line)}
+    .claim{background:var(--raised);border:1px solid var(--line);padding:16px 20px;margin:12px 0;box-shadow:var(--shadow)}
+    .flag{background:var(--raised);border:1px solid var(--line);padding:16px 20px;margin:12px 0}
+    .flag .rank{display:inline-block;background:var(--ink);color:var(--paper);font-weight:700;font-size:12px;border-radius:6px;padding:3px 10px;margin-right:8px}
+    .flag h4{display:inline}
+    .fine{font-size:12.5px;color:var(--muted)}
+    section ul{line-height:1.6}
+    .totop{position:fixed;right:18px;bottom:18px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--raised);color:var(--ink);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
+    .totop.show{opacity:1;pointer-events:auto}
+</style>
+</head>
+
+<body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · BLSM</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>A Hall-of-Fame chemist, a post-osimertinib niche — and Phase 1 evidence.</h1>
+<p class="hero-dek">BlossomHill Therapeutics is a San Diego clinical-stage oncology company built around macrocyclic small-molecule design. Its lead drug, BH-30643, is a non-covalent, mutant-selective OMNI-EGFR inhibitor aimed at the C797S resistance mutation that defeats osimertinib — with a 45% response rate in 40 patients, Fast Track designation, and an end-of-Phase 1 FDA meeting in Q4 2026 that decides whether a single-arm pivotal path exists. Everything else — the CLK splicing inhibitor, the pan-KRAS program — is optionality on top of that one meeting.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$13.94</div>
+<div class="quote-label">Latest price · Oct 16, 2026 (Finnhub)</div>
+<div class="quote-meta"><strong>~$443M</strong> market cap (31.78M shares) · <strong>~$222M</strong> est. EV on gross pro-forma cash<br>IPO Aug 7, 2026 at $16.00 · 52-wk $14.77–$27.99 (Finnhub)</div>
+</div></div></header>
+
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#trials">Trials</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+</nav></div>
+
+<main>
+<section id="frame">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>Identity, verified — and the one meeting that matters</h2><p class="lede">BLSM is BlossomHill Therapeutics, Inc. (SEC CIK 1839970, per the SEC company tickers registry), a Delaware corporation incorporated June 22, 2020, headquartered at 10255 Science Center Drive, Suite 200, San Diego, CA 92121. It listed on the Nasdaq Global Select Market on August 7, 2026. This is a genuine, newly public, clinical-stage life-sciences company — not a shell, SPAC remnant, or ticker collision.</p></div></div>
+<div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Lead asset</div><div class="big">BH-30643</div><p><span class="ev fact">FACT</span> Macrocyclic, non-covalent, mutant-selective OMNI-EGFR inhibitor; Phase 1/2 SOLARA trial in EGFR-mutant NSCLC; FDA Fast Track for C797S-positive disease after a third-generation TKI.</p></article>
+<article class="decision"><div class="tag">Swing factor</div><div class="big">Q4 2026 EoP1</div><p><span class="ev fact">FACT</span> End-of-Phase 1 meeting on recommended Phase 2 dose and a potential accelerated-approval pathway in C797S resistance. A yes reprices the company; a no pushes value out years and into a randomized trial it has not budgeted for.</p></article>
+<article class="decision"><div class="tag">Cash / runway</div><div class="big">Into Q2 2028</div><p><span class="ev fact">FACT</span> $95.4M cash at Jun 30, 2026 plus $168.3M gross IPO proceeds in August 2026; company guidance is funding into Q2 2028.</p></article>
+<article class="decision warn"><div class="tag">Stage truth</div><div class="big">Phase 1 data</div><p><span class="ev interp">INTERPRETATION</span> The headline 45% ORR is 18 of 40 patients, median follow-up 6.9 months, no durability readout yet, no control arm. Promising is not pivotal.</p></article>
+</div>
+<div class="thesis">
+<article class="thesis-card"><h3>The bull case in one paragraph</h3><ul>
+<li>There is no approved targeted therapy for EGFR C797S after osimertinib; C797S occurs in ~7% of first-line and up to ~26% of later-line osimertinib resistance in the literature.</li>
+<li>BH-30643 was purpose-built for exactly this: non-covalent (so it does not need the C797 cysteine osimertinib loses), macrocyclic (the design language of founder Jean Cui's lorlatinib and repotrectinib), mutant-selective and brain-active by design.</li>
+<li>Early data point the right way: 45% ORR (95% CI 29–62%), 88% disease control, 63% still on treatment at 6.9 months median follow-up, mostly Grade 1 wild-type EGFR toxicity.</li>
+<li>The founder has designed three FDA-approved drugs. That is a real, checkable track record, rare at a ~$443M market cap.</li>
+</ul></article>
+<article class="thesis-card risk"><h3>What the story does not remove</h3><ul>
+<li>n=40, single-arm, short follow-up: the CI runs from 29% to 62%, and durability (DoR/PFS) — what accelerated approval actually turns on — is not yet reported.</li>
+<li>C797S is a shrinking, contested niche: front-line osimertinib combinations are already reducing C797S emergence, and post-osimertinib standards (amivantamab + chemotherapy) do not require the mutation.</li>
+<li>The stock priced at $16, traded to $27.99, and sits below IPO price — a broken IPO tape with a ~180-day lock-up expiry ahead in early 2027.</li>
+<li>Two of three programs are pre-Phase 2; the KRAS drug has no IND yet. Runway into Q2 2028 does not fund an approval.</li>
+</ul></article>
+</div>
+<p class="source-note">Identity and IPO terms: SEC Form S-1 (filed Jul 16, 2026) and Form 424B4 (Aug 7, 2026), summarized in References. Price: Finnhub snapshot, Oct 16, 2026.</p>
+</section>
+
+<section id="science">
+<div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Why a macrocycle, why non-covalent — and how it fails</h2><p class="lede">Plain version first, then the technical version.</p></div></div>
+<div class="claim"><strong>Plain English.</strong> <span class="ev interp">INTERPRETATION</span> EGFR is a growth switch stuck "on" in some lung cancers. Osimertinib, the standard drug, works by permanently gluing itself to one spot on the switch (a cysteine called C797). Cancer escapes by changing that single spot to serine (C797S) — the glue no longer sticks. BH-30643 does not use glue at all: it is a ring-shaped molecule contoured to fit the mutated switch's active shape and hold it off reversibly, while largely ignoring the normal (wild-type) switch in skin and gut — which is where the rash and diarrhea of older EGFR drugs come from.</div>
+<div class="claim"><strong>Technical — BH-30643.</strong> <span class="ev fact">FACT</span> BH-30643 is an orally bioavailable, macrocyclic, non-covalent, mutant-selective "OMNI-EGFR" inhibitor designed for super-potency across classical activating mutations (exon 19 deletion, L858R), atypical/PACC mutations, exon 20 insertions, and resistance genotypes including C797S with or without T790M, while sparing wild-type EGFR and HER2 by selectively targeting the active kinase conformation. Because binding is non-covalent, it is mechanistically independent of the C797 thiol that third-generation covalent TKIs require. Company disclosures report high plasma exposures exceeding target EC90 at candidate doses and describe the drug as brain-active. <span class="ev unverified">UNVERIFIED</span> Potency/selectivity multiples are company-reported from preclinical work, not independently replicated in the materials reviewed.</div>
+<div class="claim"><strong>Why it can fail.</strong> <span class="ev interp">INTERPRETATION</span> (1) Non-covalent binding trades the lost covalent anchor for an affinity problem — sustained target coverage depends on exposure, and the dose cohorts tested spanned 20–160 mg total daily dose, with expansion at 40–60 mg twice daily. (2) On-target escape does not stop at C797S: the fourth-generation literature already documents second-site mutations (e.g., L718X, Q791L) conferring cross-resistance to this class preclinically. (3) Most post-osimertinib resistance is not C797S at all — MET amplification, bypass signaling, histologic transformation and unknown mechanisms dominate FLAURA-era data — so a C797S drug addresses a minority slice of progressing patients. (4) The most common treatment-related adverse event reported was bilirubin elevation attributed to UGT1A1 inhibition (a Gilbert's-like effect): mostly asymptomatic in Phase 1, but a real drug-interaction and labeling consideration.</div>
+<div class="claim"><strong>Technical — BH-30236 (CLK).</strong> <span class="ev fact">FACT</span> BH-30236 is an oral macrocyclic inhibitor of CDC-like kinases (CLKs), which phosphorylate splicing factors and thereby regulate alternative mRNA splicing. Aberrant splicing is a hallmark of myeloid malignancies, especially spliceosome-mutant AML/MDS, and splicing modulation is a documented mechanism of resistance to venetoclax, FLT3 inhibitors and chemotherapy. At clinically relevant concentrations BH-30236 also inhibits DYRK1A/1B/2, PIM3 and FLT3 in preclinical studies (company data). The failure mode is class-typical: splicing is essential in normal cells too, so the therapeutic window — not target engagement — is the open question, and no CLK inhibitor has ever been approved.</div>
+<div class="claim"><strong>Technical — BH-501284 (pan-KRAS).</strong> <span class="ev fact">FACT</span> BH-501284 is an oral, non-covalent, selective pan-KRAS Switch-II pocket inhibitor with a novel scaffold and "pseudo-irreversible" binding intended to produce prolonged target engagement. Approved KRAS drugs (sotorasib, adagrasib) are covalent and G12C-only. A non-covalent pan-KRAS agent would cover G12D/V/R and other alleles — and would also inhibit wild-type KRAS in normal tissue, which is the central tolerability gamble of every pan-KRAS program. Company-reported preclinical data (AACR, Apr 2026; AACR Pancreatic Cancer, Sep 2026) describe sustained engagement and tumor regression at low doses in KRAS-mutant models. <span class="ev unverified">UNVERIFIED</span> Preclinical only; no human data; IND guided Q1 2027.</div>
+</section>
+
+<section id="pipeline">
+<div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>Pipeline, ranked by value</h2><p class="lede">One clinical lead carries the valuation. The ranking below is by proximity to a value-inflecting, regulatorily meaningful event.</p></div></div>
+<table>
+<tr><th>Rank</th><th>Program</th><th>Indication</th><th>Stage</th><th>Why this rank</th></tr>
+<tr><td>1</td><td><strong>BH-30643</strong> (OMNI-EGFR)</td><td>EGFR-mutant NSCLC, C797S resistance first</td><td>Phase 1/2 (SOLARA); Fast Track</td><td>Only asset with human efficacy data and a near-term regulatory binary (Q4 2026 EoP1). IPO use-of-proceeds allocated ~$70M to it, the largest single tranche. <span class="ev fact">FACT</span></td></tr>
+<tr><td>2</td><td><strong>BH-30236</strong> (CLK inhibitor)</td><td>R/R AML and higher-risk MDS</td><td>Phase 1/1b; FDA Orphan Drug (AML)</td><td>Human safety plus early anti-leukemic signals, mono and with venetoclax; ~$20M IPO tranche. Value is real but the registrational path in R/R AML is undefined and crowded. <span class="ev fact">FACT</span></td></tr>
+<tr><td>3</td><td><strong>BH-501284</strong> (pan-KRAS)</td><td>KRAS-mutant solid tumors (pancreatic highlighted)</td><td>Preclinical; IND guided Q1 2027</td><td>Largest theoretical market, longest odds: no human data, racing better-funded pan-RAS programs. ~$15M IPO tranche to IND + Phase 1 start. <span class="ev fact">FACT</span></td></tr>
+<tr><td>4</td><td>Discovery / earlier programs</td><td>Oncology and autoimmune (historical framing)</td><td>Discovery</td><td>Not individually disclosed in the materials reviewed; no value assigned. <span class="ev gap">GAP</span></td></tr>
+</table>
+<p class="source-note">Use-of-proceeds: S-1/424B4 summary (TradingView/SEC filing summary, see References) — $70M BH-30643, $20M BH-30236, $15M BH-501284 IND-enabling/IND/Phase 1, remainder R&amp;D, capex, working capital and general corporate purposes.</p>
+</section>
+
+<section id="trials">
+<div class="section-head"><div class="section-num">04 / TRIALS</div><div><h2>What has actually been tested in humans</h2><p class="lede">Two trials. Everything else is animal data.</p></div></div>
+<div class="claim"><strong>SOLARA — BH-30643, Phase 1/2, EGFR-mutant NSCLC.</strong> <span class="ev fact">FACT</span> Open-label Phase 1/2 in locally advanced/metastatic NSCLC with EGFR (and/or HER2) mutations. Phase 1 dose escalation/backfill enrolled patients across 20–160 mg total daily dose; the ASCO 2026 cut (Mar 2, 2026 data cut, efficacy follow-up to Apr 29) covered 82 escalation/backfill patients (median 3 prior lines, 66% history of brain metastases, 71% ECOG 1). Phase 2 is designed to test antitumor efficacy and safety in mutation/treatment-history cohorts at the recommended Phase 2 dose. The trial's ClinicalTrials.gov identifier was not in the materials reviewed. <span class="ev gap">GAP</span></div>
+<div class="claim"><strong>SOLARA — C797S efficacy (IASLC/WCLC 2026 update).</strong> <span class="ev fact">FACT</span> As of the May 12, 2026 data cut (efficacy follow-up through Aug 10, 2026): 40 patients with C797S resistance to prior EGFR inhibitors, with or without concurrent T790M (35% had concurrent T790M); median 2 prior lines; 98% prior osimertinib; 53% prior chemotherapy and/or ADC; 53% history of brain metastases. 18 patients achieved confirmed (16) or ongoing unconfirmed (2) partial responses — ORR 45% (95% CI 29–62%); disease control rate 88% (35/40); 25 patients (63%) remained on treatment; median follow-up 6.9 months. Duration of response and PFS were not reported in this cut. <span class="ev gap">GAP</span> No DoR/PFS yet — the single most important missing number for an accelerated-approval argument.</div>
+<div class="claim"><strong>SOLARA — safety at expansion doses.</strong> <span class="ev fact">FACT</span> Among 174 patients treated at 40, 50 or 60 mg twice daily: treatment-related dose reductions 9%, discontinuations 3%; wild-type EGFR-associated treatment-related events were primarily Grade 1; the most common treatment-related event was bilirubin elevation, generally asymptomatic and predominantly unconjugated, consistent with UGT1A1 inhibition. The earlier ASCO cut reported Grade ≥2 wild-type EGFR treatment-related events in 27% and no clinically significant cardiac effects.</div>
+<div class="claim"><strong>BH-30236-01 — Phase 1/1b, R/R AML / HR-MDS (NCT06501196).</strong> <span class="ev fact">FACT</span> First-in-human, multicenter, open-label dose escalation and expansion, planned enrollment ~170: Part 1 monotherapy escalation (~50 patients), Part 2 escalation in combination with venetoclax (~48), Phase 1b expansion up to 72, as monotherapy or with venetoclax. Adults with R/R AML or higher-risk MDS, 1–5 prior lines, ECOG ≤2; prior CLK inhibitor excluded. Recruiting.</div>
+<div class="claim"><strong>BH-30236 — EHA 2026 initial data.</strong> <span class="ev unverified">UNVERIFIED</span> Company-reported (GlobeNewswire, Jun 11, 2026): generally well tolerated, predictable PK without accumulation and no significant venetoclax drug-interaction signal; early anti-leukemic activity including after prior venetoclax. Secondary summaries of the May 2026 update reported ≥50% bone-marrow blast reductions in 29% of evaluable monotherapy patients and 55% of evaluable combination patients, including one MRD-negative complete remission in a patient refractory to prior venetoclax — on single-digit evaluable denominators (n=5 reported in each summary line). Treat the percentages as directional only; the denominators are too small to carry a thesis.</div>
+</section>
+
+<section id="regulatory">
+<div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Designations are not approvals</h2><p class="lede">BlossomHill has collected the two designations available at its stage. Neither shortens the evidence bar by itself.</p></div></div>
+<ul>
+<li><span class="ev fact">FACT</span> <strong>Fast Track — BH-30643</strong> for advanced/metastatic EGFR C797S-positive NSCLC after a third-generation EGFR TKI (granted 2026, announced with Q2 results).</li>
+<li><span class="ev fact">FACT</span> <strong>Orphan Drug — BH-30236</strong> for AML (granted March 2026).</li>
+<li><span class="ev fact">FACT</span> <strong>End-of-Phase 1 meeting guided Q4 2026</strong> — agenda per the company: recommended Phase 2 dose selection and a potential accelerated-approval pathway in C797S resistance. First patient in the anticipated pivotal Phase 2 guided Q1 2027.</li>
+<li><span class="ev interp">INTERPRETATION</span> Accelerated approval on single-arm ORR requires responses that are large, durable, and in a population with no available therapy. A 45% ORR at 6.9 months median follow-up, without reported DoR, is the opening argument — not the conclusion. If FDA requires a randomized confirmatory-first design, timelines and capital needs change materially.</li>
+<li><span class="ev gap">GAP</span> No Breakthrough Therapy designation has been disclosed. No FDA interaction minutes are public. Whether a single-arm trial can support accelerated approval here is genuinely unknown until the EoP1 outcome is disclosed.</li>
+</ul>
+</section>
+
+<section id="competition">
+<div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Competition: clinical differentiation, not marketing</h2><p class="lede">No approved drug targets C797S. That sentence is true and insufficient — patients who progress on osimertinib already get treated, mostly without reference to C797S.</p></div></div>
+<table>
+<tr><th>Competitor / approach</th><th>Status</th><th>Clinical differentiation vs BH-30643</th></tr>
+<tr><td><strong>Osimertinib</strong> (AstraZeneca) — 3rd-gen covalent EGFR TKI</td><td>Approved, standard of care</td><td>The drug BH-30643 patients have already failed: C797S removes its covalent anchor. Not a competitor post-C797S, but front-line osimertinib ± chemotherapy (FLAURA2-era practice) shrinks and delays the C797S pool — literature: C797S in ~7% of 1L progressors vs ~14–26% in later lines. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Amivantamab + chemotherapy</strong> (J&amp;J) — EGFR×MET bispecific</td><td>Approved post-osimertinib (MARIPOSA-2 basis)</td><td>Mutation-agnostic: it competes for the same post-osimertinib patient without needing a C797S test result. BH-30643 must win on oral convenience, tolerability and CNS activity in the biomarker-positive subset — a subset of a subset. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><strong>Silevertinib / BDTX-1535</strong> (Black Diamond) — 4th-gen EGFR inhibitor</td><td>Phase 2</td><td>Closest mechanistic rival: mutant-selective, active against C797S and classical mutations, profiled head-to-head with BLU-945 and JBJ-09-063 in a 2026 Frontiers in Oncology comparison showing distinct genotype-by-genotype profiles across the class. Cross-trial ORR comparisons are not valid; the differentiation contest will be durability, CNS data and wild-type sparing at the chosen dose. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Earlier 4th-gen programs (BLU-945, JBJ-09-063)</strong></td><td>Preclinical/early clinical literature</td><td>Cautionary, not current commercial threats: the peer-reviewed profiling literature exists precisely because this class has repeatedly shown genotype-dependent potency and second-site (L718X/Q791L) cross-resistance. BH-30643's macrocyclic, active-conformation design is the company's answer; human proof is the SOLARA durability data that does not exist yet. <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td><strong>Venetoclax-based regimens</strong> (AbbVie) — BCL-2, AML standard</td><td>Approved (AML)</td><td>For BH-30236 the "competitor" is also the partner: the program's credible path is rescuing venetoclax failures and deepening venetoclax responses via splicing modulation. No CLK inhibitor is approved; other splicing modulators have historically struggled with therapeutic window. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Pan-RAS / KRAS field</strong> — daraxonrasib (RMC-6236, Revolution Medicines, Phase 3) and approved G12C-only sotorasib/adagrasib</td><td>Phase 3 / approved</td><td>BH-501284 enters KRAS years behind a Phase 3 pan-RAS program with human data. Its claimed edges — non-covalent, pseudo-irreversible engagement, novel scaffold — are preclinical assertions. <span class="ev unverified">UNVERIFIED</span></td></tr>
+</table>
+<p class="source-note">No head-to-head trials exist for any row. Statements compare designs, labels and published data only.</p>
+</section>
+
+<section id="financials">
+<div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Fresh IPO cash, Phase 1 burn, and a broken IPO price</h2><p class="lede">The balance sheet is the strongest part of the story today — because it was refilled in August, not because the business spends less.</p></div></div>
+<table>
+<tr><th>Item</th><th>Figure</th><th>Date / basis</th></tr>
+<tr><td>Cash &amp; equivalents</td><td>$95.4M ($95,376K)</td><td>Jun 30, 2026, Q2 10-Q balance sheet <span class="ev fact">FACT</span></td></tr>
+<tr><td>IPO gross proceeds</td><td>$168.3M — 10,516,240 shares at $16.00 incl. partial over-allotment</td><td>Closed Aug 2026 <span class="ev fact">FACT</span></td></tr>
+<tr><td>Pro-forma cash (gross)</td><td>$95.4M + $168.3M = $263.7M, before underwriting discounts, offering expenses and Q3 burn</td><td>Arithmetic on the two FACT rows above <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Net IPO proceeds</td><td>Not stated in the materials reviewed</td><td><span class="ev gap">GAP</span> — every EV figure here using $263.7M therefore overstates cash and understates EV</td></tr>
+<tr><td>Q2 2026 burn</td><td>Net loss $23.8M; opex $24.7M (R&amp;D $21.4M, G&amp;A $3.3M); 1H 2026 net loss $44.8M (~$22.4M/quarter)</td><td>Q2 2026 <span class="ev fact">FACT</span></td></tr>
+<tr><td>Total liabilities</td><td>$42.1M (incl. operating lease liabilities ~$23.4M current + non-current); no funded debt disclosed</td><td>Jun 30, 2026 <span class="ev fact">FACT</span></td></tr>
+<tr><td>Runway guidance</td><td>Into Q2 2028</td><td>Company, Sep 18, 2026 <span class="ev fact">FACT</span></td></tr>
+<tr><td>Shares outstanding (basic, post-IPO)</td><td>~31,784,900 = 21,268,660 post-conversion shares (Mar 31 basis: incl. 18,258,960 from preferred conversion + 365,374 exercised-option shares) + 10,516,240 IPO shares</td><td>424B4 + Q2 release; arithmetic shown <span class="ev fact">FACT</span></td></tr>
+<tr><td>Fully diluted shares</td><td>Not computed</td><td><span class="ev gap">GAP</span> — the 424B4's excluded options/warrants/pool counts were not in the materials reviewed. FD is above basic; scenario math below uses basic and says so.</td></tr>
+<tr><td>Market cap</td><td>31,784,900 × $13.94 = ~$443.1M</td><td>Price: Finnhub, Oct 16, 2026 <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Enterprise value (gross-cash method)</td><td>~$443.1M − $263.7M + $42.1M ≈ ~$221.5M</td><td>Method stated; uses gross cash, so true EV is higher <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Gross pro-forma cash / share</td><td>$263.7M ÷ 31.78M ≈ $8.30</td><td>Before fees and Q3 burn — a ceiling, not a floor <span class="ev interp">INTERPRETATION</span></td></tr>
+<tr><td>Capital raised pre-IPO</td><td>~$257M raised since inception per S-1 summaries; Series B $100M (2024) took the total to $173M at that time</td><td><span class="ev unverified">UNVERIFIED</span> secondary summaries of SEC filings</td></tr>
+<tr><td>Short interest</td><td>473,807 shares (~1.5%) at Sep 30, 2026, up from 137,567 at Sep 15</td><td>Secondary reporting of exchange data <span class="ev unverified">UNVERIFIED</span></td></tr>
+</table>
+<div class="claim"><strong>Dilution — the honest version.</strong> <span class="ev interp">INTERPRETATION</span> Runway into Q2 2028 funds the EoP1 meeting, the pivotal Phase 2 start and the KRAS IND — it does not fund an approval, a confirmatory trial, or a launch. At ~$22–25M of quarterly net loss and rising trial costs, at least one more equity raise before any approval decision is the base case, not the bear case. The ~180-day IPO lock-up expires in early February 2027 (inferred from the Aug 7, 2026 closing), releasing pre-IPO holders whose cost basis is far below $13.94. <span class="ev gap">GAP</span> Lock-up terms were not re-verified against the 424B4 text in this pass.</div>
+</section>
+
+<section id="catalysts">
+<div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>The sequence that resolves the thesis</h2><p class="lede">Date quality is tagged on every row: hard = fixed/external date, guidance = company window, inferred = our estimate.</p></div></div>
+<table>
+<tr><th>When</th><th>Event</th><th>Quality</th></tr>
+<tr><td>Q4 2026</td><td>BH-30643 end-of-Phase 1 FDA meeting — RP2D + accelerated-approval pathway</td><td>Guidance (company)</td></tr>
+<tr><td>Q1 2027</td><td>First patient dosed, anticipated pivotal Phase 2 (BH-30643)</td><td>Guidance (company)</td></tr>
+<tr><td>Q1 2027</td><td>BH-501284 IND submission</td><td>Guidance (company)</td></tr>
+<tr><td>~Feb 2027</td><td>IPO lock-up expiry (~180 days after Aug 7, 2026 closing)</td><td>Inferred</td></tr>
+<tr><td>1H 2027</td><td>Updated SOLARA Phase 1 data, incl. C797S durability (DoR)</td><td>Guidance (company)</td></tr>
+<tr><td>1H 2027</td><td>Updated BH-30236 Phase 1 safety + anti-leukemic data</td><td>Guidance (company)</td></tr>
+<tr><td>2H 2027</td><td>TKI-naive durability update + initial chemo-combination cohort data (BH-30643)</td><td>Guidance (company)</td></tr>
+<tr><td>Into Q2 2028</td><td>Guided cash runway ends — financing event required before or by then</td><td>Guidance (company) / inferred financing</td></tr>
+</table>
+</section>
+
+<section id="scenarios">
+<div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Bear, base, bull — soft ranges, explicit arithmetic</h2><p class="lede">These are scenario anchors, not price targets and not a recommendation. All use basic shares (31.78M) because the fully-diluted count is a disclosed GAP above; any future raise lowers every per-share figure. Sell-side context in the materials reviewed: consensus ~$35, Leerink $40 — the bull case below is deliberately capped at that range, not above it.</p></div></div>
+<div class="thesis">
+<article class="thesis-card risk"><h3>Bear — $4–6</h3><p><span class="ev interp">INTERPRETATION</span> EoP1 denies a single-arm accelerated path (or durability fades as follow-up matures); BH-30236 stays a Phase 1 curiosity; KRAS slips. Value collapses toward cash: assume cash erodes to ~$150M after ~4 quarters of ~$25M burn plus offering costs, plus ~$30M residual platform EV → equity ≈ $180M ÷ 31.78M = $5.66/share. Range $4–6.</p></article>
+<article class="thesis-card"><h3>Base — $16–22</h3><p><span class="ev interp">INTERPRETATION</span> FDA accepts a single-arm pivotal Phase 2 in C797S; ORR holds near ~40% with early durability; KRAS IND files on time; CLK progresses without incident. Assume EV re-rates to ~$400M (roughly the current EV plus the value of a de-risked pivotal path) plus ~$200M cash at the scenario horizon → equity ≈ $600M ÷ 31.78M = $18.88/share. Range $16–22.</p></article>
+</div>
+<div class="claim"><strong>Bull — $30–40.</strong> <span class="ev interp">INTERPRETATION</span> Accelerated-approval path is explicit, durability data in 1H 2027 are strong, pivotal enrollment is fast, and a second program (KRAS IND + early human signal, or CLK expansion responses) adds a real second leg — with partnership/takeout interest in a scarce C797S asset. Assume EV ~$900M plus ~$200M cash → equity ≈ $1.10B ÷ 31.78M = $34.61/share. Range $30–40, capped at the top of the street range found in this pass. Every scenario is pre-dilution: a raise at, say, 15% share-count growth would cut each per-share figure by ~13%.</div>
+</section>
+
+<section id="management">
+<div class="section-head"><div class="section-num">10 / PEOPLE</div><div><h2>Management and insider signals</h2><p class="lede">This is the rare Phase 1 company whose founder's prior molecules you can look up on FDA labels.</p></div></div>
+<table>
+<tr><th>Person</th><th>Role</th><th>Track record / signal</th></tr>
+<tr><td><strong>J. Jean Cui, Ph.D.</strong></td><td>Founder, President &amp; CEO</td><td>Lead designer of three FDA-approved drugs: crizotinib (Xalkori), lorlatinib (Lorbrena — the first approved macrocyclic kinase inhibitor) and repotrectinib (Augtyro); co-founded Turning Point Therapeutics (acquired by Bristol Myers Squibb for $4.1B in 2022); elected to the National Academy of Engineering (2024). <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Y. Peter Li, Ph.D., MBA</strong></td><td>Executive Chairman</td><td>Co-founder of BlossomHill and of Turning Point Therapeutics; company-building and capital-markets record. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Geoffrey R. Oxnard, M.D.</strong></td><td>EVP &amp; Chief Medical Officer</td><td>Thoracic oncologist; co-authored the first description of EGFR C797S resistance — the exact biology the lead drug targets; prior clinical-development roles at Foundation Medicine and Eli Lilly (Loxo). A Form 4 for Oxnard was filed Aug 10, 2026. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Jason Keyes, MBA</strong></td><td>EVP &amp; CFO</td><td>~25 years in biotech finance; former CFO of Equillium and Orexigen; earlier roles at Amgen and Amylin. <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Vincent P. Liptak, J.D., Ph.D.</strong></td><td>EVP &amp; General Counsel</td><td>25+ years in life-sciences IP law. Reported purchase of 2,200 shares at $16.00 on Aug 10, 2026. <span class="ev unverified">UNVERIFIED</span> (secondary reporting of Form 4)</td></tr>
+<tr><td><strong>Board additions (2026)</strong></td><td>Directors</td><td>Sheila Gujrathi, M.D. and John (Jo) Schmid joined the board around the IPO; Schmid reported buying 6,000 shares at $16.00 on Aug 10, 2026. <span class="ev fact">FACT</span> / <span class="ev unverified">UNVERIFIED</span> (purchase)</td></tr>
+</table>
+<div class="claim"><strong>Insider signal — read it correctly.</strong> <span class="ev unverified">UNVERIFIED</span> Secondary reporting counts ~1,573,900 insider shares acquired (~$25.2M) in the 90 days around the IPO, dominated by OrbiMed Advisors' 625,000 shares at the $16.00 IPO price ($10.0M) alongside its preferred-stock conversion into 2,089,279 common shares. <span class="ev interp">INTERPRETATION</span> Buying at the IPO price, at the IPO, by the pre-IPO syndicate is allocation and syndicate support — it is not the same signal as open-market buying at $13.94 in October. No post-IPO open-market insider buying at current prices was found in this pass. That absence, in a stock trading below its IPO price, is itself the signal.</div>
+</section>
+
+<section id="risks">
+<div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+<div class="flag"><span class="rank">1</span><h4>Durability is unreported — and accelerated approval is a durability argument</h4><p>ORR 45% at 6.9 months median follow-up, DoR/PFS not yet disclosed. If responses are short, the EoP1 meeting and the whole C797S thesis deflate together. <span class="ev fact">FACT</span> + <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><span class="rank">2</span><h4>The addressable niche is a subset of a subset, and it is shrinking</h4><p>C797S is ~7% of first-line osimertinib progressors in FLAURA-era data; front-line combinations reduce it further; the mutation-agnostic post-osimertinib standard does not need BLSM's biomarker. Trial success does not fix market geometry. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><span class="rank">3</span><h4>Single-arm, n=40, wide confidence interval</h4><p>45% ORR (95% CI 29–62%) in a heterogeneous, heavily pretreated population (53% prior chemo/ADC, 53% brain metastases) with 2 of 18 responses unconfirmed at the cut. Regression toward the CI's lower half on expansion is the statistical norm, not the exception. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><span class="rank">4</span><h4>Class resistance biology is already documented</h4><p>Peer-reviewed profiling shows fourth-generation EGFR inhibitors face second-site cross-resistance (L718X, Q791L). BH-30643 has no human data yet on post-treatment resistance. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><span class="rank">5</span><h4>Broken IPO tape + lock-up overhang</h4><p>Priced $16, high $27.99, now $13.94 — public holders are underwater, the ~Feb 2027 lock-up expiry releases low-basis pre-IPO shares, and short interest more than tripled in the second half of September (to ~1.5% — small, but the direction is informed money hedging the EoP1). <span class="ev fact">FACT</span> / <span class="ev unverified">UNVERIFIED</span> (short interest)</p></div>
+<div class="flag"><span class="rank">6</span><h4>CLK has no approved precedent and a window problem</h4><p>Splicing is essential biology; BH-30236's human data are single-digit-denominator blast-count summaries. A narrow window or a serious safety signal ends the second leg quietly. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><span class="rank">7</span><h4>Pan-KRAS is a race BLSM starts years behind</h4><p>Preclinical, IND not yet filed, against a Phase 3 pan-RAS competitor — and pan-KRAS means wild-type KRAS inhibition in normal tissue by design. <span class="ev fact">FACT</span></p></div>
+<div class="flag"><span class="rank">8</span><h4>Runway ends before approval does</h4><p>Into Q2 2028 funds a pivotal start, not a finish. At least one dilutive raise is the base case; the FD share count is undisclosed in this pass precisely because the option pool that will dilute first is real. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><span class="rank">9</span><h4>Key-person concentration</h4><p>The design thesis of the entire company is substantially one chemist's macrocycle platform. Cui's record is the bull case; her irreplaceability is the corresponding risk. 63 employees at listing concentrates execution risk further. <span class="ev interp">INTERPRETATION</span></p></div>
+<div class="flag"><span class="rank">10</span><h4>UGT1A1 / bilirubin and DDI management</h4><p>The most common treatment-related event is a UGT1A1-inhibition bilirubin elevation. Benign in Phase 1 summaries; in a registrational program it invites drug-interaction studies, monitoring language, and exclusion-criteria friction. <span class="ev fact">FACT</span></p></div>
+</section>
+
+<section id="open">
+<div class="section-head"><div class="section-num">12 / OPEN</div><div><h2>The evidence that would change the view</h2><p class="lede">What to watch, in order.</p></div></div>
+<ul>
+<li><strong>EoP1 outcome language (Q4 2026):</strong> "FDA agreed a single-arm trial may support accelerated approval" versus any randomized-trial language is the whole ballgame.</li>
+<li><strong>DoR/PFS at the 1H 2027 SOLARA update:</strong> median DoR beyond ~9–12 months converts ORR into an approval argument; early censoring-heavy curves do not.</li>
+<li><strong>CNS-specific response data:</strong> 53% of the C797S cohort had brain-metastasis history; intracranial ORR is a genuine differentiator if disclosed.</li>
+<li><strong>Net IPO proceeds and Q3 cash (next 10-Q):</strong> closes the GAP in this dossier's EV math.</li>
+<li><strong>BH-30236 expansion data with real denominators:</strong> CR/CRh rates, not blast-count percentages on n=5.</li>
+<li><strong>BH-501284 IND acceptance (Q1 2027)</strong> and first-in-human dose-escalation tolerability — the wild-type KRAS window question.</li>
+<li><strong>Open-market insider buying below $16</strong> — its absence so far is noted above.</li>
+</ul>
+</section>
+
+<section id="sources">
+<div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/designations via company filings → ClinicalTrials.gov → academic papers → company PRs/decks (UNVERIFIED until corroborated) → trade press. Nothing in this dossier is invented; numbers without a source are labeled GAP.</p></div></div>
+<h3>SEC filings (primary)</h3>
+<ul>
+<li>Form S-1, filed Jul 16, 2026, and Form 424B4 prospectus, Aug 7, 2026 — identity, incorporation (Delaware, Jun 22, 2020), HQ (10255 Science Center Drive, Suite 200, San Diego, CA 92121), IPO terms ($16.00; 9,375,000 base shares + 1,406,250 over-allotment), use of proceeds ($70M / $20M / $15M tranches), shares outstanding after offering (21,268,660 post-conversion basis incl. 18,258,960 preferred-conversion shares), ~$257M raised since inception (per filing summaries). Accessed via SEC-filing summaries (StockTitan 424B4 summary; TradingView S-1 summaries) — full EDGAR text should be re-pulled before any republication.</li>
+<li>Q2 2026 financial statements (10-Q, reported Sep 18, 2026) — cash $95,376K at Jun 30, 2026; total liabilities $42,088K; Q2 net loss $23,758K, R&amp;D and G&amp;A as tabled; 1H net loss $44,766K; weighted-average pre-IPO shares 2,713,696 (Q2) — pre-conversion basis, not comparable to post-IPO counts.</li>
+<li>Forms 4 (Aug 2026) — incl. Oxnard (filed Aug 10, 2026) and OrbiMed-related filings (EDGAR ref. 0000947871-26-000784, Aug 12, 2026, per secondary reporting).</li>
+</ul>
+<h3>ClinicalTrials.gov</h3>
+<ul><li>NCT06501196 — BH-30236-01, Phase 1/1b in R/R AML and HR-MDS (design, parts, ~170 planned enrollment).</li>
+<li>SOLARA (BH-30643 Phase 1/2) — NCT identifier not in the materials reviewed. <span class="ev gap">GAP</span></li></ul>
+<h3>Academic papers (mandatory literature pass)</h3>
+<ul>
+<li>Wang et al. "Osimertinib acquired resistance among patients with EGFR-mutated NSCLC." Cancer Drug Resistance 2025;8:61 — C797S mechanism (loss of the C797 covalent anchor) and ~7–26% frequency across lines.</li>
+<li>"The resistance landscape of EGFR tyrosine kinase inhibitors in advanced NSCLC." Translational Lung Cancer Research 2025 — C797S ~14% (2L, T790M-positive) vs ~7% (1L FLAURA); MET amplification 15–19%; combination-era suppression of C797S emergence.</li>
+<li>Leonetti et al. / FLAURA resistance analyses (via OncLive and PMC review, PMC9913144) — AURA3 C797 mutations 15% at progression; FLAURA 7%; real-world 11–29%.</li>
+<li>Oncolines B.V. profiling study, Frontiers in Oncology (Oct 2026) — side-by-side biochemical/cellular comparison of fourth-generation EGFR inhibitors BLU-945, JBJ-09-063 and silevertinib (BDTX-1535) across EGFR genotypes.</li>
+<li>Melis et al. AACR 2025, Abstract 6961 — CRISPR-engineered C797S models; ~316-fold osimertinib resistance; fourth-generation activity retained.</li>
+<li>Deep mutational scanning of BLU-945 resistance — L718X/Q791L second-site cross-resistance (class-risk evidence).</li>
+</ul>
+<h3>Company press releases (UNVERIFIED until corroborated)</h3>
+<ul>
+<li>Q2 2026 results, GlobeNewswire, Sep 18, 2026 — Fast Track, IPO completion (10,516,240 shares, $168.3M gross), runway into Q2 2028, milestone guidance used in Catalysts.</li>
+<li>IASLC/WCLC 2026 SOLARA update, Sep 15, 2026 — C797S cohort n=40, ORR 45% (29–62%), DCR 88%, safety at 40–60 mg BID (n=174).</li>
+<li>ASCO 2026 SOLARA presentation summary, Jun 2, 2026 (Abstract 3014) — 82 escalation/backfill patients, 20–160 mg total daily dose.</li>
+<li>BH-30236 EHA 2026 release, Jun 11, 2026, and May 2026 data summary — tolerability, mono/combo blast-reduction summaries (small denominators, flagged in text).</li>
+<li>BH-501284 AACR releases, Apr 2026 and Sep 28, 2026 (AACR Pancreatic Cancer) — preclinical pan-KRAS data; IND guided Q1 2027.</li>
+</ul>
+<h3>Trade press / market data</h3>
+<ul>
+<li>BioSpace, "2026 IPO class" (BlossomHill/Latigo Nasdaq IPOs); BioSpace/STAT Series B coverage ($100M, 2024; $173M cumulative at that time; Cormorant, OrbiMed, Vivo, Colt).</li>
+<li>Finnhub — price $13.94, 52-week range $14.77–$27.99, Oct 16, 2026 snapshot. Webull — market-cap cross-check (~$479.6M at $15.09 on Oct 15 implies ~31.8M shares, consistent with the basic count computed here).</li>
+<li>MarketBeat / Cerbat Gem — analyst targets (consensus ~$35; Leerink $40, JPMorgan $28, LifeSci $32), short interest (473,807 shares, Sep 30, 2026), insider-purchase summaries. All tagged UNVERIFIED where used.</li>
+</ul>
+<p class="fine"><b>Gaps disclosed:</b> net IPO proceeds; fully-diluted share count (option/warrant/pool exclusions in the 424B4 not retrieved); SOLARA NCT number and full protocol endpoints; BH-30643 DoR/PFS (not yet reported by the company); BH-30236 response rates on full denominators; lock-up terms not re-verified against prospectus text. <b>Zero personal data</b> is contained in this dossier.</p>
+</section>
+</main>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+
+</html>

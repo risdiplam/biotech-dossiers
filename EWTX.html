@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Edgewise Therapeutics (EWTX) Deep-Dive Dossier · As of Oct 16, 2026</title>
+<style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+
+<body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · EWTX</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>Edgewise sold the muscle business. What remains is a diastolic heart bet — funded like a fortress.</h1>
+<p class="hero-dek">Edgewise Therapeutics, Inc. (Boulder, Colorado; incorporated 2017; IPO March 2021) closed the sale of its muscular dystrophy business — sevasemten and the whole platform — to Servier on July 13, 2026, for $1.55 billion upfront plus up to $1.1 billion in milestones. What public shareholders now own is a pure cardiovascular company: EDG-7500 in hypertrophic cardiomyopathy, EDG-15400 in HFpEF, a large cash pile, and contingent milestone rights on a drug someone else now develops.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$38.20</div>
+<div class="quote-label">Close · Oct 15, 2026 (MarketBeat / Finnhub)</div>
+<div class="quote-meta"><strong>~$4.12B</strong> market cap (107.78M shares, Jun 30, 2026) · <strong>~$2.01B</strong> gross pro-forma cash (see Financials — pre-tax, pre-costs, not a reported balance)<br>52-week range $14.25–$48.51 (Finnhub)</div>
+</div></div></header>
+
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#clinical">Clinical</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button></nav></div>
+
+<main>
+<section id="frame">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The single swing factor</h2><p class="lede">Whether EDG-7500's Phase 2 profile — symptom, biomarker and gradient improvement in both obstructive and nonobstructive HCM with no LVEF signal in an open-label study — survives a large, placebo-controlled Phase 3, against two cardiac myosin inhibitors that are already approved or Phase 3-positive in the same disease.</p></div></div>
+<div class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Pro-forma cash position</div><div class="big">~$2.01B gross</div><p><span class="ev interp">INTERPRETATION</span> $460.7M reported at Jun 30, 2026 plus $1.55B Servier upfront received Jul 13, 2026 — before taxes on the gain, transaction costs, and Q3 burn. The first reported post-close balance arrives with the Q3 10-Q.</p></article>
+<article class="decision"><div class="tag">Next decisive catalyst</div><div class="big">Q4 2026</div><p><span class="ev unverified">UNVERIFIED · COMPANY</span> Two guided events: EDG-7500 Phase 3 initiation, and Servier's GRAND CANYON pivotal Becker topline (175 participants) — the latter now drives milestone probability, not Edgewise operations.</p></article>
+<article class="decision warn"><div class="tag">Core clinical risk</div><div class="big">Open-label only</div><p><span class="ev fact">FACT</span> Every EDG-7500 efficacy datum to date comes from open-label, uncontrolled CIRRUS-HCM cohorts. KCCQ and NYHA are exactly the endpoints most exposed to expectation bias without a placebo arm.</p></article>
+<article class="decision"><div class="tag">What EWTX is not anymore</div><div class="big">Not a DMD stock</div><p><span class="ev fact">FACT</span> Sevasemten, its team, IP and filings transferred to Servier at closing (Jul 13, 2026). Edgewise retains only contingent payments: up to $200M on specified U.S. Becker approval ($100M if adult-only), $600M on U.S. Duchenne approval, and $300M if annual U.S. sales exceed a $550M threshold — $1.1B maximum, none guaranteed.</p></article>
+</div>
+<div class="thesis">
+<article class="thesis-card"><h3>The case for the remaining company</h3><ul>
+<li>Funding risk is largely removed: management states the upfront is expected to fully fund EDG-7500 through potential approval <span class="ev unverified">UNVERIFIED · COMPANY</span> — dilution is a choice now, not a necessity.</li>
+<li>CIRRUS-HCM Part D (n=53, 12 weeks) showed concordant movement across hemodynamics, NT-proBNP, KCCQ and NYHA in both HCM phenotypes, with no LVEF below 50% and no exposure–LVEF relationship across 700+ echocardiograms <span class="ev unverified">UNVERIFIED · COMPANY TOPLINE</span>.</li>
+<li>Nonobstructive HCM still has no approved therapy; a diastolic-biased mechanism is a rational — not yet proven — way into it, after mavacamten failed there in Phase 3.</li>
+<li>Milestones are free optionality: a Becker approval alone is worth $100–200M against zero remaining development spend by Edgewise.</li>
+</ul></article>
+<article class="thesis-card risk"><h3>What the cash does not remove</h3><ul>
+<li>At $38.20 the market already credits ~$2.1B of operating value above gross pro-forma cash — the cash is in the price, not a floor under it.</li>
+<li>Aficamten is approved in obstructive HCM and Phase 3-positive in nonobstructive HCM (ACACIA-HCM, Aug 2026) with a supplemental filing planned Q4 2026 — EDG-7500 is third in line, years behind.</li>
+<li>Aficamten's own nHCM data show the class liability is real: LVEF &lt;50% in 10.5% on drug vs 0.8% on placebo, and heart-failure SAEs 4.7% vs 1.2% <span class="ev fact">FACT</span>. EDG-7500's clean LVEF record is 53 open-label patients for 12 weeks.</li>
+<li>HFpEF (EDG-15400) is a graveyard indication for mechanism-first drugs; Phase 2 only dosed its first patient Oct 8, 2026.</li>
+</ul></article>
+</div>
+</section>
+
+<section id="science">
+<div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Fine-tuning the sarcomere, not shutting it down</h2><p class="lede">HCM is a disease of a heart that contracts too hard and relaxes too slowly. Every approved or late-stage drug in the class reduces contractile force. Edgewise's claim is that its molecules improve relaxation preferentially — helping diastole while sparing systole.</p></div></div>
+<div class="science-chain">
+<article><b>01</b><h3>Sarcomere hypercontractility</h3><p>Pathogenic variants (commonly MYH7, MYBPC3) and acquired remodeling increase myosin cross-bridge formation, raising energy cost, wall stress and outflow obstruction in the obstructive phenotype. <span class="ev fact">FACT</span></p></article>
+<article><b>02</b><h3>Diastolic dysfunction</h3><p>Impaired relaxation and increased stiffness raise filling pressures — the shared physiology of nonobstructive HCM and much of HFpEF, and the driver of breathlessness and exercise intolerance. <span class="ev fact">FACT</span></p></article>
+<article><b>03</b><h3>The class trade-off</h3><p>Cardiac myosin inhibitors (mavacamten, aficamten) reduce cross-bridges and gradients, but dose is limited by falling LVEF and systolic heart-failure risk — hence echo-guided titration and, for mavacamten, a boxed warning and REMS. Meta-analysis of randomized trials confirms efficacy on gradients, NYHA and KCCQ with a modest mean LVEF decrease. <span class="ev fact">FACT</span></p></article>
+<article><b>04</b><h3>Edgewise's proposed break</h3><p>EDG-7500 is described by the company as a selective cardiac sarcomere modulator acting via the myosin regulatory light chain, slowing early contraction velocity and speeding relaxation while preserving myosin availability and net systolic function. <span class="ev unverified">UNVERIFIED · COMPANY MECHANISM DISCLOSURE, SEP 22, 2026</span></p></article>
+</div>
+<div class="moa-box"><h3>The mechanism in 60 seconds</h3>
+<p><strong>Plain English.</strong> Think of each heartbeat as a squeeze and a release. In HCM the squeeze is too strong and the release is too slow, so the heart cannot fill properly. Existing drugs loosen the squeeze — effective, but loosen it too much and the pump weakens. Edgewise aims to speed up the release instead, so the heart fills better without a weaker pump.</p>
+<p><strong>Technical.</strong> EDG-7500 and EDG-15400 are oral, selective cardiac sarcomere modulators. Per company disclosure (Sep 2026), EDG-7500 targets the regulatory light chain axis rather than the myosin ATPase targeted by mavacamten/aficamten, reducing early systolic contraction velocity and increasing early diastolic relaxation velocity (e′), with no observed concentration–LVEF relationship in clinical echocardiography to date. Independent peer-reviewed characterization of EDG-7500's target engagement in humans has not been published. <span class="ev gap">GAP</span></p></div>
+<div class="fail-grid">
+<article><h3>1 · Open-label mirage</h3><p>KCCQ gains of +24 / +13 points are far larger than placebo-adjusted gains seen in blinded CMI trials. Without a control arm, expectation, regression to the mean and titration attention can manufacture most of that signal.</p></article>
+<article><h3>2 · LVEF liability emerges at scale</h3><p>The class effect is dose- and exposure-related. ACACIA-HCM showed LVEF &lt;50% in 10.5% on aficamten under forced titration to maximum tolerated dose. A Phase 3 that titrates harder for efficacy may find the same wall.</p></article>
+<article><h3>3 · Diastole is not the registrational endpoint</h3><p>Regulators approve on symptoms/function (KCCQ, pVO2, NYHA composites), not e′ velocity. Mavacamten improved hemodynamics in nonobstructive HCM yet missed its dual primary endpoints in ODYSSEY-HCM — biomarker movement did not convert.</p></article>
+<article><h3>4 · HFpEF heterogeneity</h3><p>HFpEF is dozens of diseases sharing an ejection fraction. A relaxation drug can work physiologically and still fail on outcomes in an unselected population — the pattern of two decades of HFpEF trials.</p></article>
+</div>
+<p class="source-note">Literature: Olivotto et al., EXPLORER-HCM, <em>Lancet</em> 2020 (mavacamten Phase 3) · Maron et al., SEQUOIA-HCM, <em>NEJM</em> 2024 (aficamten) · Frontiers in Cardiovascular Medicine meta-analysis of cardiac myosin inhibitor RCTs (2024) · ACACIA-HCM results, ESC / <em>NEJM</em> Aug 2026 and HFSA Oct 2026 disclosures · ODYSSEY-HCM topline, BMS 2025.</p>
+</section>
+
+<section id="pipeline">
+<div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>Ranked by descending value</h2><p class="lede">Post-Servier, this is a two-drug cardiovascular pipeline plus a milestone claim and a preclinical program. Ranking reflects risk-adjusted value to EWTX shareholders, not scientific novelty.</p></div></div>
+<div class="pipeline">
+<div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">EDG-7500 — HCM (obstructive + nonobstructive)</div><div class="pipe-desc">Oral selective cardiac sarcomere modulator. Phase 2 CIRRUS-HCM complete through Part D; Phase 3 initiation guided Q4 2026. The entire operating value of the company rides on this program.</div></div><div class="pipe-status">Phase 2 done · Ph3 pending</div></div>
+<div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">Servier milestone rights — sevasemten (Becker / Duchenne)</div><div class="pipe-desc">Up to $1.1B contingent: $200M specified Becker approval ($100M adult-only), $600M Duchenne approval, $300M on &gt;$550M annual U.S. sales. No control, no spend, no timeline control. GRAND CANYON topline Q4 2026 is the first information event.</div></div><div class="pipe-status">Contingent · Servier-run</div></div>
+<div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">EDG-15400 — HFpEF (EQUINOX-HFpEF)</div><div class="pipe-desc">Oral selective cardiac sarcomere modulator for impaired relaxation in HFpEF. Phase 2 first patient dosed Oct 8, 2026: randomized, double-blind, placebo-controlled, ~90 adults, LVEF ≥50%, NYHA II–III, 25 mg vs 50 mg vs placebo, up to 12 weeks. Large indication, low prior probability, no topline date guided.</div></div><div class="pipe-status">Phase 2 enrolling</div></div>
+<div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">EDG-003 — cardiometabolic, undisclosed</div><div class="pipe-desc">Preclinical, undisclosed target/indication per company deal-era disclosures. No clinical timeline in the public record reviewed. <span class="ev gap">GAP</span></div></div><div class="pipe-status dead">Preclinical</div></div>
+</div>
+</section>
+
+<section id="clinical">
+<div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>What has actually been shown — and in whom</h2><p class="lede">All EDG-7500 efficacy data are company-reported toplines from open-label cohorts. No p-values have been published for Part D; none should be inferred. The sevasemten data below are Servier's asset now, included because they price Edgewise's milestones.</p></div></div>
+<table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Results (as reported)</th></tr></thead><tbody>
+<tr><td data-label="Study">CIRRUS-HCM Part D<br><small>EDG-7500 · Phase 2 · open-label</small></td><td data-label="Design">53 completers (20 oHCM, 33 nHCM); 25–150 mg QD, 12 weeks; dose guided by LVOT-G (oHCM) or NT-proBNP (nHCM); designed to inform Phase 3.</td><td data-label="Results"><span class="ev unverified">UNVERIFIED · COMPANY, JUN 16 2026; ESC 2026 UPDATE</span> oHCM: 90% improved hemodynamics; resting LVOT-G −55% and Valsalva −51% (ESC); 74% reached NT-proBNP normalization (&lt;150 pg/mL) or ≥50% fall; KCCQ-OSS +24 points; 70% improved ≥1 NYHA class; e′ lateral +~20%. nHCM: NT-proBNP −~65% mean; 88% met the NT-proBNP response definition; KCCQ-OSS +13; 64% improved ≥1 NYHA class; e′ lateral +37%. Safety: no LVEF &lt;50%, no exposure–LVEF relationship across 700+ echoes; two new-onset AF events among 53 (3.8%), judged unrelated by investigators (secondary summary). No placebo arm; no published p-values.</td></tr>
+<tr><td data-label="Study">CIRRUS-HCM Parts A–C<br><small>EDG-7500 · Phase 1/2</small></td><td data-label="Design">Single-dose (50/100/200 mg) and 28-day cohorts (50/100 mg) in oHCM and nHCM.</td><td data-label="Results"><span class="ev unverified">UNVERIFIED · COMPANY</span> Part A: mean resting LVOT-G −67% and Valsalva −55% at 100/200 mg single dose; NT-proBNP −64% at 200 mg; no LVEF &lt;50%. 28-day, 100 mg: oHCM resting/Valsalva gradients −71%/−58%, NT-proBNP −62%, KCCQ-OSS +23, 78% improved ≥1 NYHA class; nHCM NT-proBNP −42% at 100 mg, KCCQ-OSS +17. Directionally consistent with Part D; same open-label caveat.</td></tr>
+<tr><td data-label="Study">EQUINOX-HFpEF<br><small>EDG-15400 · Phase 2 · NCT registry details per company release</small></td><td data-label="Design">Randomized, double-blind, placebo-controlled; ~90 adults, symptomatic HFpEF, LVEF ≥50%, NYHA II–III; 25 mg vs 50 mg vs placebo QD, up to 12 weeks. First patient dosed Oct 8, 2026.</td><td data-label="Results"><span class="ev gap">GAP</span> No efficacy data. Phase 1 first-in-human data and full trial design were slated for presentation at HFSA 2026 per the company. Endpoints beyond the design summary have not been disclosed in the sources reviewed — do not assume a KCCQ or NT-proBNP primary until the registry record is read directly.</td></tr>
+<tr><td data-label="Study">GRAND CANYON (Servier)<br><small>Sevasemten · Becker · pivotal cohort</small></td><td data-label="Design">Fully enrolled, 175 participants; placebo-controlled pivotal cohort; NSAA functional endpoint over 18 months per company/trade descriptions.</td><td data-label="Results"><span class="ev unverified">UNVERIFIED · COMPANY / TRADE</span> Supporting open-label MESA extension data (Mar 2026): NSAA essentially flat (+0.1) over 2 years in ex-CANYON patients and over 3.5 years in ex-ARCH patients, vs predicted natural-history declines of −2.9 and −5.3 (natural-history decline 1.0–1.7 points/year in published Becker cohorts). Stabilization vs modeled history is hypothesis-supporting, not controlled evidence. GRAND CANYON topline guided Q4 2026 <span class="ev unverified">UNVERIFIED · COMPANY GUIDANCE AT DEAL ANNOUNCEMENT</span>. A positive readout is <em>not</em> itself a milestone payment — payments trigger on approvals and sales.</td></tr>
+</tbody></table>
+<div class="moa-box"><h3>Regulatory path</h3><p><span class="ev fact">FACT</span> EDG-7500 has no approval, no disclosed breakthrough designation, and no published FDA agreement in the sources reviewed. Company statements indicate regulators found a Phase 3 approach without echo-based titration reasonable (secondary summaries of company disclosure) <span class="ev unverified">UNVERIFIED</span> — if that holds in the actual protocol, it is a genuine practical differentiation from mavacamten's REMS/echo regime, and it is also a safety bet: no echo titration means no echo safety net. Phase 3 design (primary endpoint, duration, oHCM vs nHCM structure) was not public as of Oct 16, 2026. <span class="ev gap">GAP</span> Trial success ≠ approval ≠ commercial success applies with full force to a third entrant.</p></div>
+</section>
+
+<section id="competition">
+<div class="section-head"><div class="section-num">05 / LANDSCAPE</div><div><h2>Third in line, in a class that is winning</h2><p class="lede">Clinical differentiation only. The competitors are not standing still, and one of them has already taken the nonobstructive beachhead EDG-7500 was supposed to contest.</p></div></div>
+<div class="compare">
+<article class="compare-card"><div class="program-kicker">Bristol Myers Squibb · Approved 2022</div><div class="name">Camzyos (mavacamten)</div><dl>
+<dt>Position</dt><dd>First cardiac myosin inhibitor; adults with symptomatic NYHA II–III oHCM; pediatric oHCM (≥30 kg) added Sep 30, 2026 — broadest CMI label.</dd>
+<dt>Evidence</dt><dd>EXPLORER-HCM positive (Phase 3, blinded). ~$1.07B 2025 revenue (trade/secondary reporting).</dd>
+<dt>Weakness</dt><dd>Boxed warning for heart failure, REMS with echo monitoring; ODYSSEY-HCM <em>failed</em> dual primaries in nonobstructive HCM (2025) — no nHCM label.</dd></dl></article>
+<article class="compare-card"><div class="program-kicker">Cytokinetics · Approved Dec 19, 2025 (oHCM)</div><div class="name">Myqorzo (aficamten)</div><dl>
+<dt>Position</dt><dd>Second CMI approved in oHCM (U.S. launch Jan 2026); shorter half-life, fewer drug interactions than mavacamten per literature.</dd>
+<dt>Evidence</dt><dd>SEQUOIA-HCM: pVO2 +1.8 mL/kg/min vs placebo at 24 weeks (Phase 3, blinded). ACACIA-HCM (nHCM, Phase 3) positive Aug 2026; sNDA filing planned Q4 2026 — first potential nHCM approval, likely a 2027 event.</dd>
+<dt>Weakness</dt><dd>ACACIA safety: LVEF &lt;50% 10.5% vs 0.8% placebo; HF SAEs 4.7% vs 1.2% — the class liability, quantified in exactly the population EDG-7500 targets.</dd></dl></article>
+<article class="compare-card"><div class="program-kicker">Edgewise · Phase 3 not yet started</div><div class="name">EDG-7500</div><dl>
+<dt>Claimed differentiation</dt><dd>Diastolic-biased sarcomere modulation (regulatory light chain axis); gradient/symptom gains with no LVEF signal and potentially no echo titration; activity in both phenotypes in one program.</dd>
+<dt>Evidence gap</dt><dd>Open-label, n=53, 12 weeks, no p-values published — versus two competitors with blinded Phase 3 wins and one already selling.</dd>
+<dt>Read-through</dt><dd><span class="ev interp">INTERPRETATION</span> EDG-7500 does not need to beat aficamten head-to-head to have value — but it must first reproduce <em>any</em> blinded, placebo-adjusted effect. Until then its differentiation is a mechanism story, not a clinical one. No cross-trial head-to-head claims are made here.</dd></dl></article>
+</div>
+<p class="source-note">Also relevant: standard care (beta-blockers, non-DHP calcium channel blockers, disopyramide, septal reduction) remains the background therapy in all trials; BMS has signaled a further nHCM study of mavacamten (Reuters, Aug 2026).</p>
+</section>
+
+<section id="financials">
+<div class="section-head"><div class="section-num">06 / FINANCIALS</div><div><h2>A $2B gross cash pile and a $62M quarterly burn</h2><p class="lede">Read the pro-forma number the way it is labeled: arithmetic, not a reported balance. The reported balance is June 30; the cash arrived July 13; the tax bill, deal costs and Q3 burn sit in between and have not been reported yet.</p></div></div>
+<div class="fin-grid"><div>
+<div class="metric-stack">
+<div class="metric"><b>$460.7M</b><span>Cash, equivalents &amp; marketable securities · Jun 30, 2026 (10-Q, via Q2 release) <span class="ev fact">FACT</span></span></div>
+<div class="metric"><b>$1.55B</b><span>Servier upfront · received at closing Jul 13, 2026 <span class="ev fact">FACT</span></span></div>
+<div class="metric"><b>$61.9M</b><span>Q2 2026 operating expenses (R&amp;D $47.5M + G&amp;A $14.4M); net loss $57.3M <span class="ev fact">FACT</span></span></div>
+<div class="metric"><b>107.78M</b><span>Shares outstanding · Jun 30, 2026 (10-Q, as cited in RA Capital 13G/A) <span class="ev fact">FACT</span></span></div>
+</div>
+<div class="runway"><b>Runway: dilution is optional for years — if burn discipline holds</b><p><span class="ev interp">INTERPRETATION</span> Gross pro-forma liquidity ≈ $460.7M + $1,550M = $2,010.7M. Even at a Phase 3-era burn of $70M/quarter, that is ~28 quarters of arithmetic runway before taxes and deal costs — which will be material on a $1.55B gain and are undisclosed. <span class="ev gap">GAP</span> Management's narrower claim — upfront expected to fully fund EDG-7500 through potential approval — is the defensible version. <span class="ev unverified">UNVERIFIED · COMPANY</span></p></div>
+</div><div>
+<table class="cap-table"><thead><tr><th>Capital item</th><th>Value</th><th>Basis</th></tr></thead><tbody>
+<tr><td>Price</td><td>$38.20</td><td>Oct 15, 2026 close</td></tr>
+<tr><td>Basic shares</td><td>107.78M</td><td>Jun 30, 2026 10-Q</td></tr>
+<tr><td>Market cap</td><td>~$4.12B</td><td>$38.20 × 107.78M = $4,117M</td></tr>
+<tr><td>Gross pro-forma cash</td><td>~$2.01B</td><td>Reported Jun 30 + upfront; pre-tax/costs</td></tr>
+<tr><td>Implied operating EV</td><td>~$2.11B</td><td>$4,117M − $2,011M; liabilities ~$31.6M at Jun 30 ignored as immaterial to the bridge</td></tr>
+<tr><td>Cash per share (gross PF)</td><td>~$18.66</td><td>$2,011M ÷ 107.78M</td></tr>
+<tr><td>Fully diluted shares</td><td><span class="ev gap">GAP</span></td><td>Option/RSU overhang not extracted from the 10-Q equity notes in this pass; scenarios use an explicitly stated 118M FD assumption (~9% overhang)</td></tr>
+</tbody></table>
+<div class="overhang"><b>Dilution history</b><p style="font-size:13px">Weighted-average shares rose from ~95–105M through 2025 to 107.67M in Q2 2026 — equity-comp drift, not distress financing; the Servier deal involved <em>no</em> new share issuance. Ongoing small inducement grants continue (Sep 30, 2026: options on 7,500 shares at $40.60 plus 3,751 RSUs to three new hires). With ~$2B gross cash, the dilution question is now about compensation discipline and any opportunistic raise into Phase 3 data — not survival.</p></div>
+</div></div>
+</section>
+
+<section id="catalysts">
+<div class="section-head"><div class="section-num">07 / CATALYSTS</div><div><h2>What moves it, and how firm the dates are</h2></div></div>
+<div class="timeline">
+<div class="event primary"><div class="event-date">Q4 2026<br><span class="date-tag guidance">GUIDANCE WINDOW</span></div><div class="event-body"><b>GRAND CANYON topline — Servier's sevasemten in Becker</b>175 participants, fully enrolled. Prices the $100–200M Becker approval milestone probability. A miss does not touch EDG-7500 science but removes the nearest milestone and the deal-validation narrative.</div></div>
+<div class="event primary"><div class="event-date">Q4 2026<br><span class="date-tag guidance">GUIDANCE WINDOW</span></div><div class="event-body"><b>EDG-7500 Phase 3 initiation</b>First public Phase 3 protocol details (endpoints, size, oHCM/nHCM structure, titration rules) — the first chance to judge whether the registrational design matches the Phase 2 story.</div></div>
+<div class="event"><div class="event-date">Early Nov 2026<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Q3 2026 results / 10-Q</b>First reported post-close cash balance: taxes and costs on the Servier gain, and the true Phase 3-era burn rate. Earnings date estimated by secondary calendars, not company-confirmed in sources reviewed.</div></div>
+<div class="event"><div class="event-date">Q4 2026<br><span class="date-tag guidance">GUIDANCE WINDOW</span></div><div class="event-body"><b>Cytokinetics sNDA filing for aficamten in nHCM (competitor)</b>Starts the clock on the first nHCM approval and sets the label/safety bar EDG-7500 must clear years later.</div></div>
+<div class="event"><div class="event-date">2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>EQUINOX-HFpEF progress / first data</b>~90-patient, 12-week study dosed from Oct 2026; a 1H 2027 data window appears in secondary summaries but was not in the company's Oct 8 release reviewed — treat timing as inferred, not guided.</div></div>
+<div class="event"><div class="event-date">2028+<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>EDG-7500 Phase 3 readout</b>No company-guided readout date exists. Any date before a protocol (size/duration) is public is speculation.</div></div>
+</div>
+</section>
+
+<section id="scenarios">
+<div class="section-head"><div class="section-num">08 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario section only — these are illustrative value bridges, not price targets or recommendations. All use 118M assumed fully diluted shares (basic 107.78M + ~10M assumed equity overhang, labeled GAP above) and net cash figures that already deduct assumed taxes, deal costs and burn to the stated horizon.</p></div></div>
+<div class="scen-grid">
+<article class="scen-card bear"><div class="tag">Bear</div><div class="pt">$14–19</div><div class="soft">Soft range · illustrative</div><ul>
+<li>Phase 3 shows a small placebo-adjusted effect or an LVEF signal; no viable nHCM path; aficamten owns both phenotypes.</li>
+<li>GRAND CANYON misses; no milestones ever paid.</li>
+<li>Value bridge: net cash ~$1.40B + EDG-15400/preclinical option ~$0.30B + milestones $0 = ~$1.70–2.24B ⇒ $14–19/sh (center $1.90B ÷ 118M = $16.10).</li>
+</ul></article>
+<article class="scen-card base"><div class="tag">Base</div><div class="pt">$32–42</div><div class="soft">Soft range · illustrative</div><ul>
+<li>Phase 3 wins in oHCM with a clean-enough label; third-entrant share against two entrenched CMIs; nHCM delayed or partial.</li>
+<li>Becker approval pays $200M; Duchenne and sales milestones not paid in the horizon.</li>
+<li>Value bridge: operating value ~$2.80B + net cash at launch ~$1.50B = ~$4.30B ⇒ $36.44/sh (range $3.78–4.96B).</li>
+</ul></article>
+<article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$56–68</div><div class="soft">Soft range · illustrative</div><ul>
+<li>Phase 3 wins in both phenotypes with no REMS-style burden and a credible diastolic differentiation; EDG-15400 Phase 2 positive.</li>
+<li>Becker + a credible path to Duchenne milestones re-rated upward.</li>
+<li>Value bridge: operating value ~$5.70B + net cash ~$1.60B = ~$7.30B ⇒ $61.86/sh (range $6.61–8.02B). Note: reported average analyst target was $51.33 (Oct 2026 aggregator) — the bull case sits above consensus by construction; it requires both-phenotype success.</li>
+</ul></article>
+</div>
+<div class="assump"><b>Assumptions that do the work:</b> (1) 118M FD shares — if true overhang is larger, every range falls proportionally; (2) net cash figures assume the Servier gain is taxed and Phase 3 is fully spent — actual tax is a GAP until the Q3/Q4 filings; (3) no value is assigned to EDG-003; (4) operating values are judgment bridges, not a DCF — no revenue forecast is presented because no Phase 3 protocol, price, or share assumption can yet be sourced.</div>
+</section>
+
+<section id="management">
+<div class="section-head"><div class="section-num">09 / PEOPLE</div><div><h2>Track record and insider signals</h2></div></div>
+<div class="people-grid">
+<article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+<dt>Kevin Koch, PhD — President &amp; CEO, co-founder</dt><dd>Led the company from a skeletal-muscle platform to the Servier exit and the cardiovascular pivot. Form 4 history (Aug 2025) shows large equity alignment grants (525,000-share option at $13.39; RSUs) with a sell-to-cover for taxes — compensation mechanics, not open-market conviction trades.</dd>
+<dt>Joanne M. Donovan, MD, PhD — CMO (during sevasemten era)</dt><dd>Public face of the sevasemten program. Aug 2026 Form 4/A corrected an administrative $0.00 exercise price to $43.56 on 65,000 options — a correction, not a new grant or sale. Muscular-dystrophy staff were offered Servier transitions at closing; current post-deal clinical leadership details are a <span class="ev gap">GAP</span> in the sources reviewed.</dd>
+<dt>Michael Carruthers — CFO</dt><dd>Named investor contact through 2025–26 reporting; tenure spans the cash build from ~$470M (Dec 2024) to the Servier close.</dd>
+</dl></article>
+<article class="paper-card"><h3>Insider / ownership signals — read precisely</h3><ul class="check-list">
+<li>Jonathan C. Fox Form 4 (filed Oct 2, 2026): 308 RSUs as a quarterly outside-director retainer award, $0.00, code A — compensation, not a purchase. <span class="ev fact">FACT</span></li>
+<li>RA Capital Schedule 13G/A (Aug 14, 2026): 8,392,730 shares, 7.8% of the Jun 30 share count — a dated passive disclosure; the fund/adviser/principals report the <em>same</em> position, not additive stakes. <span class="ev fact">FACT</span></li>
+<li>No discretionary open-market insider buying was identified in the filings reviewed for this pass. Absence in a partial review is not proof of absence in EDGAR. <span class="ev gap">GAP</span></li>
+<li>Track record claim that can be verified: the team took sevasemten from discovery to a $1.55B-upfront asset sale and EDG-7500 from first-in-human to Phase 3-ready in parallel. The unverifiable part is whether the cardiovascular science is as good as the deal-making. <span class="ev interp">INTERPRETATION</span></li>
+</ul></article>
+<article class="paper-card"><h3>Governance notes</h3><p style="font-size:14px;color:var(--ink-2)">Executive severance/change-in-control terms are disclosed in the 2026 proxy (DEF 14A), including equity acceleration valued at the Dec 31, 2025 close of $24.815. Post-deal, the central governance question is capital allocation on ~$2B gross cash: Phase 3 execution vs opportunistic M&amp;A vs buyback — none announced in the sources reviewed as of Oct 16, 2026. <span class="ev gap">GAP</span></p></article>
+</div>
+</section>
+
+<section id="risks">
+<div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+<ol class="risk-list">
+<li><b>Open-label evidence base</b><span>Every efficacy claim for the lead asset rests on uncontrolled cohorts (largest n=53, 12 weeks). Blinded shrinkage is the base rate in this class, not the exception.</span></li>
+<li><b>Third-mover commercial position</b><span>Mavacamten (~$1.07B 2025 sales, pediatric label) and aficamten (approved oHCM, Phase 3-positive nHCM) will have years of prescriber habit, payer contracts and real-world data before EDG-7500 can launch.</span></li>
+<li><b>Class LVEF liability may be dose-inseparable</b><span>ACACIA quantified it for aficamten in nHCM (LVEF &lt;50%: 10.5% vs 0.8%). If relaxation and systolic depression are the same pharmacology at Phase 3 exposures, EDG-7500's differentiation collapses.</span></li>
+<li><b>Cash is gross, not net</b><span>The $2.01B figure is pre-tax, pre-cost, pre-Q3-burn arithmetic. Anyone underwriting $18.66/share of cash without the Q3 10-Q is underwriting a number no filing states.</span></li>
+<li><b>Milestones are someone else's execution</b><span>$1.1B of headline value depends on Servier's development, regulatory and commercial performance — with approval triggers, not readout triggers, and an adult-only Becker label halving the first payment to $100M.</span></li>
+<li><b>HFpEF prior probability</b><span>EDG-15400 enters the indication with the worst translation record in cardiology, at Phase 2, n≈90, 12 weeks — surrogate-scale evidence at best from this study.</span></li>
+<li><b>Price already pays for success</b><span>~$2.1B of operating EV for a company whose lead asset has never faced a placebo. The June 2026 pattern — stock down ~25% intraday on <em>positive</em> Part D data (trade summaries) — shows how much was already in the price.</span></li>
+<li><b>Key-person / transition</b><span>The muscular-dystrophy team largely moved to Servier; the cardiovascular bench that must now execute a pivotal program is thinner in the public record. <span class="ev gap">GAP</span></span></li>
+</ol>
+</section>
+
+<section id="sources">
+<div class="section-head"><div class="section-num">11 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: October 16, 2026. Source order: SEC → FDA/labels → ClinicalTrials.gov → papers → company PRs/decks (UNVERIFIED until corroborated) → trade press.</p></div></div>
+<div class="sources">
+<div class="source-group"><h3>SEC / filings-derived</h3>
+<a href="https://www.prnewswire.com/news-releases/edgewise-therapeutics-reports-second-quarter-2026-financial-results-302844178.html" target="_blank" rel="noopener">Q2 2026 results (10-Q data)<small>Cash $460.7M at Jun 30, 2026; Q2 opex $61.9M; net loss $57.3M; weighted shares 107,669,774</small></a>
+<a href="https://www.stocktitan.net/sec-filings/EWTX/schedule-13g-a-edgewise-therapeutics-inc-amended-passive-investment-d-c046e195b73d.html" target="_blank" rel="noopener">RA Capital 13G/A (Aug 14, 2026)<small>8,392,730 shares / 7.8% on 107,776,380 shares outstanding per Jun 30 10-Q</small></a>
+<a href="https://pharmaphorum.com/news/servier-wagers-265bn-edgewise-muscular-dystrophy-drug" target="_blank" rel="noopener">Servier deal terms as filed (via trade summary of filing)<small>$1.55B upfront; $200M/$100M Becker; $600M Duchenne; $300M on &gt;$550M annual U.S. sales; $1.1B cap</small></a>
+</div>
+<div class="source-group"><h3>Clinical / literature</h3>
+<a href="https://www.prnewswire.com/news-releases/edgewise-therapeutics-announces-positive-top-line-data-from-12-week-phase-2-cirrus-hcm-trial-with-edg-7500-in-obstructive-and-nonobstructive-hypertrophic-cardiomyopathy-hcm-302801108.html" target="_blank" rel="noopener">CIRRUS-HCM Part D topline (company, Jun 16, 2026)<small>All Part D figures are company-reported, open-label, no published p-values</small></a>
+<a href="https://www.prnewswire.com/news-releases/edgewise-therapeutics-doses-first-patient-in-phase-2-equinox-hfpef-trial-of-edg-15400-302901913.html" target="_blank" rel="noopener">EQUINOX-HFpEF first patient dosed (company, Oct 8, 2026)<small>~90 patients, 25/50 mg vs placebo, ≤12 weeks, LVEF ≥50%</small></a>
+<a href="https://www.frontiersin.org/articles/10.3389/fcvm.2024.1477487/full" target="_blank" rel="noopener">Cardiac myosin inhibitors: RCT meta-analysis (Frontiers, 2024)<small>Class efficacy on gradients/NYHA/KCCQ with modest LVEF decrease</small></a>
+<a href="https://ir.cytokinetics.com/press-releases/press-release-details/2026/Cytokinetics-Announces-Additional-Data-from-ACACIA-HCM-Presented-at-the-HFSA-Annual-Scientific-Meeting-2026/default.aspx" target="_blank" rel="noopener">ACACIA-HCM safety detail (Cytokinetics, Oct 2026)<small>LVEF &lt;50% 10.5% vs 0.8%; HF SAEs 4.7% vs 1.2% (aficamten, nHCM)</small></a>
+</div>
+<div class="source-group"><h3>Deal / corporate</h3>
+<a href="https://www.morningstar.com/news/pr-newswire/20260713ln02099/servier-completes-the-acquisition-of-edgewise-therapeutics-muscular-dystrophy-business" target="_blank" rel="noopener">Servier closing release (Jul 13, 2026)<small>Completion after regulatory clearance; GRAND CANYON 175 participants, topline guided Q4 2026</small></a>
+<a href="https://www.biospace.com/press-releases/edgewise-therapeutics-unveils-the-differentiated-mechanism-of-action-moa-of-its-cardiac-sarcomere-modulator-edg-7500" target="_blank" rel="noopener">EDG-7500 mechanism disclosure (company via BioSpace, Sep 22, 2026)<small>Regulatory-light-chain framing; Phase 3 guided Q4 2026 — company claims, UNVERIFIED</small></a>
+<a href="https://www.morningstar.com/news/pr-newswire/20260310la06174/edgewise-announces-positive-long-term-sevasemten-data-demonstrating-sustained-functional-stabilization-in-becker-muscular-dystrophy-through-35-years-of-follow-up" target="_blank" rel="noopener">MESA long-term sevasemten data (company, Mar 10, 2026)<small>NSAA +0.1 over 2 yrs (ex-CANYON) and 3.5 yrs (ex-ARCH) vs modeled declines</small></a>
+</div>
+<div class="source-group"><h3>Market / competitor</h3>
+<a href="https://www.marketbeat.com/stocks/NASDAQ/EWTX/chart/" target="_blank" rel="noopener">MarketBeat price history<small>Oct 15, 2026 close $38.20; market cap ~$4.02B on its share count basis</small></a>
+<a href="https://www.hcplive.com/view/fda-approves-mavacamten-for-pediatric-patients-with-obstructive-hcm" target="_blank" rel="noopener">Camzyos pediatric approval (Sep 30, 2026)<small>SCOUT-HCM: Valsalva gradient −48.0 mmHg vs placebo, p&lt;.0001, n=44 adolescents</small></a>
+<a href="https://www.reuters.com/business/healthcare-pharmaceuticals/cytokinetics-eyes-expanded-use-heart-drug-after-promising-late-stage-data-2026-08-28/" target="_blank" rel="noopener">Reuters on ACACIA-HCM (Aug 28, 2026)<small>Aficamten nHCM Phase 3; sNDA planned Q4 2026; analyst caution on effect size and safety</small></a>
+</div>
+</div>
+<div class="method"><strong>Method &amp; gaps disclosed:</strong> The Q2 10-Q was used via its furnished results release and the 13G/A share-count citation; the anti-dilutive securities table (exact FD count), the Servier purchase agreement's tax/cost detail, the EDG-7500 Phase 3 protocol, and ClinicalTrials.gov records read directly are GAPs in this pass and are labeled as such in the text. Nothing in this dossier is invented: figures without a primary source above are labeled INTERPRETATION, GAP or UNVERIFIED. This dossier contains no personal or holder information.</div>
+</section>
+</main>
+<footer><strong>EWTX · Edgewise Therapeutics, Inc.</strong> — Deep-dive dossier, as of October 16, 2026. For research only; not investment advice. Scenario ranges are illustrative and authorized only for this library batch.</footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+
+</html>

@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Lexeo Therapeutics (LXEO) Deep-Dive Dossier · Oct 16, 2026</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · LXEO</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>A cardiac gene-therapy company trading at its cash — with a 13-patient pivotal as the whole story.</h1>
+<p class="hero-dek">Lexeo Therapeutics, Inc. is a New York clinical-stage genetic-medicine company built around AAVrh10 delivery to the heart. Its lead asset, LX2006, restores frataxin in Friedreich ataxia (FA) cardiomyopathy and is now in SUNRISE-FA 2, a small open-label pivotal designed for accelerated approval. The second program, LX2020 in PKP2 arrhythmogenic cardiomyopathy, has real human transduction data and an RMAT designation. Everything else is preclinical optionality.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$2.76</div><div class="quote-label">Close · Oct 15, 2026 (MarketBeat price history)</div>
+<div class="quote-meta"><strong>~$226M</strong> market cap (82.05M shares, Aug 10, 2026) · <strong>~$234M</strong> cash &amp; Treasuries (Jun 30, 2026)<br>52-week range $2.56–$10.99 · Enterprise value ≈ cash, before Q3 burn and July–August ATM proceeds — see Financials for the bridge and its gaps</div>
+</div></div></header>
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#clinical">Clinical</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button></nav></div>
+<main>
+<section id="frame"><div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The single swing factor</h2><p class="lede">Whether SUNRISE-FA 2 — 13 treated patients versus 13 concurrent untreated controls, open-label — shows a left-ventricular-mass-index (LVMI) effect at 6 months large enough for FDA to grant accelerated approval on LVMI as a surrogate. The protocol is powered around a ≥15% LVMI effect; the Phase 1/2 signal that justifies it rests, at the abnormal-baseline doses that matter, on three patients.</p></div></div>
+<div class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Lead asset</div><div class="big">LX2006</div><p>FACT AAVrh10.hFXN, one-time IV, for FA cardiomyopathy. Five FDA designations: Breakthrough, RMAT, Orphan, Rare Pediatric Disease, Fast Track; in FDA's CMC Development and Readiness Pilot (CDRP).</p></article>
+<article class="decision"><div class="tag">Pivotal readout</div><div class="big">2H 2027</div><p>UNVERIFIED Company-guided SUNRISE-FA 2 topline (6-month LVMI), with a BLA targeted for 1H 2028 under accelerated approval.</p></article>
+<article class="decision warn"><div class="tag">Cash / runway</div><div class="big">$234.2M</div><p>FACT Jun 30, 2026 cash, equivalents and U.S. Treasury investments. UNVERIFIED Company guides runway into 2028 — past the pivotal readout, not past a launch.</p></article>
+<article class="decision"><div class="tag">Price vs cash</div><div class="big">~1.0×</div><p>INTERPRETATION $226M basic market cap vs $234M last-reported cash. The market is paying roughly nothing for two clinical gene therapies — and pricing in burn, dilution and pivotal risk to get there.</p></article>
+</div>
+<div class="thesis"><article class="thesis-card"><h3>The bull frame in one pass</h3><ul>
+<li>Human target engagement is not hypothetical: cardiac biopsies showed frataxin increased in all 8 SUNRISE-FA participants at 3 months, and the dataset is peer-reviewed (JAMA Cardiology, June 2026).</li>
+<li>FDA alignment is unusually complete for a company this size: finalized pivotal protocol + statistical analysis plan, LVMI surrogate accepted for an accelerated-approval design, no additional nonclinical bridging studies required, and a flexible CMC plan with reduced PPQ batches.</li>
+<li>LX2020 is a genuine second shot: dose-dependent PKP2 protein (+93% low dose, +162% high dose on biopsy), arrhythmia-burden stabilization/improvement, RMAT granted August 2026.</li>
+<li>The balance sheet funds the binary: $234.2M against ~$19M/quarter operating cash burn in H1 2026.</li></ul></article>
+<article class="thesis-card risk"><h3>What the cheapness is actually pricing</h3><ul>
+<li>The pivotal is tiny and open-label: 13 vs 13, no placebo or sham, LVMI read at 6 months. Small-n imaging endpoints are fragile to baseline imbalance, regression to the mean and reader bias.</li>
+<li>The headline Phase 1/2 LVMI numbers (28% at 6 months, 33% at 12 months) are n=3 — the abnormal-baseline subgroup of the mid/high-dose cohorts.</li>
+<li>No p-values have been disclosed for the key LX2006 cardiac endpoints in the materials reviewed; the one statistical claim — mFARS versus a propensity-matched natural-history cohort — is a non-randomized comparison.</li>
+<li>Share count has roughly tripled since the IPO era via two 2025 financings ($234M raised) struck at $2.88 and $8.00 — the second now deeply underwater, which sets the financing backdrop.</li>
+<li>AAV class risks (liver, myocarditis, durability, redosing impossibility) are unretired at n=17 for LX2006 and n=10 for LX2020.</li></ul></article></div>
+<p class="source-note">Identity and filings: Lexeo Therapeutics, Inc., Delaware, Commission File No. 001-41855, 345 Park Avenue South, Floor 6, New York, NY 10010 (10-K/10-Q covers). Q2 2026 10-Q filed Aug 12, 2026. Price history: MarketBeat LXEO chart (Oct 15, 2026 close $2.76).</p>
+</section>
+
+<section id="science"><div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Restore the missing protein, in the organ that kills</h2><p class="lede">FA is a frataxin-deficiency disease. LX2006 does not edit the patient's gene, suppress a toxic species, or treat symptoms — it adds a working copy of FXN, delivered systemically, aimed first at the heart because cardiomyopathy is the leading cause of death in FA.</p></div></div>
+<div class="moa-box"><h3>MoA in 60 seconds</h3>
+<p><strong>Plain English.</strong> People with FA inherit expanded DNA repeats that silence the frataxin gene, so their cells make too little of a mitochondrial protein needed to build iron–sulfur clusters and produce energy. Heart muscle thickens, scars and fails. LX2006 is a one-time IV infusion of a harmless-virus shell (AAVrh10) carrying a normal frataxin gene; the virus homes to heart muscle, the gene switches on, and the cell makes frataxin again.</p>
+<p><strong>Technical.</strong> INTERPRETATION LX2006 (AAVrh.10hFXN) is a recombinant AAVrh10 vector encoding human frataxin under a constitutive promoter, dosed once IV (pivotal dose 1.2×10<sup>12</sup> vg/kg). Frataxin is a mitochondrial matrix protein required for iron–sulfur cluster biogenesis; deficiency causes mitochondrial iron accumulation, oxidative sensitivity and ATP failure. Restoring FXN expression in cardiomyocytes is mechanistically upstream of every downstream phenotype — which is the strength (causal) and the risk (expression level, distribution and durability in human myocardium decide everything).</p></div>
+<div class="science-chain">
+<article><b>01</b><h3>GAA expansion</h3><p>FACT ~96% of FA is biallelic GAA trinucleotide expansion in intron 1 of FXN, repressing transcription. Onset usually in the first two decades; wheelchair dependence commonly within 10–15 years.</p></article>
+<article><b>02</b><h3>Frataxin loss</h3><p>FACT Reduced frataxin impairs iron–sulfur cluster assembly, mitochondrial respiration and iron handling — hitting dorsal root ganglia, cerebellum, pancreas and myocardium.</p></article>
+<article><b>03</b><h3>Cardiomyopathy</h3><p>FACT Hypertrophic remodeling, fibrosis and arrhythmia; cardiac disease is the main cause of premature mortality in FA. LVMI is the imaging measure of that hypertrophy — and the pivotal surrogate.</p></article>
+<article><b>04</b><h3>AAVrh10.hFXN</h3><p>FACT One-time systemic delivery of a functional FXN transgene. Preclinically, LX2006 reversed cardiac abnormalities and improved function/survival in FA models (company/FDA-designation summaries).</p></article>
+</div>
+<div class="fail-grid">
+<article><h3>1 · Expression ≠ rescue</h3><p>Biopsy frataxin rose in all sampled patients, but biopsy samples a few milligrams of myocardium. GAP Whole-heart transduction fraction at the pivotal dose in humans is not measurable with current sampling — the LVMI result is the real test.</p></article>
+<article><h3>2 · Too much frataxin?</h3><p>Company reports no signs of frataxin over-expression in cardiac tissue to date. INTERPRETATION Frataxin overexpression is toxic in model systems; a constitutive promoter gives no dose control after infusion. Long-term expression data beyond ~3 years are thin.</p></article>
+<article><h3>3 · Cardiac-only rescue in a systemic disease</h3><p>FACT LX2006 is developed for the cardiomyopathy. Neurology (ataxia, the disability patients feel daily) is measured (mFARS) but the registrational claim is cardiac. INTERPRETATION Even a clean win leaves the neurologic disease progressing — relevant to label breadth, payer framing and combination future.</p></article>
+<article><h3>4 · AAV class biology</h3><p>FACT Across systemic AAV programs: transaminitis, complement activation, thrombocytopenia/TMA, dorsal-root-ganglion toxicity in animals, and anti-capsid immunity that prevents redosing. Lexeo's n is too small to exclude any of these at the pivotal dose.</p></article>
+<article><h3>5 · LVMI as surrogate</h3><p>INTERPRETATION LVMI regression is plausible as "reasonably likely to predict benefit" — hypertrophy tracks outcomes in FA cohorts — but no therapy has yet won approval on LVMI in FA. Accelerated approval leaves a confirmatory obligation and withdrawal risk if clinical benefit is not verified.</p></article>
+<article><h3>6 · One Grade 2 myocarditis</h3><p>FACT One possibly treatment-related Grade 2 asymptomatic myocarditis event at ~1 year post-dose in the Phase 1/2 program. INTERPRETATION In an n=17 program that is a signal to watch, not a verdict — and in a cardiac indication, myocarditis attribution will be scrutinized in the pivotal and at FDA review.</p></article>
+</div>
+<p class="source-note">Literature: GeneReviews, Friedreich Ataxia (NCBI Bookshelf NBK1281); Lill &amp; Mühlenhoff and the iron–sulfur-cluster literature on frataxin function; FA clinical-management guidelines (PMC9652828); Crystal et al., LX2006 Phase 1/2 data, JAMA Cardiology (June 2026) — see Sources. Skyclarys (omaveloxolone) FDA approval, Feb 28, 2023, for FA in patients ≥16 years — an Nrf2 activator, not a frataxin-restoring therapy.</p>
+</section>
+
+<section id="pipeline"><div class="section-head"><div class="section-num">03 / PIPELINE</div><div><h2>Ranked by descending value</h2><p class="lede">Two clinical cardiac programs carry essentially all of the value. The preclinical pair and the legacy Alzheimer's work are options, not assets, until human data exist.</p></div></div>
+<div class="pipeline">
+<div class="pipe-row"><div class="pipe-rank">1</div><div><div class="pipe-name">LX2006 — AAVrh10.hFXN · FA cardiomyopathy</div><div class="pipe-desc">FACT Pivotal (SUNRISE-FA 2) started June 2026. ~5,000 US FA patients (company figure); cardiomyopathy is the mortality driver. Five FDA designations + CDRP. Only frataxin-restoring cardiac therapy in a registrational design.</div></div><div class="pipe-status">Pivotal</div></div>
+<div class="pipe-row"><div class="pipe-rank">2</div><div><div class="pipe-name">LX2020 — AAVrh10.PKP2 · PKP2 arrhythmogenic cardiomyopathy</div><div class="pipe-desc">FACT Phase 1/2 (HEROIC-PKP2) enrollment complete, n=10 dosed. Company estimates PKP2 is the most common genetic cause of ACM (~50% of cases; ~60,000 US). RMAT + Orphan + Fast Track. 12-month high-dose data due Q4 2026.</div></div><div class="pipe-status">Phase 1/2</div></div>
+<div class="pipe-row"><div class="pipe-rank">3</div><div><div class="pipe-name">LX2021 — Cx43 (GJA1) · DSP cardiomyopathy</div><div class="pipe-desc">FACT Preclinical; delivers connexin-43 coding sequence for desmoplakin-related and related ACM/DCM populations (company estimate ~35K US). GAP No IND timeline disclosed in materials reviewed.</div></div><div class="pipe-status">Preclinical</div></div>
+<div class="pipe-row"><div class="pipe-rank">4</div><div><div class="pipe-name">LX2022 — TNNI3 · hypertrophic cardiomyopathy</div><div class="pipe-desc">FACT Preclinical, IND-enabling per Jan 2026 corporate presentation (company estimate ~25K US). GAP No clinical timeline.</div></div><div class="pipe-status">Preclinical</div></div>
+<div class="pipe-row"><div class="pipe-rank">5</div><div><div class="pipe-name">APOE program (LX1001 / LX1020 / LX1021) · APOE4 Alzheimer's</div><div class="pipe-desc">FACT LX1001 (AAVrh10 APOE2) completed Phase 1/2 in APOE4 homozygotes; company has sought a development partner rather than self-funding. INTERPRETATION Strategically deprioritized after the cardiovascular pivot — carry at option value only.</div></div><div class="pipe-status dead">Partner-seeking</div></div>
+<div class="pipe-row"><div class="pipe-rank">6</div><div><div class="pipe-name">Cardiac RNA collaboration (Perceptive Xontogeny / venBio, 2025)</div><div class="pipe-desc">UNVERIFIED Secondary-source summaries describe up to $40M of partner financing for non-viral cardiac RNA work. GAP Terms and program status not verified against a primary filing excerpt in this build.</div></div><div class="pipe-status">Discovery</div></div>
+</div>
+<p class="source-note">Company states it retains global rights across all programs (Jan 2026 corporate presentation, via Quartr). Foundational licenses: Weill Cornell Medicine and UC San Diego.</p>
+</section>
+
+<section id="clinical"><div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Small trials, biopsy-verified biology, one very small pivotal</h2><p class="lede">The Phase 1/2 LX2006 dataset is published and internally consistent — expression up, LVMI down in the patients who had room to improve, mFARS stable. It is also 17 patients, open-label, with the pivotal effect size anchored on an n=3 subgroup. Both things are true, and the dossier weights them equally.</p></div></div>
+<table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Population / endpoints</th><th>Status</th></tr></thead><tbody>
+<tr><td data-label="Study">SUNRISE-FA (NCT05445323)</td><td data-label="Design">Phase 1/2, open-label, dose-escalation, single IV dose; 52-week core</td><td data-label="Population">FA cardiomyopathy; safety, frataxin (cardiac biopsy), LVMI, hs-troponin I, wall thickness, mFARS</td><td data-label="Status">FACT n=8 in Lexeo cohort; combined n=17 with Weill Cornell study</td></tr>
+<tr><td data-label="Study">Weill Cornell Phase 1A (NCT05302271)</td><td data-label="Design">Investigator-initiated Phase 1/2, open-label</td><td data-label="Population">FA cardiomyopathy; same endpoint family</td><td data-label="Status">FACT n=9; data licensed to Lexeo</td></tr>
+<tr><td data-label="Study">CLARITY-FA</td><td data-label="Design">Prospective natural-history study</td><td data-label="Population">FA patients; identifies SUNRISE-FA 2-eligible participants and contextualizes control data</td><td data-label="Status">FACT Enrolling globally (Q2 2026 update)</td></tr>
+<tr><td data-label="Study">SUNRISE-FA 2 (pivotal)</td><td data-label="Design">Open-label; 13 treated (single IV 1.2×10<sup>12</sup> vg/kg, age ≥16) vs 13 concurrent untreated controls; no placebo/sham; pediatric arm referenced in FARA statement</td><td data-label="Population">Abnormal baseline LVMI required; primary LVMI at 6 months; SAP powered to detect ≥15% LVMI effect</td><td data-label="Status">FACT Initiated June 2026, first patient enrolled; topline guided 2H 2027</td></tr>
+<tr><td data-label="Study">HEROIC-PKP2 (NCT06109181)</td><td data-label="Design">Phase 1/2, single-arm, open-label, multicenter; low dose 2×10<sup>13</sup> vg/kg, high dose 6×10<sup>13</sup> vg/kg</td><td data-label="Population">PKP2-ACM; safety, biopsy PKP2/VCN/mRNA, NSVT/PVC burden, PGIC, RVEF, NYHA</td><td data-label="Status">FACT Enrollment complete Q4 2025; n=10 dosed</td></tr>
+</tbody></table>
+<div class="signal-grid" style="margin-top:20px">
+<article class="paper-card"><div class="program-kicker">LX2006 · Phase 1/2 · JAMA Cardiology 2026</div><h3>What the published data actually show</h3>
+<ul class="check-list">
+<li>FACT Frataxin: all 8 SUNRISE-FA biopsy participants increased from baseline at 3 months — the first cardiac-tissue expression evidence in FA.</li>
+<li>FACT LVMI: in participants with abnormal baseline LVMI in mid/high-dose cohorts (<strong>n=3</strong>), mean improvement 28% at 6 months and 33% at 12 months; some maintained improvement to 3 years. Majority of all participants improved or stabilized.</li>
+<li>FACT Secondary cardiac markers (hs-troponin I, lateral wall thickness) improved or stabilized in most participants regardless of baseline LVMI.</li>
+<li>FACT mFARS stabilized over time in treated participants; March 2026 ACC update: UNVERIFIED company-reported statistically significant mean mFARS improvement versus a propensity-matched UNIFAI natural-history cohort — non-randomized, GAP no p-value in materials reviewed.</li>
+<li>FACT Safety (n=17): no Grade 3+ SAEs; no clinically significant complement activation; minimal transient LFT elevations; no discontinuations; one possibly related Grade 2 asymptomatic myocarditis at ~1 year.</li>
+</ul></article>
+<article class="paper-card"><div class="program-kicker">LX2020 · HEROIC-PKP2 · Jan 2026 interim</div><h3>Dose-dependent biology, early arrhythmia signal</h3>
+<ul class="check-list">
+<li>FACT Biopsy (n=7, 3 months): mean PKP2 protein +93% low dose (n=2), +162% high dose (n=5); VCN 1.5 (n=1) vs 3.3 (n=5); exogenous mRNA 7.9×10<sup>4</sup> vs 2.7×10<sup>5</sup> copies/µg; correct intercalated-disc colocalization.</li>
+<li>FACT Arrhythmia (n=8 with ≥6 months): NSVT improved a mean 22% and PVCs 14% in high-dose cohorts (n=5) at latest visit; reduced or stabilized in the majority. 4 of 5 high-dose participants reported improvement on PGIC.</li>
+<li>FACT Safety (n=10): generally well tolerated; no clinically significant complement activation; LFT elevations in 5 high-dose participants, all resolved with protocol immunosuppression (prednisone/sirolimus).</li>
+<li>FACT One Grade 3 SAE of sustained ventricular tachycardia at 3 months, assessed possibly treatment-related; treated with antiarrhythmic medication, discharged without additional intervention. INTERPRETATION In an arrhythmia disease this event is intrinsically hard to attribute — disease and drug are both plausible — which is exactly why FDA engagement in 2026 matters.</li>
+<li>GAP No p-values, no placebo arm, and arrhythmia burden is notoriously variable day-to-day; n=5 high-dose efficacy reads are hypothesis-generating only.</li>
+</ul></article></div>
+<div class="moa-box"><h3>Regulatory path — LX2006</h3><p>FACT Protocol and SAP finalized June 15, 2026 (8-K). Design intent: accelerated-approval BLA in 1H 2028 on the 6-month LVMI analysis, using the concurrent untreated control within the same protocol (FDA feedback incorporated to limit bias), commercial-scale drug product ready, no additional nonclinical bridging studies required, and a flexible validation plan with reduced PPQ batches. Earlier FDA alignment (2025) had referenced co-primary LVMI (&gt;10% improvement at 12 months) and frataxin (any increase at 3 months) thresholds for a registrational study; the finalized pivotal moved the primary LVMI analysis to 6 months with the SAP powered at ≥15%. INTERPRETATION Treat the June 2026 finalized design — not the 2025 alignment language — as governing. Accelerated approval would still require a confirmatory trial verifying clinical benefit.</p></div>
+</section>
+
+<section id="competition"><div class="section-head"><div class="section-num">05 / LANDSCAPE</div><div><h2>Differentiation is mechanistic, not marketing</h2><p class="lede">No approved therapy restores frataxin, and no approved therapy treats FA cardiomyopathy specifically. Lexeo's differentiation is being the only causal, cardiac-first program in a pivotal — its vulnerability is that every competitor comparison is cross-trial and the field's one approved drug treats the other organ system.</p></div></div>
+<div class="compare">
+<article class="compare-card"><div class="program-kicker">FA · Approved</div><div class="name">Skyclarys (omaveloxolone, Biogen/Reata)</div><dl><dt>Mechanism</dt><dd>FACT Nrf2 activator, oral daily; approved Feb 2023 for FA ≥16 years on mFARS (neurologic) data (MOXIe).</dd><dt>Differentiation vs LX2006</dt><dd>INTERPRETATION Not frataxin-restoring and not a cardiac therapy. Complementary organ targets today; a combination future is conceivable but untested. It does set the regulatory precedent that FA approves on functional/surrogate packages with natural-history support.</dd></dl></article>
+<article class="compare-card"><div class="program-kicker">FA · In development</div><div class="name">FXN-restoration followers</div><dl><dt>Programs</dt><dd>FACT Design Therapeutics' DT-216 (small-molecule FXN expression), Larimar's CTI-1601 (frataxin replacement protein) and PTC's vatiquinone (failed its pivotal endpoint in 2023 reporting) illustrate the field.</dd><dt>Differentiation</dt><dd>INTERPRETATION None is a cardiac gene therapy in a registrational trial. LX2006's lead is real but time-limited: a systemic FXN restorer that also helped neurology would be strategically superior if one ever reads out cleanly.</dd></dl></article>
+<article class="compare-card"><div class="program-kicker">PKP2-ACM · Direct rivals</div><div class="name">Rocket RP-A601 · Tenaya TN-401</div><dl><dt>Mechanism</dt><dd>FACT Both are AAV9-based PKP2 gene therapies in Phase 1 (Rocket RP-A601 for PKP2 ARVC; Tenaya TN-401 in MyPEAK-1).</dd><dt>Differentiation</dt><dd>INTERPRETATION Lexeo (AAVrh10) is ahead on disclosed human biopsy expression and arrhythmia data and holds RMAT. Capsid, dose, immunosuppression and manufacturing — not the transgene — will decide this race. No head-to-head data exist; cross-trial arrhythmia comparisons are unreliable.</dd></dl></article>
+</div>
+<div class="readthrough"><strong>Adjacent read-through.</strong> INTERPRETATION Rocket's Danon program (RP-A501, AAV9.LAMP2B) is the closest regulatory precedent for a cardiac AAV pivotal in a genetic cardiomyopathy — its FDA interactions and any CMC findings are the best external template for how LX2006's BLA review may run. Systemic-AAV safety events at any sponsor (liver failure deaths in unrelated high-dose programs in 2025) reprice the whole class, Lexeo included.</div>
+</section>
+
+<section id="financials"><div class="section-head"><div class="section-num">06 / FINANCIALS</div><div><h2>Funded to the binary, priced at cash, diluted to get here</h2><p class="lede">The June 30 balance sheet is clean — $234.2M of cash and Treasuries, no disclosed interest-bearing debt in the excerpts reviewed, total liabilities $19.8M. The cost of building it was a share count that went from ~33M in early 2025 to 82M by August 2026, with 13.9M common warrants still outstanding.</p></div></div>
+<div class="fin-grid"><div>
+<div class="metric-stack">
+<div class="metric"><b>$234.2M</b><span>FACT Cash, equivalents &amp; U.S. Treasury investments · Jun 30, 2026 (vs $246.6M Dec 31, 2025)</span></div>
+<div class="metric"><b>$38.7M</b><span>FACT Net cash used in operations · H1 2026 (~$19.4M/quarter; H1 2025: $48.9M)</span></div>
+<div class="metric"><b>$46.1M</b><span>FACT Net loss · H1 2026 (Q2 alone: $25.9M, $0.30/share; R&amp;D $19.0M, G&amp;A $9.0M in Q2)</span></div>
+<div class="metric"><b>$19.8M</b><span>FACT Total liabilities · Jun 30, 2026 · GAP no interest-bearing debt figure isolated in excerpts reviewed; lease obligations sit inside this total</span></div>
+</div>
+<div class="runway"><b>Runway into 2028 — company guidance</b><p>UNVERIFIED At the H1 2026 operating burn (~$77M annualized), $234.2M is ~3 years of arithmetic runway; the company's "into 2028" guide is consistent with pivotal + CMC spend rising from here. INTERPRETATION Runway covers the 2H 2027 topline and a 1H 2028 BLA filing. It does not cover a confirmatory trial plus launch — a raise or partnership before approval is the base case, not a failure mode.</p></div>
+</div><div>
+<table class="cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>As of</th></tr></thead><tbody>
+<tr><td>Common outstanding</td><td>78,622,604</td><td>Jun 30, 2026</td></tr>
+<tr><td>Common outstanding</td><td>82,046,255</td><td>Aug 10, 2026 (10-Q cover; +3.42M, consistent with ATM issuance under the Mar 2025 Leerink sales agreement)</td></tr>
+<tr><td>Pre-funded warrants — May 2025 ($0.0001 strike, no expiry)</td><td>6,963,556</td><td>Issued May 28, 2025</td></tr>
+<tr><td>Pre-funded warrants — Oct 2025 ($0.0001, Balyasny)</td><td>1,250,015</td><td>Issued Oct 20, 2025; none exercised at Jun 30, 2026</td></tr>
+<tr><td>Common warrants — May 2025 ($2.82 strike, exp. May 2029)</td><td>13,876,838</td><td>Issued May 28, 2025</td></tr>
+<tr><td><strong>Warrant-inclusive FD (before options/RSUs)</strong></td><td><strong>~104.1M</strong></td><td>82.05M + 8.21M + 13.88M = 104.14M — INTERPRETATION assumes no May 2025 pre-funded exercises; GAP exercises to Aug 2026 and the options/RSU/ESPP pool were not isolated in excerpts reviewed, so true FD is higher</td></tr>
+</tbody></table>
+<div class="overhang"><b>$226M → ~$0 EV</b><p style="margin:6px 0 0;font-size:13px">INTERPRETATION Oct 15 close $2.76 × 82.05M = $226.4M basic market cap (MarketBeat prints $226.45M for Oct 15 — cross-checks). Against Jun 30 cash of $234.2M, headline EV is ≈ –$8M. Correcting mechanically for one quarter of burn (~$19M) and unknown Q3 ATM proceeds (3.42M shares issued by Aug 10 at undisclosed prices) puts current EV in a rough $0–30M band — GAP Q3 cash is not reported until the Q3 10-Q. On warrant-inclusive FD, market cap is $2.76 × 104.14M = $287.4M.</p></div>
+</div></div>
+<h3 style="margin-top:24px">Dilution history — how the count tripled</h3>
+<table class="study-table"><thead><tr><th>Date</th><th>Transaction</th><th>Terms</th></tr></thead><tbody>
+<tr><td data-label="Date">Nov 2023</td><td data-label="Transaction">IPO (Nasdaq: LXEO)</td><td data-label="Terms">FACT Public listing; share count ~27–33M through early 2025 (weighted-average counts, 10-Qs)</td></tr>
+<tr><td data-label="Date">May 28, 2025</td><td data-label="Transaction">Private placement</td><td data-label="Terms">FACT 20,790,120 shares + 6,963,556 pre-funded warrants, with 13,876,838 accompanying warrants; $2.8825/unit; ~$80.0M gross / $73.1M net</td></tr>
+<tr><td data-label="Date">Oct 20, 2025</td><td data-label="Transaction">Public offering + concurrent private placement</td><td data-label="Terms">FACT 17,968,750 shares at $8.00 ($143.8M gross, incl. full greenshoe) + 1,250,015 pre-funded warrants to Balyasny at $7.9999 (~$10.0M); ~$153.8M total gross</td></tr>
+<tr><td data-label="Date">2026</td><td data-label="Transaction">ATM (Leerink, from Mar 2025)</td><td data-label="Terms">FACT Shares outstanding rose 78.62M → 82.05M between Jun 30 and Aug 10, 2026; GAP proceeds/prices not in excerpts reviewed</td></tr>
+</tbody></table>
+<p class="source-note">INTERPRETATION The October 2025 raise at $8.00 — done after the Breakthrough designation — is the bulls' best financing datapoint and the bears' best overhang datapoint: those holders are ~65% underwater at $2.76, and the May 2025 warrants at $2.82 sit essentially at the current price, capping rallies with exercise supply until May 2029.</p>
+</section>
+
+<section id="catalysts"><div class="section-head"><div class="section-num">07 / CATALYSTS</div><div><h2>The sequence that resolves the thesis</h2><p class="lede">Date quality: <span class="date-tag hard">HARD</span> confirmed · <span class="date-tag guidance">GUIDANCE</span> company window · <span class="date-tag inferred">INFERRED</span> estimated. As of Oct 16, 2026.</p></div></div>
+<div class="timeline">
+<div class="event"><div class="event-date">Q4 2026</div><div class="event-body"><b>LX2020 12-month data — all high-dose participants</b>FACT Guided in Jan 2026 and reiterated in Q2 2026 reporting. The nearest falsifiable event in the story.<br><span class="date-tag guidance">GUIDANCE</span></div></div>
+<div class="event"><div class="event-date">2026</div><div class="event-body"><b>LX2020 FDA regulatory engagement</b>FACT Expected in 2026 per company; RMAT (Aug 2026) raises the odds the meeting defines a registrational path.<br><span class="date-tag guidance">GUIDANCE</span></div></div>
+<div class="event"><div class="event-date">Nov 2026</div><div class="event-body"><b>Q3 2026 results / 10-Q</b>INTERPRETATION Timing inferred from the Aug 12 Q2 cadence; first look at post-ATM share count, Q3 cash and SUNRISE-FA 2 enrollment pace.<br><span class="date-tag inferred">INFERRED</span></div></div>
+<div class="event"><div class="event-date">2027</div><div class="event-body"><b>SUNRISE-FA 2 enrollment completion</b>GAP No completion date guided in materials reviewed; with only 13 treated slots and CLARITY-FA feeding eligibility, enrollment speed is itself a signal.<br><span class="date-tag gap">GAP</span></div></div>
+<div class="event primary"><div class="event-date">2H 2027</div><div class="event-body"><b>SUNRISE-FA 2 topline — 6-month LVMI</b>UNVERIFIED Company guidance (Q2 2026). The binary.<br><span class="date-tag guidance">GUIDANCE</span></div></div>
+<div class="event"><div class="event-date">1H 2028</div><div class="event-body"><b>BLA submission under accelerated approval</b>UNVERIFIED Company target (June 2026). Assumes the LVMI package holds and CMC/PPQ executes on the flexible plan.<br><span class="date-tag guidance">GUIDANCE</span></div></div>
+</div>
+</section>
+
+<section id="scenarios"><div class="section-head"><div class="section-num">08 / SCENARIOS</div><div><h2>Bear, base, bull — soft ranges, explicit math</h2><p class="lede">Illustrative anchors for this library batch only; not price targets or recommendations. All per-share math is shown and uses share counts stated in the assumptions.</p></div></div>
+<div class="scen-grid">
+<article class="scen-card bear"><div class="tag">Bear</div><div class="pt">$0.90–$1.50</div><div class="soft">Soft range</div><ul>
+<li>SUNRISE-FA 2 misses on LVMI (effect &lt;15% / not credible to FDA) or a cardiac safety event stops the program; LX2020 stays Phase 1/2 science.</li>
+<li>Equity value = cash stub at readout: $234M (Jun 2026) less ~5 quarters × ~$20M burn ≈ $134M, haircut for wind-down/option burn → $95–155M.</li>
+<li>Math: $95M ÷ 104.1M = $0.91; $155M ÷ 104.1M = $1.49.</li></ul></article>
+<article class="scen-card base"><div class="tag">Base</div><div class="pt">$4.50–$6.35</div><div class="soft">Soft range</div><ul>
+<li>LVMI hits the powered threshold; accelerated approval in 2028–29 on a confirmatory-trial condition; LX2020 gets a defined registrational path; one more raise (~10M shares) funds launch prep.</li>
+<li>Equity value $520–730M (risk-adjusted LX2006 US cardiac-FA value plus LX2020 option, net of remaining spend) on ~115M shares (104.1M warrant-FD + ~11M new).</li>
+<li>Math: $520M ÷ 115M = $4.52; $730M ÷ 115M = $6.35.</li></ul></article>
+<article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$10.00–$13.05</div><div class="soft">Soft range</div><ul>
+<li>LVMI effect at Phase 1/2-like magnitude with clean safety; approval plus a priority-review-voucher / Rare Pediatric Disease value event; LX2020 registrational data make PKP2 a second approvable asset; partner or takeout interest in the cardiac-AAV platform.</li>
+<li>Equity value $1.15–1.50B on the same ~115M share count.</li>
+<li>Math: $1,150M ÷ 115M = $10.00; $1,500M ÷ 115M = $13.04.</li></ul></article>
+</div>
+<div class="assump"><b>Assumptions, stated plainly.</b> INTERPRETATION (1) Current warrant-inclusive FD of 104.1M excludes options/RSUs (GAP) — true FD is higher, which would lower every range. (2) Base/bull use ~115M shares, assuming the May 2025 $2.82 warrants exercise (adding ~$39M cash, inside the equity values) and ~11M new shares are issued. (3) No revenue is modeled before a hypothetical 2028–29 approval; no TAM build is used — equity values are anchored to cash, the company's own financing marks ($2.88 in May 2025, $8.00 in Oct 2025), and precedent rare-cardiac gene-therapy valuations, not to a sales forecast. (4) The bear case assumes no platform salvage value, which history (asset sales, shells) says is conservative but not zero.</div>
+</section>
+
+<section id="management"><div class="section-head"><div class="section-num">09 / PEOPLE</div><div><h2>Management track record and insider signals</h2><p class="lede">A founder-led team that pivoted the company from a broad genetic-medicine story (including Alzheimer's) to a focused cardiac franchise, raised $234M in 2025 at two very different prices, and refreshed its medical and finance leadership for late-stage execution. Insider behavior in 2026 is tax-sale mechanics, not conviction in either direction.</p></div></div>
+<div class="people-grid">
+<article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+<dt>R. Nolan Townsend — CEO &amp; Director</dt><dd>FACT Chief executive through the IPO (Nov 2023), the cardiovascular pivot and both 2025 financings. Held 374,472 shares after his Aug 18, 2026 Form 4 (secondary tally).</dd>
+<dt>Louis Tamayo — CFO</dt><dd>FACT Principal financial officer signing the Q2 2026 10-Q (Aug 12, 2026); appointed during the 2025 commercial-finance build-out.</dd>
+<dt>Narinder Bhalla, MD — CMO</dt><dd>FACT Appointed ahead of the pivotal start; previously senior medical/clinical roles at Bristol Myers Squibb and AstraZeneca, including product launches (company biography).</dd>
+<dt>Sandi See Tai — Chief Development Officer</dt><dd>FACT Public voice of the LX2006 registrational program in FDA-alignment disclosures.</dd>
+<dt>Scientific roots</dt><dd>FACT Foundational science licensed from Weill Cornell Medicine (Ronald G. Crystal, MD — lead author of the JAMA Cardiology LX2006 paper) and UC San Diego (Eric Adler, MD — former Lexeo CMO/Head of Research).</dd>
+</dl></article>
+<article class="paper-card"><h3>Track record — scored</h3><ul class="check-list">
+<li>Delivered: first cardiac-biopsy frataxin-expression dataset in FA, peer-reviewed; five designations on LX2006; pivotal protocol finalized on the guided timeline and started June 2026.</li>
+<li>Delivered: $234M raised in 2025 before it was forced — runway into 2028 from a position of news flow, not distress.</li>
+<li>Miss/cost: the $8.00 October 2025 raise is ~65% underwater within a year — the raise was well-timed for the company and expensive for its buyers; expect that history to price the next one.</li>
+<li>Deprioritized: APOE Alzheimer's (LX1001) moved to partner-seeking after Phase 1/2 — disciplined capital allocation, and an admission the original broad story is gone.</li>
+<li>GAP No member of this team has yet taken a gene therapy through BLA approval at Lexeo; Bhalla's launch experience is the closest in-house precedent.</li></ul></article>
+<article class="paper-card"><h3>Insider &amp; institutional signals</h3><ul class="check-list">
+<li>FACT Form 4 pattern 2026 (EDGAR via secondary tallies): repeated sales by Townsend, Tamayo, Otero and Bhalla on Feb 18, Apr 6, May 18, Jul 1 and Aug 18, 2026 — footnoted as sales to cover tax withholding on vesting equity awards (e.g., Townsend 25,947 shares at $4.48 on Jul 1; 55,000 at $5.69 on Apr 6). INTERPRETATION Mechanical, small, and price-insensitive — neutral signal.</li>
+<li>FACT No open-market insider purchases were identified in the materials reviewed for 2025–2026. INTERPRETATION At ~cash value, the absence of a single insider buy is a soft negative the bulls have to carry.</li>
+<li>FACT Balyasny: ~9.99% beneficial ownership (13G/A, Aug 14, 2026, incl. warrant shares; capped by the 9.99% blocker) and buyer of the Oct 2025 pre-funded warrants — a sophisticated holder, in via structured paper.</li>
+<li>FACT JPMorgan Chase: 5.5% (4,573,701 shares) on Schedule 13G filed Oct 13, 2026 (event date Sep 30, 2026), held in ordinary course via banking/IM subsidiaries. INTERPRETATION Passive-scale ownership, not an activist signal.</li>
+<li>FACT Paradigm BioCapital filed a 13G in Aug 2026 — specialist healthcare capital on the register alongside the generalists.</li></ul></article>
+</div>
+</section>
+
+<section id="risks"><div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+<ol class="risk-list">
+<li><b>1 · A 13-patient pivotal</b><span>INTERPRETATION SUNRISE-FA 2's treated arm is 13 people. One or two non-responders, a baseline-LVMI imbalance, or imaging variability can move the mean across the success line in either direction. The design is FDA-agreed — and still statistically fragile by construction.</span></li>
+<li><b>2 · The anchor subgroup is n=3</b><span>FACT The 28%/33% LVMI improvements come from 3 abnormal-baseline patients at mid/high dose. INTERPRETATION Regression to the mean is the null hypothesis the pivotal must beat; enrolling only abnormal-LVMI patients builds that risk into the design deliberately (it is also the only way the endpoint can move).</span></li>
+<li><b>3 · Open-label, untreated control, imaging endpoint</b><span>FACT No placebo, no sham, no blinding of participants. INTERPRETATION LVMI by MRI is relatively objective, but site, reader and co-medication effects are uncontrolled; FDA agreed to this — agreement on design is not agreement on the result.</span></li>
+<li><b>4 · No disclosed p-values on the core cardiac claims</b><span>GAP In the materials reviewed, LVMI/frataxin claims carry no inferential statistics, and the one significance claim (mFARS vs propensity-matched UNIFAI) is non-randomized with no p-value shown. The published paper should be read directly before underwriting the effect size.</span></li>
+<li><b>5 · Cardiac safety attribution</b><span>FACT One possibly related Grade 2 myocarditis (LX2006, ~1 year) and one possibly related Grade 3 sustained VT (LX2020, 3 months). INTERPRETATION In cardiac gene therapy, late inflammatory events are the class's known failure mode; 15-year gene-therapy follow-up obligations apply.</span></li>
+<li><b>6 · Immunosuppression burden (LX2020)</b><span>FACT 5 of 7 high-dose participants had LFT elevations requiring prednisone/sirolimus. INTERPRETATION Manageable in a trial; a real-world tolerability and monitoring cost if replicated at the pivotal dose.</span></li>
+<li><b>7 · Warrant overhang at the current price</b><span>FACT 13,876,838 warrants at $2.82 (to May 2029) vs a $2.76 close. INTERPRETATION Every rally to the strike creates ~$39M of exercise supply; the May 2025 cohort's paper is the ceiling until it clears.</span></li>
+<li><b>8 · Further dilution is the base case</b><span>INTERPRETATION Runway "into 2028" ends at the BLA, not at launch. A confirmatory trial + commercial build will be financed from a share price that has fallen ~75% in a year — the terms, not the fact, are the risk.</span></li>
+<li><b>9 · CMC is a gene-therapy BLA's usual failure point</b><span>FACT Lexeo is in CDRP with a flexible plan and reduced PPQ batches. INTERPRETATION That flexibility cuts both ways: fewer PPQ batches means less process evidence at review. Sf9/baculovirus platform claims (low empty capsids, purity) are company-asserted — UNVERIFIED independently.</span></li>
+<li><b>10 · Single-organ claim in a two-organ disease</b><span>INTERPRETATION An FA-cardiomyopathy label leaves neurology to Skyclarys and successors; payers and patients will judge LX2006 against the whole disease, not the organ it treats.</span></li>
+<li><b>11 · Preclinical pipeline is narrative until IND</b><span>GAP LX2021/LX2022 have no disclosed IND dates; the APOE program needs a partner that has not been announced. Carry both at zero in any conservative build.</span></li>
+<li><b>12 · Class repricing risk</b><span>INTERPRETATION The stock fell from $10.99 to $2.56 (52-week range) with no Lexeo-specific failure — sector AAV sentiment and time-to-readout did that. It can happen again, in either direction, on other companies' news.</span></li>
+</ol>
+</section>
+
+<section id="sources"><div class="section-head"><div class="section-num">11 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of October 16, 2026. Source order: SEC → FDA/labels → ClinicalTrials.gov → academic papers → company PRs/decks (unverified until corroborated) → trade press.</p></div></div>
+<div class="sources">
+<div class="source-group"><h3>SEC filings (primary)</h3>
+<a href="https://www.stocktitan.net/news/LXEO/lexeo-therapeutics-reports-second-quarter-2026-financial-results-and-1n5wjkscdbmf.html" target="_blank" rel="noopener">Q2 2026 results (Aug 12, 2026) — full release text incl. balance-sheet data<small>Cash $234.171M, total assets $254.898M, liabilities $19.837M at Jun 30, 2026; Q2 net loss $25.9M</small></a>
+<a href="https://www.stocktitan.net/sec-filings/LXEO/10-q-lexeo-therapeutics-inc-quarterly-earnings-report-716bcda6226a.html" target="_blank" rel="noopener">Q2 2026 10-Q (filed Aug 12, 2026)<small>Shares 78,622,604 at Jun 30, 2026 and 82,046,255 at Aug 10, 2026; H1 operating cash use $38.7M; May/Oct 2025 financing terms</small></a>
+<a href="https://www.sec.gov/Archives/edgar/data/1907108/000119312526288703/lxeo-20260625.htm" target="_blank" rel="noopener">8-K — 2026 Annual Meeting (Jun 29, 2026)<small>CIK 1907108; File No. 001-41855</small></a>
+<a href="https://www.sec.gov/Archives/edgar/data/1907108/000095017025108427/lxeo-20250630.htm" target="_blank" rel="noopener">10-Q — Q2 2025<small>Company description; pre-financing share counts</small></a>
+<span style="display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px">Form 4s 2025–2026 and Schedules 13G (Balyasny 13G/A Aug 14, 2026; JPMorgan 13G Oct 13, 2026, 5.5%) — via EDGAR, tallied in Sources notes.<small style="display:block;color:var(--muted)">Tax-withholding footnotes on 2026 executive sales</small></span>
+</div>
+<div class="source-group"><h3>Registries, FDA &amp; literature</h3>
+<span style="display:block;padding:9px 0;font-size:13px;font-weight:650">ClinicalTrials.gov: NCT05445323 (SUNRISE-FA) · NCT05302271 (Weill Cornell 1A) · NCT06109181 (HEROIC-PKP2)<small style="display:block;color:var(--muted);font-weight:400">Registry identifiers as cited in company releases and FDA-designation summaries</small></span>
+<span style="display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650">FDA: Skyclarys (omaveloxolone) approval, Feb 28, 2023 — FA, ≥16 years<small style="display:block;color:var(--muted);font-weight:400">First FA approval; Nrf2 mechanism; MOXIe mFARS basis</small></span>
+<span style="display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650">Crystal et al. — LX2006 Phase 1/2, JAMA Cardiology (June 2026)<small style="display:block;color:var(--muted);font-weight:400">Peer-reviewed SUNRISE-FA + Weill Cornell dataset (n=17)</small></span>
+<span style="display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650">GeneReviews — Friedreich Ataxia (NCBI NBK1281); FA clinical management guidelines (PMC9652828)<small style="display:block;color:var(--muted);font-weight:400">GAA/FXN biology, cardiac mortality, natural history</small></span>
+<a href="https://www.globenewswire.com/news-release/2026/06/15/3311662/0/en/Lexeo-Therapeutics-Announces-Regulatory-Update-and-Registrational-Trial-Design-for-LX2006-Gene-Therapy-in-Friedreich-Ataxia.html" target="_blank" rel="noopener">SUNRISE-FA 2 finalized design (Jun 15, 2026) — company release (UNVERIFIED until 8-K/registry corroboration)<small>13 vs 13, 1.2×10^12 vg/kg, LVMI primary at 6 months, BLA target 1H 2028</small></a>
+<a href="https://www.globenewswire.com/news-release/2026/01/12/3216688/0/en/Lexeo-Therapeutics-Announces-Positive-Interim-Phase-I-II-Data-for-LX2020-for-the-Treatment-of-PKP2-Associated-Arrhythmogenic-Cardiomyopathy.html" target="_blank" rel="noopener">LX2020 HEROIC-PKP2 interim data (Jan 12, 2026) — company release<small>Biopsy, NSVT/PVC, safety detail as cited</small></a>
+<a href="https://www.globenewswire.com/news-release/2026/06/17/3313795/0/en/Lexeo-Therapeutics-Announces-Publication-in-JAMA-Cardiology-of-Phase-I-II-Data-for-LX2006-in-Friedreich-Ataxia.html" target="_blank" rel="noopener">JAMA Cardiology publication release (Jun 17, 2026)<small>LVMI 28%/33% (n=3 subgroup), frataxin biopsies n=8, safety n=17</small></a>
+<a href="https://www.marketbeat.com/stocks/NASDAQ/LXEO/chart/" target="_blank" rel="noopener">MarketBeat LXEO price history<small>Oct 15, 2026 close $2.76; market cap $226.45M; 52-week $2.56–$10.99 (Finnhub cross-reference)</small></a>
+</div></div>
+<div class="method"><strong>Method.</strong> Built Oct 16, 2026. Filings used: Q2 2026 10-Q (filed Aug 12, 2026), FY2025 10-K (filed Mar 30, 2026, financing terms), June 2026 8-Ks, Form 4s and 13Gs as noted. Where a primary filing excerpt was not directly retrieved in this build, the item is tagged GAP or UNVERIFIED rather than asserted. Nothing in this dossier is invented: numbers without a source above are labeled INTERPRETATION or GAP. Cross-trial comparisons are not head-to-head. Scenario ranges in section 08 are soft, authorized for this library batch, and are not recommendations.</div>
+</section>
+</main>
+<footer><strong>LXEO deep-dive dossier</strong> · Built October 16, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot (Oct 15, 2026 close).</footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+/* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}render()}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  
+</script></body>
+</html>

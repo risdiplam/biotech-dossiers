@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Contineum Therapeutics (CTNM) Deep-Dive Dossier · As of Oct 16, 2026</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · CTNM</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+        <h1>Two partnered failures later, Contineum is a single-asset LPA1 bet — and the class just both validated and complicated itself.</h1>
+        <p class="hero-dek">A source-weighted investigation of Contineum Therapeutics, Inc. (formerly Pipeline Therapeutics, incorporated in Delaware in 2009, San Diego): PIPE-791, a brain-penetrant, once-daily LPA1 antagonist now in a 324-patient Phase 2 in idiopathic pulmonary fibrosis, after PIPE-307 failed in both relapsing-remitting MS and major depressive disorder — and four days after Bristol Myers Squibb's admilparant met its Phase 3 IPF endpoint at one dose and missed at the higher one.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$7.90</div>
+        <div class="quote-label">Fixed market snapshot · Oct 15, 2026 close (MarketBeat)</div>
+        <div class="quote-meta"><strong>~$61M</strong> est. enterprise value (ex-leases) · <strong>$6.29</strong> cash &amp; securities per basic share<br>$297M market cap (37.62M shares) · $236.6M cash &amp; securities (Jun 30, 2026)<br>Oct 16 intraday snapshot ~$7.08 (Finnhub) — post-ALOFT slide still in progress at writing</div>
+      </div>
+    </div>
+  </header>
+  <div class="jump-wrap"><nav class="jump" aria-label="Dossier sections">
+    <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Trials</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open questions</a><a href="#sources">Sources</a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+  </nav></div>
+  <main>
+  <section id="frame">
+    <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>What is left is cleaner — and more concentrated — than the IPO story</h2><p class="lede">Contineum listed in April 2024 (6,875,000 Class A shares at $16.00, ~$110M gross) as a neuroscience, inflammation and immunology company with two clinical assets. By October 2026 the neuroscience half has failed twice, the founding CSO has left, discovery has been narrowed to inflammatory and fibrotic disease, and essentially all equity value sits in one unpartnered molecule in one Phase 2 trial that does not read out until 2028.</p></div></div>
+    <div class="evidence-strip"><span>Evidence key:</span><span class="ev fact">FACT</span><span>sourced primary/registry</span><span class="ev interp">INTERPRETATION</span><span>analysis</span><span class="ev gap">GAP</span><span>not disclosed / not resolvable</span><span class="ev unverified">UNVERIFIED</span><span>company or single-source claim</span></div>
+    <div class="decision-grid">
+      <div class="decision accent"><div class="tag">Lead asset</div><div class="big">PIPE-791 · IPF</div><p>Selective LPA1 receptor antagonist, oral once-daily, brain-penetrant. Phase 2 PROPEL-IPF (NCT07284459), ~324 patients, 26 weeks, primary endpoint absolute change in FVC (mL) at Week 26. <span class="ev fact">FACT</span></p></div>
+      <div class="decision"><div class="tag">Single swing factor</div><div class="big">Dose–response credibility</div><p>Whether PIPE-791 shows a coherent dose–response on FVC in PROPEL-IPF — the exact property BMS's admilparant Phase 3 just failed to show (60 mg BID met, 120 mg BID missed, Oct 12, 2026). <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></p></div>
+      <div class="decision warn"><div class="tag">Partnered asset</div><div class="big">PIPE-307: 0-for-2</div><p>M1 antagonist licensed worldwide to Janssen (J&amp;J). Failed Phase 2 VISTA in RRMS (Nov 2025) and Phase 2 MOONLIGHT-1 in MDD (Sep 14, 2026). J&amp;J continuation decision not disclosed. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></p></div>
+      <div class="decision"><div class="tag">Balance sheet</div><div class="big">$236.6M to mid-2029</div><p>Cash, equivalents and marketable securities at Jun 30, 2026; no debt; company-guided runway through mid-2029, ~1 year past expected PROPEL-IPF completion. <span class="ev fact">FACT</span></p></div>
+    </div>
+    <div class="thesis">
+      <div class="thesis-card"><h3>The constructive case</h3><ul>
+        <li><b>The target is now Phase 3-validated in IPF.</b> Admilparant's 60 mg win is the first pivotal evidence that LPA1 antagonism can move FVC — PIPE-791 is no longer testing an unproven mechanism, it is testing whether it is the better molecule in a proven class. <span class="ev interp">INTERPRETATION</span></li>
+        <li><b>Real differentiation levers exist:</b> once-daily dosing (admilparant is twice-daily), a distinct scaffold with slow, tight binding and demonstrated human LPA1 receptor occupancy by PET, and a 10 mg dose in pain work — far below admilparant's 120–240 mg/day exposure, relevant if the class liver signal is dose-related. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></li>
+        <li><b>The cash math is unusually forgiving:</b> at $7.90 the market cap is $297M against $236.6M of cash and securities — ~$61M of enterprise value for a Phase 3-validated class, a Phase 2 already enrolling, and residual J&amp;J optionality. <span class="ev fact">FACT</span></li>
+        <li><b>No financing is required before the binary:</b> guided runway (mid-2029) extends ~a year past expected PROPEL-IPF completion (mid-2028). <span class="ev fact">FACT</span></li>
+      </ul></div>
+      <div class="thesis-card risk"><h3>What breaks it</h3><ul>
+        <li><b>The ALOFT dose paradox.</b> If more LPA1 occupancy did not mean more FVC benefit for BMS, the core pharmacology assumption behind PIPE-791's &gt;90% trough occupancy design goal is weakened — and nobody has published the ALOFT effect sizes yet. <span class="ev gap">GAP</span></li>
+        <li><b>Class liver history.</b> First-generation BMS-986020 was stopped for hepatobiliary toxicity; in 2026 the ALOFT program reported a limited number of liver injury events including one death (blinded, causality unresolved) and a protocol amendment. <span class="ev fact">FACT</span></li>
+        <li><b>Single-asset concentration after two failures</b>, a founding-CSO departure, and persistent insider selling — no open-market insider buying in 12 months. <span class="ev fact">FACT</span></li>
+        <li><b>Time:</b> no company-controlled value-inflecting readout until 2028, while a better-resourced LPA1 competitor may be filing. <span class="ev interp">INTERPRETATION</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="market">
+    <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Priced at ~1.26× cash after a competitor's mixed win</h2><p class="lede">CTNM fell 36% on Oct 12, 2026 ($13.38 → $8.56) on a competitor's topline — not its own data — and kept sliding. The chart below is the verified daily-close series around both 2026 shocks (Sep 14 MOONLIGHT-1 miss; Oct 12 ALOFT-IPF).</p></div></div>
+    <div class="chart-card">
+      <div class="chart-top"><div><div class="chart-title">CTNM daily closes · Sep 23 – Oct 15, 2026</div><div class="source-note">Source: MarketBeat daily price history. Limited window shown because only these closes were verified for this dossier — no series is fabricated to fill the gap. <span class="ev gap">GAP</span></div></div>
+      <div class="range" role="group" aria-label="Chart range"><button type="button" data-range="17" aria-pressed="true">ALL</button><button type="button" data-range="10" aria-pressed="false">10D</button><button type="button" data-range="5" aria-pressed="false">5D</button></div></div>
+      <div class="chart-stats"><div class="chart-stat"><b id="rangeReturn">—</b><span>Range return</span></div><div class="chart-stat"><b id="rangeLow">—</b><span>Range low</span></div><div class="chart-stat"><b id="rangeHigh">—</b><span>Range high</span></div><div class="chart-stat"><b>$7.90</b><span>Oct 15, 2026 close</span></div></div>
+      <div class="chart-shell" id="chartShell"><svg id="priceChart" role="img" aria-label="CTNM price chart"></svg><div class="chart-tooltip" id="chartTip"></div></div>
+      <p class="chart-caption">52-week range $7.72–$17.79 (Oct 15, 2026). Baird downgraded CTNM to Neutral on Oct 13, 2026, cutting its target to $14 from $19, explicitly on the ALOFT dose split; Stifel ($28, Sep 30), RBC ($23) and Morgan Stanley ($17) targets predate the ALOFT readout and are stale. <span class="ev fact">FACT</span></p>
+    </div>
+    <div class="valuation-bridge"><div><span>Market cap (basic)</span><b>$297.2M</b><small>37,621,132 shares (Jul 24, 2026) × $7.90</small></div><i>−</i><div><span>Cash &amp; securities</span><b>$236.6M</b><small>Jun 30, 2026 · $14.7M cash + $221.8M marketable securities · no debt</small></div><i>=</i><div class="bridge-result"><span>Enterprise value</span><b>~$60.7M</b><small>~$67.2M including $6.6M operating-lease liabilities</small></div></div>
+  </section>
+
+  <section id="science">
+    <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>LPA1: a fibroblast-recruitment switch with human genetics-free, knockout-grade preclinical support — and a liver shadow</h2><p class="lede">Plain English first, then the technical chain, then why it might fail.</p></div></div>
+    <div class="moa-box"><h3>Plain English</h3><p>In IPF, the lung repeatedly injures and mis-repairs. A fat-like signal called LPA accumulates in the injured lung and, through its LPA1 receptor, calls in scar-forming fibroblasts, leaks blood vessels, and helps kill surface (epithelial) cells — three steps that produce scar instead of air sacs. PIPE-791 is a once-daily pill that blocks LPA1, aiming to slow the scarring process rather than reverse scar already laid down. The realistic best outcome, as with every approved IPF drug, is slower loss of lung capacity (FVC), not recovery.</p><p>PIPE-307, the partnered asset, works in the brain: blocking the M1 muscarinic receptor was meant to release a brake on myelin-making cells (remyelination in MS) and to modulate circuits in depression. It has now failed an efficacy test in each indication.</p></div>
+    <div class="science-chain">
+      <article><b>01</b><h3>LPA rises in IPF lung</h3><p>LPA is elevated in bronchoalveolar lavage fluid from IPF patients, and IPF lavage fluid drives fibroblast chemotaxis that an LPA1 blocker abolishes (Tager et al., Nat Med 2008). <span class="ev fact">FACT</span></p></article>
+      <article><b>02</b><h3>LPA1 drives fibrosis steps</h3><p>LPA1 mediates fibroblast recruitment, vascular leak and epithelial apoptosis after lung injury (Tager 2008; Funke et al. 2012). <span class="ev fact">FACT</span></p></article>
+      <article><b>03</b><h3>Knockout protection</h3><p>LPA1-deficient mice are protected from bleomycin-induced pulmonary fibrosis, with less fibroblast recruitment and vascular leak (Tager 2008); an oral LPA1 antagonist reproduced benefit in the same model (Swaney et al., Br J Pharmacol 2010). <span class="ev fact">FACT</span></p></article>
+      <article><b>04</b><h3>PIPE-791's claimed edge</h3><p>A distinct scaffold giving slow, tight LPA1 binding, brain penetration and full occupancy at a low once-daily dose, per its discovery paper (Chen et al., J Med Chem, Jun 29, 2026). Chemistry/preclinical evidence — not clinical efficacy. <span class="ev fact">FACT</span></p></article>
+    </div>
+    <div class="paper-card" style="margin-top:20px"><div class="program-kicker">Human target engagement</div><h3 style="margin-top:10px">PET occupancy: engagement shown, in brain — not yet in IPF lung at Phase 2 doses</h3><p class="mechanism">In a Phase 1b PET study (reported Sep 18, 2025), PIPE-791 achieved high brain LPA1 receptor occupancy in healthy volunteers and progressive MS patients, with a PK–occupancy relationship (plasma EC<sub>50</sub> 37 ng/mL at 24 h; 12 ng/mL at 168 h in healthy volunteers). The company states planned Phase 2 doses should exceed 90% target coverage at trough on once-daily dosing. <span class="ev fact">FACT</span> Two qualifications matter: occupancy was demonstrated in brain, while PROPEL-IPF's target organ is lung; and ALOFT has just shown that more occupancy in this class did not translate into more FVC benefit at the higher dose — so occupancy is a necessary, not sufficient, argument. <span class="ev interp">INTERPRETATION</span></p></div>
+    <h3 style="margin-top:26px">Why it might fail</h3>
+    <div class="fail-grid">
+      <article><h3>1 · Bleomycin ≠ human IPF</h3><p>The knockout/antagonist evidence rests heavily on the mouse bleomycin model, an injury-driven, partly self-resolving system that has predicted many IPF failures. Human validation arrived only on Oct 12, 2026 — at one of two doses, with no effect sizes disclosed. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></p></article>
+      <article><h3>2 · The dose–response paradox</h3><p>Admilparant 60 mg BID met its endpoint; 120 mg BID did not. Proposed explanations (placebo-arm noise, exposure-related tolerability/adherence, a genuine bell-shaped response) cannot be distinguished without the full dataset. If the paradox is mechanistic, PIPE-791's high-occupancy strategy inherits it. <span class="ev gap">GAP</span></p></article>
+      <article><h3>3 · Hepatobiliary class history</h3><p>BMS-986020, BMS's first-generation LPA1 antagonist, showed a Phase 2 FVC signal but was halted for off-target hepatobiliary toxicity (bile-acid transporter inhibition, per the admilparant literature). In 2026, ALOFT reported a limited number of liver injury events including one death in a blinded program, a May protocol amendment and a dedicated liver-injury committee; the DMC recommended continuation. Causality — molecule, dose, mechanism, or background — is unresolved. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></p></article>
+      <article><h3>4 · Slowing decline is a small-signal game</h3><p>Approved agents shift 52-week FVC by roughly 70–130 mL against noisy, variable decline. PROPEL-IPF is 26 weeks and ~324 patients — powered, presumably, on an admilparant-like effect; a smaller true effect, background-therapy mix, or site heterogeneity can sink it. Powering assumptions are not public. <span class="ev gap">GAP</span></p></article>
+      <article><h3>5 · M1 antagonism has now missed twice</h3><p>The remyelination rationale (M1 blockade releasing oligodendrocyte-progenitor differentiation; Poon et al. 2024) failed to move LCLA or any secondary endpoint in VISTA, joining opicinumab and clemastine-era translational disappointments; the rapid-onset depression rationale failed at Day 5 on MADRS in MOONLIGHT-1. Two independent misses lower the prior for a third indication rescue. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></p></article>
+      <article><h3>6 · Brain penetration is double-edged in IPF</h3><p>PIPE-791's CNS penetration is essential for MS/pain optionality but unnecessary exposure for an elderly, comorbid IPF population; any CNS or drug-interaction signal in PROPEL-IPF would be a self-inflicted liability its peripherally-restricted sibling (CTX-343) was designed to avoid. <span class="ev interp">INTERPRETATION</span></p></article>
+    </div>
+  </section>
+
+  <section id="clinical">
+    <div class="section-head"><div class="section-num">04 / TRIALS</div><div><h2>One live efficacy trial, two completed failures, one small exploratory win on safety</h2><p class="lede">Every number below carries its population, timepoint and source tier. Where a sponsor released topline only — no effect size, no p-value — that absence is stated, not filled in.</p></div></div>
+    <div class="paper-card"><div class="program-kicker">PIPE-791 · IPF · Phase 2 · Recruiting</div><h3 style="margin-top:10px">PROPEL-IPF (NCT07284459)</h3>
+      <table class="study-table"><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody>
+      <tr><td data-label="Item">Design</td><td data-label="Detail">Randomized, double-blind, placebo-controlled, global multicenter; 1:1:1 to PIPE-791 Dose A, PIPE-791 Dose B, or placebo, oral once-daily × 26 weeks; 6-week screening, 4-week safety follow-up (total ~36 weeks). Dose amounts for A/B are not disclosed in the registry materials reviewed. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></td></tr>
+      <tr><td data-label="Item">Population</td><td data-label="Detail">~324 patients, age ≥40, IPF diagnosis within 7 years per 2022 ATS/ERS/JRS/ALAT guideline, centrally-read HRCT UIP/probable UIP, ppFVC ≥40% at screening; background nintedanib <em>or</em> pirfenidone permitted (not both). <span class="ev fact">FACT</span></td></tr>
+      <tr><td data-label="Item">Primary endpoint</td><td data-label="Detail">Change from baseline through Week 26 in absolute FVC (mL). Secondary: safety/tolerability, additional lung function, clinical outcomes, patient-reported outcomes; exploratory: quantified fibrosis imaging and QoL. <span class="ev fact">FACT</span></td></tr>
+      <tr><td data-label="Item">Status / timing</td><td data-label="Detail">First patient dosed Q1 2026 (study start Jan 8, 2026); &gt;55 sites active in 8 countries at Jul 30, 2026 (company later described 70+ sites); registry last updated Sep 25, 2026; estimated completion Jun 2028. <span class="ev fact">FACT</span></td></tr>
+      <tr><td data-label="Item">Results</td><td data-label="Detail">None — no interim efficacy data disclosed. There is no human FVC data for PIPE-791 at any dose. <span class="ev gap">GAP</span></td></tr>
+      </tbody></table></div>
+    <div class="paper-card" style="margin-top:20px"><div class="program-kicker">PIPE-791 · Chronic pain · Phase 1b · Completed</div><h3 style="margin-top:10px">Exploratory crossover pain study (NCT06810245) — reported Apr 30, 2026</h3><p class="mechanism">Randomized, double-blind, placebo-controlled, 4-week crossover (two 4-week periods, no intervening washout after Period 1), N=43 (23 chronic osteoarthritis pain, 20 chronic low back pain), PIPE-791 10 mg once-daily. <span class="ev fact">FACT</span></p>
+      <table class="study-table"><thead><tr><th>Measure</th><th>Result</th></tr></thead><tbody>
+      <tr><td data-label="Measure">Primary: safety/tolerability</td><td data-label="Result">Met. AE profile consistent with prior PIPE-791 studies; most TEAEs mild–moderate; no serious AEs. Most common: headache (n=3), fatigue (n=2). No clinically meaningful BP/orthostatic changes. <span class="ev fact">FACT</span></td></tr>
+      <tr><td data-label="Measure">Exploratory pain (PI-NRS, change from baseline, Period 1, Week 4)</td><td data-label="Result">Osteoarthritis: PIPE-791 −1.60 (95% CI −2.49, −0.72) vs placebo −1.27 (−2.15, −0.39) — a −0.33-point numerical difference, CIs broadly overlapping, no p-value reported. Low back pain: −1.33 (−1.83, −0.84) vs −0.55 (−1.33, 0.22). Period 2 was inconsistent (CLBP on drug +0.13). <span class="ev fact">FACT</span></td></tr>
+      <tr><td data-label="Measure">Read</td><td data-label="Result">A safety study that also produced directionally positive, statistically untested pain trends in 43 patients over 4 weeks. It supports tolerability of 10 mg QD in patients — relevant to PROPEL-IPF — and nothing stronger. The company states it is contemplating next steps; no Phase 2 pain trial has been announced. <span class="ev interp">INTERPRETATION</span> <span class="ev gap">GAP</span></td></tr>
+      </tbody></table></div>
+    <div class="paper-card" style="margin-top:20px"><div class="program-kicker">PIPE-791 · PET occupancy · Phase 1b · Completed Sep 2025</div><h3 style="margin-top:10px">Brain LPA1 occupancy study</h3><p class="mechanism">High brain LPA1 receptor occupancy in healthy volunteers and progressive MS patients with an exposure–occupancy relationship; safety consistent with prior studies. Company inference: planned Phase 2 doses exceed 90% trough coverage once-daily. No efficacy endpoints. <span class="ev fact">FACT</span> <span class="ev unverified">UNVERIFIED</span> (dose-coverage inference is the company's)</p></div>
+    <div class="paper-card" style="margin-top:20px"><div class="program-kicker">PIPE-307 (JNJ-5120) · RRMS · Phase 2 · Failed</div><h3 style="margin-top:10px">VISTA (NCT06083753) — topline Nov 20, 2025</h3><p class="mechanism">Randomized, double-blind, placebo-controlled proof-of-concept; N=168 RRMS patients, two PIPE-307 doses vs placebo. Primary endpoint — change in binocular 2.5% low-contrast letter acuity (LCLA) — was <b>not met</b>; no prespecified secondary efficacy endpoint was met; no significant LCLA change across arms. Safety/tolerability acceptable at both doses. No effect sizes or p-values have been published; full dataset presentation/publication was promised and has not appeared in the materials reviewed. Contineum self-funded this trial under its J&amp;J license election; with its completion, further MS development is at J&amp;J's sole discretion. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></p></div>
+    <div class="paper-card" style="margin-top:20px"><div class="program-kicker">PIPE-307 (JNJ-5120) · MDD · Phase 2 · Failed</div><h3 style="margin-top:10px">MOONLIGHT-1 (NCT06785012) — topline Sep 14, 2026</h3><p class="mechanism">J&amp;J-run randomized, double-blind, multicenter, placebo-controlled proof-of-concept; N=107 adults with major depressive disorder (enrollment completed Jun 2026), two JNJ-5120 regimens vs placebo, monotherapy. Primary endpoint — change in MADRS at <b>Day 5</b> vs placebo — was <b>not met</b>. Well tolerated, no new safety signals. J&amp;J is evaluating prespecified exploratory endpoints; whether development continues is undisclosed. No effect size or p-value disclosed. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span> Note the endpoint design: a Day-5 MADRS bar is a rapid-onset claim, an unusually hard test — the miss kills the rapid-onset story specifically, and any slower-onset hypothesis now depends entirely on J&amp;J's exploratory read and willingness to fund another trial. <span class="ev interp">INTERPRETATION</span></p></div>
+    <div class="outlier-box"><h3>Regulatory path — what is actually known</h3><p style="font-size:14px">No PIPE-791 regulatory designation (Breakthrough, Fast Track, Orphan) is disclosed in the materials reviewed. <span class="ev gap">GAP</span> The standard IPF path applies: PROPEL-IPF is a Phase 2 dose-finding study; a positive result would still require a 52-week Phase 3 (the ALOFT/FIBRONEER precedent) before an NDA — i.e., no filing before ~2030 on any realistic timeline. <span class="ev interp">INTERPRETATION</span> Admilparant's path is the live template: BMS states it will discuss submissions with regulators after full ALOFT analysis; if a single-dose Phase 3 win earns a filing, it also sets the efficacy bar and the label language PIPE-791 will eventually be judged against. <span class="ev fact">FACT</span></p></div>
+  </section>
+
+  <section id="competition">
+    <div class="section-head"><div class="section-num">05 / LANDSCAPE</div><div><h2>Clinical differentiation, not marketing: PIPE-791 is third in its own class queue</h2><p class="lede">Three oral antifibrotics are approved; one LPA1 antagonist is Phase 3-positive; one deuterated pirfenidone is Phase 3-bound with 26-week FVC data stronger than the class norm. Cross-trial comparisons are flagged as such — populations, background therapy and durations differ, and no head-to-head data exist.</p></div></div>
+    <div class="compare">
+      <div class="compare-card"><div class="program-kicker">Same target · Ahead</div><div class="name">Admilparant (BMS-986278) · BMS</div><dl>
+        <dt>Stage / regimen</dt><dd>Phase 3 ALOFT-IPF (N≈1,255, NCT06003426), 60 mg or 120 mg <b>twice daily</b> × ≥52 weeks. <span class="ev fact">FACT</span></dd>
+        <dt>Result (Oct 12, 2026)</dt><dd>60 mg met primary (absolute FVC change, Week 52, p&lt;0.05 per BMS; no effect size, CI or p-value disclosed). 120 mg slowed decline, not significant. Well tolerated; AE discontinuations low, similar to placebo. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></dd>
+        <dt>Phase 2 anchor</dt><dd>60 mg BID reduced FVC decline ~62% vs placebo at 26 weeks (while-on-treatment; 54% treatment-policy). <span class="ev fact">FACT</span></dd>
+        <dt>Overhang</dt><dd>Blinded liver-injury events incl. one death reported in the ALOFT program in 2026; ALOFT-PPF (N≈1,057) topline expected early 2027. <span class="ev fact">FACT</span></dd>
+        <dt>Vs PIPE-791</dt><dd>Admilparant validates the class and will likely reach market ~3 years earlier. PIPE-791's counters are QD dosing, lower milligram exposure and a different scaffold — none yet shown to matter clinically. <span class="ev interp">INTERPRETATION</span></dd></dl></div>
+      <div class="compare-card"><div class="program-kicker">Approved · Standard of care</div><div class="name">Nintedanib, pirfenidone, nerandomilast</div><dl>
+        <dt>Nintedanib (Ofev, BI)</dt><dd>Multi-kinase inhibitor, approved 2014; GI tolerability limits persistence. Background therapy in PROPEL-IPF. <span class="ev fact">FACT</span></dd>
+        <dt>Pirfenidone (Esbriet)</dt><dd>Antifibrotic, approved 2014, TID dosing; background therapy in PROPEL-IPF. <span class="ev fact">FACT</span></dd>
+        <dt>Nerandomilast (Jascayd, BI)</dt><dd>PDE4B inhibitor, FDA-approved Oct 7, 2025 — first new IPF approval in &gt;10 years. FIBRONEER-IPF (N=1,177): adjusted mean FVC change at Week 52 −114.7 mL (18 mg BID) vs −183.5 mL placebo — difference 68.8 mL (95% CI 30.3–107.4); diarrhea 41.3% vs 16.0%. <span class="ev fact">FACT</span></dd>
+        <dt>Implication</dt><dd>By PROPEL-IPF's 2028 readout, the add-on bar will be set against a three-drug standard; a monotherapy-vs-placebo Phase 2 signal on mixed background therapy will need to be large to be commercially legible. <span class="ev interp">INTERPRETATION</span></dd></dl></div>
+      <div class="compare-card"><div class="program-kicker">Pipeline · Closest 26-week comp</div><div class="name">Deupirfenidone (LYT-100) · PureTech/Celea</div><dl>
+        <dt>Stage</dt><dd>Deuterated pirfenidone; End-of-Phase 2 FDA meeting completed; single Phase 3 (SURPASS-IPF) planned via 505(b)(2). <span class="ev fact">FACT</span></dd>
+        <dt>ELEVATE Phase 2b (26 weeks)</dt><dd>FVC change: deupirfenidone 825 mg TID −21.5 mL vs pirfenidone 801 mg TID −51.6 mL vs placebo −112.5 mL — a 91 mL placebo-adjusted difference at the same 26-week timepoint PROPEL-IPF uses. <span class="ev fact">FACT</span></dd>
+        <dt>Vs PIPE-791</dt><dd>That 91 mL at 26 weeks is the number PROPEL-IPF will be informally judged against — a cross-trial comparison, stated as context, not equivalence. Bexotegrast (Pliant, αvβ6/αvβ1 integrin) is a further Phase 2-stage competitor in the same indication. <span class="ev interp">INTERPRETATION</span></dd></dl></div>
+    </div>
+    <div class="readthrough"><b>Read-through discipline:</b> ALOFT's 60 mg win raises PIPE-791's probability of a real FVC effect and simultaneously raises its differentiation burden and its safety surveillance. Both effects are in the Oct 12 price action — the stock fell on the <em>dose split and liver history</em>, not on class invalidation. Treating ALOFT as purely good or purely bad news for CTNM is the error this dossier is built to avoid. <span class="ev interp">INTERPRETATION</span></div>
+  </section>
+
+  <section id="pipeline">
+    <div class="section-head"><div class="section-num">06 / PIPELINE</div><div><h2>Ranked by descending value</h2><p class="lede">Ranking reflects risk-adjusted value as of Oct 16, 2026 — owned economics, stage, and evidence — not company presentation order.</p></div></div>
+    <div class="pipeline">
+      <div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">PIPE-791 — IPF (PROPEL-IPF)</div><div class="pipe-desc">Wholly owned LPA1 antagonist. The company, post-refocus. Phase 2 enrolling, readout ~2028. Carries effectively all of the ~$61M enterprise value. <span class="ev fact">FACT</span></div></div><div class="pipe-status">Phase 2 · Recruiting</div></div>
+      <div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">PIPE-791 — Chronic pain</div><div class="pipe-desc">Same molecule; Phase 1b safety met with untested exploratory pain trends (N=43). No funded next trial announced; value is optionality that costs nothing to hold until PROPEL-IPF reads out. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></div></div><div class="pipe-status">Phase 1b · Done</div></div>
+      <div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">PIPE-307 / JNJ-5120 — J&amp;J license</div><div class="pipe-desc">$50M upfront received (2023); ~$1.0B in potential milestones and low-double-digit to high-teen tiered royalties remain contractually available — after two Phase 2 primary misses, with continuation at J&amp;J's sole discretion and a co-fund option for Contineum only if J&amp;J elects a Phase 3. Expected value is now small but non-zero; treat any model that still carries it materially as stale (William Blair removed it from its model after MOONLIGHT-1). <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></div></div><div class="pipe-status">Phase 2 · 0-for-2</div></div>
+      <div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">PIPE-791 — Progressive MS</div><div class="pipe-desc">PET occupancy supports the biology; no Phase 2 has been initiated and the July 2026 refocus to inflammatory/fibrotic disease deprioritizes it. No timeline is guided. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></div></div><div class="pipe-status">Pre-Phase 2 · Parked</div></div>
+      <div class="pipe-row"><div class="pipe-rank">05</div><div><div class="pipe-name">CTX-343 — Peripherally-restricted LPA1</div><div class="pipe-desc">Preclinical candidate (nominated Jan 2024). Company has deferred further clinical development until program-specific funding is obtained. Carries no value in this dossier's scenarios. <span class="ev fact">FACT</span></div></div><div class="pipe-status">Preclinical · Deferred</div></div>
+      <div class="pipe-row"><div class="pipe-rank">06</div><div><div class="pipe-name">Discovery — Inflammatory &amp; fibrotic</div><div class="pipe-desc">Undisclosed programs, narrowed in scope Jul 2026 with a limited research workforce reduction. Unquantifiable; assigned no value. <span class="ev fact">FACT</span></div></div><div class="pipe-status">Discovery</div></div>
+    </div>
+  </section>
+
+  <section id="catalysts">
+    <div class="section-head"><div class="section-num">07 / CATALYSTS</div><div><h2>The sequence that will resolve the thesis — most of it is other companies' data</h2><p class="lede">Date-quality tags are literal: <span class="date-tag hard">HARD</span> a dated, verifiable event; <span class="date-tag guidance">GUIDANCE</span> a company-stated window; <span class="date-tag inferred">INFERRED</span> derived from registry timelines or cadence.</p></div></div>
+    <div class="timeline">
+      <div class="event landed"><div class="event-date">SEP 14, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>MOONLIGHT-1 (PIPE-307, MDD) missed its primary endpoint</b>J&amp;J-run, N=107, MADRS at Day 5. CTNM −~10% after hours. J&amp;J exploratory review pending — the next PIPE-307 headline is a continuation/termination decision with no guided date. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></div></div>
+      <div class="event landed"><div class="event-date">OCT 12, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>ALOFT-IPF (admilparant, BMS) split its doses</b>60 mg BID met, 120 mg BID missed, no effect sizes. CTNM $13.38 → $8.56 (−36%) that day; Baird downgrade to Neutral ($14 target) followed Oct 13. <span class="ev fact">FACT</span></div></div>
+      <div class="event"><div class="event-date">~NOV 2026<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Q3 2026 results</b>Expected on the company's quarterly cadence (an aggregator lists Nov 11, 2026 — unconfirmed). Watch: PROPEL-IPF enrollment pace/site count, any burn change post-refocus, any PIPE-307 language change. <span class="ev gap">GAP</span></div></div>
+      <div class="event"><div class="event-date">H2 2026 – 2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Full ALOFT-IPF dataset (medical meeting, BMS)</b>The single most informative external event for CTNM before 2028: effect sizes, dose–response shape, liver tables by arm. No date or venue announced. <span class="ev gap">GAP</span></div></div>
+      <div class="event"><div class="event-date">EARLY 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>ALOFT-PPF topline (admilparant in progressive pulmonary fibrosis, BMS)</b>Second class readout; carries the program with the disclosed liver-injury history and Breakthrough designation in PPF. A clean win widens the class; a safety-driven miss re-prices CTNM again. <span class="ev fact">FACT</span></div></div>
+      <div class="event"><div class="event-date">2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>PROPEL-IPF enrollment completion</b>Not guided. Implied by a Jun 2028 study completion and a 26-week treatment period: last patient in around late 2027. Slippage here pushes the only owned binary into 2029 — against a mid-2029 runway guide. <span class="ev interp">INTERPRETATION</span></div></div>
+      <div class="event primary"><div class="event-date">MID / H2 2028<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>PROPEL-IPF topline — the binary</b>Registry estimated completion Jun 2028; company frames completion ~mid-2028. Change in absolute FVC (mL) at Week 26, two doses vs placebo, on mixed background antifibrotic therapy. Everything else in this dossier is preamble. <span class="ev fact">FACT</span></div></div>
+      <div class="event"><div class="event-date">UNDATED<br><span class="date-tag gap">NO DATE</span></div><div class="event-body"><b>J&amp;J PIPE-307 continuation decision · PIPE-791 pain Phase 2 decision · PrMS Phase 2 start</b>All three are real options with no guided timing. None is carried in the scenarios below at material value. <span class="ev gap">GAP</span></div></div>
+    </div>
+  </section>
+
+  <section id="scenarios">
+    <div class="section-head"><div class="section-num">08 / SCENARIOS</div><div><h2>Bear, base, bull — with soft price anchors</h2><p class="lede">Soft ranges, authorized for this library batch. Each is simple arithmetic on the fully diluted count — 45.28M shares (37.62M basic at Jul 24, 2026 + 7.66M options outstanding at Jun 30, 2026) — so every anchor can be re-performed. Anchors are framed at the PROPEL-IPF readout (2028) and exclude any post-readout Phase 3 raise, which would dilute bull/base per-share values; they are not price targets.</p></div></div>
+    <div class="scen-grid">
+      <div class="scen-card"><div class="tag">Bear</div><div class="pt">$1.75 – $2.50</div><div class="soft">Soft anchor · equity $79–113M ÷ 45.28M FD</div><ul>
+        <li>PROPEL-IPF misses on FVC, or a liver/CNS safety signal stops development; ALOFT full data read as a class ceiling, not a floor.</li>
+        <li>Value collapses to residual cash: $236.6M (Jun 2026) less ~2 years of burn at ~$58M/yr ≈ ~$121M, haircut for wind-down/option value to $79–113M.</li>
+        <li>PIPE-307 terminated by J&amp;J; CTX-343 and discovery unsold. <span class="ev interp">INTERPRETATION</span></li></ul></div>
+      <div class="scen-card base"><div class="tag">Base</div><div class="pt">$7.50 – $9.50</div><div class="soft">Soft anchor · equity $340–430M ÷ 45.28M FD</div><ul>
+        <li>PROPEL-IPF positive but ordinary: one dose significant on FVC with an effect in the admilparant Phase 2 neighborhood, no clean dose–response, tolerability acceptable.</li>
+        <li>Program advances to a 52-week Phase 3 as a probable third-to-market LPA1, QD convenience as the commercial wedge; equity re-rates to roughly today's pre-ALOFT market cap range ($478–504M in early Oct 2026, haircut for two years of burn).</li>
+        <li>PIPE-307 contributes ~zero; pain remains an unfunded option. <span class="ev interp">INTERPRETATION</span></li></ul></div>
+      <div class="scen-card bull"><div class="tag">Bull</div><div class="pt">$19.00 – $25.00</div><div class="soft">Soft anchor · equity $860M–$1,132M ÷ 45.28M FD</div><ul>
+        <li>PROPEL-IPF shows a clean, dose-ordered FVC effect at 26 weeks approaching the ~91 mL placebo-adjusted deupirfenidone benchmark, with a liver table clean enough to claim best-in-class safety at a fraction of admilparant's milligram dose.</li>
+        <li>PIPE-791 becomes the takeout/partnering asset in a Phase 3-validated class; a pain Phase 2 starts on the same data package.</li>
+        <li>Ceiling discipline: the $25 top sits inside the pre-ALOFT street range ($17–$28) rather than above it. <span class="ev interp">INTERPRETATION</span></li></ul></div>
+    </div>
+    <div class="assump"><b>Assumptions, explicit:</b> (1) No equity raise before the PROPEL-IPF readout — consistent with the mid-2029 runway guide, but the unused upsized $100M ATM (Mar 2026) means opportunistic dilution is possible at any time. (2) Burn averages ~$58M/yr 2026H2–2028H1, above the H1 2026 operating cash use of $27.8M (annualized ~$55.5M) to allow for PROPEL-IPF ramp. (3) No revenue, no milestones, no debt in any scenario. (4) FD count held at 45.28M; the 2.51M shares still available under equity plans and 0.60M ESPP reserve are excluded from FD and would add ~7% dilution if fully issued. Arithmetic: 37.621 + 7.657 = 45.278M; bear 45.278 × $1.75 = $79.2M and × $2.50 = $113.2M; base × $7.50 = $339.6M and × $9.50 = $430.1M; bull × $19.00 = $860.3M and × $25.00 = $1,132.0M.</div>
+  </section>
+
+  <section id="financials">
+    <div class="section-head"><div class="section-num">09 / FINANCIALS</div><div><h2>Funded to the binary — after diluting ~45% in nineteen months to get there</h2><p class="lede">All figures from the Q2 2026 Form 10-Q (period ended Jun 30, 2026) unless dated otherwise.</p></div></div>
+    <div class="fin-grid"><div>
+      <div class="metric-stack">
+        <div class="metric"><b>$236.6M</b><span>Cash, equivalents &amp; marketable securities · Jun 30, 2026 ($14.7M + $221.8M) <span class="ev fact">FACT</span></span></div>
+        <div class="metric"><b>$29.6M</b><span>Net loss · H1 2026 (Q2: $15.2M, −$0.40/sh) · no revenue in H1 2026 or H1 2025 <span class="ev fact">FACT</span></span></div>
+        <div class="metric"><b>$27.8M</b><span>Operating cash used · H1 2026 (~$13.9M/qtr) vs $30.1M H1 2025 <span class="ev fact">FACT</span></span></div>
+        <div class="metric"><b>$34.3M</b><span>H1 2026 opex: R&amp;D $24.3M + G&amp;A $10.0M; stock comp $7.7M of H1 costs is non-cash <span class="ev fact">FACT</span></span></div>
+      </div>
+      <div class="runway"><b>Runway: through mid-2029 (company guide)</b><p>The 10-Q's formal language is the standard "at least 12 months from issuance"; the mid-2029 guide from the Q2 release is ~1 year past expected PROPEL-IPF completion. At the H1 2026 burn rate the cash would naively last longer — the guide embeds PROPEL-IPF ramp and is the number to hold management to. Accumulated deficit: $207.0M. Total liabilities: $10.7M (no debt; $6.6M is operating leases). <span class="ev fact">FACT</span></p></div>
+    </div><div>
+      <table class="cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>Date</th></tr></thead><tbody>
+        <tr><td>Class A common (voting, listed)</td><td>32,958,632</td><td>Jul 24, 2026</td></tr>
+        <tr><td>Class B common (non-voting)</td><td>4,662,500</td><td>Jul 24, 2026</td></tr>
+        <tr><td><b>Basic total</b></td><td><b>37,621,132</b></td><td>Jul 24, 2026</td></tr>
+        <tr><td>Options outstanding (WAEP $10.99; 3.84M exercisable @ $8.93)</td><td>7,656,913</td><td>Jun 30, 2026</td></tr>
+        <tr><td><b>Fully diluted (basic + options)</b></td><td><b>45,278,045</b></td><td>mixed, as above</td></tr>
+        <tr><td>Memo: still available — 2024 Plan 2,042,449 · 2026 Inducement Plan 472,000 · ESPP 595,549</td><td>3,109,998</td><td>Jun 30, 2026</td></tr>
+        <tr><td>Memo: warrants / RSUs outstanding</td><td>none disclosed in the 10-Q <span class="ev gap">GAP</span></td><td>Jun 30, 2026</td></tr>
+      </tbody></table>
+      <div class="overhang"><b>$6.29</b> cash &amp; securities per basic share vs a $7.90 price — the market is paying ~$1.61/share, ~$61M in total, for the entire pipeline. FD market cap at $7.90 is $357.7M; FD enterprise value ~$121.1M. <span class="ev fact">FACT</span></div>
+    </div></div>
+    <h3 style="margin-top:26px">Dilution history — how the share count got here</h3>
+    <div class="event-tape">
+      <article><div class="event-mark">APR 2024 · IPO</div><p>6.875M Class A at $16.00 (~$110M gross). Basic total at Dec 31, 2024: 25,854,549 (19,125,377 A + 6,729,172 B). <span class="ev fact">FACT</span></p></article>
+      <article><div class="event-mark">2025 · ATM + FOLLOW-ON</div><p>~$19.0M sold under the ATM in 2025; Dec 2025 follow-on: 8,097,570 Class A at $12.25 for $93.0M net — priced 23% below the IPO price. Year-end 2025 basic: 37,320,125. <span class="ev fact">FACT</span></p></article>
+      <article><div class="event-mark">2026 · LOADED, UNUSED</div><p>Mar 2026: ATM upsized by a further $100M of capacity; zero shares sold under it in H1 2026. Class B conversions added Class A float (Class B 6.08M → 4.66M during H1 2026) without new capital. Basic total Jul 24, 2026: 37,621,132 — <b>+45.5%</b> vs Dec 31, 2024. <span class="ev fact">FACT</span></p></article>
+    </div>
+  </section>
+
+  <section id="management">
+    <div class="section-head"><div class="section-num">10 / PEOPLE</div><div><h2>Management and insider signals: a refocus executed, a founder-scientist gone, sellers only</h2><p class="lede">Track record is judged on decisions visible in filings: the J&amp;J deal, the VISTA self-funding election, the December 2025 raise, and the July 2026 refocus.</p></div></div>
+    <div class="people-grid">
+      <div class="paper-card"><h3>Leadership</h3><dl class="people-list">
+        <dt>Carmine N. Stengone — President &amp; CEO, director</dt><dd>Led the 2023 J&amp;J license ($50M upfront + $25M J&amp;J equity investment, ~$1.0B milestones, low-double-digit to high-teen royalties), the Apr 2024 IPO, the Dec 2025 follow-on, and the Jul 2026 pivot. Publicly dismissed the ALOFT liver signal as molecule/dose-specific for PIPE-791 — a claim PROPEL-IPF's own safety table will test. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></dd>
+        <dt>Timothy R. Watkins, M.D., M.Sc. — CMO &amp; Head of Development</dt><dd>Joined Apr 28, 2025 from Gilead Sciences, with a pulmonology and immunology/fibrotic-disease development background — hired specifically for the IPF pivot, succeeding Stephen Huhn. The PROPEL-IPF design is his. <span class="ev fact">FACT</span></dd>
+        <dt>Peter T. Slover — CFO</dt><dd>Chief Financial Officer of record in 2026 filings. <span class="ev fact">FACT</span></dd>
+        <dt>Daniel S. Lorrain, Ph.D. — co-founding CSO, departed Jul 2026</dt><dd>A founding executive; the company's science originator. His departure came with the discovery narrowing and a limited research workforce reduction — announced in the Q2 release, not as a standalone 8-K event in the materials reviewed. <span class="ev fact">FACT</span> <span class="ev gap">GAP</span></dd>
+      </dl></div>
+      <div class="paper-card"><h3>Decisions on the record</h3><ul class="check-list">
+        <li><b>The J&amp;J deal was good business:</b> $75M of non-dilutive-plus-equity capital in 2023 for an asset Contineum could not have Phase-3-funded alone — and J&amp;J bore MOONLIGHT-1's cost. <span class="ev interp">INTERPRETATION</span></li>
+        <li><b>The VISTA election was the expensive exception:</b> Contineum elected, at its own cost, to run the RRMS Phase 2 itself. It failed on every prespecified endpoint, and no dataset has been published since. <span class="ev fact">FACT</span></li>
+        <li><b>The Dec 2025 raise was well-timed, whatever it says about price:</b> $93.0M net at $12.25 — before both 2026 failures — is why no raise is needed into the 2028 binary. <span class="ev interp">INTERPRETATION</span></li>
+        <li><b>The Jul 2026 refocus was decisive but late-cycle:</b> discovery narrowed and the CSO exited only after VISTA failed and with MOONLIGHT-1 already enrolled. <span class="ev interp">INTERPRETATION</span></li>
+      </ul></div>
+      <div class="paper-card"><h3>Insider signals (EDGAR Form 4)</h3><ul class="check-list">
+        <li><b>Zero open-market buys, ~30 sells, ~$1.84M sold in the 12 months to Sep 2026</b> (aggregator tally of Form 4s). <span class="ev fact">FACT</span></li>
+        <li>Stengone: recurring small sales under a Rule 10b5-1 plan adopted Sep 23, 2025 — e.g., option exercise at $1.01 and sale of 2,500 shares at $16.4566 on Sep 8, 2026, with identical 2,500-share sales Aug 3 and Jul 8, 2026 at ~$16.00–16.01, plus 10,000 shares Jun 30, 2026 at $16.01. Patterned plan selling at ~$16 — roughly double the Oct 15 price — not panic selling, and not buying. <span class="ev fact">FACT</span></li>
+        <li>Lorrain was the most active seller (18 transactions), including 37,179 shares on Jun 30, 2026 at ~$15.99 — immediately before his departure was announced Jul 30, 2026. Watkins sold 10,833 shares Jun 30, 2026 at $16.02. <span class="ev fact">FACT</span></li>
+        <li><b>Read:</b> insiders monetized steadily at $13–16 through 2026 and none has bought the post-ALOFT $7–8 level in any filing reviewed. Absence of buying at ~1.26× cash is a soft negative, not a thesis-breaker. <span class="ev interp">INTERPRETATION</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="risks">
+    <div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+    <ol class="risk-list">
+      <li><b>ALOFT's missing dose–response is mechanistic until proven otherwise</b><span>If LPA1 occupancy does not scale to FVC benefit, PIPE-791's core design premise (&gt;90% trough occupancy) is aimed at the wrong variable, and PROPEL-IPF's two undisclosed doses are a coin-flip on an unknown exposure–response curve. Full ALOFT data is the only resolution. <span class="ev gap">GAP</span></span></li>
+      <li><b>Class liver liability, twice observed</b><span>BMS-986020 died of hepatobiliary toxicity; the ALOFT program then produced blinded liver-injury events including a death and a protocol amendment. If the eventual unblinded table attributes injury to admilparant, regulators will import that scrutiny into PROPEL-IPF mid-trial — monitoring, eligibility, or worse. <span class="ev fact">FACT</span></span></li>
+      <li><b>Single-asset, single-trial, 2028</b><span>After VISTA and MOONLIGHT-1, there is no second shot on goal. A PROPEL-IPF miss leaves residual cash and a deferred preclinical asset — the bear case is the company. <span class="ev fact">FACT</span></span></li>
+      <li><b>Competitive obsolescence before launch</b><span>Admilparant may file on ALOFT; nerandomilast is already approved; deupirfenidone is Phase 3-bound on a 505(b)(2). Even a positive PROPEL-IPF in 2028 enters a Phase 3 that finishes into a four-drug market. <span class="ev interp">INTERPRETATION</span></span></li>
+      <li><b>Enrollment/execution risk against a fixed runway</b><span>~324 patients across 70+ sites competing for the same IPF population as BMS and BI programs; completion is registry-estimated, not guided. Each year of slippage consumes ~$58M and shortens the post-readout cushion the mid-2029 guide promises. <span class="ev interp">INTERPRETATION</span></span></li>
+      <li><b>J&amp;J optionality is J&amp;J's, not Contineum's</b><span>Continuation, indication choice and timing for PIPE-307 are at Janssen's sole discretion; the ~$1.0B milestone headline has survived two primary-endpoint misses on paper only. Any valuation still capitalizing it is overstated. <span class="ev fact">FACT</span></span></li>
+      <li><b>Dilution machinery stays loaded</b><span>Basic shares +45.5% in 19 months; a further $100M ATM is upsized and unused; 3.11M plan/ESPP shares remain available on top of 7.66M options (WAEP $10.99 — most underwater at $7.90, a retention/repricing pressure point). <span class="ev fact">FACT</span></span></li>
+      <li><b>Key-person and capability concentration</b><span>The founding CSO is gone, discovery is cut, and institutional knowledge for the LPA1 franchise now rests on a small team (51 employees cited in 2026 profiles) whose CMO joined in 2025. <span class="ev fact">FACT</span> <span class="ev interp">INTERPRETATION</span></span></li>
+      <li><b>Insider alignment is one-directional</b><span>Thirty sells, no buys in 12 months, including the departing CSO's largest sale weeks before his exit was announced. Legal and largely 10b5-1-patterned — and still the opposite of the signal a ~$61M-EV story would want. <span class="ev fact">FACT</span></span></li>
+      <li><b>Unpublished failures</b><span>Neither VISTA's full dataset nor MOONLIGHT-1's effect sizes have been disclosed. What is not published cannot be falsified — the market is pricing both programs on two binary sentences. <span class="ev gap">GAP</span></span></li>
+    </ol>
+  </section>
+
+  <section id="open">
+    <div class="section-head"><div class="section-num">12 / OPEN QUESTIONS</div><div><h2>The evidence that would change the view</h2></div></div>
+    <div class="open-grid">
+      <article><span>UPGRADE</span><h3>ALOFT full data exculpates the mechanism</h3><p>Published effect sizes showing a coherent exposure story (e.g., a documented adherence/tolerability explanation for 120 mg) plus a liver table that is placebo-like on drug — that combination would materially raise PROPEL-IPF's prior and re-rate the EV off $61M.</p></article>
+      <article><span>UPGRADE</span><h3>PROPEL-IPF dose disclosure + enrollment pace</h3><p>Publication of the Dose A/B amounts with lung (not just brain) occupancy support, and an enrollment-completion guide that holds Jun 2028, would convert the two biggest GAPs in this dossier into facts.</p></article>
+      <article><span>DOWNGRADE</span><h3>Unblinded ALOFT liver attribution</h3><p>If the fatal liver injury and the event cluster sit on admilparant arms at rates above placebo, expect FDA/DSMB attention to PROPEL-IPF and a further class de-rating regardless of PIPE-791's different scaffold.</p></article>
+      <article><span>DOWNGRADE</span><h3>ATM use at these prices</h3><p>Any material sale under the $100M ATM below ~$8 would signal management itself does not believe the mid-2029 runway narrative — or sees a burn the guide has not admitted.</p></article>
+      <article><span>WATCH</span><h3>J&amp;J's PIPE-307 decision</h3><p>Termination closes the file at zero; a funded new trial (any indication) would be a genuine, if small, positive surprise — it is carried at ~zero in every scenario here.</p></article>
+      <article><span>WATCH</span><h3>Insider buying at ~cash value</h3><p>The first open-market purchase by any officer/director at the $7–8 level would be the cheapest credibility signal available to this management team. Its continued absence is data.</p></article>
+    </div>
+    <div class="verdict-box"><div><div class="program-kicker" style="color:var(--yellow)">Verdict</div><h3>A validated class, an unvalidated molecule, and ~$61M of enterprise value for a 2028 answer.</h3></div><p>CTNM is no longer the two-asset NI&amp;I story it IPO'd as — it is a cash-rich, single-binary LPA1 option whose mechanism was de-risked and whose differentiation was complicated by the same Oct 12, 2026 readout. The balance sheet genuinely funds the binary, which is rarer than it should be at this market cap. What the dossier cannot resolve — ALOFT's effect sizes, its liver attribution, PROPEL-IPF's doses and powering — is exactly what the next twelve months of other people's disclosures will resolve for free. Position sizing, as ever, is the reader's call, not this document's.</p></div>
+  </section>
+
+  <section id="sources">
+    <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/labels → ClinicalTrials.gov → academic papers → company PRs/decks (UNVERIFIED until corroborated) → trade press. No number in this dossier is carried without a source in this list or an explicit GAP tag.</p></div></div>
+    <div class="sources">
+      <div class="source-group"><h3>SEC filings (primary)</h3>
+        <a href="https://www.stocktitan.net/sec-filings/CTNM/10-q-contineum-therapeutics-inc-quarterly-earnings-report-24bef296648a.html">Form 10-Q, quarter ended Jun 30, 2026 (filed Jul 2026)<small>Cash $236.6M; shares 37,621,132 at Jul 24, 2026 (32,958,632 A / 4,662,500 B); options 7,656,913 @ WAEP $10.99; H1 net loss $29.6M; operating cash use $27.8M; Dec 2025 follow-on 8,097,570 @ $12.25 = $93.0M net; ATM upsized +$100M Mar 2026, unused H1; J&amp;J license terms ($50M upfront, ~$1.0B milestones, low-double-digit to high-teen royalties)</small></a>
+        <a href="https://www.sec.gov/Archives/edgar/data/1855175/000143774925006458/cont20241231_10k.htm">Form 10-K, year ended Dec 31, 2024 (SEC/EDGAR, CIK 1855175)<small>Share counts at Dec 31, 2024 / Feb 28, 2025; incorporation and name history</small></a>
+        <a href="https://www.secform4.com/insider-trading/1855175.htm">EDGAR Form 4 record, CTNM (via secform4.com index)<small>Stengone 10b5-1 sales (plan adopted Sep 23, 2025); Lorrain and Watkins sales, Jun–Sep 2026</small></a>
+      </div>
+      <div class="source-group"><h3>Registries &amp; labels</h3>
+        <a href="https://clinicaltrials.gov/study/NCT07284459">ClinicalTrials.gov NCT07284459 — PROPEL-IPF<small>~324 patients, 1:1:1, 26 weeks, primary: absolute FVC change at Week 26; start Jan 8, 2026; est. completion Jun 2028; updated Sep 25, 2026</small></a>
+        <a href="https://clinicaltrials.gov/study/NCT06810245">ClinicalTrials.gov NCT06810245 — PIPE-791 chronic pain Phase 1b<small>Crossover design reference for the Apr 2026 topline</small></a>
+        <a href="https://clinicaltrials.gov/study/NCT06083753">ClinicalTrials.gov NCT06083753 — VISTA (PIPE-307, RRMS)</a>
+        <a href="https://clinicaltrials.gov/study/NCT06785012">ClinicalTrials.gov NCT06785012 — MOONLIGHT-1 (JNJ-5120, MDD)</a>
+        <a href="https://clinicaltrials.gov/study/NCT06003426">ClinicalTrials.gov NCT06003426 — ALOFT-IPF (admilparant, BMS)<small>N≈1,255; 60/120 mg BID; primary: FVC change, Week 52</small></a>
+      </div>
+      <div class="source-group"><h3>Academic papers (mandatory)</h3>
+        <a href="https://www.resmedjournal.com/article/S0954-6111(17)30261-5/fulltext">Tager AM et al. Nat Med 2008;14:45–54 (reviewed in Respir Med literature)<small>LPA1 links pulmonary fibrosis to lung injury: fibroblast recruitment, vascular leak; LPA elevated in IPF BAL; LPA1-knockout protection in bleomycin model</small></a>
+        <a href="https://www.jlr.org/article/S0022-2275(23)00048-2/fulltext">Bioactive LPA species and IPF progression, J Lipid Res<small>LPA association with DLCO decline and radiographic progression</small></a>
+        <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12768127/">Nerandomilast (Jascayd) review, PMC<small>FDA approval Oct 2025; PDE4B mechanism; FIBRONEER context</small></a>
+        <p style="font-size:13px;color:var(--muted);padding-top:9px;border-top:1px solid var(--line)">Also relied on: Swaney JS et al., Br J Pharmacol 2010 (oral LPA1 antagonist, bleomycin); Funke M et al., Am J Respir Cell Mol Biol 2012 (LPA1 and epithelial apoptosis); Chen et al., J Med Chem 2026 (PIPE-791 discovery — company-authored, treated as preclinical evidence only); Poon et al. 2024 (PIPE-307 remyelination rationale, as reviewed in Front Mol Neurosci 2026); FIBRONEER-IPF, NEJM (18 mg: −114.7 mL vs placebo −183.5 mL at Week 52; difference 68.8 mL, 95% CI 30.3–107.4).</p>
+      </div>
+      <div class="source-group"><h3>Company releases (UNVERIFIED until corroborated) &amp; trade press</h3>
+        <a href="https://www.businesswire.com/news/home/20260730847164/en/Contineum-Therapeutics-Reports-Second-Quarter-2026-Financial-Results-Affirms-Key-Clinical-Development-Milestones">Q2 2026 results release, Jul 30, 2026<small>Runway through mid-2029; discovery streamlining; limited research workforce reduction incl. CSO Lorrain; &gt;55 PROPEL-IPF sites in 8 countries; MOONLIGHT-1 enrollment complete (107)</small></a>
+        <a href="https://www.businesswire.com/news/home/20260430136243/en/Contineum-Therapeutics-Reports-Positive-Topline-Data-From-Its-Exploratory-PIPE-791-Phase-1b-Trial-in-Chronic-Pain">PIPE-791 chronic pain Phase 1b topline, Apr 30, 2026<small>N=43 crossover; 10 mg QD; PI-NRS tables as reproduced in §04</small></a>
+        <a href="https://www.businesswire.com/news/home/20250918260264/en/Contineum-Therapeutics-Reports-Positive-Topline-Data-From-Phase-1b-Positron-Emission-Tomography-PET-Trial-of-PIPE-791">PIPE-791 PET occupancy topline, Sep 18, 2025<small>Brain LPA1 occupancy; EC50 37 ng/mL (24 h) / 12 ng/mL (168 h)</small></a>
+        <a href="https://www.businesswire.com/news/home/20261011397472/en/Bristol-Myers-Squibb-Announces-Phase-3-ALOFT-IPF-Trial-Evaluating-Admilparant-in-Adults-with-Idiopathic-Pulmonary-Fibrosis-Met-Primary-Endpoint">BMS ALOFT-IPF topline release, Oct 12, 2026<small>60 mg met primary; 120 mg not significant; no effect sizes disclosed</small></a>
+        <a href="https://www.biospace.com/drug-development/bms-reports-liver-injury-events-in-lung-disease-program-with-key-readout-near">BioSpace, Oct 1, 2026 — ALOFT liver-injury disclosure<small>Blinded events incl. one death; May protocol amendment; DMC recommended continuation; analyst (Stifel/William Blair/BMO) read-throughs to CTNM</small></a>
+        <a href="https://www.fiercebiotech.com/biotech/jjs-contineum-partnered-asset-flunks-another-phase-2-test">Fierce Biotech, Sep 2026 — MOONLIGHT-1 miss<small>J&amp;J deal history; William Blair removed JNJ-5120 from its model</small></a>
+        <a href="https://www.hcplive.com/view/aloft-ipf-admilparant-60-mg-meets-primary-fvc-end-point">HCP Live, Oct 2026 — ALOFT-IPF analysis<small>Trial design N≈1,255; absence of disclosed effect sizes/CIs/p-values; Phase 2 anchor (62% while-on-treatment / 54% treatment-policy)</small></a>
+        <a href="https://www.marketbeat.com/stocks/NASDAQ/CTNM/chart/">MarketBeat — CTNM daily price history<small>Daily closes Sep 23–Oct 15, 2026 used in §02 chart; Oct 15 close $7.90; 52-week range $7.72–$17.79</small></a>
+        <p style="font-size:13px;color:var(--muted);padding-top:9px;border-top:1px solid var(--line)"><b>Gaps disclosed:</b> PROPEL-IPF dose amounts (A/B) and powering assumptions; VISTA full dataset and all PIPE-307 effect sizes/p-values; MOONLIGHT-1 effect size; ALOFT-IPF effect sizes and unblinded liver attribution; any PIPE-791 regulatory designation; J&amp;J's PIPE-307 continuation decision. <b>Nothing in this dossier is invented</b> — numbers without a source above are labeled INTERPRETATION or GAP.</p>
+      </div>
+    </div>
+    <div class="method">Method: identity, share counts, cash, license terms and insider trades are taken from SEC filings first; trial designs from ClinicalTrials.gov; efficacy claims are reproduced only with population, dose and timepoint; company statements are tagged UNVERIFIED unless corroborated by a filing, registry or paper. This dossier contains no personal data.</div>
+  </section>
+  </main>
+  <footer><strong>CTNM — Contineum Therapeutics, Inc.</strong> · Deep-dive dossier as of October 16, 2026 · Biotech dossier library · For research and education; not investment advice.</footer>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+<script>
+    const prices=[['2026-09-23',12.51],['2026-09-24',12.49],['2026-09-25',12.56],['2026-09-28',12.73],['2026-09-29',11.5],['2026-09-30',13.42],['2026-10-01',12.99],['2026-10-02',13.12],['2026-10-05',12.72],['2026-10-06',12.65],['2026-10-07',12.73],['2026-10-08',13.18],['2026-10-09',13.38],['2026-10-12',8.56],['2026-10-13',8.42],['2026-10-14',8.14],['2026-10-15',7.9]];
+
+    const svg=document.getElementById('priceChart'), shell=document.getElementById('chartShell'), tip=document.getElementById('chartTip');
+    let range=17, visible=[];
+    const NS='http://www.w3.org/2000/svg';
+    function el(name,attrs){attrs=attrs||{};const n=document.createElementNS(NS,name);for(const k of Object.keys(attrs))n.setAttribute(k,attrs[k]);return n}
+    function money(v){return '$'+v.toFixed(2)}
+    function prettyDate(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}
+    function themeVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+    function render(){
+      visible=prices.slice(-range); svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(function(n){n.remove()});
+      const W=1000,H=330,L=62,R=20,T=20,B=42; const vals=visible.map(function(d){return d[1]}); const min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); const pad=(max-min)*.12||1; const lo=Math.max(0,min-pad),hi=max+pad;
+      const lineC=themeVar('--chart-line'), areaC=themeVar('--chart-area'), gridC=themeVar('--chart-grid'), textC=themeVar('--chart-text');
+      const x=function(i){return L+i*(W-L-R)/(visible.length-1)}, y=function(v){return T+(hi-v)*(H-T-B)/(hi-lo)};
+      const grid=el('g');
+      for(let i=0;i<5;i++){const val=lo+(hi-lo)*(4-i)/4, yy=T+i*(H-T-B)/4;grid.append(el('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:gridC,'stroke-width':'1'}));const tx=el('text',{x:L-10,y:yy+4,'text-anchor':'end',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent='$'+val.toFixed(2);grid.append(tx)}
+      const ticks=[0,Math.floor((visible.length-1)/2),visible.length-1];ticks.forEach(function(i){const tx=el('text',{x:x(i),y:H-13,'text-anchor':i===0?'start':i===visible.length-1?'end':'middle',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent=new Date(visible[i][0]+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'});grid.append(tx)});svg.append(grid);
+      let d='';visible.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(2)+','+y(p[1]).toFixed(2)});const area=el('path',{d:d+'L'+x(visible.length-1)+','+(H-B)+'L'+x(0)+','+(H-B)+'Z',fill:areaC,opacity:'.75'});svg.append(area);svg.append(el('path',{d:d,fill:'none',stroke:lineC,'stroke-width':'3','vector-effect':'non-scaling-stroke','stroke-linejoin':'round'}));
+      const hover=el('g',{opacity:'0'});const vline=el('line',{y1:T,y2:H-B,stroke:'#d85f2a','stroke-width':'1.5','stroke-dasharray':'4 4','vector-effect':'non-scaling-stroke'}),dot=el('circle',{r:'6',fill:'#fff',stroke:'#d85f2a','stroke-width':'3','vector-effect':'non-scaling-stroke'});hover.append(vline,dot);svg.append(hover);
+      const hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent',tabindex:'0','aria-label':'Explore chart values'});svg.append(hit);
+      function show(evt){const rect=shell.getBoundingClientRect(), px=Math.max(0,Math.min(rect.width,(evt.clientX||rect.left)-rect.left));const plotLeft=L/W*rect.width,plotRight=(W-R)/W*rect.width;const frac=Math.max(0,Math.min(1,(px-plotLeft)/(plotRight-plotLeft)));const i=Math.round(frac*(visible.length-1)),p=visible[i],xx=x(i),yy=y(p[1]);hover.setAttribute('opacity','1');vline.setAttribute('x1',xx);vline.setAttribute('x2',xx);dot.setAttribute('cx',xx);dot.setAttribute('cy',yy);tip.style.display='block';tip.style.left=(xx/W*rect.width)+'px';tip.style.top=(yy/H*rect.height)+'px';tip.textContent=prettyDate(p[0])+' · '+money(p[1])}
+      hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',function(){hover.setAttribute('opacity','0');tip.style.display='none'});
+      const ret=(visible[visible.length-1][1]/visible[0][1]-1)*100;document.getElementById('rangeReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';document.getElementById('rangeLow').textContent=money(min);document.getElementById('rangeHigh').textContent=money(max);
+    }
+    document.querySelectorAll('.range button').forEach(function(b){b.addEventListener('click',function(){range=Number(b.dataset.range);document.querySelectorAll('.range button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render()})});
+    render();
+
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}render()}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>
