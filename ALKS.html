@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Alkermes plc (ALKS) Deep-Dive Dossier · As of Oct 16, 2026</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head><body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · ALKS</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>A $1.8B-revenue neuroscience company that just bought its growth — and levered itself to an orexin race.</h1>
+<p class="hero-dek">Alkermes plc (Ireland; Commission File No. 001-35299; CIK 1520262; HQ Connaught House, 1 Burlington Road, Dublin 4, with U.S. operations in Waltham, MA) is a commercial-stage neuroscience company. Its owned products — VIVITROL, ARISTADA, LYBALVI and, since the Feb. 12, 2026 acquisition of Avadel, LUMRYZ — plus J&amp;J/Biogen royalty streams produced $888.9M of revenue in H1 2026. The equity story now turns on whether the orexin pipeline it has been building — alixorexton in Phase 3, ALKS 7290 in ADHD — justifies the $1.5B of acquisition debt and a valuation already well above the commercial base's cash earnings.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$41.22</div>
+<div class="quote-label">Close · Oct 16, 2026 (Finnhub)</div>
+<div class="quote-meta"><strong>~$6.91B</strong> market cap (167.54M shares, Jun 30, 2026) · <strong>~$7.9B</strong> est. EV (see Financials) · $691.6M cash &amp; investments vs $1,503.1M acquisition term loans<br>52-week range $27.00–$55.67 (Finnhub)</div>
+</div></div></header>
+
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#commercial">Commercial</a><a href="#science">Science</a><a href="#pipeline">Pipeline</a><a href="#clinical">Clinical</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button></nav></div>
+
+<main>
+<section id="frame">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The single swing factor</h2><p class="lede">Whether alixorexton — an oral orexin 2 receptor agonist with genuinely strong Phase 2 data — can win a durable place in hypersomnolence against Takeda's already-approved oveporexton and Lilly's acquired Centessa program, at a scale large enough to carry the Avadel debt load and replace the VIVITROL revenue that generic entry begins eroding in 2027. Everything else in the story is a cash-generative base; this is the only piece priced like growth.</p></div></div>
+<div class="evidence-strip"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Commercial base</div><div class="big">$1.73–1.84B</div><p><span class="ev fact">FACT</span> FY2026 total revenue guidance, reiterated Jul. 28, 2026, with adjusted EBITDA guided at $370–410M — against a guided GAAP net loss of $95–115M, the gap being Avadel acquisition accounting (inventory step-up, amortization, CVR fair value, interest).</p></article>
+<article class="decision"><div class="tag">Next decisive catalyst</div><div class="big">YE 2026</div><p><span class="ev unverified">UNVERIFIED · COMPANY</span> Vibrance-3 (alixorexton in idiopathic hypersomnia, n≈126) topline guided by end of 2026; LUMRYZ IH sNDA filing also planned by YE 2026. Brilliance Phase 3 readouts are a 2027 event (registry primary completion May 2027).</p></article>
+<article class="decision warn"><div class="tag">Structural headwind</div><div class="big">Generics, 2027</div><p><span class="ev fact">FACT</span> The company itself expects generic VIVITROL entry in 2027 (licensed Teva entry under an Aug. 2023 settlement). VIVITROL was $467.9M of FY2025 sales — roughly a third of product revenue — and the Avadel deal was funded with $1.525B of term loans drawn at closing.</p></article>
+<article class="decision"><div class="tag">Leadership</div><div class="big">New CEO</div><p><span class="ev fact">FACT</span> Blair Jackson (former EVP/COO) became CEO Aug. 1, 2026, succeeding Richard Pops after 35 years; Pops remains Chairman and advisor. The orexin build-out and the Avadel acquisition are the strategy the new CEO inherits — and has publicly championed.</p></article>
+</div>
+<div class="thesis">
+<article class="thesis-card"><h3>What the bull case rests on</h3><ul>
+<li>A real, diversified commercial engine: four owned products growing in aggregate (proprietary sales +34% y/y in Q2 2026 to $411.7M), plus ~$140–290M/yr of manufacturing and royalty income that carries little incremental cost.</li>
+<li>Phase 2 orexin data that are unusually complete for the class: Vibrance-1 (NT1) published in <em>The Lancet Neurology</em> with all doses normalizing MWT; Vibrance-2 (NT2) positive on its dual primaries at SLEEP 2026; FDA Breakthrough Therapy designation in NT1.</li>
+<li>LUMRYZ gives Alkermes an incumbent narcolepsy franchise — prescriber base, REMS infrastructure, payer contracts — into which alixorexton would launch, plus a Phase 3 win (REVITALYZ) extending LUMRYZ toward IH.</li>
+<li>ALKS 7290's Phase 1b ADHD proof-of-concept (Sept. 21, 2026) opens a second, much larger indication family for the orexin platform if the enrolling Phase 2 confirms it under controlled conditions.</li>
+</ul></article>
+<article class="thesis-card risk"><h3>What the price already assumes</h3><ul>
+<li>At ~$7.9B EV the market pays roughly 20× guided adjusted EBITDA for a base whose largest product faces generic entry within ~15 months and whose royalty streams (INVEGA, VUMERITY) are in slow decline.</li>
+<li>Takeda's oveporexton was approved Aug. 5, 2026 and is first in NT1; Lilly paid $6.3B for Centessa's orexin pipeline. Alixorexton is, at best, second — its once-daily claim is the differentiation, and its own Phase 3 program also tests split dosing.</li>
+<li>The balance sheet flipped in one deal: from ~$1.3B cash &amp; investments at YE 2025 to $691.6M against $1,503.1M of term loans plus a $136.3M contingent-consideration liability. Interest is now a guided $75–85M/yr net expense.</li>
+<li>Phase 2 orexin effect sizes were generated in 6–8-week trials with urinary/insomnia AE rates of 46–73% (pollakiuria). Chronic, real-world tolerability at NT2/IH doses (10–18 mg, above the NT1 range) is unproven.</li>
+</ul></article>
+</div>
+<p class="source-note">Identity and filings: SEC submissions record, CIK 1520262. Financial anchors: Q2 2026 Form 10-Q (filed Jul. 28, 2026) and FY2025 Form 10-K (filed Feb. 25, 2026). Price: Finnhub, Oct. 16, 2026 close.</p>
+</section>
+
+<section id="commercial">
+<div class="section-head"><div class="section-num">02 / COMMERCIAL</div><div><h2>The commercial engine, product by product</h2><p class="lede">Alkermes is not a pipeline story with a product attached; it is a specialty commercial business with four owned brands and two royalty annuities. The diligence question is durability: every owned product except LYBALVI and LUMRYZ is either mature, facing generics, or both.</p></div></div>
+<table class="study-table"><thead><tr><th>Product</th><th>What it is</th><th>Q2 2026</th><th>H1 2026</th><th>FY2025</th><th>FY2026 guide</th></tr></thead><tbody>
+<tr><td data-label="Product"><strong>VIVITROL</strong></td><td data-label="What">Monthly injectable naltrexone (alcohol + opioid dependence)</td><td data-label="Q2">$124.5M</td><td data-label="H1">$236.9M</td><td data-label="FY25">$467.9M</td><td data-label="Guide">$460–480M</td></tr>
+<tr><td data-label="Product"><strong>ARISTADA</strong> (+ INITIO)</td><td data-label="What">Long-acting injectable aripiprazole (schizophrenia)</td><td data-label="Q2">$96.7M</td><td data-label="H1">$190.5M</td><td data-label="FY25">$370.0M</td><td data-label="Guide">$365–385M</td></tr>
+<tr><td data-label="Product"><strong>LYBALVI</strong></td><td data-label="What">Olanzapine/samidorphan oral (schizophrenia, bipolar I)</td><td data-label="Q2">$94.0M</td><td data-label="H1">$186.3M</td><td data-label="FY25">$346.7M</td><td data-label="Guide">$380–400M</td></tr>
+<tr><td data-label="Product"><strong>LUMRYZ</strong></td><td data-label="What">Once-nightly sodium oxybate ER (narcolepsy; acquired with Avadel, Feb. 12, 2026)</td><td data-label="Q2">$96.6M</td><td data-label="H1">$136.1M*</td><td data-label="FY25">—</td><td data-label="Guide">$315–335M*</td></tr>
+<tr><td data-label="Product"><strong>Manufacturing &amp; royalties</strong></td><td data-label="What">Long-acting INVEGA/XEPLION royalties; VUMERITY manufacturing + royalty; RISPERDAL CONSTA (ended) and other</td><td data-label="Q2">$84.3M</td><td data-label="H1">$139.1M</td><td data-label="FY25">$291.3M</td><td data-label="Guide">Not broken out</td></tr>
+<tr><td data-label="Product"><strong>Total revenues</strong></td><td data-label="What"></td><td data-label="Q2"><strong>$496.0M</strong></td><td data-label="H1"><strong>$888.9M</strong></td><td data-label="FY25"><strong>$1,475.9M</strong></td><td data-label="Guide"><strong>$1,730–1,840M</strong></td></tr>
+</tbody></table>
+<p class="source-note"><span class="ev fact">FACT</span> Product sales and totals: Q2 2026 10-Q. *LUMRYZ H1 and guide cover only the post-close period (Feb. 12–Dec. 31, 2026 for the guide); Avadel itself recorded $33M of LUMRYZ sales Jan. 1–Feb. 11, 2026, so the implied full-year 2026 figure is ~$348–368M. Guidance as updated Jul. 28, 2026 (8-K Ex. 99.1).</p>
+<div class="fail-grid">
+<article><h3>VIVITROL — the melting anchor</h3><p><span class="ev fact">FACT</span> Still the largest single product, growing low-single-digits on alcohol-dependence demand. The 10-K states the company expects generic entry in 2027 under the Aug. 2023 Teva settlement/license (latest patent expiry 2029). A putative direct-purchaser antitrust class action over the VIVITROL patent's Orange Book listing is pending in D. Mass. (motion to dismiss filed Dec. 2025). The Sep. 2025 authorized-generic supply deal with Amneal was terminated Jul. 6, 2026 after Amneal declined to order — the AG channel is not currently part of the defense.</p></article>
+<article><h3>ARISTADA — share fight in LAI antipsychotics</h3><p><span class="ev fact">FACT</span> Q2 sales fell y/y ($96.7M vs $101.3M) despite H1 growth; management cited ~$4M of gross-to-net favorability in the quarter. Competition is branded and generic: ABILIFY MAINTENA/ASIMTUFII (Otsuka), UZEDY (Teva/MedinCell), RYKINDO, and generic risperidone LAIs referencing RISPERDAL CONSTA. Alkermes' own RISPERDAL CONSTA manufacturing royalty has wound down ($19.6M in FY2025, mostly manufacturing).</p></article>
+<article><h3>LYBALVI — cleanest owned growth asset</h3><p><span class="ev fact">FACT</span> +12% y/y in Q2 with TRx +18%; guide implies continued double-digit growth. The clinical claim is samidorphan's mitigation of olanzapine-associated weight gain (ENLIGHTEN program). Competition is the oral atypical class — CAPLYTA, REXULTI, VRAYLAR and cheap generic olanzapine itself, against which LYBALVI must justify branded pricing every refill. A pediatric (schizophrenia/bipolar) development program is listed by the company as Phase 3. <span class="ev gap">GAP</span> No pediatric timeline is guided.</p></article>
+<article><h3>LUMRYZ — bought growth, real but encumbered</h3><p><span class="ev fact">FACT</span> Once-nightly oxybate competing with Jazz's XYREM/XYWAV (XYWAV is also approved in IH). Acquired for $21.00/share cash plus a $1.50/share CVR tied to a specified milestone; purchase accounting put ~$1.79B of intangibles and $594.3M of total goodwill on the balance sheet (goodwill at Jun. 30). The Q2 contingent-consideration fair value rose $26.4M specifically because REVITALYZ hit — i.e., the CVR is tracking the IH milestone, and success literally increases the liability.</p></article>
+</div>
+<h3 style="margin-top:22px">Royalty &amp; manufacturing streams — the quiet annuity</h3>
+<p><span class="ev fact">FACT</span> FY2025 manufacturing + royalty revenue was $291.3M, of which royalty revenue was $245.3M: long-acting INVEGA products (J&amp;J) $109.6M royalty; VUMERITY (Biogen) $130.5M combined ($113.9M royalty + $16.5M manufacturing). Both are declining: Q2 2026 showed INVEGA-family at $27.4M and VUMERITY at $30.6M (of which the manufacturing piece is shrinking as Alkermes' VUMERITY subcontracting obligations concluded). These streams are high-margin but wasting — they fund, and cannot replace, the owned-product base. <span class="ev interp">INTERPRETATION</span> Treat ~$250–290M/yr of royalty-heavy revenue as a declining annuity with a long tail, not a growth line.</p>
+<h3 style="margin-top:22px">Margins</h3>
+<p><span class="ev fact">FACT</span> H1 2026 cost of goods sold was $159.7M including $43.7M of non-cash LUMRYZ inventory step-up amortization; FY2026 COGS is guided at $320–340M including ~$105M of step-up expected to be expensed in 2026. Excluding step-up, underlying COGS runs at roughly 15% of product sales — a high-gross-margin specialty model — but SG&amp;A is the real cost structure: $482.2M in H1 2026 (including ~$35.9M of Avadel transaction costs) against a $890–930M full-year guide, funding four field forces. The adjusted-EBITDA guide ($370–410M) is ~22% of guided revenue; the GAAP guide is a loss. Both statements are true, and the distance between them is the acquisition.</p>
+</section>
+<section id="science">
+<div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Orexin: replacing a missing wake signal — or forcing one</h2><p class="lede">The pipeline is one biology bet expressed four ways: agonize the orexin 2 receptor (OX2R), the brain's master wakefulness switch. The biology is unusually well validated for a CNS mechanism — and the failure modes are equally concrete.</p></div></div>
+<div class="science-plain"><h3>Plain English</h3><p>Deep in the brain, a small cluster of neurons makes a chemical called orexin that keeps you awake, alert and able to sustain attention. In narcolepsy type 1 (NT1), those neurons die — patients fall asleep uncontrollably and muscles give way (cataplexy). In NT2 and idiopathic hypersomnia (IH), the neurons survive but the signal is functionally insufficient, and patients are pathologically sleepy. Alkermes' drugs are pills that switch the orexin receptor (specifically the type-2 receptor) directly. In NT1 that substitutes for a missing signal; in NT2, IH and ADHD it amplifies a weak one. If it works, patients stay awake on a once-daily pill instead of stimulants or the heavily restricted oxybate salts LUMRYZ and XYWAV sell today.</p></div>
+<p><span class="ev fact">FACT</span> Technical framing (10-K): orexins (hypocretins) are neuropeptides from lateral-hypothalamic neurons acting at OX1R and OX2R; OX2R is the principal receptor mediating wake stabilization. NT1 is caused by selective loss of orexin-producing neurons and profoundly low CSF orexin; OX2R agonism is therefore replacement pharmacology in NT1 and signal amplification in NT2/IH, where endogenous ligand persists (which is why NT2/IH doses — 10–18 mg — sit above the NT1 range of 4–8 mg; SLEEP 2026 Vibrance-2 poster).</p>
+<div class="mech-grid">
+<article class="mech-card"><h3>Alixorexton (ALKS 2680)</h3><p>Highly potent, selective oral OX2R agonist, once-daily dosing in Phase 2; Phase 3 tests once-daily and split-dose regimens. Indications: NT1 (Breakthrough Therapy designation, Dec. 2025), NT2, IH (Orphan Drug designations: EC for narcolepsy; FDA for IH, Jun. 2026).</p></article>
+<article class="mech-card"><h3>ALKS 7290</h3><p>Second OX2R agonist, chemically distinct, dosed split (20 mg or 50 mg total daily in Phase 1b) and aimed at ADHD — the hypothesis being that orexin tone drives the attention/arousal domains stimulants treat indirectly. First-in-class claim: no orexin agonist has previously reported clinical data in ADHD.</p></article>
+<article class="mech-card"><h3>ALKS 4510</h3><p>Third OX2R agonist, Phase 1 in healthy volunteers, aimed at fatigue in multiple sclerosis and Parkinson's disease. Same mechanism, different symptom domain — a platform-breadth claim, at platform-breadth (i.e., minimal) evidence.</p></article>
+<article class="mech-card"><h3>Valiloxybate</h3><p>Acquired with Avadel: a GABAB-agonist oxybate-class candidate in Phase 1 (pharmacokinetics in healthy volunteers) for narcolepsy and IH. Carried in purchase accounting as in-process R&amp;D. If it works it cannibalizes-defends the LUMRYZ slot; it is an option, not a program.</p></article>
+</div>
+<h3 style="margin-top:22px">Why this could fail</h3>
+<div class="fail-grid">
+<article><h3>Tolerability at chronic dosing</h3><p><span class="ev fact">FACT</span> Across Vibrance-1/2, pollakiuria ran 46–73%, insomnia up to 36% (NT2, 14 mg), plus micturition urgency, salivary hypersecretion, dizziness. These are on-target (orexin is wake-promoting; urinary effects reflect OX2R pharmacology). Six-to-eight-week trials in screened patients do not establish that real patients stay on drug for years; treatment discontinuations for TEAEs were low (3 of 69 on drug in Vibrance-2), though full-study completion in the 10 mg arm was 74% vs 100% on placebo once the open-label extension is included (poster disposition table) — an attrition pattern the poster does not explain.</p></article>
+<article><h3>Class history: hepatotoxicity</h3><p><span class="ev fact">FACT</span> Takeda's earlier OX2R agonist TAK-994 was discontinued in 2021 for liver toxicity. Alkermes posters report no hepatic signals to date and no serious TEAEs in Vibrance-1/2, but the class carries a standing liver-safety prior that regulators will test against the full Phase 3 database. <span class="ev interp">INTERPRETATION</span> Any hepatic signal in Brilliance is an existential, not incremental, event for the program.</p></article>
+<article><h3>Endpoint fragility in NT2/IH</h3><p><span class="ev fact">FACT</span> NT2 has no biomarker; diagnosis is clinical and heterogeneous, and MWT/ESS are effort- and expectation-sensitive. In Vibrance-2 the ESS co-primary separated only at the highest dose after multiplicity adjustment (§05). IH is harder still: no approved-therapy precedent for an orexin agent, and Vibrance-3's primary is ESS alone. A Phase 3 that reproduces MWT but wobbles on ESS invites a complete-response or a narrow label.</p></article>
+<article><h3>Second-to-market pharmacology</h3><p><span class="ev fact">FACT</span> Oveporexton is approved (Aug. 5, 2026) with twice-daily dosing and the same class AE signature (insomnia, pollakiuria, urgency, salivary hypersecretion per the approval coverage). Alixorexton's once-daily convenience is a real but modest edge; payers may not pay a premium for it, and Takeda has a multi-year head start in prescriber habituation. There are no head-to-head data and none are planned publicly. <span class="ev gap">GAP</span></p></article>
+</div>
+<p class="source-note">Academic anchors: Vibrance-1 published in <em>The Lancet Neurology</em> (2026); oveporexton Phase 2b, <em>New England Journal of Medicine</em> (2025); orexin-system reviews cited at SLEEP 2026 (Krahn et al., <em>Adv Ther</em> 2022; Bassetti et al., <em>Nat Rev Neurol</em> 2019). Full references in §12.</p>
+</section>
+
+<section id="pipeline">
+<div class="section-head"><div class="section-num">04 / PIPELINE</div><div><h2>Ranked by value contribution</h2><p class="lede">Ranking weighs probability-weighted revenue relevance to the equity, not scientific novelty. The LUMRYZ IH expansion ranks first because it is closest, de-risked by a positive Phase 3, and defends the asset the debt was raised to buy; alixorexton is second only because its value, while larger in ceiling, is a 2028+ Phase 3 story in a race already lost to first.</p></div></div>
+<div class="stack">
+<article class="asset top"><div class="asset-head"><div><h3>1 · LUMRYZ — idiopathic hypersomnia expansion</h3><div class="asset-meta">Marketed product (narcolepsy) · Phase 3 positive (REVITALYZ) · sNDA filing planned YE 2026</div></div><span class="prob high">De-risked</span></div>
+<p><span class="ev fact">FACT</span> REVITALYZ (randomized-withdrawal, 104 participants in the double-blind period) met its primary (ESS) and both key secondaries (PGI-C, IHSS) at p&lt;0.0001 (May 12, 2026). The expansion defends LUMRYZ against XYWAV, which already owns the IH label. <strong>The catch is legal, not clinical:</strong> under a prior settlement/license, Alkermes may not market LUMRYZ for IH before <strong>Mar. 1, 2028</strong> even if the FDA approves it earlier — so IH revenue is a 2028 event regardless of the 2026 filing.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>2 · Alixorexton (ALKS 2680) — NT1 / NT2 / IH</h3><div class="asset-meta">OX2R agonist · Phase 3 (Brilliance, NT1 + NT2) · Phase 2 (Vibrance-3, IH) · BTD in NT1</div></div><span class="prob mid">Phase 3</span></div>
+<p><span class="ev fact">FACT</span> The swing factor (§01). Two positive Phase 2 studies, one peer-reviewed (NT1) and one congress-reported (NT2); Phase 3 started Apr. 2026 with registry primary completion May 2027. IH Phase 2 topline guided YE 2026 is the nearest pipeline readout. Value case: the only orexin program spanning all three hypersomnolence indications with (in Phase 2) once-daily dosing.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>3 · ALKS 7290 — ADHD</h3><div class="asset-meta">OX2R agonist · Phase 2 enrolling (n≈312, NCT07755410) · Phase 1b PoC positive Sept. 21, 2026</div></div><span class="prob low">Early</span></div>
+<p><span class="ev fact">FACT</span> Phase 1b (n=50, 14 days, split dosing) showed median AISRS reductions of 14.0 (20 mg) and 19.0 points (50 mg) from baseline — but the study was explicitly not powered for efficacy and placebo-adjusted effects were not the headline; management calls it a potential "company changer" (Fierce Biotech). Phase 2 primary: AISRS change at week 4, registry completion Jul. 2027. ADHD is a large, stimulant-dominated market where a non-stimulant mechanism needs a controlled win, not a median change from baseline.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>4 · LYBALVI pediatric program</h3><div class="asset-meta">Marketed product lifecycle · company-listed Phase 3</div></div><span class="prob mid">Lifecycle</span></div>
+<p><span class="ev gap">GAP</span> Listed on the company pipeline (Aug. 2026) as Phase 3 for pediatric schizophrenia/bipolar I. No design, timeline or readout guidance found in filings reviewed; incremental label value only.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>5 · ALKS 4510 — fatigue (MS / Parkinson's)</h3><div class="asset-meta">OX2R agonist · Phase 1 healthy volunteers</div></div><span class="prob low">Preclinical-grade risk</span></div>
+<p><span class="ev unverified">UNVERIFIED</span> Phase 2a start has been referenced in secondary coverage of company commentary; no registry record or guided timeline verified. Option value only.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>6 · Valiloxybate — narcolepsy / IH</h3><div class="asset-meta">GABAB agonist (oxybate-class) · Phase 1 PK · acquired with Avadel</div></div><span class="prob low">Option</span></div>
+<p><span class="ev fact">FACT</span> Valued in purchase accounting on a cost approach as IPR&amp;D — i.e., the acquirer's own accountants assigned it early-stage value. A next-generation oxybate that would defend the LUMRYZ franchise against orexin-class erosion, including Alkermes' own alixorexton.</p></article>
+</div>
+</section>
+<section id="clinical">
+<div class="section-head"><div class="section-num">05 / CLINICAL</div><div><h2>The data, trial by trial</h2><p class="lede">Alixorexton's Phase 2 package is the strongest part of the story — and even here, the details matter: cataplexy separated at only one NT1 dose, NT2 ESS separated only at the top dose after multiplicity adjustment, and every study is short. REVITALYZ is clean but its commercial payoff is contractually delayed to 2028.</p></div></div>
+<h3 style="margin-bottom:10px">Alixorexton — Vibrance-1 (NT1, Phase 2, published)</h3>
+<table class="study-table"><thead><tr><th>Design</th><th>Result</th></tr></thead><tbody>
+<tr><td data-label="Design">NCT06358950 · n=92 · randomized 1:1:1:1 to alixorexton 4/6/8 mg once daily or placebo · 6 weeks · primary: change in mean sleep latency on MWT at week 6 · Published in <em>The Lancet Neurology</em> (2026)</td><td data-label="Result"><span class="ev fact">FACT</span> Primary met at all doses. Week-6 mean MWT sleep latency: 24.0 min (4 mg), 25.9 (6 mg), 28.2 (8 mg) vs 2.3 (placebo) as reported in the published analysis; p=0.0099 (4 mg), p&lt;0.0001 (6 mg, 8 mg). ESS improved significantly at all doses (company report: p&lt;0.0001). Weekly cataplexy rate: significant only at 6 mg (p=0.005) — the anti-cataplectic dose-response is not clean. TEAEs ≥10%: pollakiuria 55%, insomnia 28%, salivary hypersecretion 25%, micturition urgency 14%, blurred vision 14%, hyperhidrosis 7%; no serious TEAEs. <span class="ev interp">INTERPRETATION</span> MWT normalization into the healthy range (latencies &gt;20 min) at all doses is a best-in-class Phase 2 signal; cataplexy, the NT1-defining symptom, is the soft spot.</td></tr>
+</tbody></table>
+<h3 style="margin:18px 0 10px">Alixorexton — Vibrance-2 (NT2, Phase 2, SLEEP 2026)</h3>
+<table class="study-table"><thead><tr><th>Design</th><th>Result</th></tr></thead><tbody>
+<tr><td data-label="Design">NCT06555783 · n=93 · 1:1:1:1 to 10/14/18 mg once daily or placebo · 8 weeks + OLE · <strong>dual primaries</strong>: MWT change and ESS change at week 8 · Baseline MWT ≈5.6 min, ESS ≈17.4</td><td data-label="Result"><span class="ev fact">FACT</span> MWT LSM change: +1.6 (PBO), +10.8 (10 mg), +8.3 (14 mg), +8.2 min (18 mg); differences vs PBO +9.3 (10 mg; significance not assessable under the graphical multiplicity procedure), +6.7 (p=0.049), +6.7 (p=0.047). ESS LSM change: −3.7 (PBO), −5.8, −6.9, −7.2; differences −2.1 (p=0.195), −3.2 (p=0.077), −3.6 (p=0.046) — <strong>only the 18 mg dose separated on ESS after multiplicity adjustment</strong>. Supportive: PROMIS-Fatigue (nominal p=0.044/0.001 at 14/18 mg), BC-CCI cognition (nominal p=0.042 at 18 mg). Pollakiuria 46–73% by dose; no serious TEAEs. <span class="ev interp">INTERPRETATION</span> A real win — first OX2R agonist positive in NT2 — but a thinner one than the headline "met both primaries": the dose-response is non-monotonic on MWT and the ESS margin at the likely commercial doses is a 3-point scale move with p at the boundary.</td></tr>
+</tbody></table>
+<h3 style="margin:18px 0 10px">Alixorexton — Vibrance-3 (IH, Phase 2, ongoing) and Brilliance (Phase 3)</h3>
+<table class="study-table"><thead><tr><th>Study</th><th>Registry facts</th></tr></thead><tbody>
+<tr><td data-label="Study"><strong>Vibrance-3</strong> (IH)</td><td data-label="Facts"><span class="ev fact">FACT</span> NCT06843590 · n≈126 (estimated) · Part A: 10/14/18 mg vs placebo; primary: ESS change at week 8 · status: active, not recruiting · registry completion Nov. 2026 · Company guides topline by end of 2026.</td></tr>
+<tr><td data-label="Study"><strong>Brilliance NT1</strong> (two studies)</td><td data-label="Facts"><span class="ev fact">FACT</span> NCT07455383 (Study 302): n≈150 est., two dose levels vs placebo, primary MWT change at week 12, started Apr. 6, 2026, registry primary completion May 2027. NCT07540897 (Study 304): second NT1 study in the program (split-dose evaluation per company materials). <span class="ev gap">GAP</span> Study 304 enrollment target not extracted from the registry at time of writing.</td></tr>
+<tr><td data-label="Study"><strong>Brilliance NT2</strong></td><td data-label="Facts"><span class="ev fact">FACT</span> NCT07502443 · n≈176 est. · three dose levels vs placebo · primary MWT change at week 12 · primary completion May 2027 (registry). Doses informed by Vibrance-2; both once-daily and split-dose regimens are being evaluated across the program (SLEEP 2026 poster).</td></tr>
+</tbody></table>
+<h3 style="margin:18px 0 10px">LUMRYZ — REVITALYZ (IH, Phase 3, positive)</h3>
+<table class="study-table"><thead><tr><th>Design</th><th>Result</th></tr></thead><tbody>
+<tr><td data-label="Design">Randomized-withdrawal design: open-label LUMRYZ treatment, then 104 participants randomized to continue LUMRYZ or switch to placebo for the double-blind period · primary: ESS change · key secondaries: PGI-C, IHSS</td><td data-label="Result"><span class="ev fact">FACT</span> Primary and both key secondaries met at p&lt;0.0001: patients switched to placebo worsened significantly vs those maintained on LUMRYZ (company, via May 12, 2026 8-K/PR). TEAEs ≥10%: nausea, headache, anxiety, dizziness, vomiting. Randomized-withdrawal designs enrich for responders — the effect size overstates what a treatment-naïve IH population would show, but the design is the accepted regulatory template for this claim. sNDA filing planned by YE 2026; IH marketing contractually blocked until Mar. 1, 2028 (§04).</td></tr>
+</tbody></table>
+<h3 style="margin:18px 0 10px">ALKS 7290 — Phase 1b (ADHD, proof-of-concept)</h3>
+<table class="study-table"><thead><tr><th>Design</th><th>Result</th></tr></thead><tbody>
+<tr><td data-label="Design">n=50 adults with ADHD · split doses of 20 mg or 50 mg total daily vs placebo · 14 days after 2-week washout of prior ADHD medication · primary objectives: safety/tolerability; AISRS/CGI-S exploratory · Phase 2 (NCT07755410, n≈312, primary: AISRS change at week 4) enrolling since Aug. 2026</td><td data-label="Result"><span class="ev fact">FACT</span> Median AISRS change from baseline at day 14: −14.0 points (20 mg), −19.0 points (50 mg), from a baseline median ≈39; onset as early as day 6; CGI-S median −1.0 / −2.0 points. No serious TEAEs; no discontinuations on drug (2 on placebo). <span class="ev interp">INTERPRETATION</span> The headline numbers are <strong>within-group changes from baseline</strong> in a 14-day, unpowered study — ADHD trials carry large placebo responses, and the company itself notes the study was not designed to detect significant differences. The Phase 2 week-4 placebo-adjusted AISRS is the first real test.</td></tr>
+</tbody></table>
+<h3 style="margin:18px 0 10px">Regulatory status</h3>
+<p><span class="ev fact">FACT</span> Alixorexton: FDA Breakthrough Therapy designation for NT1 (Dec. 2025); Orphan Drug designation for narcolepsy (EC) and IH (FDA, Jun. 2026). No orexin NDA has been filed by Alkermes; Brilliance completion May 2027 (registry) implies a filing no earlier than late 2027 and approval no earlier than 2028, before any review-cycle risk. LUMRYZ: approved for narcolepsy (cataplexy or EDS in adults; pediatric expansion previously approved under Avadel) and sold under a REMS as a sodium oxybate; the IH sNDA is a filing event (YE 2026), not an approval event, and commercialization in IH is settlement-blocked to Mar. 2028. <span class="ev gap">GAP</span> No FDA correspondence (CRL history, RTFs) exists for the orexin program — it has not yet been filed anywhere.</p>
+</section>
+
+<section id="competition">
+<div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Competition: second into the orexin class, incumbent in oxybate</h2><p class="lede">Alixorexton enters a class that crystallized while it was in Phase 2: Takeda approved first, Lilly bought its way in for $6.3B, and Jazz defends the oxybate base that pays for everything. Differentiation claims are comparative pharmacology, not comparative data — no head-to-head trials exist anywhere in this section.</p></div></div>
+<table class="study-table"><thead><tr><th>Player / asset</th><th>Status</th><th>Differentiation vs Alkermes</th></tr></thead><tbody>
+<tr><td data-label="Player"><strong>Takeda — oveporexton (Orzeyful)</strong></td><td data-label="Status"><span class="ev fact">FACT</span> FDA-approved Aug. 5, 2026 for NT1 in adults — first-in-class OX2R agonist. Phase 2b published in NEJM (2025).</td><td data-label="Diff">Twice-daily dosing (second dose 3–5 hours after the first) vs alixorexton's once-daily Phase 2 regimen — Alkermes' main convenience claim. Same class AE signature (insomnia, pollakiuria, urgency, salivary hypersecretion). Takeda has first-mover prescriber position and the class-defining label; its earlier candidate TAK-994 died on hepatotoxicity, a class overhang for everyone.</td></tr>
+<tr><td data-label="Player"><strong>Eli Lilly — Centessa (cleminorexton)</strong></td><td data-label="Status"><span class="ev fact">FACT</span> Lilly acquired Centessa for $6.3B (early 2026); cleminorexton in Phase 2/3 across NT1/NT2/IH.</td><td data-label="Diff">The deepest-pocketed entrant, with the same three-indication sprawl as alixorexton. Lilly's primary-care and payer machinery is a commercial threat disproportionate to its current data. The acquisition price is also the market's loudest statement of what a winning orexin franchise might be worth — and it was paid for a pre-Phase-3-complete asset.</td></tr>
+<tr><td data-label="Player"><strong>Eisai (ledasorexton), Takeda (TAK-360), others</strong></td><td data-label="Status"><span class="ev fact">FACT</span> Phase 2 programs in NT2/IH per the <em>Nature Reviews Drug Discovery</em> competitive table (2026).</td><td data-label="Diff">The class will have 4–5 credible entrants by the time alixorexton could launch (~2028). Crowding compresses the NT2/IH opportunity that alixorexton's breadth thesis depends on.</td></tr>
+<tr><td data-label="Player"><strong>Jazz — XYREM / XYWAV</strong></td><td data-label="Status"><span class="ev fact">FACT</span> Incumbent oxybate franchise; XYWAV approved in narcolepsy and IH.</td><td data-label="Diff">LUMRYZ's once-nightly dosing is the differentiator against twice-nightly XYREM and low-sodium XYWAV. The settlement that bars LUMRYZ-IH marketing until Mar. 1, 2028 is Jazz's moat, bought in litigation. Longer term, orexin agonists (including Alkermes' own) threaten the entire oxybate class on convenience and safety — GHB-class drugs carry REMS and sodium/abuse baggage orexins do not.</td></tr>
+<tr><td data-label="Player"><strong>Legacy markets</strong></td><td data-label="Status"><span class="ev fact">FACT</span> VIVITROL: generic entry expected 2027 (company-stated); BRIXADI and oral naltrexone in addiction medicine. ARISTADA: Otsuka/Teva/Luye LAIs + generic risperidone LAI. LYBALVI: oral atypicals incl. generic olanzapine.</td><td data-label="Diff">Alkermes' legacy moat is its specialty salesforce and LAI manufacturing know-how, not molecule exclusivity — which is why the VIVITROL cliff, when it comes, is a revenue event, not a legal one.</td></tr>
+</tbody></table>
+<p class="source-note"><span class="ev interp">INTERPRETATION</span> The honest competitive statement: alixorexton has the broadest Phase 2-proven indication set in the class and a once-daily claim against the one approved rival — and is still second, racing Lilly's checkbook, with no comparative data. That is a real position, not a dominant one.</p>
+</section>
+<section id="financials">
+<div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Cash, debt, and the arithmetic of the Avadel deal</h2><p class="lede">Alkermes entered 2026 debt-free with ~$1.3B of cash and investments. It exits the Avadel transaction with $691.6M of liquidity, $1.50B of term loans, a CVR liability, and a guided GAAP loss — while remaining adjusted-EBITDA positive. Both the leverage and the profitability are real; which one dominates depends on 2027–28 execution.</p></div></div>
+<table class="study-table"><thead><tr><th>Item</th><th>Value</th><th>Basis</th></tr></thead><tbody>
+<tr><td data-label="Item">Cash &amp; equivalents</td><td data-label="Value"><strong>$511.5M</strong></td><td data-label="Basis">Jun. 30, 2026 (10-Q)</td></tr>
+<tr><td data-label="Item">Short-term + long-term investments</td><td data-label="Value"><strong>$180.1M</strong> ($145.0M + $35.1M)</td><td data-label="Basis">Jun. 30, 2026 (10-Q) → total cash + investments ≈ $691.6M</td></tr>
+<tr><td data-label="Item">Term loans</td><td data-label="Value"><strong>$1,503.1M</strong></td><td data-label="Basis">Term Loan A $739.4M (due Feb. 2031) + Term Loan B $763.7M (due Aug. 2031); $26.5M current portion. Drawn $1.525B at the Feb. 12, 2026 closing. Aug. 12, 2026 Amendment No. 1 cut spreads (TLA now SOFR + 1.75–2.25%)</td></tr>
+<tr><td data-label="Item">Contingent consideration (CVR)</td><td data-label="Value"><strong>$136.3M</strong> (liability, fair value)</td><td data-label="Basis">Jun. 30, 2026; rose $26.4M in Q2 on the REVITALYZ win</td></tr>
+<tr><td data-label="Item">Shares outstanding</td><td data-label="Value"><strong>167,541,198</strong></td><td data-label="Basis">Jun. 30, 2026 (184,700,718 issued; 17,159,520 treasury). Q2 diluted WA shares 173.5M; FY2026 guided diluted ≈172.8M</td></tr>
+<tr><td data-label="Item">Market cap / EV</td><td data-label="Value"><strong>~$6.91B / ~$7.9B</strong></td><td data-label="Basis">167.54M × $41.22 (Oct. 16 close) = $6.91B; EV = mcap + $1,503.1M debt + $136.3M contingent consideration − $691.6M cash &amp; investments ≈ $7.85B (basic-share basis; ~$8.1B on diluted shares). Operating leases (~$69.5M) excluded — stated, not hidden</td></tr>
+<tr><td data-label="Item">Cash flow</td><td data-label="Value"><strong>H1 2026 OCF −$20.6M</strong></td><td data-label="Basis">vs +$249.0M in H1 2025; capex $12.2M → H1 FCF ≈ −$32.8M. Distorted by Avadel transaction/integration costs and deal timing — not a run-rate, but the deal consumed the cash machine's output for a half</td></tr>
+<tr><td data-label="Item">Buyback</td><td data-label="Value"><strong>$172.3M remaining</strong></td><td data-label="Basis">$400M program (Feb. 2024). Q1 2026: ~1.0M shares @ $27.82 avg ($27.7M); none repurchased in Q2 2026 — buyback paused around the levered deal</td></tr>
+</tbody></table>
+<h3 style="margin:20px 0 10px">FY2026 guidance (updated Jul. 28, 2026)</h3>
+<table class="study-table"><thead><tr><th>Line</th><th>Guide</th><th>Note</th></tr></thead><tbody>
+<tr><td data-label="Line">Total revenues</td><td data-label="Guide">$1,730–1,840M</td><td data-label="Note">Reiterated at Q2</td></tr>
+<tr><td data-label="Line">VIVITROL / LYBALVI / ARISTADA / LUMRYZ</td><td data-label="Guide">$460–480M / $380–400M / $365–385M / $315–335M</td><td data-label="Note">LUMRYZ = Feb. 12–Dec. 31 stub period only</td></tr>
+<tr><td data-label="Line">COGS / R&amp;D / SG&amp;A</td><td data-label="Guide">$320–340M / $445–485M / $890–930M</td><td data-label="Note">COGS includes ~$105M non-cash inventory step-up</td></tr>
+<tr><td data-label="Line">Amortization / net interest</td><td data-label="Guide">$75–85M / $75–85M</td><td data-label="Note">Both new at this scale, post-Avadel</td></tr>
+<tr><td data-label="Line">GAAP net loss</td><td data-label="Guide"><strong>($95)–($115)M</strong></td><td data-label="Note">Widened at Q2 from ($70)–($90)M on the CVR fair-value increase</td></tr>
+<tr><td data-label="Line">EBITDA / Adjusted EBITDA</td><td data-label="Guide">$75–95M / <strong>$370–410M</strong></td><td data-label="Note">Adj. EBITDA reiterated — the number the equity story actually trades on</td></tr>
+</tbody></table>
+<p><span class="ev interp">INTERPRETATION</span> Runway framing does not apply the way it does for pre-revenue biotech: Alkermes is self-funding at the adjusted level. The real financial questions are (1) how fast VIVITROL erodes from 2027, (2) whether LUMRYZ + LYBALVI growth covers that erosion plus ~$80M/yr of interest, and (3) whether Brilliance-era R&amp;D ($445–485M/yr and rising) leaves enough FCF to delever before the 2031 maturities. On current guidance the company treads water on GAAP and generates cash on an adjusted basis — there is no financing cliff before 2031, and no buyback support while leverage is worked down.</p>
+<p class="source-note">Sources: Q2 2026 10-Q (filed Jul. 28, 2026), FY2025 10-K (filed Feb. 25, 2026), Q2 2026 results 8-K exhibit (accession 0001193125-26-318844), Aug. 12, 2026 amendment 8-K (accession 0001193125-26-345901).</p>
+</section>
+
+<section id="catalysts">
+<div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>What moves the stock, and how firm the dates are</h2><p class="lede">Date quality is tagged per the library standard: HARD (fixed/announced date), GUIDANCE (company window), INFERRED (derived from registry timing or cadence).</p></div></div>
+<div class="stack">
+<article class="asset"><div class="asset-head"><div><h3>Vibrance-3 (alixorexton, IH) topline</h3><div class="asset-meta">Phase 2, n≈126 · primary ESS at week 8 · registry completion Nov. 2026</div></div><span class="prob mid">By YE 2026 · GUIDANCE</span></div>
+<p>The nearest pipeline binary. A clean IH win completes the three-indication Phase 2 sweep and firms the Brilliance-era label ambition; a miss hits the "breadth" thesis that distinguishes alixorexton from oveporexton.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>LUMRYZ IH sNDA filing</h3><div class="asset-meta">On positive REVITALYZ data</div></div><span class="prob high">By YE 2026 · GUIDANCE</span></div>
+<p>A filing, not an approval — and approval, whenever it lands, cannot be marketed in IH until Mar. 1, 2028 (settlement). Treat headline pops carefully: the revenue is 2028 regardless.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>Q3 2026 earnings</h3><div class="asset-meta">First full quarter of LUMRYZ + legacy reporting under the new CEO</div></div><span class="prob mid">Late Oct. 2026 · INFERRED</span></div>
+<p>Watch: LUMRYZ trajectory vs the $315–335M stub guide, VIVITROL gross-to-net ahead of the 2027 generic year, and whether the paused buyback resumes.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>Sleep Europe 2026 presentations</h3><div class="asset-meta">Alixorexton / LUMRYZ datasets</div></div><span class="prob high">Oct. 21–23, 2026 · HARD</span></div>
+<p>Congress detail (company-announced Oct. 13, 2026) — incremental data color, not new binaries.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>Brilliance NT1/NT2 Phase 3 toplines</h3><div class="asset-meta">Registry primary completion May 2027</div></div><span class="prob mid">H2 2027 · INFERRED</span></div>
+<p>The decisive events for the whole thesis. Also in 2027: ALKS 7290 Phase 2 ADHD topline (registry completion Jul. 2027) · INFERRED.</p></article>
+<article class="asset"><div class="asset-head"><div><h3>VIVITROL generic entry; LUMRYZ IH launch window</h3><div class="asset-meta">Licensed entry under Teva settlement; IH marketing bar lifts Mar. 1, 2028</div></div><span class="prob high">2027 / Mar. 2028 · GUIDANCE / HARD</span></div>
+<p>The two dated structural events. Generic erosion speed in 2027 and the IH launch in 2028 bracket alixorexton's arrival — the sequencing of the whole equity story.</p></article>
+</div>
+</section>
+<section id="scenarios">
+<div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario ranges authorized for this library. Method: equity-value builds per scenario, divided by a fixed fully-diluted share count of ~173M (treasury method; Q2 2026 diluted WA 173.5M, company-guided FY2026 diluted ≈172.8M). Net obligations held at the Jun. 30, 2026 level (~$948M = $1,503.1M debt + $136.3M contingent consideration − $691.6M cash &amp; investments) for comparability; deleveraging would shift value from EV to equity over time. Reference price $41.22 (Oct. 16, 2026 close). Street context: consensus average target ~$56–59, high $83 (Jefferies) — the bull range below stays inside the street's high.</p></div></div>
+<div class="scenario-grid">
+<article class="scenario bear"><div class="scenario-top"><span>Bear</span><strong>$25–31</strong></div>
+<p><strong>Assumptions:</strong> Vibrance-3 misses or is equivocal; Brilliance NT2 fails on ESS and alixorexton launches (if at all) as a weak NT1 #2 behind oveporexton; VIVITROL erodes faster than the licensed-entry glide path from 2027; LUMRYZ loses share to XYWAV and class-switching to orexins; adjusted EBITDA compresses toward ~$275M and the multiple de-rates.</p>
+<p class="math">Equity value $4,325–5,363M ÷ 173M FD shares = <strong>$25.00–31.00</strong>. (Implied EV $5.27–6.31B after adding back ~$948M net obligations.)</p></article>
+<article class="scenario base"><div class="scenario-top"><span>Base</span><strong>$44–53</strong></div>
+<p><strong>Assumptions:</strong> Guidance delivered in 2026; VIVITROL declines on the managed licensed-entry path while LYBALVI and LUMRYZ growth roughly offset it; Vibrance-3 positive and Brilliance reads out in 2027 broadly in line with Phase 2, producing 2028 approvals in NT1/NT2 with alixorexton taking a solid #2 share on once-daily convenience; 7290 Phase 2 is positive but unpriced; adjusted EBITDA rebuilds toward ~$450M by 2028 and debt amortizes on schedule.</p>
+<p class="math">Equity value $7,612–9,169M ÷ 173M FD shares = <strong>$44.00–53.00</strong>. (Implied EV $8.56–10.12B.)</p></article>
+<article class="scenario bull"><div class="scenario-top"><span>Bull</span><strong>$64–80</strong></div>
+<p><strong>Assumptions:</strong> Alixorexton becomes the orexin class leader across NT1/NT2/IH — once-daily wins the convenience argument, Phase 3 reproduces Lancet-grade effect sizes, and the LUMRYZ prescriber base converts into launch share; ALKS 7290 Phase 2 hits on placebo-adjusted AISRS, opening ADHD as a second franchise; VIVITROL erosion is shallow; deleveraging plus a resumed buyback compounds per-share value.</p>
+<p class="math">Equity value $11,072–13,840M ÷ 173M FD shares = <strong>$64.00–80.00</strong>. (Implied EV $12.02–14.79B; top of range below the street's $83 high target.)</p></article>
+</div>
+<p class="source-note"><span class="ev interp">INTERPRETATION</span> The current $41.22 sits below the base range and well above bear — the market is paying for the commercial base plus a meaningful, but not full, probability on the orexin franchise. The gap between base and bull is almost entirely alixorexton share and 7290; the gap between base and bear is almost entirely VIVITROL erosion speed and NT2 execution.</p>
+</section>
+
+<section id="management">
+<div class="section-head"><div class="section-num">10 / PEOPLE</div><div><h2>Management &amp; insider signals</h2><p class="lede">A founder succession in the middle of a levered transformation: the strategy (Avadel, orexin) was set under Richard Pops and is now executed by his chosen successor. Track record is genuinely strong on drug development and genuinely mixed on value timing — the Avadel premium was paid at the top of the orexin news cycle.</p></div></div>
+<div class="fail-grid">
+<article><h3>The transition</h3><p><span class="ev fact">FACT</span> Richard Pops, CEO since 1991, retired as CEO Jul. 31, 2026 and remains Chairman and advisor (announced with the FY2025 results, Feb. 25, 2026). Blair Jackson — previously EVP, Chief Business Officer and then COO, and the executive most associated with the business-development strategy — became CEO Aug. 1, 2026. Anne C. Whitaker joined the board Sep. 14, 2026. There was no activist rupture and no strategy reset announced with the handover; the orexin/Avadel strategy is continuity, owned by both men.</p></article>
+<article><h3>Track record</h3><p><span class="ev fact">FACT</span> Under Pops, Alkermes converted a drug-delivery company into a four-brand commercial neuroscience business: VIVITROL (2006), ARISTADA (2015), LYBALVI (approved May 2021, after a 2020 complete response letter on manufacturing matters), plus the Biogen VUMERITY collaboration. The Avadel acquisition (Feb. 2026, $21.00/share + CVR, ~$2.09B cash outflow net of cash acquired) is the largest bet of the tenure: it bought immediate scale in the exact therapeutic area where alixorexton will launch. <span class="ev interp">INTERPRETATION</span> The deal logic is coherent; the price and the leverage are the critique, and both are now the new CEO's to defend.</p></article>
+<article><h3>Insider signals (EDGAR Form 4)</h3><p><span class="ev fact">FACT</span> Recent filings are routine in character: EVP/CLO David Gaffin sold 2,034 shares on Sep. 3, 2026 @ $48.01 and an identical 2,034 shares on Oct. 2, 2026 @ $41.03 — matching sizes in consecutive months, a pattern consistent with pre-arranged plan selling (plan status not confirmed from the filings reviewed). CFO Joshua Reed's Oct. 8, 2026 Form 4 shows an option-exercise acquisition of 9,164 shares (code M) with 4,069 shares withheld for taxes (code F) @ $40.11 — a settlement, not a market trade. No open-market purchases by insiders appear in the recent Form 4s reviewed. <span class="ev interp">INTERPRETATION</span> Neutral-to-mildly-negative signal set: no insider is buying the orexin story with personal capital at $41, but nothing in the flow suggests distress selling either.</p></article>
+<article><h3>Ownership &amp; governance</h3><p><span class="ev fact">FACT</span> Irish-incorporated plc with a U.S. listing; ~95% institutional ownership per aggregator data. The CVR structure from the Avadel deal ($1.50/share maximum, milestone-contingent; $136.3M fair value at Jun. 30) means former Avadel holders remain economically exposed to the IH outcome — an alignment footnote, not a governance issue. <span class="ev gap">GAP</span> Beneficial-ownership detail (13F/13G holders) was not re-verified for this dossier.</p></article>
+</div>
+</section>
+
+<section id="risks">
+<div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Red flags, ranked</h2><p class="lede">Ranked by expected value impact, not by headline drama. The top three are all dated, knowable, and already visible in the filings.</p></div></div>
+<div class="risk-list">
+<article><span>1</span><div><h3>VIVITROL generic entry, 2027</h3><p><span class="ev fact">FACT</span> The company expects generic entry in 2027 on ~$470M of annual sales, under a confidential Teva license whose royalty/economics are undisclosed. Erosion speed is the single largest 2027 P&amp;L unknown, and it arrives the same year Brilliance spend peaks. A pending antitrust class action over the VIVITROL patent's listing adds legal overhang to the same asset.</p></div></article>
+<article><span>2</span><div><h3>Leverage is new and the cushion is thinner than it looks</h3><p><span class="ev fact">FACT</span> $1,503.1M of term loans against $691.6M of cash &amp; investments; guided net interest $75–85M/yr; H1 2026 operating cash flow was negative (−$20.6M) in a deal-distorted half. Maturities are 2031 — this is not a liquidity risk today — but a 2027–28 downside case (fast VIVITROL erosion + an orexin stumble) would meet a levered balance sheet with the buyback already paused.</p></div></article>
+<article><span>3</span><div><h3>Second-to-market in the class that carries the valuation</h3><p><span class="ev fact">FACT</span> Oveporexton approved Aug. 2026; alixorexton cannot file before late 2027 on registry timing. Lilly/Centessa and Eisai crowd NT2/IH. If once-daily convenience does not translate into share, the growth asset is worth a fraction of what the current EV embeds.</p></div></article>
+<article><span>4</span><div><h3>Phase 2 → Phase 3 translation risk, incl. class hepatotoxicity prior</h3><p><span class="ev fact">FACT</span> Vibrance trials were 6–8 weeks; Brilliance runs 12 weeks in larger, less-selected populations, with ESS fragility already visible in NT2 (significant only at 18 mg). The class's TAK-994 liver failure means any hepatic signal in the larger database is program-threatening.</p></div></article>
+<article><span>5</span><div><h3>LUMRYZ encumbrances: IH blocked to Mar. 2028; CVR cost rises with success</h3><p><span class="ev fact">FACT</span> The IH indication — the growth case for the acquired asset — cannot be marketed for ~17 months after the sNDA filing window, and the contingent consideration liability already rose $26.4M in one quarter because REVITALYZ succeeded (carrying value $136.3M vs a $1.50/share CVR cap).</p></div></article>
+<article><span>6</span><div><h3>Royalty decay and partner dependence</h3><p><span class="ev fact">FACT</span> INVEGA royalties and VUMERITY manufacturing/royalty income (~$291M in FY2025) are declining streams controlled by J&amp;J and Biogen respectively; RISPERDAL CONSTA manufacturing has ended. Nothing in Alkermes' control replaces them except the orexin program.</p></div></article>
+<article><span>7</span><div><h3>Accounting noise obscures the underlying trend</h3><p><span class="ev fact">FACT</span> Guided FY2026 GAAP net loss of $95–115M vs adjusted EBITDA of $370–410M. Inventory step-up (~$105M in 2026), $75–85M amortization, CVR fair-value swings and transaction costs will keep reported results volatile and headline-hostile through 2027; investors relying on GAAP screens will misread this company in both directions.</p></div></article>
+<article><span>8</span><div><h3>Succession execution</h3><p><span class="ev interp">INTERPRETATION</span> A first-time CEO inherits the largest integration and the pivotal trial program simultaneously, three months into the job at the time of writing. The risk is not the individual — Jackson ran operations — it is the concentration of bet-the-company execution in a transition year.</p></div></article>
+</div>
+<p class="source-note">Open questions: Teva license economics for generic VIVITROL (undisclosed); Brilliance Study 304 design detail; Vibrance-3 exact readout timing within Q4 2026; whether the buyback resumes in Q3/Q4 2026; 13G holder detail. Each is flagged GAP where it appears above.</p>
+</section>
+
+<section id="sources">
+<div class="section-head"><div class="section-num">12 / SOURCES</div><div><h2>References</h2><p class="lede">Ordered by the library's source hierarchy: SEC first, then regulators/registries, peer-reviewed literature, company releases, trade press.</p></div></div>
+<ol class="refs">
+<li>SEC EDGAR — Alkermes plc (CIK 1520262) submissions record and company_tickers.json: identity, file no. 001-35299, EIN 98-1007018, Dublin HQ. Accessed Oct. 16, 2026.</li>
+<li>Form 10-Q for the quarter ended Jun. 30, 2026 (filed Jul. 28, 2026; accession 0001193125-26-319022): Q2/H1 product sales, manufacturing &amp; royalty detail, Avadel acquisition accounting (Note 3), balance sheet, debt, share counts, buyback, legal matters.</li>
+<li>Form 10-K for FY2025 (filed Feb. 25, 2026; accession 0001193125-26-068925): FY2025 revenue by product and royalty stream, VIVITROL generic-entry expectation and Teva settlement, competitive sets, orexin biology framing, CEO succession announcement.</li>
+<li>Form 8-K, Q2 2026 results exhibit (Jul. 28, 2026; accession 0001193125-26-318844): updated FY2026 guidance incl. product guides, EBITDA/adjusted EBITDA, inventory step-up estimate.</li>
+<li>Form 8-K (Aug. 12, 2026; accession 0001193125-26-345901): Credit Agreement Amendment No. 1 — term-loan repricing.</li>
+<li>Form 8-K (Jul. 6, 2026; accession 0001193125-26-298004): termination of Amneal authorized-generic supply agreement for VIVITROL (Item 1.02).</li>
+<li>Form 8-K (Sept. 21, 2026; accession 0001193125-26-396065): ALKS 7290 Phase 1b topline (Item 8.01); full release via Business Wire, Sept. 21, 2026 (n=50; AISRS/CGI-S medians; not powered for efficacy).</li>
+<li>Form 8-K (Sept. 14, 2026; accession 0001193125-26-392527): Anne C. Whitaker board appointment (Item 5.02).</li>
+<li>Form 8-K / press release (May 12, 2026): LUMRYZ REVITALYZ Phase 3 topline in IH (ESS, PGI-C, IHSS all p&lt;0.0001; randomized-withdrawal, 104 participants in double-blind period); sNDA planned YE 2026; IH marketing restricted until Mar. 1, 2028 under prior settlement/license.</li>
+<li>SEC Form 4 filings (EDGAR): D. Gaffin, Oct. 2 and Sept. 3, 2026 (sales of 2,034 shares each, $41.03 / $48.01); J. Reed, Oct. 8, 2026 (code M 9,164; code F 4,069 @ $40.11); A. Whitaker, Oct. 7, 2026.</li>
+<li>ClinicalTrials.gov records (accessed Oct. 16, 2026): NCT06358950 (Vibrance-1), NCT06555783 (Vibrance-2), NCT06843590 (Vibrance-3), NCT07455383 and NCT07540897 (Brilliance NT1), NCT07502443 (Brilliance NT2), NCT07755410 (ALKS 7290-201).</li>
+<li>Alixorexton Vibrance-1 results, <em>The Lancet Neurology</em> (2026) — NT1 Phase 2 primary publication (MWT by dose; p-values as cited); company topline release for the same study.</li>
+<li>Bogan RK et al. Vibrance-2 poster, SLEEP 2026 (Jun. 14–17, 2026), Alkermes Medical Affairs — full NT2 efficacy/safety tables (MWT, ESS, PROMIS-Fatigue, BC-CCI, TEAEs) as cited in §05.</li>
+<li>Oveporexton Phase 2b in NT1, <em>New England Journal of Medicine</em> (2025); FDA approval of oveporexton (Orzeyful) for NT1, Aug. 5, 2026 — class validation and first-mover benchmark.</li>
+<li>Competitive landscape of OX2R agonists, <em>Nature Reviews Drug Discovery</em> news (2026) — Lilly/Centessa cleminorexton, Eisai ledasorexton, Takeda TAK-360, ALKS 4510 positioning.</li>
+<li>Alkermes press releases via Business Wire: Vibrance-2 topline (Nov. 12, 2025); alixorexton Breakthrough Therapy designation (Jan. 6, 2026); Sleep Europe 2026 presentations (Oct. 13, 2026, via BioSpace).</li>
+<li>Market data: Finnhub (Oct. 16, 2026 close $41.22; prior close $40.10 on Oct. 15; 52-week range $27.00–$55.67). Analyst targets: StockAnalysis/MarketBeat/TipRanks aggregations (consensus avg ~$56–59; Jefferies high $83; Stifel $63, Oct. 5, 2026) — third-party aggregations, cited for street context only.</li>
+<li>Trade press (context, flagged where used): Fierce Biotech on ALKS 7290 ("company changer" remark attributed to CEO Blair Jackson); Zacks Q2 2026 recap (guidance confirmation, Vibrance-3 timing); TipRanks coverage of the Sept. 2026 pipeline update.</li>
+</ol>
+<p class="source-note">As-of date: October 16, 2026. Filings used: FY2025 10-K; Q2 2026 10-Q; 8-Ks of May 12, Jul. 6, Jul. 28, Aug. 12, Sept. 14 and Sept. 21, 2026. No unpublished or non-public information is used anywhere in this dossier.</p>
+</section>
+</main>
+<footer><strong>ALKS · Alkermes plc</strong> — Deep-dive dossier, as of October 16, 2026. For research only; not investment advice. Scenario ranges are illustrative and authorized only for this library batch.</footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>

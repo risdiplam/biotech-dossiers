@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>APMD — Apnimed · Deep-Dive Dossier · 2026-10-16</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · APMD</span><span class="stamp">Deep-dive dossier · October 16, 2026</span></div>
+        <h1>Two positive Phase 3s. One FDA question: is a better AHI a better patient?</h1>
+        <p class="hero-dek">Apnimed's Oxnimbi (AD109) would be the first oral drug aimed at the neuromuscular cause of obstructive sleep apnea. The pivotal data are statistically strong and tolerability-limited; the PDUFA review turns on an endpoint-meaningfulness question the FDA raised before the NDA was even filed.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$18.25</div>
+        <div class="quote-label">Fixed market snapshot · Oct 15, 2026 close (MarketBeat/Webull)</div>
+        <div class="quote-meta"><strong>~$437M</strong> est. enterprise value (basic bridge) · <strong>~$8.97</strong> pro-forma cash per share<br>$760M implied equity (41.62M shares) · ~$373M est. pro-forma cash</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A regulatory binary, not a data binary</h2><p class="lede">Apnimed, Inc. (Nasdaq: APMD; SEC CIK 1745648), incorporated in Delaware in June 2017 and headquartered in Cambridge, Massachusetts, is a single-asset, late-stage company. Its only clinical candidate, AD109 — proposed brand name Oxnimbi, conditionally approved by the FDA in May 2025 — has already succeeded in two Phase 3 trials. What remains is whether the FDA accepts the size and kind of benefit demonstrated as clinically meaningful at the February 28, 2027 PDUFA date.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Single swing factor</div><div class="big">Feb 28, 2027</div><p><span class="ev fact">FACT</span> PDUFA goal date for the Oxnimbi NDA (submitted April 2026, accepted July 2026). At the pre-NDA meeting the FDA questioned the clinical meaningfulness of the endpoint results and the limitations of the patient-reported outcomes. <span class="ev interp">INTERPRETATION</span> Approval, label breadth, and timing all price off how that exchange resolves.</p></article>
+        <article class="decision"><div class="tag">Est. enterprise value</div><div class="big">~$437M</div><p><span class="ev interp">INTERPRETATION</span> $759.6M basic market cap (41,623,183 shares × $18.25, Oct 15, 2026 close) less ~$373.2M estimated pro-forma cash, plus $40.3M term-loan fair value and $10.0M revenue-interest liability (both June 30, 2026). Cash is estimated — see Financials.</p></article>
+        <article class="decision warn"><div class="tag">Tolerability signal</div><div class="big">21–29%</div><p><span class="ev fact">FACT</span> Adverse-event discontinuation on AD109 across the two Phase 3 trials (21.2% SynAIRgy; 23.7% at month 6 and 28.6% at month 12 in LunAIRo) versus 3.1–10.0% on placebo. Efficacy is real; staying on the drug is the commercial question inside the regulatory one.</p></article>
+        <article class="decision"><div class="tag">Cash position</div><div class="big">~$373M est.</div><p><span class="ev fact">FACT</span> $172.8M cash at June 30, 2026 (Q2 10-Q) plus ~$200.4M net IPO proceeds (closed August 2026). <span class="ev interp">INTERPRETATION</span> The company is funded through the PDUFA and into launch preparation — but its own filing frames runway as "at least twelve months" from September 8, 2026, and launch spending is rising.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>Why the bull case is not just "first pill wins"</h3><ul><li>Both registrational trials met the primary endpoint under the conservative treatment-policy estimand, with placebo-adjusted AHI reductions and consistent oxygenation gains (hypoxic burden, ODI).</li><li>The treated population is the one devices cannot hold: adults who failed or refused positive airway pressure (PAP), across mild, moderate and severe disease, obese and non-obese — a segment tirzepatide's obesity-restricted label does not reach.</li><li>The balance sheet was rebuilt in one year: $100M from selling the Shionogi joint-venture stake, a $50M credit tranche, and a $220.8M gross IPO — the PDUFA is not a financing event.</li><li>Management has done this before: the CEO took over in June 2026 after co-founding and selling Longboard Pharmaceuticals.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the data do not remove</h3><ul><li>The absolute AHI separation in SynAIRgy was −4.0 events/hour versus placebo; the patient-reported fatigue endpoint missed in the intent-to-treat analysis (p=0.059) and sleep-related impairment showed no treatment effect. The FDA's meaningfulness question is specific, documented, and unanswered in public.</li><li>Roughly one in four patients stops the drug for adverse events in the first year. On-treatment effects (up to −55.6% AHI) describe the patients who stay.</li><li>There is no second clinical asset. The pipeline behind Oxnimbi is preclinical and exploratory.</li><li>Lender economics ride on approval: a revenue interest on Oxnimbi sales and two further $50M loan tranches keyed to approval and sales targets.</li></ul></article>
+      </div>
+      <p class="source-note">Identity: <a href="https://www.sec.gov/files/company_tickers.json" target="_blank" rel="noopener">SEC company_tickers registry (APMD — Apnimed, Inc., CIK 1745648)</a>. Prospectus: <a href="https://www.sec.gov/Archives/edgar/data/1745648/000119312526328422/apmd_424b4.htm" target="_blank" rel="noopener">Form 424B4, July 31, 2026</a>. Financials: <a href="https://www.sec.gov/Archives/edgar/data/1745648/000119312526385356/apmd-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q (filed Sept. 8, 2026)</a>.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>A July IPO that priced the approval in, then halved the premium</h2><p class="lede">Apnimed priced an upsized IPO at $16.00 on July 31, 2026 and closed its first session at $25.00. By October 15 the stock was $18.25 — above the IPO price, roughly 48% below its $35.29 post-IPO high — with the entire market value still resting on one regulatory decision four months out.</p></div></div>
+      <div class="metric-stack" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)">
+        <div class="metric"><b>$220.8M</b><span>Gross IPO proceeds · 13,800,000 shares at $16.00 incl. full 1.8M overallotment (closed Aug 3, 2026) · FACT (10-Q Note 17)</span></div>
+        <div class="metric"><b>~$200.4M</b><span>Net IPO proceeds after discounts and expenses · FACT (10-Q)</span></div>
+        <div class="metric"><b>$759.6M</b><span>Basic market cap · 41,623,183 shares × $18.25 (Oct 15, 2026 close) · matches vendor market-cap prints (~$759.6M, Webull)</span></div>
+        <div class="metric"><b>$35.29 / $16.12</b><span>Post-IPO high / low (vendor data, Oct 2026) · the stock has traded both sides of the approval question in ten weeks</span></div>
+      </div>
+      <div class="readthrough"><strong> tape since listing.</strong> <span class="ev fact">FACT · MARKET DATA</span> Selected closes (MarketBeat price history): Jul 31, 2026 $25.00 · Sep 22 $25.51 · Sep 29 $23.90 · Oct 1 $22.54 · Oct 5 $21.75 · Oct 9 $18.52 · Oct 13 $17.83 · Oct 14 $17.23 · Oct 15 $18.25 (+5.92%). <span class="ev interp">INTERPRETATION</span> The September 8 Q2 report — headline "profit" built entirely from one-time gains (see Financials) — did not hold the post-IPO premium; the drift into October is a slow de-rating toward the binary, not a reaction to new clinical or regulatory information, because there has been none since the NDA acceptance.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">AUG 25, 2026</span><h3>Street initiates high</h3><p><span class="ev unverified">UNVERIFIED · AGGREGATOR</span> Cantor Fitzgerald overweight, $60 target; BofA buy, $41; LifeSci outperform, $50 (via MarketBeat/press summaries). Consensus average ~$50.33 — the reference ceiling for this dossier's bull case.</p></article>
+        <article><span class="event-mark">SEP 8, 2026</span><h3>First report as a public company</h3><p><span class="ev fact">FACT</span> Q2 2026 10-Q and earnings: net income of $125.9M for the quarter is an accounting artifact of the Shionogi disposition and a liability reversal, not product economics (there is no product).</p></article>
+        <article><span class="event-mark">FEB 28, 2027</span><h3>The only price-setting event</h3><p><span class="ev fact">FACT</span> PDUFA goal date. Everything between now and then — lock-up expiry mechanics, Q3 reporting, launch hiring — is positioning around it.</p></article>
+      </div>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>The disease chain — and the two switches the drug flips</h2><p class="lede">Obstructive sleep apnea is recurrent collapse of the pharyngeal airway during sleep. Anatomy loads the gun, but the trigger is neuromuscular: the dilator muscles that hold the airway open — above all the genioglossus — lose their drive as sleep deepens. Oxnimbi is pharmacology aimed at that drive, not at the anatomy.</p></div></div>
+      <div class="science-chain" aria-label="OSA disease mechanism">
+        <article><b>01</b><h3>Airway collapsibility</h3><p>Fat deposition, craniofacial structure and fluid shifts narrow the pharynx. Most patients also carry non-anatomic traits — low arousal threshold, high loop gain, and poor dilator-muscle responsiveness — in differing proportions.</p></article>
+        <article><b>02</b><h3>NREM: noradrenergic withdrawal</h3><p>Genioglossus activity falls in NREM sleep mainly because excitatory noradrenergic input is withdrawn (disfacilitation). Animal work showed restoring that input at the hypoglossal motor nucleus largely restores muscle activity.</p></article>
+        <article><b>03</b><h3>REM: muscarinic inhibition</h3><p>In REM sleep, acetylcholine acting at muscarinic receptors on hypoglossal motor neurons actively inhibits genioglossus activation — a second, pharmacologically distinct brake that a noradrenergic drug alone cannot release.</p></article>
+        <article><b>04</b><h3>Events, hypoxia, arousals</h3><p>The result is apneas and hypopneas (the AHI count), intermittent hypoxia (captured by hypoxic burden and oxygen desaturation index), and sleep fragmentation — the pathway to the cardiovascular, metabolic and neurocognitive consequences associated with OSA in epidemiologic cohorts.</p></article>
+      </div>
+      <div class="moa-box"><h3>The combination in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> Two old pharmacologies, combined on purpose. Atomoxetine (long marketed for ADHD) blocks norepinephrine reuptake, replacing the excitatory signal the tongue muscle loses in NREM sleep. Aroxybutynin — a refined form of the bladder drug oxybutynin — blocks the muscarinic brake that silences the same muscle in REM sleep. Taken once at bedtime, the pair is designed to keep the upper airway's main dilator switched on through the whole night.</p><p><strong>Technical.</strong> Fixed-dose tablet of aroxybutynin 2.3 mg / atomoxetine 75 mg (stated as free-base equivalents of 2.5 mg aroxybutynin hydrochloride / 85.7 mg atomoxetine hydrochloride; a 37.5 mg atomoxetine dose level was also studied). Atomoxetine is a selective norepinephrine transporter inhibitor increasing noradrenergic drive to hypoglossal motor neurons; aroxybutynin is an antimuscarinic that attenuates cholinergic inhibition at the same motor pool and, in the Phase 2 data, also blunted atomoxetine's arousal/sleep-disrupting effects. The mechanism addresses one OSA endotype — dilator-muscle compensation — and does not modify anatomy, loop gain, or arousal threshold directly.</p></div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Foundational human proof of concept</div><h3>One night, −63% AHI</h3><p><span class="ev fact">FACT</span> Taranto-Montemurro and colleagues (Brigham and Women's Hospital) gave atomoxetine 80 mg + oxybutynin 5 mg for a single night to 20 patients in a randomized crossover study: AHI fell ~63%, and genioglossus responsiveness to negative pressure rose from 2.2 to 6.3 %/cmH₂O (p&lt;0.001). This study — by Apnimed's co-founder and current CSO — is the scientific origin of the company; the key intellectual property is in-licensed from Brigham and Women's Hospital (BWH).</p><p class="source-note">Am J Respir Crit Care Med, 2019 · Frontiers in Sleep review, 2023 · BWH license per 424B4.</p></article>
+        <article class="paper-card"><div class="program-kicker">What the combination adds over atomoxetine alone</div><h3>The antimuscarinic is not ballast</h3><p><span class="ev fact">FACT</span> In the Phase 2 AD036 study (atomoxetine 80 mg + oxybutynin 5 mg, n=62), both the combination and atomoxetine alone reduced AHI (6.2 and 4.8 events/hour respectively), but only the combination improved ventilation at the arousal threshold and avoided the total-sleep-time reduction trend seen on atomoxetine alone (−26 minutes, p=0.06) — the empirical basis for keeping both components in the fixed-dose product the FDA is reviewing.</p><p class="source-note">Schweitzer et al., AD036 Phase 2, as reviewed in Brain Sciences, 2026 (AD109 neurobiology review).</p></article>
+      </div>
+      <div class="fail-grid" aria-label="Ways the mechanism could fail">
+        <article><h3>1 · Wrong endotype for many patients</h3><p>Patients whose OSA is dominated by anatomy, loop gain or arousal threshold rather than dilator-muscle failure have less for this drug to fix. The Phase 3 populations were unselected CPAP-failures, so the average effect dilutes whatever the responsive endotype achieves — and no validated endotype test exists to enrich prescribing.</p></article>
+        <article><h3>2 · AHI is a surrogate for what patients feel</h3><p>The mechanism demonstrably moves physiology. Whether a −4.0 events/hour placebo-adjusted separation (SynAIRgy, treatment-policy) converts into feeling and functioning better is exactly where the program's own patient-reported data are weakest — PROMIS Fatigue missed in ITT, sleep-related impairment did not separate at all.</p></article>
+        <article><h3>3 · The side-effect profile is the mechanism, continued</h3><p>Noradrenergic and antimuscarinic activity does not confine itself to the hypoglossal nucleus: dry mouth, insomnia, nausea and urinary hesitation are on-target effects elsewhere. One in five to one in four patients stopping therapy is the clinical expression of this — and it caps real-world effectiveness regardless of label.</p></article>
+        <article><h3>4 · Cardiovascular safety of a nightly noradrenergic</h3><p><span class="ev gap">GAP</span> Atomoxetine carries known heart-rate and blood-pressure effects from its ADHD use, in a disease population with elevated baseline cardiovascular risk. The Phase 3 program reported no drug-related serious adverse events, but the public record does not include a dedicated cardiovascular outcomes assessment; the FDA's label negotiations — warnings, monitoring language — are where residual concern would land.</p></article>
+      </div>
+      <p class="source-note">Mechanistic literature: Taranto-Montemurro et al., AJRCCM 2019 (PMID-indexed single-night study) · Chan et al. 2006 and Fenik et al. 2005 (animal hypoglossal neurobiology, via Frontiers in Sleep 2023) · <a href="https://www.frontiersin.org/journals/sleep/articles/10.3389/frsle.2023.1148282/pdf" target="_blank" rel="noopener">Frontiers in Sleep, 2023 — noradrenergic/antimuscarinic development review</a> · Brain Sciences, 2026 — targeting hypoglossal neurobiology (AD109 review).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Two registrational trials, one honest tension: effect vs persistence</h2><p class="lede">The Phase 3 program is unusually complete for a first-in-class indication — two randomized, double-blind, placebo-controlled trials, ~1,300 participants, mild-to-severe disease, pre-specified estimands reported both ways. Read the treatment-policy numbers as the regulatory case and the discontinuation rates as the commercial case; both are in the same tables.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card">
+          <div class="program-kicker">Registrational program · AD109 (Oxnimbi)</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Aroxybutynin 2.3 mg / atomoxetine 75 mg, once nightly</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> Both trials enrolled adults with mild, moderate or severe OSA who were intolerant of, or unwilling to use, PAP therapy. Primary endpoint in each: change from baseline in AHI (hypopneas scored at ≥4% desaturation) at week 26.</p>
+          <div class="status-row"><span class="pill">NDA accepted Jul 2026</span><span class="pill">PDUFA Feb 28, 2027</span><span class="pill">No drug-related SAEs in Ph3</span></div>
+          <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Evidence status</th></tr></thead><tbody>
+            <tr><td data-label="Study">SynAIRgy<br><small>NCT05813275</small></td><td data-label="Design">Phase 3, 26 weeks; 646 randomized at 69 centers (US/Canada); efficacy cohort 615 (302 AD109 / 313 placebo); median age 58; 49.3% female; median BMI 32.4; median baseline AHI 19.6 (35% mild / 42% moderate / 23% severe).</td><td data-label="Evidence">Primary met; peer-reviewed publication 2026 (Strollo et al.).</td></tr>
+            <tr><td data-label="Study">LunAIRo<br><small>NCT05811247</small></td><td data-label="Design">Phase 3, 52 weeks; 660 participants (US). Primary assessed at week 26; durability followed to week 51.</td><td data-label="Evidence">Primary met; week-51 effect maintained on-treatment, attenuated under treatment-policy by discontinuations and control-based imputation.</td></tr>
+            <tr><td data-label="Study">MARIPOSA (APC-005)<br><small>Phase 2b</small></td><td data-label="Design">209 participants, 4 weeks, four arms: AD109 2.5/75 mg, AD109 5/75 mg, atomoxetine 75 mg alone, placebo (doses as HCl salt basis).</td><td data-label="Evidence">Dose-finding; placebo-adjusted AHI reductions 47.1% (2.5 mg dose) and 42.9% (5 mg dose); the 2.5 mg dose advanced.</td></tr>
+            <tr><td data-label="Study">AD036 / early studies<br><small>Phase 2 and prior</small></td><td data-label="Design">Atomoxetine 80 mg + oxybutynin 5 mg (the precursor combination), incl. the n=62 AD036 trial and the n=20 single-night crossover.</td><td data-label="Evidence">Proof of mechanism; established the combination-over-monotherapy rationale.</td></tr>
+          </tbody></table>
+          <p class="source-note"><a href="https://clinicaltrials.gov/study/NCT05813275" target="_blank" rel="noopener">SynAIRgy registry</a> · <a href="https://clinicaltrials.gov/study/NCT05811247" target="_blank" rel="noopener">LunAIRo registry</a> · 424B4 clinical section.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">Phase 3 · week 26 · treatment-policy (ITT) estimand</div><h3>AHI reduction vs placebo</h3>
+          <div class="bar-set" aria-label="AHI percent reduction by trial and estimand">
+            <div class="bar-row"><div class="bar-label">SynAIRgy</div><div class="bar-track"><div class="bar-fill" style="width:79.4%"></div></div><div class="bar-value">−44.1%</div></div>
+            <div class="bar-row"><div class="bar-label">LunAIRo</div><div class="bar-track"><div class="bar-fill" style="width:60.7%"></div></div><div class="bar-value">−33.7%</div></div>
+            <div class="bar-row"><div class="bar-label">Syn. on-tx</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">−55.6%</div></div>
+            <div class="bar-row"><div class="bar-label">Lun. on-tx</div><div class="bar-track"><div class="bar-fill" style="width:84.2%"></div></div><div class="bar-value">−46.8%</div></div>
+          </div>
+          <p class="source-note"><span class="ev fact">FACT</span> Placebo arms: −17.6% (SynAIRgy) and −7.3% (LunAIRo), treatment-policy; p≤0.0001 for both primary comparisons (424B4). "On-treatment" describes participants who stayed on drug — a larger effect in a self-selected population, not the regulatory estimand.</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">The detail the FDA will weigh</div><h3 style="margin-top:6px">Absolute effect, responder rates, and the PRO miss</h3><p style="font-size:13px;margin:0 0 10px"><span class="ev fact">FACT</span> SynAIRgy absolute separation was −4.0 events/hour (95% CI −6.4 to −1.6; p=0.001) on a median baseline AHI of 19.6. Complete disease control (AHI &lt;5): 17.6% on AD109 vs 9.3% placebo (p=0.012) in SynAIRgy; 22.9% in LunAIRo (company topline). ≥50% AHI reduction: 38.3% (SynAIRgy). Hypoxic burden fell 44.7% / 37.4% (treatment-policy) and ODI improved significantly — but in SynAIRgy the formal testing hierarchy halted at the PROMIS Fatigue endpoint, which missed in ITT (p=0.059; on-treatment p=0.030), leaving some oxygenation endpoints nominal rather than formally significant; PROMIS Sleep-Related Impairment showed no treatment effect.</p></div>
+        </article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Tolerability is the program's tax</h3><p><span class="ev fact">FACT</span> AE-related discontinuation: SynAIRgy 21.2% (AD109) vs 3.1% (placebo); LunAIRo 23.7% vs 6.6% by month 6 and 28.6% vs 10.0% by month 12, with overall 12-month discontinuation 46.5% vs 25.1%. Most common events: dry mouth, insomnia, nausea, urinary hesitation — predominantly mild, early-onset.</p></article>
+        <article><h3>What the safety database does show</h3><p><span class="ev fact">FACT</span> No treatment-related serious adverse events or deaths in either Phase 3 trial. The safety profile is consistent from the single-night study through Phase 2b (MARIPOSA AE discontinuations 11% overall; 19% on atomoxetine alone) to Phase 3 — a stable, mechanism-typical profile rather than an emerging late signal.</p></article>
+        <article><h3>What remains unknowable pre-label</h3><p><span class="ev gap">GAP</span> Public data do not establish: long-term cardiovascular effects of nightly noradrenergic dosing in this population; persistence/adherence beyond trial conditions (where 46.5% had stopped by month 12 in LunAIRo); or efficacy in patients currently succeeding on PAP, who were not the studied population.</p></article>
+      </div>
+      <p class="source-note">Clinical sources: 424B4 (trial designs, estimand-level results, discontinuations) · SynAIRgy peer-reviewed publication, 2026 (Strollo et al.) and its summaries in <a href="https://www.drugtopics.com/view/investigational-oral-ad109-reduces-sleep-apnea-severity-by-44-" target="_blank" rel="noopener">Drug Topics</a> / <a href="https://www.pharmacytimes.com/view/fda-accepts-nda-for-ad109-to-treatment-of-adults-with-obstructive-sleep-apnea" target="_blank" rel="noopener">Pharmacy Times</a> · LunAIRo topline, company release via BioSpace/CHEST 2025 presentations (<span class="ev unverified">UNVERIFIED</span> where not yet in a filing or journal).</p>
+    </section>
+
+    <section id="regulatory">
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Accepted, dated — and pre-questioned</h2><p class="lede">The NDA was submitted in April 2026 and accepted in July 2026 with a standard 10-month review clock to February 28, 2027. Unusually, the central review dispute is already on the public record, because the company disclosed the pre-NDA feedback in its own prospectus.</p></div></div>
+      <div class="harbor-grid">
+        <article class="harbor-fact"><h3>What is established</h3><ul><li><span class="ev fact">FACT</span> NDA for Oxnimbi (adults with OSA) submitted April 2026; accepted for review July 2026; PDUFA goal date <b>February 28, 2027</b>.</li><li><span class="ev fact">FACT</span> Two adequate and well-controlled Phase 3 trials, both positive on the pre-specified primary endpoint — the conventional evidentiary basis for approval.</li><li><span class="ev fact">FACT</span> Proposed brand name Oxnimbi conditionally approved May 2025, reconfirmed June 2026.</li><li><span class="ev fact">FACT</span> No approved pharmacologic therapy targets the neuromuscular cause of OSA; the only drug approval in the indication is tirzepatide (Dec 2024), restricted to moderate-to-severe OSA in adults with obesity, as an adjunct to diet and activity.</li></ul></article>
+        <article class="harbor-gap"><h3>What is contested</h3><ul><li><span class="ev fact">FACT</span> At the pre-NDA meeting, the FDA gave feedback on "the clinical meaningfulness of certain endpoint results, including the primary endpoint and the limitations of the patient-reported outcomes," and indicated additional analyses and justification may be needed. The company responded within the NDA and expects to keep addressing it in review.</li><li><span class="ev gap">GAP</span> Whether an advisory committee will be convened has not been disclosed. For a first-in-class indication with a contested meaningfulness question, an AdCom is a live possibility, not a disclosed plan.</li><li><span class="ev gap">GAP</span> Label breadth is unresolved: the studied population was PAP-intolerant/unwilling adults; whether the label mirrors that, spans all adults with OSA, or carries severity or tolerability limitations will be decided in review.</li><li><span class="ev interp">INTERPRETATION</span> The realistic outcome distribution is wider than approve/reject: approval with a narrow or warning-heavy label, and a complete response letter asking for additional analyses (or data) on meaningfulness, are both credible paths — and they price very differently.</li></ul></article>
+      </div>
+      <p class="source-note">Regulatory facts: 424B4 (NDA timeline, pre-NDA feedback, brand name) · FDA acceptance release, July 2026, via <a href="https://www.biospace.com/press-releases/apnimed-announces-fda-acceptance-of-new-drug-application-for-ad109-an-investigational-oral-pill-to-treat-adults-with-obstructive-sleep-apnea-osa" target="_blank" rel="noopener">BioSpace</a> (<span class="ev unverified">UNVERIFIED</span> as a company release; the PDUFA date is corroborated across trade press and the prospectus).</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Competing against a machine, a hormone, and an implant — in different patients</h2><p class="lede">No competitor treats the same patient the same way. PAP is more effective per night used and fails on adherence; tirzepatide produces larger AHI reductions in a narrower, obese, moderate-to-severe population; the implant serves a selected surgical subset. Oxnimbi's differentiation is breadth and convenience, not maximal efficacy. Cross-trial comparisons below are population descriptions, not head-to-head claims — none exist.</p></div></div>
+      <div class="compare">
+        <article class="compare-card"><div class="program-kicker">Standard of care</div><div class="name">PAP / CPAP</div><dl><dt>Mechanism</dt><dd>Pneumatic splinting of the airway; near-complete event suppression while worn.</dd><dt>Clinical reality</dt><dd><span class="ev fact">FACT</span> Adherence in the literature runs ~30–60%; both Apnimed Phase 3 trials enrolled the patients PAP could not retain (66.8% intolerant, 33.3% refusing in SynAIRgy).</dd><dt>Implication</dt><dd>Oxnimbi does not need to beat PAP's efficacy; it needs to be good enough for the large population getting no effective therapy at all. Payer and guideline positioning will test exactly that claim.</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker">Approved drug · obesity-restricted</div><div class="name">Tirzepatide (Zepbound, Lilly)</div><dl><dt>FDA status</dt><dd><span class="ev fact">FACT</span> Approved Dec 20, 2024 for moderate-to-severe OSA in adults with obesity, with diet and activity.</dd><dt>Data</dt><dd><span class="ev fact">FACT</span> SURMOUNT-OSA (n=469, 52 weeks): AHI reduced ~20–24 events/hour vs placebo, remission (AHI &lt;5, or &lt;15 without symptoms) in 42–50%, weight loss 18–20% — in a moderate-to-severe, obese population with far higher baseline AHI than SynAIRgy's median 19.6.</dd><dt>Implication</dt><dd>In overlapping obese patients, tirzepatide treats the cause upstream and carries cardiometabolic benefits Oxnimbi does not. Outside obesity — a majority of the OSA population by the company's commissioned epidemiology — it is not an option. The two drugs partition the market more than they fight over it, at first.</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker">Device · surgical</div><div class="name">Hypoglossal stimulation (Inspire)</div><dl><dt>Mechanism</dt><dd>Implanted neurostimulator synchronizing tongue protrusion with respiration; established, reimbursed, growing procedure base.</dd><dt>Population</dt><dd>CPAP-intolerant moderate-to-severe patients meeting BMI and airway-anatomy criteria — a screened subset, with surgical risk and device cost.</dd><dt>Implication</dt><dd>An effective oral option plausibly sits before an implant in the treatment sequence for eligible patients — and the existence of an implant market proves payers will fund non-PAP therapy for this population. Inspire's market value (~$1.44B at Apnimed's IPO, per trade reports) is also a rough public anchor for what a scaled non-PAP franchise can be worth.</dd></dl></article>
+      </div>
+      <div class="readthrough"><strong>Also in the field.</strong> <span class="ev fact">FACT</span> Mandibular advancement oral appliances and upper-airway surgery serve smaller, selected populations with variable efficacy. <span class="ev fact">FACT</span> Other noradrenergic/antimuscarinic combinations were tried and did not advance — e.g., a single-night atomoxetine + fesoterodine study (n=12) did not reduce overall AHI. <span class="ev gap">GAP</span> No other late-stage oral neuromuscular candidate for OSA was identified in this review; the nearest pharmacologic threat is expansion of incretin labels and evidence, not a direct mechanistic rival.</div>
+      <p class="source-note">Competition sources: JAMA Otolaryngology–Head &amp; Neck Surgery, 2026 (GLP-1 RA review of OSA, incl. SURMOUNT-OSA and CPAP adherence ranges) · Lilly FDA approval, Dec 2024 (NEJM SURMOUNT-OSA) · Frontiers in Sleep, 2023 (failed/precursor combinations).</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>One asset, ranked honestly: there is nothing behind it yet</h2><p class="lede">Pipeline tables usually flatter. Here the ranking is the risk statement: a registrational-stage single asset, a contingent milestone receivable, a sold joint venture, and exploratory preclinical work that the prospectus itself describes as early-stage combination-therapy exploration.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">Oxnimbi (AD109) — OSA, adults</div><div class="pipe-desc">Aroxybutynin/atomoxetine fixed-dose, once nightly. NDA under review; PDUFA Feb 28, 2027. Carries effectively all of the company's value.</div></div><div class="pipe-status">NDA review</div></div>
+        <div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">SASS contingent milestone</div><div class="pipe-desc">One-time milestone receivable from the March–April 2026 sale of Apnimed's stake in Shionogi-Apnimed Sleep Science (SASS) to Shionogi — carried as a contingent asset at ~$9.9M fair value (June 30, 2026). Cash, not pipeline — but it is the second-largest identifiable value item after Oxnimbi.</div></div><div class="pipe-status">Receivable</div></div>
+        <div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">Preclinical sleep-breathing programs</div><div class="pipe-desc"><span class="ev gap">GAP</span> Exploratory combination-therapy approaches for sleep-related breathing disorders and related comorbidities. No candidate named, no IND timeline disclosed, no clinical value assignable today. The company also continues to perform services for SASS under a master services agreement (related-party revenue, non-core).</div></div><div class="pipe-status dead">Preclinical</div></div>
+        <div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">Territory note — SASS disposition</div><div class="pipe-desc"><span class="ev fact">FACT</span> In the SASS sale, exclusive licenses covering certain sleep-disorder compounds within the JV's scope were converted into perpetual, irrevocable, non-exclusive, royalty-free licenses for a specified product set. Oxnimbi itself remains Apnimed's asset; what was sold was the JV stake and its program rights, for $100.0M upfront — the transaction that funded the run to the IPO.</div></div><div class="pipe-status">Closed Apr 2026</div></div>
+      </div>
+      <p class="source-note">Pipeline and SASS facts: 424B4 (business + SASS disposition) · Q2 2026 10-Q Note disclosures (contingent asset $9,893K; gain on sale $85.4M).</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>One hard date dominates the calendar</h2><p class="lede">Date quality is tagged the house way: <span class="date-tag hard">Hard</span> a date fixed by a regulator or filing, <span class="date-tag guidance">Guidance</span> a company-guided window, <span class="date-tag inferred">Inferred</span> a date reasoned from mechanics or precedent — never presented as disclosed.</p></div></div>
+      <div class="timeline">
+        <div class="event primary"><div class="event-date">FEB 28, 2027 <span class="date-tag hard">Hard</span></div><div class="event-body"><b>PDUFA goal date — Oxnimbi NDA decision</b>The binary. Approval (and label breadth), a complete response letter, or an extension reprices the entire company. Watch first for any advisory-committee announcement and for mid/late-cycle FDA communications the company chooses to disclose.</div></div>
+        <div class="event"><div class="event-date">NOV 2026 <span class="date-tag inferred">Inferred</span></div><div class="event-body"><b>Q3 2026 report — first post-IPO balance sheet</b>Expected ~November 2026 on the September-reporting precedent (the Q2 10-Q was filed Sept 8, 2026); not a confirmed date. This filing resolves this dossier's pro-forma estimates: actual post-IPO cash, launch-spend trajectory, and any debt or revenue-interest movement.</div></div>
+        <div class="event"><div class="event-date">~JAN 27, 2027 <span class="date-tag inferred">Inferred</span></div><div class="event-body"><b>IPO lock-up expiry</b>The prospectus makes most pre-IPO shares eligible for sale beginning on the 181st day after the prospectus date — mechanics imply late January 2027, weeks before the PDUFA. Float expansion into a binary is a positioning risk, not a thesis input.</div></div>
+        <div class="event"><div class="event-date">2027 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Tranche B $50M term loan</b>Available on FDA authorization of Oxnimbi for OSA in any adult population (a defined milestone in the April 2026 credit agreement) — non-dilutive launch funding that only exists in the approval branch.</div></div>
+        <div class="event"><div class="event-date">BY JUN 30, 2028 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Tranche C $50M term loan test</b>Available if trailing-twelve-month net sales of BWH-licensed products reach $175M by June 30, 2028 — a contractual, dated marker for what lenders underwrote as a successful launch trajectory.</div></div>
+        <div class="event"><div class="event-date">ON APPROVAL <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Commercial launch</b>Proceeds use in the IPO allocated ~$237.8M (from offering proceeds and existing resources) to the regulatory process and, if approved, launch. G&amp;A already more than doubled year over year in Q2 2026 ($12.7M vs $5.4M) as the commercial build began — the spend is committed before the decision arrives.</div></div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario values are illustrative, assumption-labeled, and recomputed on treasury-method share counts at each scenario price (options: 9,617,884 at a blended $5.11 weighted-average strike; lender warrants: 100,163 at a nominal strike, counted in full). They are not recommendations or predictions. The bull case is deliberately capped below the street's ~$50.33 consensus average target.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear — CRL or value-destroying label</div><div class="pt">$4.00–$5.00</div><div class="soft">Soft range · equity $170–210M</div><ul><li>FDA issues a complete response letter on clinical-meaningfulness grounds, or approves a label too narrow/warning-heavy to support the launch build.</li><li>Value collapses toward net cash: ~$373M pro-forma cash + ~$10M contingent asset, less ~$150M of committed launch spend, remediation and wind-down burn, less $40.3M debt and $10.0M revenue-interest liability ≈ $183M at the build's center.</li><li>At these prices the options (WAEP ~$5.11) are at/out of the money; divisor ≈ 41.72M shares (basic + lender warrants). $183M ÷ 41.72M ≈ $4.38.</li></ul></article>
+        <article class="scen-card base"><div class="tag">Base — approval, workable label, slow build</div><div class="pt">$19.50–$23.50</div><div class="soft">Soft range · equity $950M–$1.15B</div><ul><li>Approval on or near Feb 28, 2027 with a label broadly matching the studied population; launch begins into the PAP-failure segment.</li><li>Revenue builds over years against real tolerability churn; Tranche B drawn; no takeout. Equity value roughly re-rates to the level the IPO's first session implied, on evidence rather than anticipation.</li><li>Divisor at ~$21 ≈ 49.0M treasury-method shares. $1,050M ÷ 49.0M ≈ $21.40.</li></ul></article>
+        <article class="scen-card bull"><div class="tag">Bull — approval + category creation</div><div class="pt">$38.00–$47.50</div><div class="soft">Soft range · equity $1.9–2.4B</div><ul><li>Clean label, strong early uptake, adherence better than trial discontinuation implied, and Oxnimbi becomes the default first pharmacologic step before devices in CPAP-intolerant patients; Tranche C's $175M sales test comes into view.</li><li>Takeout optionality by a larger sleep/respiratory or primary-care franchise is additive, not assumed.</li><li>Divisor at ~$42 ≈ 50.2M treasury-method shares. $2,100M ÷ 50.2M ≈ $41.85. Range top ($47.50) is held below the ~$50.33 street consensus average.</li></ul></article>
+      </div>
+      <div class="assump"><b>How to read the current price against these:</b> at $18.25 the market is paying $759.6M of basic equity value — just below the base case's floor — for a company whose cash and contingent asset cover roughly half of that. <span class="ev interp">INTERPRETATION</span> The tape is pricing a meaningful-but-not-certain approval probability with a label discount already applied; it is not pricing the bull case, and it leaves the bear case (−72% to −78%) fully exposed. That asymmetry is the position, in both directions.</div>
+      <p class="source-note">Scenario inputs: share counts and option strikes, 424B4 (Mar 31, 2026 basis) and 10-Q Note 17; cash and liabilities, Q2 2026 10-Q; consensus targets, MarketBeat aggregator (<span class="ev unverified">UNVERIFIED</span>). Arithmetic re-performed for this dossier; treasury method per house convention.</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>A rebuilt balance sheet, an accounting "profit," and lender economics on the label</h2><p class="lede">The June 30, 2026 balance sheet is a pre-IPO snapshot of a company that had just sold its joint venture and borrowed against its own approval. The IPO then added ~$200.4M of net proceeds. Everything forward — runway, launch funding, dilution — has to be built from those two steps, and the Q3 10-Q is the first document that will show them combined.</p></div></div>
+      <div class="fin-grid">
+        <div>
+          <div class="metric-stack">
+            <div class="metric"><b>$172.8M</b><span>Cash and equivalents · June 30, 2026 (10-Q) · FACT</span></div>
+            <div class="metric"><b>~$373.2M</b><span>Pro-forma cash · $172.8M + ~$200.4M net IPO proceeds (Aug 2026) · INTERPRETATION — before Q3 burn and any post-close payments; not a reported figure</span></div>
+            <div class="metric"><b>$40.3M + $10.0M</b><span>Term loan at fair value + revenue-interest liability · June 30, 2026 (10-Q) · FACT</span></div>
+            <div class="metric"><b>$37.9M</b><span>Operating cash use, H1 2026 (~$19M/quarter) · includes JV wind-down flows · FACT (10-Q cash flow)</span></div>
+          </div>
+          <div class="runway"><b>Funded through the decision; the launch is the next financing question</b><p><span class="ev fact">FACT</span> The 10-Q states that $172.8M plus IPO proceeds will fund operations "at least twelve months" from the September 8, 2026 financial-statement date — language paired with substantial-doubt going-concern disclosure for the pre-IPO period. <span class="ev interp">INTERPRETATION</span> At the H1 operating burn (~$19M/quarter) the pro-forma cash covers years; at a launch-year burn — G&amp;A already doubled year over year and the company pre-committed ~$237.8M to approval-plus-launch — the honest statement is narrower: the PDUFA and the first launch year are funded; sustained commercialization at scale likely requires Tranche B, revenue, or new capital.</p></div>
+        </div>
+        <div>
+          <table class="cap-table"><thead><tr><th>Share count (dated)</th><th>Shares</th><th>Basis</th></tr></thead><tbody>
+            <tr><td>Basic, post-IPO (Aug 3, 2026)</td><td>41,623,183</td><td>424B4 basis (Mar 31 counts) incl. full overallotment; 10-Q Note 17 confirms 13,800,000 IPO shares and conversion of preferred, Class B/C and convertible notes into 25,975,771 shares at closing</td></tr>
+            <tr><td>Options outstanding</td><td>9,617,884</td><td>6,796,259 @ $3.85 WAEP (Mar 31, 2026) + 2,821,625 @ $8.15 granted after Mar 31 → blended WAEP ~$5.11</td></tr>
+            <tr><td>Lender warrants (Apr 2026)</td><td>100,163</td><td>Nominal/cashless exercise, exp. Apr 2, 2036 — economically shares</td></tr>
+            <tr><td>Fully diluted @ $18.25 (treasury)</td><td>~48.65M</td><td>41.62M + 0.10M + 9.62M × (1 − 5.11/18.25) ≈ 41.62M + 0.10M + 6.92M</td></tr>
+            <tr><td>Reserved, unissued</td><td>8,869,948</td><td>2026 Plan 5,811,181 + ESPP 558,767 + 2026 Inducement Plan 2,500,000 (adopted Aug 21, 2026) — future dilution capacity, not current FD</td></tr>
+          </tbody></table>
+          <div class="overhang"><b>The P&amp;L is not what the headline says.</b> <span class="ev fact">FACT</span> H1 2026 "net income" of $193.7M and Q2's $125.9M comprise: a $85.4M gain on the SASS sale (on $100.0M upfront cash plus a ~$9.8M contingent-milestone asset), a $57.1M gain on reversal of a deposit liability, and $96.9M of related-party revenue (largely JV deferred-revenue recognition as the venture wound down; deferred revenue fell ~$93.5M in the period). Operating expenses were $40.6M in H1 (R&amp;D $18.0M, G&amp;A $19.2M, related-party service costs $3.4M). There is no product revenue and there has never been any. Anyone quoting APMD's "profitability" or P/E is quoting a disposition.</div>
+        </div>
+      </div>
+      <div class="readthrough"><strong>The credit agreement deserves its own read.</strong> <span class="ev fact">FACT</span> April 2026: lenders advanced a $50.0M Tranche A term loan (recorded at $40.3M fair value at June 30 under the fair-value option) at 3-month Term SOFR + 5.75%, with 100,163 warrants and a <b>revenue interest</b> — a low-single-digit percentage of annual net revenues up to $200M and below one percent on the $200–500M band, payable quarterly for up to ten years. Tranche B ($50M) unlocks on FDA approval; Tranche C ($50M) on $175M of trailing sales by June 30, 2028. <span class="ev interp">INTERPRETATION</span> This is approval-contingent, royalty-bearing leverage: cheap if the launch works, a fixed claim on the only asset if it doesn't, and a structural reason the equity's bull case is shared with lenders from the first dollar of sales.</div>
+      <p class="source-note">Financial sources: Q2 2026 10-Q (balance sheet, cash flow, Notes on credit agreement, warrants, SASS, IPO subsequent event) · 424B4 (offering terms, share counts, option strikes, use of proceeds ~$237.8M to regulatory + launch).</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>A new CEO with an exit behind him, a founder who became the science</h2><p class="lede">Leadership changed hands weeks before the IPO: a deliberate pre-launch succession from the founding physician-CEO to an operator whose last company was acquired — with the founder-scientist whose work created the asset still inside the building.</p></div></div>
+      <div class="people-grid">
+        <article class="paper-card"><h3>Principals</h3><dl class="people-list">
+          <dt>Kevin R. Lind — CEO (since June 2026)</dt><dd><span class="ev fact">FACT</span> Co-founder and former CEO of Longboard Pharmaceuticals, acquired by Lundbeck (deal value ~$2.6B, announced 2024) — a CNS development-and-exit track record directly relevant to a single-asset company approaching a regulatory/commercial inflection. Succeeded co-founder Lawrence G. Miller, M.D., who remains on the board.</dd>
+          <dt>Luigi Taranto-Montemurro, M.D. — Co-founder, CSO</dt><dd><span class="ev fact">FACT</span> Brigham and Women's / Harvard sleep researcher; first author of the 2019 single-night proof-of-concept study. The mechanism is his science, and the core IP is licensed from BWH.</dd>
+          <dt>Michael Kelly — CFO</dt><dd><span class="ev fact">FACT</span> Joined from Cantor Fitzgerald, where he was a managing director in life-sciences investment banking — a capital-markets CFO for a company whose next two years are capital-allocation decisions.</dd>
+          <dt>Operating bench</dt><dd><span class="ev fact">FACT</span> President/COO Dennis Molnar (ex-Paratek CEO); CMO John Cronin (ex-Philips Respironics CMO, sleep medicine); CCO Graham Goodrich (led the Nurtec ODT launch at Pfizer); Chief Regulatory &amp; Safety Officer Beth Weinberg (23 years at Eli Lilly). ~65 employees at IPO per vendor/company profiles (<span class="ev unverified">UNVERIFIED</span> for the headcount).</dd>
+        </dl></article>
+        <article class="paper-card"><h3>Insider and holder signals</h3><ul class="check-list">
+          <li><span class="ev fact">FACT</span> Holder base is concentrated pre-IPO venture capital: Morningside and Alpha Wave were the largest preferred holders, converting at the IPO (EDGAR 13G filings, Aug 6–7, 2026).</li>
+          <li><span class="ev unverified">UNVERIFIED · SECONDARY</span> Morningside bought a further 312,500 shares at the $16.00 IPO price on Aug 3, 2026, taking it to 7,152,713 shares (~17% of basic) per Form 4 summaries — an IPO allocation to an existing insider, supportive but not an open-market signal.</li>
+          <li><span class="ev fact">FACT</span> The August 2026 Form 4 cluster otherwise reflects IPO-date grants, conversions and vesting mechanics, not discretionary buying or selling.</li>
+          <li><span class="ev gap">GAP</span> No post-IPO open-market insider purchases at market prices were identified in this review. With the stock ~14% above IPO price and ~48% off its high, insider conviction at current levels is untested in public filings.</li>
+        </ul></article>
+        <article class="paper-card"><h3>Track-record read</h3><p><span class="ev interp">INTERPRETATION</span> The pattern is coherent: the founding team got the science through two Phase 3s (a genuine achievement in a field littered with failed sleep-drug programs), monetized the JV to fund the endgame without a dilutive pre-IPO raise, and handed the launch to a CEO who has sold a company like this before. The counterweight is timing: the succession, the credit agreement, the JV sale and the IPO all happened within five months of each other in 2026 — an entirely new capital and leadership structure that has not yet operated through a single setback.</p><p class="source-note">People sources: 424B4 (management biographies, BWH license) · EDGAR filing list (13G/Form 3/4, Aug 2026) · Longboard–Lundbeck acquisition, trade press 2024.</p></article>
+      </div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+      <ol class="risk-list">
+        <li><b>Clinical-meaningfulness CRL</b><span><span class="ev fact">FACT</span> The FDA raised the meaningfulness of the primary endpoint and the PRO limitations before the NDA was filed, and the program's own fatigue endpoint missed in ITT while sleep-related impairment did not separate. A CRL — or an approval so conditioned it functions as one — is the single event that takes the equity to the bear range.</span></li>
+        <li><b>Tolerability caps the commercial asset even if approved</b><span><span class="ev fact">FACT</span> 21–29% AE discontinuation and 46.5% total 12-month discontinuation (LunAIRo) mean trial efficacy overstates population effectiveness. Chronic nightly therapy competes against a device patients also abandon — the adherence problem may be portable, not solved.</span></li>
+        <li><b>Single-asset concentration</b><span><span class="ev fact">FACT</span> Oxnimbi is the sole clinical candidate; the remaining pipeline is unnamed preclinical exploration. There is no second shot, no partnered asset, no revenue — a binary outcome distribution by construction.</span></li>
+        <li><b>Label breadth and warnings are unpriced optionality — downward</b><span><span class="ev gap">GAP</span> Population restriction (PAP-failure only), severity restriction, or cardiovascular/anticholinergic warning language each compress the launch the G&amp;A build is already spending toward.</span></li>
+        <li><b>Lender claims sit ahead of the launch</b><span><span class="ev fact">FACT</span> SOFR + 5.75% term debt at fair value, a revenue interest on Oxnimbi sales for up to ten years, and approval/sales-contingent further tranches. The structure rewards approval and taxes success; in a weak-launch branch it consumes the cash the equity case depends on.</span></li>
+        <li><b>Launch spend is pre-committed</b><span><span class="ev fact">FACT</span> G&amp;A of $12.7M in Q2 2026 was 2.4× the prior-year quarter, and ~$237.8M was allocated to regulatory-plus-launch. If the decision slips (extension or CRL), the burn does not slip with it.</span></li>
+        <li><b>Accounting quality of reported "profit"</b><span><span class="ev fact">FACT</span> Headline net income is dispositions and liability reversals; related-party revenue collapses now that the JV is sold. Models or screens annualizing H1 2026 will misstate the company's economics in both directions.</span></li>
+        <li><b>Float and lock-up mechanics</b><span><span class="ev fact">FACT</span> Most pre-IPO shares become sale-eligible from the 181st day post-prospectus (~late Jan 2027, inferred), held by concentrated venture holders, immediately before the PDUFA. Supply into the binary is a real, dated overhang; 8.87M reserved plan shares add future issuance capacity.</span></li>
+        <li><b>In-licensed core IP</b><span><span class="ev fact">FACT</span> Key Oxnimbi patents are licensed from BWH under diligence, milestone and royalty obligations, with prosecution largely controlled by the licensor. Standard for the sector, but the company's only asset sits on someone else's patents.</span></li>
+        <li><b>Incretin expansion</b><span><span class="ev interp">INTERPRETATION</span> Tirzepatide already owns the obese moderate-to-severe segment with larger absolute AHI effects and cardiometabolic halo; label or evidence expansion — and prescriber habit — can compress Oxnimbi's addressable population from the edges over time.</span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>What this dossier could not resolve</h2><p class="lede">Disclosed, not filled. Each item names the document that resolves it.</p></div></div>
+      <div class="open-grid">
+        <article><span>GAP 01</span><h3>Actual post-IPO cash</h3><p>Pro-forma cash (~$373M) combines the June 30 reported balance with net IPO proceeds. Q3 burn, closing adjustments, and any debt movement since June 30 are unreported. <b>Resolved by:</b> Q3 2026 10-Q (~Nov 2026, inferred).</p></article>
+        <article><span>GAP 02</span><h3>Advisory committee</h3><p>No disclosure of whether the FDA will convene an AdCom for this first-in-class review. <b>Resolved by:</b> company disclosure or FDA meeting notice during the review cycle.</p></article>
+        <article><span>GAP 03</span><h3>Exact current share count</h3><p>Basic count (41,623,183) rests on March 31, 2026 counts plus the confirmed 13.8M IPO shares; option exercises since are immaterial but uncounted here. <b>Resolved by:</b> Q3 10-Q cover.</p></article>
+        <article><span>GAP 04</span><h3>LunAIRo full dataset</h3><p>Week-51 and secondary detail beyond topline/presentations (including the full estimand tables) has not been located in a peer-reviewed publication for this dossier. <b>Resolved by:</b> LunAIRo manuscript / FDA review documents.</p></article>
+        <article><span>GAP 05</span><h3>Cardiovascular characterization</h3><p>No dedicated CV safety analysis of nightly atomoxetine-containing therapy in the OSA population is public. <b>Resolved by:</b> the approved label's warnings section, or FDA clinical review at approval.</p></article>
+        <article><span>GAP 06</span><h3>SASS milestone terms</h3><p>The contingent milestone behind the ~$9.9M asset is described as one-time; its trigger and amount are not itemized in the reviewed excerpts. <b>Resolved by:</b> the MIPA exhibit / future 10-K note detail.</p></article>
+      </div>
+      <div class="verdict-box"><div><div class="tag" style="font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#9db6b1">Verdict</div><h3>A well-built binary</h3></div><p>Apnimed did the hard part correctly: a real mechanism, two adequate trials reported honestly under both estimands, a funded balance sheet, and a launch team with exits behind it. The investment question is narrower than the science and entirely regulatory — whether a −4 events/hour average separation, with a missed fatigue endpoint, is a benefit the FDA will call meaningful for a first-in-class chronic therapy. The stock at $18.25 prices that as more likely than not, with the tolerability tax still to be collected commercially. Deep-dive warranted was the question at rundown stage; the dossier's answer is that everything material now sits in one FDA review room, and the dated document trail — Q3 10-Q, any AdCom notice, the Feb 28, 2027 decision — is the whole watchlist.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/labels → ClinicalTrials.gov → papers/conferences → company PRs/decks (unverified until corroborated) → trade press.</p></div></div>
+      <div class="sources">
+        <div class="source-group"><h3>SEC filings (primary)</h3>
+          <a href="https://www.sec.gov/files/company_tickers.json" target="_blank" rel="noopener">SEC company_tickers registry<small>APMD — Apnimed, Inc., CIK 1745648, Nasdaq</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1745648/000119312526328422/apmd_424b4.htm" target="_blank" rel="noopener">Form 424B4 prospectus — July 31, 2026<small>Business, clinical program, risk factors, offering terms, share counts, management, BWH license, SASS disposition</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1745648/000119312526385356/apmd-20260630.htm" target="_blank" rel="noopener">Form 10-Q — Q2 2026 (filed Sept 8, 2026)<small>Balance sheet, cash flow, credit agreement (Note 16), SASS gain, IPO subsequent event (Note 17)</small></a>
+          <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001745648&amp;type=4" target="_blank" rel="noopener">EDGAR filing index — Forms 3/4 and Schedules 13G, Aug 2026<small>IPO-date insider and holder filings (Morningside, Alpha Wave)</small></a>
+        </div>
+        <div class="source-group"><h3>Regulatory, registry, and literature</h3>
+          <a href="https://clinicaltrials.gov/study/NCT05813275" target="_blank" rel="noopener">ClinicalTrials.gov — SynAIRgy (NCT05813275)</a>
+          <a href="https://clinicaltrials.gov/study/NCT05811247" target="_blank" rel="noopener">ClinicalTrials.gov — LunAIRo (NCT05811247)</a>
+          <a href="https://www.frontiersin.org/journals/sleep/articles/10.3389/frsle.2023.1148282/pdf" target="_blank" rel="noopener">Frontiers in Sleep, 2023<small>Development of noradrenergic + antimuscarinic combinations for OSA — challenges and progress (mechanism, precursor trials)</small></a>
+          <a href="https://www.drugtopics.com/view/investigational-oral-ad109-reduces-sleep-apnea-severity-by-44-" target="_blank" rel="noopener">Drug Topics, 2026<small>SynAIRgy peer-reviewed results summary (absolute AHI separation, responder and disease-control rates, hierarchy note)</small></a>
+        </div>
+        <div class="source-group"><h3>Papers (cited in text)</h3>
+          <a href="https://www.pharmacytimes.com/view/fda-accepts-nda-for-ad109-to-treatment-of-adults-with-obstructive-sleep-apnea" target="_blank" rel="noopener">Pharmacy Times, 2026 — NDA acceptance and trial summaries<small>PROMIS Fatigue ITT miss (p=0.059) vs on-treatment (p=0.030); SynAIRgy/LunAIRo secondary endpoints</small></a>
+          <a href="https://www.biospace.com/press-releases/apnimed-announces-fda-acceptance-of-new-drug-application-for-ad109-an-investigational-oral-pill-to-treat-adults-with-obstructive-sleep-apnea-osa" target="_blank" rel="noopener">BioSpace — FDA acceptance release (company PR)<small>PDUFA Feb 28, 2027; UNVERIFIED tier as a company release, corroborated by the prospectus</small></a>
+          <a href="https://www.globenewswire.com/news-release/2026/08/03/3337925/0/en/apnimed-announces-closing-of-upsized-initial-public-offering-including-full-exercise-of-underwriters-option-to-purchase-additional-shares.html" target="_blank" rel="noopener">GlobeNewswire — IPO closing, Aug 3, 2026<small>13,800,000 shares, $220.8M gross, full overallotment</small></a>
+        </div>
+        <div class="source-group"><h3>Market and trade</h3>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/APMD/chart/" target="_blank" rel="noopener">MarketBeat — APMD price history<small>Daily closes incl. Oct 15, 2026 ($18.25); 52-week range $16.12–$35.29; analyst targets (Cantor $60, BofA $41, LifeSci $50; consensus ~$50.33)</small></a>
+          <a href="https://www.webull.com/quote/nasdaq-apmd" target="_blank" rel="noopener">Webull — APMD quote<small>Market cap ~$759.6M cross-check against the computed basic capitalization</small></a>
+          <a href="https://www.renaissancecapital.com/IPO-Center/News/120807/sleep-apnea-pill-developer-apnimed-prices-upsized-ipo-at-16-the-high-end" target="_blank" rel="noopener">Renaissance Capital — IPO pricing summary<small>Upsized 12.0M shares at $16.00, top of range</small></a>
+        </div>
+      </div>
+      <div class="method"><strong>Method and gaps.</strong> Every number in this dossier traces to a source above; where sources conflict, the filing wins (e.g., LunAIRo efficacy is stated on the prospectus treatment-policy estimand, −33.7%, not the −46.8% on-treatment figure used in some trade coverage). Dose is stated as the prospectus states it — 2.3 mg aroxybutynin / 75 mg atomoxetine in free-base equivalents (= 2.5 mg / 85.7 mg as hydrochloride salts, the basis used in trial publications). Scenario ranges are soft, assumption-labeled illustrations, not recommendations. <strong>Nothing in this dossier is invented</strong> — numbers without a source are labeled INTERPRETATION or GAP, and the open items are listed in §13.</div>
+    </section>
+  </main>
+
+  <footer><strong>APMD deep-dive dossier</strong> · Built October 16, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot (Oct 15, 2026 close).</footer>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>VIR — Vir Biotechnology · Deep-Dive Dossier · 2026-10-16</title>
+<style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · VIR</span><span class="stamp">Deep-dive dossier · October 16, 2026</span></div>
+        <h1>Two pivots deep, Vir is now a hepatitis-delta readout plus a masked-TCE platform.</h1>
+        <p class="hero-dek">A source-weighted investigation of Vir Biotechnology: whether the tobevibart + elebsiran combination can win a hepatitis delta market that competitors reached first, and whether the PRO-XTEN dual-masked T-cell engagers licensed from Sanofi — now validated by Astellas and Gilead deals — are worth more than the infectious-disease franchise they replaced.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$10.47</div>
+        <div class="quote-label">Fixed market snapshot · Oct 15, 2026 close (MarketBeat)</div>
+        <div class="quote-meta"><strong>~$764M</strong> est. enterprise value · <strong>~$5.96</strong> cash per share<br>$1.77B market cap (169.22M shares) · $1,007.7M cash &amp; investments (Jun 30, 2026)</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#eclipse">ECLIPSE</a><a href="#oncology">Oncology</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The swing factor is a Week-48 composite, not the Week-96 headline</h2><p class="lede">Vir's hepatitis delta (HDV) combination produces the deepest viral suppression in the field — 88% undetectable HDV RNA at Week 96 in Phase 2 — but its own Phase 2 primary endpoint, a Week-24 composite of virologic response plus ALT normalization, numerically favored antibody monotherapy over the combination (70% vs 47%). The Phase 3 ECLIPSE 1 readout in Q4 2026 tests a Week-48 version of that composite against deferred treatment. Everything else — the Astellas and Gilead T-cell-engager deals, the $1.0B cash pile — buys time and optionality around that single test.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$764M</div><p><span class="ev interp">INTERPRETATION</span> Oct 15: $1,771.7M market cap (169,215,958 shares, Jul 29, 2026, per Q2 10-Q cover) less $1,007.7M cash &amp; investments (Jun 30, 2026). No debt identified. Pro-forma for the pending Gilead equity/cash package, EV falls to ~$693M.</p></article>
+        <article class="decision"><div class="tag">Cash per share</div><div class="big">~$5.96</div><p><span class="ev interp">INTERPRETATION</span> $1,007.7M ÷ 169.22M shares. Not a floor: H1 2026 operating expenses were $297.7M, and the cash balance exists because partners and shareholders just refilled it (see Financials).</p></article>
+        <article class="decision warn"><div class="tag">Next decisive readout</div><div class="big">Q4 2026</div><p><span class="ev unverified">UNVERIFIED</span> Company-guided ECLIPSE 1 Phase 3 topline (tobevibart + elebsiran vs deferred treatment in chronic hepatitis delta). ECLIPSE 2 and 3 follow in Q1 2027, also company guidance.</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">BTD + PRIME</div><p><span class="ev fact">FACT</span> The HDV combination holds FDA Breakthrough Therapy and Fast Track designations and EMA PRIME and orphan designations. VIR-5500 (PSMA T-cell engager) received FDA Fast Track in October 2026. No product is approved or filed.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What is genuinely strong here</h3><ul><li>SOLSTICE (NEJM-published): combination HDV RNA target-not-detected reached 66% at Week 48 (21/32) and 88% ITT at Week 96 (28/32), vs 53% for tobevibart monotherapy at Week 96 — the deepest sustained suppression reported in HDV, with no grade ≥3 treatment-related AEs and no treatment-related discontinuations in the combination arm.</li><li>The registrational program is fully enrolled across all three ECLIPSE trials — execution risk on recruitment is retired.</li><li>Third-party validation is real and recent: Astellas paid $240M upfront plus a $75M equity investment for VIR-5500 co-development (closed April 2026); Gilead signed a three-program masked-TCE discovery deal on Oct 9, 2026 ($90M upfront package including $25M of equity at a 30% premium).</li><li>Runway guided into H2 2028 — the HDV readout and a VIR-5500 Phase 3 start are both funded on the current plan.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the price already has to survive</h3><ul><li>Vir is third in line in its lead market: Gilead's Hepcludex (bulevirtide) won the first US HDV approval in spring 2026, and Mirum's single-agent antibody brelovitug hit its Phase 3 composite in September 2026 (56%/45% vs 0%, p&lt;.0001) with a filing guided for H1 2027.</li><li>The two-drug monthly regimen must beat a one-drug antibody on the endpoint regulators already accepted for a competitor — the same composite on which Vir's Phase 2 combination arm trailed its own monotherapy arm at Week 24.</li><li>Every layer of the economics is shared: Alnylam royalties on elebsiran, Sanofi's 20% cut of Astellas proceeds, Norgine owning EU/Australia/NZ commercialization, Astellas taking half of US VIR-5500 profit.</li><li>Share count rose ~21% in seven months (139.5M → 169.2M). The cash pile is substantially other people's money, raised at $8.50–$10.36 per share.</li></ul></article>
+      </div>
+      <p class="source-note">Valuation inputs: <a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026053549/vir-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> · MarketBeat price history (Oct 15, 2026 close). SOLSTICE: Asselah et al., <em>N Engl J Med</em> 2026;394:343–53; EASL Congress 2026 Week-96 presentation. Competition: Mirum AZURE-1 topline, Sept 28, 2026.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>The market is paying ~$764M for the pipeline, and the tape is deal-driven</h2><p class="lede">At $10.47, implied equity is ~$1.77B against $1,007.7M of cash and investments. The stock roughly doubled off its lows during 2026 on partner deals (Astellas close, Gilead signing) rather than on clinical data — which makes the Q4 2026 ECLIPSE 1 readout the first data test of the new valuation.</p></div></div>
+      <div class="chart-card">
+        <div class="chart-top"><div><div class="chart-title">VIR daily close · October 2026</div><div class="source-note">USD · fixed series, MarketBeat price history</div></div></div>
+        <div class="chart-stats"><div class="chart-stat"><b>$10.47</b><span>Oct 15 close</span></div><div class="chart-stat"><b>$12.00</b><span>Oct 9 intraday high</span></div><div class="chart-stat"><b>$4.815–$12</b><span>52-week range (Finnhub)</span></div></div>
+        <table class="study-table"><thead><tr><th>Date (2026)</th><th>Close</th><th>Note</th></tr></thead><tbody>
+          <tr><td data-label="Date">Oct 1</td><td data-label="Close">$11.29</td><td data-label="Note">Pre-deal drift</td></tr>
+          <tr><td data-label="Date">Oct 5</td><td data-label="Close">$11.78</td><td data-label="Note">New CFO effective (Aziz Sawaf)</td></tr>
+          <tr><td data-label="Date">Oct 9</td><td data-label="Close">$11.70</td><td data-label="Note">Gilead agreement signed (announced Oct 14); VIR-5500 Fast Track announced</td></tr>
+          <tr><td data-label="Date">Oct 13</td><td data-label="Close">$10.61</td><td data-label="Note">−6.1% on the day; new CMO effective (David Liu)</td></tr>
+          <tr><td data-label="Date">Oct 14</td><td data-label="Close">$10.41</td><td data-label="Note">Gilead deal announced; +10% premarket spike faded to −1.9% close (Reuters)</td></tr>
+          <tr><td data-label="Date">Oct 15</td><td data-label="Close">$10.47</td><td data-label="Note">Snapshot price for this dossier</td></tr>
+        </tbody></table>
+        <div class="chart-caption">The price table is a dated build-time snapshot, not a live quote. Source: MarketBeat daily price history; Finnhub instrument data for the 52-week range and ~$1.76B displayed market cap.</div>
+      </div>
+      <div class="event-tape">
+        <article><span class="event-mark">FEB–APR 2026</span><h3>Astellas deal closes</h3><p>$240M upfront + $75M equity at $10.36 for VIR-5500 co-development; Vir paid $48M of the proceeds onward to Sanofi under the 2024 license. Q2 revenue of $238.9M and Vir's first profitable quarter ($80.1M net income) are this deal, not product sales.</p></article>
+        <article><span class="event-mark">SEP 28, 2026</span><h3>Competitor hits first</h3><p>Mirum's brelovitug met the AZURE-1 Phase 3 composite endpoint (56% weekly / 45% monthly vs 0% delayed, p&lt;.0001). The HDV race Vir expected to lead now has an approved drug (Hepcludex) and a Phase-3-positive single-agent antibody ahead of it.</p></article>
+        <article><span class="event-mark">OCT 9–14, 2026</span><h3>Gilead validates the platform</h3><p>Three new dual-masked TCE discovery programs; $90M upfront consideration ($65M cash + $25M equity at $14.16, a 30% premium), up to $45M near-term milestones, up to $1.74B further milestones, high-single to low-double-digit royalties. Vir leads discovery; Gilead takes development and commercialization.</p></article>
+      </div>
+      <p class="source-note"><a href="https://www.reuters.com/legal/litigation/vir-gilead-team-up-solid-tumor-cancer-therapies-up-19-billion-deal-2026-10-14/" target="_blank" rel="noopener">Reuters, Oct 14, 2026</a> · <a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026065826/vir-20261009.htm" target="_blank" rel="noopener">Gilead 8-K (Oct 14, 2026)</a> · <a href="https://www.marketbeat.com/stocks/NASDAQ/VIR/chart/" target="_blank" rel="noopener">MarketBeat price history</a>.</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Two platforms: antigen suppression for hepatitis, masked T-cell engagement for cancer</h2><p class="lede">HDV is a defective virus that cannot make its own envelope — it coats itself in hepatitis B surface antigen (HBsAg). Vir attacks that dependency twice: an antibody that neutralizes HBsAg-bearing particles, and an siRNA that stops HBsAg being made. In oncology, Vir's bet is that protease-activated masking can give T-cell engagers a therapeutic window in solid tumors that the unmasked class has never had.</p></div></div>
+      <div class="science-chain" aria-label="HDV disease mechanism">
+        <article><b>01</b><h3>HBV co-infection</h3><p>HDV infects only people with HBV. The liver produces large excesses of HBsAg, most of it in non-infectious subviral particles.</p></article>
+        <article><b>02</b><h3>Envelope theft</h3><p>HDV assembles its envelope from HBsAg, enters hepatocytes via the same NTCP route as HBV, and replicates using host machinery.</p></article>
+        <article><b>03</b><h3>Fast progression</h3><p>Chronic hepatitis delta is the most severe viral hepatitis — rapid progression to cirrhosis, liver failure and hepatocellular carcinoma; HDV was classified carcinogenic by IARC in 2025.</p></article>
+        <article><b>04</b><h3>Suppression = outcome</h3><p>Persistent detectable HDV RNA predicts liver events; sustained undetectability (target not detected, TND) is the field's accepted treatment goal and the endpoint hierarchy regulators have now approved drugs on.</p></article>
+      </div>
+      <div class="moa-box"><h3>The HDV combination in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> Hepatitis delta is a parasite of hepatitis B: it wraps itself in a hepatitis B protein (HBsAg) to infect liver cells. Tobevibart is an antibody that grabs that protein — blocking new infections and clearing viral particles from the blood. Elebsiran is a small interfering RNA that switches off the protein's production line inside liver cells. One drug mops up the antigen that exists; the other stops more being made. They are given as two sequential under-the-skin injections, once a month.</p><p><strong>Technical.</strong> Tobevibart: broadly neutralizing anti-HBsAg mAb (antigenic loop epitope), Fc-engineered for effector engagement and immune-complex clearance, with Xencor Xtend half-life extension. Elebsiran (VIR-2218 / ALN-HBV02): GalNAc-conjugated siRNA licensed from Alnylam, targeting a conserved HBV transcript region shared across genotypes, degrading HBV RNAs and reducing HBsAg production, including from integrated HBV DNA to the extent transcripts share the target sequence.</p></div>
+      <div class="moa-box"><h3>PRO-XTEN masked T-cell engagers in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> A T-cell engager is a two-armed antibody: one arm grabs a tumor protein, the other grabs CD3 on a T cell, forcing a kill. Unmasked engagers also fire outside tumors, causing cytokine storms and damage to healthy tissue that shares the target. Vir's molecules wear protease-cut masks over both arms; the masks come off mainly where tumor-associated proteases are active — inside the tumor — so the drug should be inert in the blood and active at the cancer.</p><p><strong>Technical.</strong> PRO-XTEN (originated at Amunix, acquired by Sanofi in 2021, licensed exclusively to Vir for oncology and infectious disease in 2024): peptide masks tethered by protease-cleavable linkers block both the tumor-antigen and CD3 binding sites; tumor-microenvironment proteases cleave the linkers and unmask the bispecific. Masking also prolongs circulating half-life of the inactive prodrug. Vir layers its dAIsY AI/protein-engineering platform on candidate design — a company capability claim, not independently validated. <span class="ev unverified">UNVERIFIED</span></p></div>
+      <div class="fail-grid" aria-label="Ways the mechanisms could fail">
+        <article><h3>1 · Antigen sources the siRNA can't reach</h3><p>HBsAg is also expressed from HBV DNA integrated into the host genome. If integrated transcripts escape elebsiran's target site in a patient subset, antigen production persists, HDV keeps enveloping, and TND plateaus — one plausible read of why suppression deepens slowly over 96 weeks rather than saturating early.</p></article>
+        <article><h3>2 · Virology ≠ the composite endpoint</h3><p>Approvals in HDV now turn on virologic response <em>plus</em> ALT normalization. ALT reflects liver inflammation with many drivers (including underlying HBV activity and steatosis); a patient can be TND and still fail the composite. SOLSTICE's Week-24 composite favored monotherapy — the ALT leg, not the viral leg, is the combination's weak point.</p></article>
+        <article><h3>3 · Masking cuts both ways</h3><p>The same mask that prevents systemic activation can blunt potency if tumor protease activity is heterogeneous, and can leak if proteases are active in inflamed healthy tissue. CRS still occurred in 50% of VIR-5500 patients (mostly grade 1) — masking reduces, and has not eliminated, class toxicity. No masked TCE has ever been approved, anywhere.</p></article>
+        <article><h3>4 · Target biology in healthy tissue</h3><p>PSMA is expressed in salivary glands, kidney and gut; HER2 in cardiac and pulmonary tissue (the trastuzumab lesson); EGFR in skin and GI mucosa. Dual masking must protect all of these simultaneously, at doses high enough to work in poorly perfused solid tumors — the central unproven claim of the whole oncology pivot.</p></article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>HDV combination safety</h3><p><span class="ev fact">FACT</span> In SOLSTICE, the combination arm had no grade ≥3 treatment-related adverse events and no treatment-related discontinuations through Week 96; treatment-emergent events were generally mild-to-moderate and transient. This is a genuinely clean profile for a chronic monthly regimen — if it holds in the larger ECLIPSE population.</p></article>
+        <article><h3>VIR-5500 safety</h3><p><span class="ev fact">FACT</span> Phase 1 monotherapy (n=58): no dose-limiting toxicities; grade ≥3 treatment-related AEs 12% (7/58); CRS 50% (29/58), predominantly grade 1 fever, without routine prophylactic steroids. Better than historical unmasked TCE experience, not benign.</p></article>
+        <article><h3>What remains unknowable</h3><p><span class="ev gap">GAP</span> No masked-TCE durability data (response duration for VIR-5500 has not been reported), no randomized data for any Vir program except the controlled ECLIPSE trials now reading out, and no human data at all for VIR-5525 efficacy or the Gilead discovery candidates.</p></article>
+      </div>
+      <p class="source-note">Mechanism and safety: <a href="https://investors.vir.bio/news/news-details/2026/Vir-Biotechnology-Provides-Corporate-Update-and-Reports-Second-Quarter-2026-Financial-Results/default.aspx" target="_blank" rel="noopener">Q2 2026 release (company)</a> · Asselah et al., <em>NEJM</em> 2026 · VIR-5500 ASCO GU 2026 presentation as reported by OncLive/Targeted Oncology. Platform history: Sanofi–Amunix acquisition (2021); Vir–Sanofi license (Aug 2024).</p>
+    </section>
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>SOLSTICE: the deepest HDV suppression on record — with an endpoint paradox inside it</h2><p class="lede">The Phase 2 SOLSTICE trial randomized 65 adults with chronic hepatitis delta to the combination (tobevibart 300 mg + elebsiran 200 mg, every 4 weeks; n=32) or tobevibart monotherapy (300 mg every 2 weeks; n=33), open label. It was published in the <em>New England Journal of Medicine</em> in 2026 — and its details matter more than its headline.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card">
+          <div class="program-kicker">Phase 2 · SOLSTICE · NCT number not stated in sources reviewed <span class="ev gap">GAP</span></div><h3>Design and the prespecified primary</h3>
+          <table class="study-table"><thead><tr><th>Element</th><th>Detail</th></tr></thead><tbody>
+            <tr><td data-label="Element">Population</td><td data-label="Detail">65 adults with chronic hepatitis delta, including participants with cirrhosis and high baseline HDV RNA <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Element">Arms</td><td data-label="Detail">Combination: tobevibart 300 mg Q4W + elebsiran 200 mg Q4W (n=32). Monotherapy: tobevibart 300 mg Q2W (n=33). Open label; no prespecified hypothesis test and no sample-size calculation — analyses are descriptive (Clopper-Pearson intervals), per the NEJM methods <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Element">Primary endpoint</td><td data-label="Detail">Combined response at Week 24: HDV RNA &lt;LLOQ or ≥2 log<sub>10</sub> decline <em>plus</em> ALT normalization. <strong>Result: monotherapy 70% vs combination 47%</strong> — the prespecified primary numerically favored the simpler regimen <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Element">Key secondary</td><td data-label="Detail">HDV RNA target not detected (TND) over time — the measure on which the combination separates, increasingly with duration (below)</td></tr>
+          </tbody></table>
+          <p class="source-note">Asselah et al., <a href="https://pubmed.ncbi.nlm.nih.gov/?term=tobevibart+elebsiran" target="_blank" rel="noopener"><em>N Engl J Med</em> 2026;394:343–53</a>. The Week-24 primary result is from the paper's Table 2 as reported in secondary analysis; Vir's own communications lead with TND.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">HDV RNA target not detected (TND) · combination vs monotherapy</div><h3>Suppression deepens with time on the combination</h3>
+          <table class="study-table"><thead><tr><th>Timepoint</th><th>Combination</th><th>Tobevibart alone</th></tr></thead><tbody>
+            <tr><td data-label="Timepoint">Week 48</td><td data-label="Combination">66% (21/32)</td><td data-label="Mono">Not the reported comparison at this cut</td></tr>
+            <tr><td data-label="Timepoint">Week 72</td><td data-label="Combination">77% (24/31)</td><td data-label="Mono">53% (17/32)</td></tr>
+            <tr><td data-label="Timepoint">Week 96 (ITT)</td><td data-label="Combination"><strong>88% (28/32)</strong></td><td data-label="Mono">53% (17/32)</td></tr>
+            <tr><td data-label="Timepoint">Week 96 (LOCF)</td><td data-label="Combination">97% (31/32)</td><td data-label="Mono">—</td></tr>
+          </tbody></table>
+          <p class="source-note"><span class="ev fact">FACT</span> Week 96 ITT/LOCF from the complete SOLSTICE dataset presented at EASL 2026 (company release, Aug 5, 2026). ~90% of combination participants also reduced HBsAg to ≤10 IU/mL by Week 48 (AASLD 2025). No p-values are prespecified for these comparisons — treat the separation as a large descriptive effect in n=32 per arm, not a tested one. <span class="ev interp">INTERPRETATION</span></p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">The honest tension</div><h3 style="margin-top:6px">Why take the combination into Phase 3 at all?</h3><p style="font-size:13px;margin:0">Because TND — complete suppression — is what predicts liver outcomes, and only the combination gets most patients there and keeps them there (mono TND is flat at ~53% from Week 72 to 96; the combination climbs). The Week-24 composite punished the combination on ALT normalization timing, not on virology. <span class="ev interp">INTERPRETATION</span> That is a coherent scientific case. It is also a post-hoc reordering of endpoint importance relative to the trial's own primary — exactly the kind of argument regulators discount, and ECLIPSE 1's Week-48 timing gives ALT two more quarters to normalize. Whether that was foresight or luck is what Q4 2026 answers.</p></div>
+        </article>
+      </div>
+      <div class="moa-box"><h3>MARCH (hepatitis B): real HBsAg loss, sub-commercial functional cure <span class="ev fact">FACT</span></h3><p>The Phase 2 MARCH study (NCT04856085) tested the same doublet ± weekly pegylated interferon-α in chronic hepatitis B. At 24 weeks post-treatment (EASL 2025): HBsAg loss in the low-baseline-HBsAg (&lt;1,000 IU/mL) subgroup was 17% (3/18) doublet and 21% (3/14) triplet — but study-defined <strong>functional cure was 4% (2/51) and 10% (3/30) across all participants</strong>. Vir has stated Phase 3 in HBV proceeds only with a global partner; none has been secured in the ~17 months since the data. The program is carried in this dossier as an option, not a value driver.</p></div>
+      <p class="source-note">MARCH: Vir release, May 9, 2025 (EASL Congress, Amsterdam). HBV epidemiology context (WHO estimates) is company-cited in that release.</p>
+    </section>
+
+    <section id="eclipse">
+      <div class="section-head"><div class="section-num">05 / ECLIPSE</div><div><h2>The registrational program: fully enrolled, three controlled trials</h2><p class="lede">ECLIPSE is designed to give regulators what SOLSTICE could not: randomized, controlled evidence. ECLIPSE 1 and 2 are the registrational core; ECLIPSE 3 is a head-to-head against bulevirtide built for European access arguments. All three completed enrollment by Q2 2026.</p></div></div>
+      <table class="study-table"><thead><tr><th>Trial</th><th>Design</th><th>Primary / role</th><th>Topline</th></tr></thead><tbody>
+        <tr><td data-label="Trial"><strong>ECLIPSE 1</strong> (Phase 3)<br><small>NCT06903338</small></td><td data-label="Design">~120 participants (planned), randomized 2:1: combination vs <strong>deferred treatment</strong> (NRTIs only, then switch to combination), in the US and regions where bulevirtide use is limited <span class="ev fact">FACT</span></td><td data-label="Primary">Composite: HDV RNA TND plus ALT normalization at Week 48 vs the deferred arm at the end of its deferred period <span class="ev fact">FACT</span></td><td data-label="Topline">Q4 2026 <span class="date-tag guidance">GUIDANCE</span></td></tr>
+        <tr><td data-label="Trial"><strong>ECLIPSE 2</strong> (Phase 3)<br><small>NCT07128550</small></td><td data-label="Design">Switch study: patients <strong>not virally suppressed on bulevirtide</strong> switch to the combination <span class="ev fact">FACT</span></td><td data-label="Primary">Registrational support; also the commercial bridge for bulevirtide inadequate responders</td><td data-label="Topline">Q1 2027 <span class="date-tag guidance">GUIDANCE</span></td></tr>
+        <tr><td data-label="Trial"><strong>ECLIPSE 3</strong> (Phase 2b)<br><small>NCT07142811</small></td><td data-label="Design"><strong>Head-to-head vs bulevirtide</strong> in bulevirtide-naïve patients <span class="ev fact">FACT</span></td><td data-label="Primary">Supportive; designed for access/reimbursement arguments in Europe and other markets</td><td data-label="Topline">Q1 2027 <span class="date-tag guidance">GUIDANCE</span></td></tr>
+      </tbody></table>
+      <div class="fail-grid">
+        <article><h3>Design strength</h3><p>A deferred-treatment control in a disease with no spontaneous composite responses (Mirum's delayed arm: 0%) makes a positive ECLIPSE 1 hard to argue with on efficacy. Breakthrough Therapy + PRIME status give Vir intensive regulator contact on exactly the endpoint question that matters. <span class="ev interp">INTERPRETATION</span></p></article>
+        <article><h3>Design exposure</h3><p>ECLIPSE 1 was built for a world where bulevirtide was unavailable in the US. Gilead won US approval for Hepcludex in spring 2026. The deferred-treatment rationale still holds for trial conduct, but payers and prescribers will compare Vir's monthly two-injection combo against an approved daily drug and a Phase-3-positive monthly single-agent antibody — cross-trial, with all the usual caveats. <span class="ev interp">INTERPRETATION</span></p></article>
+      </div>
+      <p class="source-note">ECLIPSE program: Vir releases (first-patient and enrollment-completion announcements, 2025; Q2 2026 update). Designations: FDA Breakthrough Therapy and Fast Track; EMA PRIME and orphan drug — company releases, consistent across 2025–2026. <span class="ev fact">FACT</span></p>
+    </section>
+
+    <section id="oncology">
+      <div class="section-head"><div class="section-num">06 / ONCOLOGY</div><div><h2>The pivot: three Sanofi molecules, two pharma partners, one Phase 1 data set</h2><p class="lede">In August 2024 Vir licensed three clinical-stage dual-masked TCEs and the PRO-XTEN platform from Sanofi for $100M upfront, cut ~25% of its workforce, and ended its influenza and COVID programs. Two years later that portfolio carries the company's second value leg — and its only human efficacy data is for VIR-5500 in prostate cancer.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card"><div class="program-kicker">VIR-5500 · PSMA×CD3 · Phase 1 (NCT05997615) · Astellas co-development</div><h3>Heavily pretreated mCRPC, real responses</h3>
+          <table class="study-table"><thead><tr><th>Measure</th><th>Result</th></tr></thead><tbody>
+            <tr><td data-label="Measure">Population</td><td data-label="Result">58 monotherapy patients; median 4 prior lines (range 2–7); 100% prior ARPI, ~95% prior taxane, ~45% visceral metastases <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Measure">PSA50 (≥3000 µg/kg Q3W)</td><td data-label="Result"><strong>82% (14/17)</strong> PSA-evaluable; PSA90 53% (9/17) <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Measure">Objective response</td><td data-label="Result">ORR 45% (5/11 RECIST-evaluable; 4 confirmed, 1 pending) <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Measure">Safety</td><td data-label="Result">No DLTs; grade ≥3 TRAEs 12%; CRS 50%, mostly grade 1 <span class="ev fact">FACT</span></td></tr>
+            <tr><td data-label="Measure">Durability</td><td data-label="Result"><span class="ev gap">GAP</span> Duration of response / rPFS not reported at the ASCO GU 2026 cut</td></tr>
+          </tbody></table>
+          <p class="source-note">ASCO Genitourinary Cancers Symposium 2026 (de Bono et al.), as reported by OncLive / Targeted Oncology / Urology Times. Dose-expansion cohorts (monotherapy in taxane-naïve, radioligand-naïve and radioligand-exposed mCRPC; combinations with enzalutamide, docetaxel, darolutamide) initiated 2026. FDA Fast Track granted October 2026. Pivotal Phase 3 initiation anticipated 2027 (company/Astellas). <span class="ev unverified">UNVERIFIED</span> for the Phase 3 timing.</p>
+        </article>
+        <article class="paper-card"><div class="program-kicker">VIR-5818 (HER2) · VIR-5525 (EGFR) · Gilead discovery programs</div><h3>Earlier, thinner — and partly sold forward</h3>
+          <p class="mechanism"><strong>VIR-5818</strong> (HER2×CD3, ex-SAR446309/AMX-818): Phase 1 basket dose escalation ± pembrolizumab across solid tumors; company reports early signals in microsatellite-stable colorectal cancer (trade press). Updated dose-escalation data guided for H2 2026. <span class="ev unverified">UNVERIFIED</span></p>
+          <p class="mechanism"><strong>VIR-5525</strong> (EGFR×CD3, ex-SAR446368/AMX-525): Phase 1 enrolling since the first patient was dosed in July 2025 (which triggered release of the $75M escrowed Amunix milestone under the Sanofi deal). No efficacy data reported. <span class="ev fact">FACT</span> for dosing; efficacy <span class="ev gap">GAP</span>.</p>
+          <p class="mechanism"><strong>Gilead programs</strong> (Oct 2026): three discovery-stage dual-masked TCEs against selected solid-tumor antigens, targets undisclosed. Vir discovers/designs (dAIsY platform); Gilead holds the exclusive license and all later development. Economics: $90M upfront package, up to $45M near-term milestones, up to $1.74B further milestones, high-single to low-double-digit royalties. <span class="ev fact">FACT</span></p>
+          <p class="source-note">A portion of Astellas collaboration proceeds is shared with Sanofi (20% of certain proceeds; $48M paid June 2026) — the oncology economics are net of a Sanofi layer throughout. See Financials.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">07 / LANDSCAPE</div><div><h2>Competition: Vir is no longer first in HDV, and is one of many in masked TCEs</h2><p class="lede">Clinical differentiation only — no cross-trial efficacy rankings are claimed; populations, endpoints and timepoints differ.</p></div></div>
+      <div class="compare">
+        <article class="compare-card"><div class="tag">HDV · Approved (US, 2026)</div><div class="name">Hepcludex (bulevirtide) · Gilead</div><dl><dt>Mechanism</dt><dd>NTCP entry inhibitor peptide; <strong>daily</strong> subcutaneous injection</dd><dt>Status</dt><dd>First FDA-approved HDV therapy (spring 2026); EU-approved since 2020. ECLIPSE 3 tests Vir's combo head-to-head against it; ECLIPSE 2 recruits its inadequate responders</dd><dt>Differentiation vs Vir</dt><dd>Approved and entrenched, but daily dosing and incomplete suppression in a subset are the openings Vir's monthly, deeper-suppression combo aims at</dd></dl></article>
+        <article class="compare-card"><div class="tag">HDV · Phase 3 positive</div><div class="name">Brelovitug · Mirum</div><dl><dt>Mechanism</dt><dd>Anti-HBsAg monoclonal antibody — <strong>single agent</strong>, weekly or monthly dosing</dd><dt>Status</dt><dd>AZURE-1 Phase 3 hit Sept 28, 2026: composite response 56% (weekly) / 45% (monthly) vs 0% delayed at Week 24, p&lt;.0001 for both; N=153 with 41% cirrhosis. AZURE-4 reads Q4 2026; BLA guided H1 2027 <span class="ev fact">FACT</span> (company topline)</dd><dt>Differentiation vs Vir</dt><dd>The direct threat: same antigen target, one drug instead of two, Phase 3 composite data in hand, sicker enrolled population. Vir's counter is depth/durability of TND (88% at Week 96 in Ph2) — at a Week-48 endpoint, in a smaller trial</dd></dl></article>
+        <article class="compare-card"><div class="tag">Masked TCEs · Class</div><div class="name">The masking field</div><dl><dt>Players</dt><dd>Multiple large and private developers are pursuing protease-masked or conditionally active TCEs; Sanofi itself originated Vir's molecules and exited them. Unmasked PSMA TCEs (e.g., earlier industry programs) were limited by CRS and narrow windows — the problem masking exists to solve</dd><dt>Vir's position</dt><dd>Most clinically advanced dual-masked portfolio, now funded by Astellas (VIR-5500) and validated at discovery stage by Gilead. But the platform's value is concentrated in a single Phase 1 asset's response durability, which is unreported</dd><dt>Watch</dt><dd>Any competitor masked-TCE approval or Phase 2 failure reprices the whole platform claim, in either direction</dd></dl></article>
+      </div>
+      <div class="readthrough"><strong>The structural point.</strong> <span class="ev interp">INTERPRETATION</span> In 2024 Vir's HDV program was the field's front-runner. By October 2026 it is third in sequence — approved daily drug, Phase-3-positive monthly antibody, then Vir — and its differentiation has narrowed to one claim: deepest complete suppression (TND) with chronic dosing. That claim is plausible on SOLSTICE data and is also exactly what ECLIPSE 1 was not primarily designed to prove at its Week-48 composite. In oncology the sequence is reversed: Vir is early, partnered, and not yet durable-data-tested.</div>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">08 / PIPELINE</div><div><h2>Pipeline, ranked by descending value contribution</h2><p class="lede">Ranking reflects stage, exclusivity of economics retained, and proximity to a value-inflecting readout — judgment, labeled as such. <span class="ev interp">INTERPRETATION</span></p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">Tobevibart + elebsiran — chronic hepatitis delta</div><div class="pipe-desc">Phase 3 (ECLIPSE 1/2) + Phase 2b (ECLIPSE 3), fully enrolled. US rights retained; EU/Australia/NZ licensed to Norgine (Dec 2025, with ECLIPSE cost-sharing). Elebsiran carries Alnylam royalties (low-double-digits to mid-teens) and milestones. Readout: Q4 2026 / Q1 2027.</div></div><div class="pipe-status">Phase 3 · Lead</div></div>
+        <div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">VIR-5500 — PSMA×CD3 dual-masked TCE (mCRPC)</div><div class="pipe-desc">Phase 1 with expansion cohorts running; Fast Track Oct 2026; Phase 3 planned 2027. Astellas: 50/50 US profit split, Astellas leads US commercialization, ex-US exclusive to Astellas with tiered double-digit royalties to Vir; up to $1.37B further milestones. Sanofi shares in certain proceeds.</div></div><div class="pipe-status">Phase 1 · Partnered</div></div>
+        <div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">VIR-5818 — HER2×CD3 dual-masked TCE</div><div class="pipe-desc">Phase 1 basket ± pembrolizumab; updated dose-escalation data guided H2 2026. Wholly Vir's (subject to Sanofi license economics). The indication focus is still being selected, per the company.</div></div><div class="pipe-status">Phase 1</div></div>
+        <div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">VIR-5525 — EGFR×CD3 dual-masked TCE</div><div class="pipe-desc">Phase 1 enrolling ± pembrolizumab since July 2025. EGFR is the hardest of the three targets for on-target/off-tumor toxicity; no efficacy data yet.</div></div><div class="pipe-status">Phase 1</div></div>
+        <div class="pipe-row"><div class="pipe-rank">05</div><div><div class="pipe-name">Gilead discovery collaboration — 3 dual-masked TCEs</div><div class="pipe-desc">Preclinical; targets undisclosed. Vir earns discovery economics and royalties; Gilead controls development. Value today is the $90M upfront package and platform validation, not the $1.74B milestone headline.</div></div><div class="pipe-status">Discovery · Licensed</div></div>
+        <div class="pipe-row"><div class="pipe-rank">06</div><div><div class="pipe-name">Tobevibart + elebsiran — chronic hepatitis B</div><div class="pipe-desc">Phase 2 complete (MARCH). Functional cure 4–10% overall; Phase 3 explicitly gated on finding a global partner, none secured. Carried at option value only.</div></div><div class="pipe-status">Phase 2 · Partner-seeking</div></div>
+        <div class="pipe-row"><div class="pipe-rank">07</div><div><div class="pipe-name">Antibody / dAIsY platform and preclinical portfolio</div><div class="pipe-desc">The discovery engine behind tobevibart and the TCE optimization claims; preclinical masked TCEs against validated targets. Historically also produced sotrovimab (COVID; revenue gone with variant evolution) and failed influenza programs (discontinued 2024) — the platform's commercial track record is one pandemic product.</div></div><div class="pipe-status dead">Platform · Mixed record</div></div>
+      </div>
+    </section>
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>Event path: a data-dense five months, then the filing clock</h2><p class="lede">Every date is tagged by quality. There are no hard calendar dates on Vir's own program — the entire near-term path is guidance.</p></div></div>
+      <div class="timeline">
+        <div class="event"><span class="event-date">Q4 2026 <span class="date-tag guidance">GUIDANCE</span></span><div class="event-body"><h3>ECLIPSE 1 topline — the swing event</h3><p>Phase 3 combination vs deferred treatment in HDV; composite of HDV RNA TND + ALT normalization at Week 48. Guided in the Q2 2026 release (Aug 5, 2026). This is the single event the dossier's frame is built around.</p></div></div>
+        <div class="event"><span class="event-date">Q4 2026 <span class="date-tag guidance">GUIDANCE</span></span><div class="event-body"><h3>Mirum AZURE-4 topline (competitor)</h3><p>Brelovitug vs delayed treatment, 48-week data. A strong 48-week durability print raises the bar ECLIPSE 1 is judged against in the same quarter — sequencing risk Vir does not control.</p></div></div>
+        <div class="event"><span class="event-date">H2 2026 <span class="date-tag guidance">GUIDANCE</span></span><div class="event-body"><h3>VIR-5818 updated Phase 1 data</h3><p>HER2 TCE dose-escalation update (monotherapy and pembrolizumab combination). First chance to show the masked platform is more than one asset.</p></div></div>
+        <div class="event"><span class="event-date">~Nov 4, 2026 <span class="date-tag inferred">INFERRED</span></span><div class="event-body"><h3>Q3 2026 results</h3><p>Aggregator-estimated earnings date (Barchart), not company-confirmed. Watch: Gilead deal closing ($65M cash + $25M equity at $14.16), updated runway, ECLIPSE timing language.</p></div></div>
+        <div class="event"><span class="event-date">Q1 2027 <span class="date-tag guidance">GUIDANCE</span></span><div class="event-body"><h3>ECLIPSE 2 + ECLIPSE 3 topline</h3><p>Switch data in bulevirtide inadequate responders, and the head-to-head vs bulevirtide. Together with ECLIPSE 1 these complete the filing package; a weak ECLIPSE 1 cannot be rescued by these, but a strong one is commercially completed by them.</p></div></div>
+        <div class="event"><span class="event-date">2027 <span class="date-tag guidance">GUIDANCE</span></span><div class="event-body"><h3>HDV filing; VIR-5500 Phase 3 start</h3><p>Company intends a comprehensive global filing package after ECLIPSE data; Astellas/Vir anticipate initiating pivotal VIR-5500 trials in 2027. No filing date has been committed. <span class="ev unverified">UNVERIFIED</span></p></div></div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">10 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario section only — illustrative value bridges, not price targets or recommendations. All three use one fully diluted divisor: <strong>186.6M shares</strong> = 169.22M basic (Jul 29, 2026) + 10.34M options outstanding + 7.06M restricted shares (Q2 2026 10-Q anti-dilutive table), taken at face value with no treasury-method proceeds offset because the options' weighted-average exercise price was not extracted (see GAP in Financials). That is deliberately conservative: a treasury-method calculation with in-the-money strikes would produce a smaller divisor and higher per-share values. Cash is the reported $1,008M (Jun 30, 2026); the pending Gilead package (~+$90M cash/equity) is excluded and would add ~$0.48/share of cash if it closes as signed.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear</div><div class="pt">$3.50–5.00</div><div class="soft">Soft range · illustrative</div><ul>
+          <li>ECLIPSE 1 hits virology but misses or barely clears the composite (ALT leg), or brelovitug's data make Vir's profile look late and complicated; HDV becomes a small, third-entrant, partner-dependent business.</li>
+          <li>VIR-5500 responses prove short-lived; Phase 3 slips; TCE platform reverts to discovery-stage value. HBV program written to zero.</li>
+          <li>Value bridge: operating EV ~$250M (residual HDV ex-US/royalty value + platform) + cash $1,008M − ~$450M burn and wind-down to a restructured steady state = ~$808M equity ⇒ <strong>$4.33/sh</strong> (range equity $653–933M).</li>
+        </ul></article>
+        <article class="scen-card base"><div class="tag">Base</div><div class="pt">$12–16</div><div class="soft">Soft range · illustrative</div><ul>
+          <li>ECLIPSE 1 clears the composite convincingly; HDV filing in 2027, approval thereafter as a differentiated monthly option in a 3-player market; Norgine carries Europe.</li>
+          <li>VIR-5500 enters Phase 3 with Astellas in 2027 with durability data adequate to sustain the 50/50 program; VIR-5818 shows a selectable indication.</li>
+          <li>Value bridge: operating EV ~$1,800M (HDV ~$0.9B + VIR-5500/TCE ~$0.8B + HBV/other ~$0.1B) + cash $1,008M − ~$300M net burn to launch = ~$2,508M equity ⇒ <strong>$13.44/sh</strong> (range equity $2,239–2,986M).</li>
+        </ul></article>
+        <article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$23–29</div><div class="soft">Soft range · illustrative</div><ul>
+          <li>ECLIPSE 1 shows best-in-class TND depth at Week 48 with the composite clearing by a wide margin; Vir's regimen becomes the suppression standard, with ECLIPSE 2/3 converting bulevirtide's installed base.</li>
+          <li>VIR-5500 durability confirms a pivotal-ready, best-in-class masked TCE; Gilead programs advance and the platform is re-rated as a franchise, not an asset.</li>
+          <li>Value bridge: operating EV ~$4,200M + cash $1,008M − ~$300M net burn = ~$4,908M equity ⇒ <strong>$26.30/sh</strong> (range equity $4,292–5,412M). Note: a secondary aggregator put the average analyst target at $20.78 (Stockopedia, crawled ~Oct 2026) — the bull case sits above that average by construction and requires both legs to succeed.</li>
+        </ul></article>
+      </div>
+      <div class="assump"><b>Assumptions that do the work:</b> (1) 186.6M FD divisor at face value — any treasury-method offset or future raise moves every range; (2) burn figures are net of guided partner contributions through the stated horizon and stop at H2 2028 runway; (3) operating values are judgment bridges anchored to the current ~$764M EV and deal-implied marks (Astellas's $315M upfront package for a 50%-shared single asset; Gilead's $90M for discovery rights), not a DCF — no revenue forecast is presented because HDV pricing, US market split among three entrants, and VIR-5500 Phase 3 design are not yet sourceable facts; (4) trial success is not approval, and approval is not commercial success — the base case already spends value on both translations.</div>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">11 / FINANCIALS</div><div><h2>$1.0B of cash that arrived in eighteen months of deals and dilutions</h2><p class="lede">Vir's balance sheet is strong and almost entirely transactional: a February–April 2026 Astellas closing, a Q1 2026 follow-on offering, and partner equity purchases rebuilt it. Underlying operations still consume cash at a rate the deal flow currently covers.</p></div></div>
+      <div class="fin-grid">
+        <div class="metric-stack">
+          <div class="metric"><span>Cash, equivalents &amp; investments</span><strong>$1,007.7M</strong><small>Jun 30, 2026 · 10-Q ($278.7M cash, $249.9M short-term investments, balance in long-term investments and cash deposits)</small></div>
+          <div class="metric"><span>Reported runway</span><strong>Into H2 2028</strong><small>Company guidance, Q2 2026 release — including Astellas effects, before the Gilead package</small></div>
+          <div class="metric"><span>H1 2026 operating spend</span><strong>$297.7M</strong><small>Total opex; R&amp;D $244.2M including the $48M Sanofi pass-through; H1 net loss $45.6M; Q2 alone was +$80.1M net income on Astellas revenue recognition</small></div>
+        </div>
+        <div>
+          <div class="runway"><h3>How the cash got here (H1 2026)</h3><div class="runway-track"><div class="runway-fill" style="width:72%"></div></div><p><span class="ev fact">FACT</span> Astellas: $240M upfront cash + $75M equity (7,239,382 shares at $10.36), closed Apr 16, 2026. Follow-on offering: 20,294,117 shares, $162.2M net (Q1 2026). Less: $48M Sanofi pass-through (June 2026). Net effect: cash rose ~$198.5M in Q2 alone, to ~$1.01B, while H1 operating cash use was only $9.1M — the upfront did the work. Pro-forma for Gilead (signed, closing conditions pending): +$65M cash and +$25M equity (1,765,486 shares at $14.16) ⇒ ~$1,098M cash, 170.98M shares, EV ~$693M at $10.47. <span class="ev interp">INTERPRETATION</span></p></div>
+          <h3 style="margin-top:22px">Capitalization</h3>
+          <table class="cap-table"><thead><tr><th>Component</th><th>Shares / value</th><th>As of</th></tr></thead><tbody>
+            <tr><td data-label="Component">Common shares outstanding (basic)</td><td data-label="Shares">169,215,958</td><td data-label="As of">Jul 29, 2026 · 10-Q cover</td></tr>
+            <tr><td data-label="Component">Options outstanding</td><td data-label="Shares">10,336,678</td><td data-label="As of">H1 2026 · 10-Q anti-dilutive table</td></tr>
+            <tr><td data-label="Component">Restricted shares (RSU/PSU)</td><td data-label="Shares">7,058,395</td><td data-label="As of">H1 2026 · 10-Q anti-dilutive table</td></tr>
+            <tr><td data-label="Component">Gross fully diluted (face value)</td><td data-label="Shares">186,611,031</td><td data-label="As of">Sum of the above; weighted-average option strike not extracted <span class="ev gap">GAP</span> — treasury-method FD is therefore not computable from sources pulled</td></tr>
+            <tr><td data-label="Component">Market cap / EV at $10.47</td><td data-label="Shares">$1,771.7M / ~$764M</td><td data-label="As of">Oct 15, 2026 close; cash Jun 30, 2026</td></tr>
+            <tr><td data-label="Component">Dilution, trailing</td><td data-label="Shares">139.47M → 169.22M (+21%)</td><td data-label="As of">Dec 31, 2025 → Jul 29, 2026; Q1 offering + Astellas equity; ATM facility on file (Cowen, since 2023)</td></tr>
+          </tbody></table>
+          <div class="holder-note"><b>Partner economics stacked on the pipeline.</b> <span class="ev fact">FACT</span> Alnylam (elebsiran): $30M paid in 2025 after it declined the profit-share opt-in; up to $145M further development/regulatory milestones, up to $250M sales milestones, royalties low-double-digits to mid-teens. Sanofi: $100M upfront (2024) + $75M escrow milestone (paid on VIR-5525 first dosing) + 20% of certain Astellas proceeds ($48M paid) + milestones/royalties. Astellas: up to $1.37B further milestones on VIR-5500; Vir co-funds development and takes 50% of US profit/loss. Norgine: exclusive HDV commercialization in Europe/Australia/NZ plus ECLIPSE cost-sharing (deal value undisclosed). Gilead: milestone/royalty ladder per the Oct 2026 agreement.</div>
+          <div class="holder-note"><b>Major holders (latest filings).</b> <span class="ev fact">FACT</span> 2026 proxy (April): BlackRock 14.83M (9.2%), SVF Endurance/SoftBank 13.12M (8.1%), ARCH Venture Partners 12.92M (8.0%), Glaxo Group 8.55M (5.3%); Vanguard 11.55M (6.85%, 13G/A Jul 31, 2026); SSGA 9.96M (5.9%, 13G Aug 7, 2026). Astellas holds 7.24M (~4.3%); Gilead's 1.77M (~1.0%) is pending closing. Officers and directors as a group: 2.9%.</div>
+        </div>
+      </div>
+      <p class="source-note">All financials: <a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026053549/vir-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> (filed Aug 5, 2026) and <a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026065826/vir-20261009.htm" target="_blank" rel="noopener">Gilead 8-K with agreement summary (Oct 14, 2026)</a>. Holder data: 2026 DEF 14A and Schedule 13G/13G-A filings as summarized by Stock Titan/QuoteMedia.</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Management: a pivot team, refreshed at CFO and CMO weeks before the readout</h2><p class="lede">CEO Marianne De Backer (since April 2023, ex-Bayer) has executed the oncology pivot and the deal cadence. The cost of that record sits beside it: two restructurings, the write-off of the COVID/flu franchises, and now simultaneous CFO and CMO transitions in October 2026.</p></div></div>
+      <div class="people-grid">
+        <article><h3>Track record</h3><ul class="people-list">
+          <li><span class="ev fact">FACT</span> Built the company on the antibody platform; sole approved product was sotrovimab (with GSK), whose authorization lapsed as variants evolved — a scientific success and a commercial dead end.</li>
+          <li><span class="ev fact">FACT</span> August 2024: discontinued influenza and COVID programs, phased out the T-cell vaccine platform, cut ~25% of staff (~$100M targeted savings), and licensed the Sanofi masked-TCE portfolio — the pivot this dossier values.</li>
+          <li><span class="ev fact">FACT</span> 2025–26 deal execution: HBV/HDV partnering (Norgine), VIR-5500 to Astellas ($240M upfront), platform to Gilead ($90M upfront package) — three transactions in ten months, each with a strategic equity component.</li>
+          <li><span class="ev interp">INTERPRETATION</span> The team is demonstrably good at selling the platform to partners and at cutting what is not working. It has not yet carried a self-developed program through a successful pivotal trial and filing — ECLIPSE is the first test of that muscle since the COVID era.</li>
+        </ul></article>
+        <article><h3>Changes and insider signals (EDGAR)</h3><ul class="check-list">
+          <li><span class="ev fact">FACT</span> New CFO Aziz Sawaf appointed Oct 1, effective Oct 5, 2026; new CMO David Liu appointed Oct 7, effective Oct 12, 2026 (8-Ks Oct 1 and Oct 8, 2026) — both seats changed within a month of the pivotal readout window.</li>
+          <li><span class="ev fact">FACT</span> SoftBank's SVF Endurance trimmed from 14.60M shares (Oct 2025 Form 4s, 10b5-1 sales at ~$6) to 13.12M in the April 2026 proxy — a slow, planned exit by the largest legacy holder, not a rush.</li>
+          <li><span class="ev fact">FACT</span> Multiple Form 144 proposed-sale notices were filed Aug–Sep 2026, and routine Form 4 activity is dominated by vesting/exercise events; no open-market insider purchases were identified in the filings reviewed.</li>
+          <li><span class="ev interp">INTERPRETATION</span> Strategic holders (GSK 5.3%, Astellas ~4.3%, Gilead ~1.0% pending, ARCH 8.0%) validate the science and complicate the register: their interests are program-specific, and several are also counterparties or competitors.</li>
+        </ul></article>
+      </div>
+      <p class="source-note">EDGAR full-text and filing index for CIK 1706431 (8-Ks Oct 1, Oct 8, Oct 14, 2026; DEF 14A 2026; Forms 4/144, 2025–2026).</p>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">13 / RED FLAGS</div><div><h2>Ranked: what can break the thesis, in order</h2><p class="lede">Ranking weighs probability against value at risk, as of Oct 16, 2026. <span class="ev interp">INTERPRETATION</span></p></div></div>
+      <div class="risk-list">
+        <article class="risk-item"><div class="risk-rank">01</div><div><h3>The composite endpoint already failed the combination once</h3><p>SOLSTICE's prespecified Week-24 primary — virologic response plus ALT normalization — read 70% monotherapy vs 47% combination. There was no prespecified statistical testing, and the combination's case rests on later TND separation. ECLIPSE 1 moves the composite to Week 48 against deferred treatment, but the ALT leg remains the regimen's demonstrated weak point in the only randomized dataset that exists. <span class="ev fact">FACT</span> (data) / <span class="ev interp">INTERPRETATION</span> (weight)</p></div></article>
+        <article class="risk-item"><div class="risk-rank">02</div><div><h3>Third to market in the lead indication</h3><p>Hepcludex is approved in the US (2026); brelovitug has positive Phase 3 composite data (p&lt;.0001) and a guided H1 2027 filing as a single-agent monthly antibody. Vir's two-drug monthly combo must differentiate on depth of suppression alone, against entrenched and simpler alternatives, while self-funding US commercialization. <span class="ev fact">FACT</span></p></div></article>
+        <article class="risk-item"><div class="risk-rank">03</div><div><h3>Economics are shared at every layer</h3><p>Alnylam royalties and up to $395M of milestones sit on elebsiran; Sanofi takes 20% of certain Astellas proceeds and holds TCE milestones/royalties; Norgine owns HDV commercialization across Europe/Australia/NZ; Astellas takes half of US VIR-5500 profit and all of ex-US. Reported "up to" deal values overstate what reaches Vir shareholders by several turns. <span class="ev fact">FACT</span></p></div></article>
+        <article class="risk-item"><div class="risk-rank">04</div><div><h3>Dilution is the business model's quiet half</h3><p>Shares rose ~21% in seven months of 2026 (offering at a ~$8.50 implied net price; partner equity at $10.36–$14.16). An ATM is on file. A US HDV launch, an ECLIPSE filing, and a VIR-5500 Phase 3 are all ahead of the cash curve's end (H2 2028) — expect the share count, not just the science, to compound. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></p></div></article>
+        <article class="risk-item"><div class="risk-rank">05</div><div><h3>Masked TCEs remain an unproven class</h3><p>No protease-masked TCE has been approved; VIR-5500's durability is unreported; CRS still occurs in half of patients (mostly grade 1); VIR-5818 and VIR-5525 have no efficacy data. The platform's market value currently capitalizes a Phase 1 PSA-response signal. <span class="ev fact">FACT</span></p></div></article>
+        <article class="risk-item"><div class="risk-rank">06</div><div><h3>HBV is a stranded asset absent a partner</h3><p>MARCH functional cure of 4–10% overall has not attracted a Phase 3 partner in ~17 months. Either the data are below the partnering bar or Vir's terms are — both readings cap the program's value near zero until proven otherwise. <span class="ev interp">INTERPRETATION</span></p></div></article>
+        <article class="risk-item"><div class="risk-rank">07</div><div><h3>C-suite churn into the binary</h3><p>CFO and CMO both changed in October 2026, weeks before ECLIPSE 1 topline. Individually explicable (growth-stage finance and clinical leadership for a pivotal year); jointly, they remove the two officers most associated with the readout's delivery and interpretation. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></p></div></article>
+      </div>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">14 / OPEN QUESTIONS</div><div><h2>What this dossier could not close</h2><p class="lede">Stated plainly, in the order they matter.</p></div></div>
+      <div class="open-grid">
+        <article><h3>Option strike schedule</h3><p><span class="ev gap">GAP</span> The Q2 2026 10-Q anti-dilutive table gives option and restricted-share counts but the weighted-average exercise prices were not extracted, so a true treasury-method fully diluted count cannot be computed. Scenarios use the gross 186.6M; the treasury-method figure would be lower and per-share scenario values correspondingly higher.</p></article>
+        <article><h3>Norgine economics</h3><p><span class="ev gap">GAP</span> The December 2025 Norgine license (HDV commercialization, Europe/Australia/NZ, plus ECLIPSE cost-sharing) has no disclosed upfront, milestone or royalty terms in the sources reviewed; the EU value split of the lead asset is therefore unpriced in this dossier.</p></article>
+        <article><h3>VIR-5500 durability</h3><p><span class="ev gap">GAP</span> Duration of response, rPFS and ≥3000 µg/kg cohort follow-up beyond the ASCO GU 2026 cut are not public. The base and bull cases both lean on durability that has not yet been shown.</p></article>
+        <article><h3>ECLIPSE 1 analysis details</h3><p><span class="ev gap">GAP</span> The statistical analysis plan for the Week-48 composite (handling of the deferred arm's pre-switch window, missing-data rules, cirrhosis subgroup power) has not been published; SOLSTICE's descriptive-only precedent argues for caution until the topline release's methods are visible.</p></article>
+        <article><h3>Gilead deal closing</h3><p><span class="ev gap">GAP</span> Closing conditions and expected closing date for the October 2026 Gilead agreement ($65M cash, $25M equity at $14.16) are not stated in the 8-K summary reviewed; pro-forma figures here assume it closes as signed.</p></article>
+        <article><h3>SOLSTICE registration identifier</h3><p><span class="ev gap">GAP</span> SOLSTICE's ClinicalTrials.gov identifier was not confirmed in the sources pulled for this dossier (MARCH is NCT04856085; the ECLIPSE and VIR-5500 identifiers are stated in their sections).</p></article>
+      </div>
+      <div class="verdict-box"><h3>Bottom line</h3><p><span class="ev interp">INTERPRETATION</span> Vir is two asymmetric bets sharing one balance sheet. The HDV bet is near, binary, and no longer first: the science (deep, durable TND suppression) is the best in the field on the measure that predicts outcomes, but the value will be decided by a composite endpoint on which the combination has already trailed once, against competitors who have moved first. The TCE bet is earlier, partnered twice over, and priced on a Phase 1 signal whose durability is unshown. At ~$764M of enterprise value with ~$5.96/share of cash beneath it, the market is paying for the platform and asking the HDV readout to prove it deserves to. Q4 2026 answers the first half of that sentence.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">15 / SOURCES</div><div><h2>References</h2><p class="lede">As-of date: October 16, 2026. Source hierarchy applied: SEC filings, then regulator/trial records, then peer-reviewed literature, then company releases (treated as unverified until corroborated), then trade press and aggregators.</p></div></div>
+      <div class="sources">
+        <article class="source-group"><h3>SEC filings (EDGAR, CIK 1706431)</h3><ul>
+          <li><a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026053549/vir-20260630.htm" target="_blank" rel="noopener">Form 10-Q for Q2 2026</a> (filed Aug 5, 2026) — cash, share counts, collaboration notes (Sanofi, Alnylam, Astellas), offering and equity issuance.</li>
+          <li><a href="https://www.sec.gov/Archives/edgar/data/1706431/000162828026065826/vir-20261009.htm" target="_blank" rel="noopener">Form 8-K, Gilead collaboration</a> (filed Oct 14, 2026) — $90M upfront package, $45M near-term and up to $1.74B milestones, royalty tiers, equity at $14.16.</li>
+          <li>Forms 8-K Oct 1 and Oct 8, 2026 — CFO (Sawaf) and CMO (Liu) appointments. DEF 14A (2026) — beneficial ownership (BlackRock, SVF Endurance, ARCH, Glaxo Group). Schedules 13G/13G-A (Vanguard, Jul 31, 2026; SSGA, Aug 7, 2026). Forms 4/144 (2025–2026).</li>
+        </ul></article>
+        <article class="source-group"><h3>Peer-reviewed literature &amp; congress data</h3><ul>
+          <li>Asselah T, et al. Tobevibart and elebsiran for chronic hepatitis delta (SOLSTICE). <em>N Engl J Med</em> 2026;394:343–53 — design, Week-24 combined response (70% mono vs 47% combo), Week-48 TND 66% (21/32).</li>
+          <li>SOLSTICE Week 72/96 data, AASLD 2025 / EASL Congress 2026 — TND 77% (24/31) Week 72; 88% ITT (28/32) and 97% LOCF (31/32) at Week 96, vs 53% (17/32) monotherapy.</li>
+          <li>MARCH Phase 2 (NCT04856085), EASL Congress 2025 — HBsAg loss and functional-cure rates by cohort and baseline HBsAg.</li>
+          <li>VIR-5500 Phase 1 (NCT05997615), ASCO Genitourinary Cancers Symposium 2026 (de Bono et al.) — PSA50 82% (14/17) at ≥3000 µg/kg Q3W, ORR 45% (5/11), CRS 50%, grade ≥3 TRAEs 12%.</li>
+        </ul></article>
+        <article class="source-group"><h3>Company releases (unverified until corroborated)</h3><ul>
+          <li><a href="https://investors.vir.bio/news/news-details/2026/Vir-Biotechnology-Provides-Corporate-Update-and-Reports-Second-Quarter-2026-Financial-Results/default.aspx" target="_blank" rel="noopener">Q2 2026 corporate update and results</a> (Aug 5, 2026) — ECLIPSE enrollment complete; topline guidance Q4 2026 / Q1 2027; runway into H2 2028; Week-96 SOLSTICE ITT data.</li>
+          <li>ECLIPSE program releases (2025) — trial designs, NCT numbers, Breakthrough Therapy / Fast Track / PRIME / orphan designations.</li>
+          <li>Astellas collaboration close (Apr 2026); Norgine license (Dec 2025); Sanofi license (Aug 2024) — deal structures as summarized in the 10-Q.</li>
+          <li>VIR-5500 FDA Fast Track announcement (Oct 2026).</li>
+        </ul></article>
+        <article class="source-group"><h3>Competitors, trade press &amp; market data</h3><ul>
+          <li>Mirum Pharmaceuticals: AZURE-1 topline release (Sep 28, 2026) — 56%/45% vs 0%, p&lt;.0001; AZURE-4 guided Q4 2026; BLA guided H1 2027; company peak-sales claim (≥$1B) treated as unverified and not used in scenarios.</li>
+          <li>Gilead/Fierce Pharma — Hepcludex FDA approval (spring 2026), first US HDV therapy.</li>
+          <li><a href="https://www.reuters.com/legal/litigation/vir-gilead-team-up-solid-tumor-cancer-therapies-up-19-billion-deal-2026-10-14/" target="_blank" rel="noopener">Reuters (Oct 14, 2026)</a> — Gilead deal terms, market reaction. OncLive / Targeted Oncology / Urology Times — VIR-5500 ASCO GU data.</li>
+          <li>MarketBeat — daily price history (Oct 2026 closes; $10.47 on Oct 15, 2026). Finnhub — 52-week range $4.815–$12.00. Stockopedia — average analyst target $20.78 (aggregator, ~Oct 2026). Barchart — estimated Q3 earnings date ~Nov 4, 2026 (inferred tag applied).</li>
+        </ul></article>
+      </div>
+      <div class="method"><b>Method &amp; limits.</b> Figures are drawn from the filings and sources above as of Oct 16, 2026; where sources conflict, the higher-hierarchy source governs and the conflict is flagged in-line. Cross-trial comparisons are presented as landscape context only, never as head-to-head claims. Mirum's and Vir's composite endpoints differ in timepoint (Week 24 vs Week 48) and population. No personal information of any kind appears in this dossier.</div>
+    <div class="fine">Prepared October 16, 2026 · Vir Biotechnology, Inc. (NASDAQ: VIR) · CIK 1706431 · This dossier is research, not investment advice.</div>
+    </section>
+</main>
+
+  <script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>CABA — Cabaletta Bio · Deep-Dive Dossier · 2026-10-16</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · CABA</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>One CAR T, six diseases, and a share count that tripled while nobody was watching the dose data.</h1>
+<p class="hero-dek">Cabaletta Bio, Inc. is a Philadelphia-based, clinical-stage cell-therapy company whose value rests on a single asset — rese-cel (resecabtagene autoleucel, formerly CABA-201), a fully human, 4-1BB CD19 CAR T cell therapy dosed once at 1×10⁶ cells/kg after patients stop immunomodulators. The Phase 1/2 signals across myositis, lupus, systemic sclerosis and myasthenia gravis are genuinely unusual. So is the capital structure: between mid-2025 and September 2026 the share count went from ~51M to ~214M, and the market now prices the whole program at roughly cash.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$1.55</div><div class="quote-label">Close · Oct 15, 2026 (MarketBeat price history)</div>
+<div class="quote-meta"><strong>~$36M</strong> est. enterprise value on the post-warrant-exercise share count<br>~$331M equity value (~213.7M shares, est.) · ~$295M est. pro-forma cash · no debt other than finance leases</div>
+</div></div></header>
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#pipeline">Pipeline</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button></nav></div>
+<main>
+
+<section id="frame">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A registrational story trading like a cash shell</h2><p class="lede">Cabaletta has something most autoimmune CAR T sponsors do not yet have: an FDA-aligned, single-arm registrational design in myositis with RMAT designation and a BLA submission guided for 2H 2027. It also has a chart and a cap table that explain why the equity is cheap — three dilutive financings in fifteen months, the last of which put ~46M new shares into the float in a single warrant-expiry window in September 2026.</p></div></div>
+<div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$36M</div><p><span class="ev interp">INTERPRETATION</span> ~$331M equity value on ~213.7M post-expiry shares at $1.55, less ~$295M estimated pro-forma cash. The market is assigning almost no value to the rese-cel program above cash. Both inputs are estimates — see §07 for the bridge and its gaps.</p></article>
+<article class="decision"><div class="tag">Single swing factor</div><div class="big">Myositis registrational cohort</div><p><span class="ev fact">FACT</span> FDA-aligned single-arm cohorts in dermatomyositis/antisynthetase syndrome and IMNM, primary endpoint built on the Total Improvement Score within 26 weeks. Company math says ≤50% of patients need to hit the endpoint for a positive study. Everything else in the story is sequenced behind this.</p></article>
+<article class="decision warn"><div class="tag">Cash / runway</div><div class="big">Into mid-2027 — guided pre-warrant-money</div><p><span class="ev fact">FACT</span> $225.1M cash at Jun 30, 2026; the company's mid-2027 runway guide predates ~$115.0M of gross warrant-exercise proceeds received Jul–Sep 2026. <span class="ev interp">INTERPRETATION</span> Pro-forma cash ≈ $295M after estimated Q3 burn — enough to reach the registrational data, not to launch.</p></article>
+<article class="decision"><div class="tag">Regulatory state</div><div class="big">RMAT ×3 programs</div><p><span class="ev fact">FACT</span> RMAT designation for rese-cel in myositis and in SLE/lupus nephritis, and (Jan 2026) systemic sclerosis; Fast Track in dermatomyositis, SLE, LN, SSc, gMG and MS. No approved autoimmune CAR T exists anywhere in the class yet.</p></article>
+</div>
+<div class="thesis">
+<article class="thesis-card"><h3>Why the setup is interesting</h3><ul>
+<li>The academic CD19 CAR T experiment this field is built on produced drug-free remissions in refractory lupus, myositis and systemic sclerosis (Müller et al., NEJM 2024, n=15) — rese-cel is the industrial version of that biology, run at one fixed dose across six diseases.</li>
+<li>Phase 1/2 data are directionally consistent across independent indications: 5/6 dermatomyositis patients met the registrational endpoint definition at week 16 and stayed off immunomodulators up to ~1.5 years; 10/13 refractory gMG patients improved clinically meaningfully off immunomodulators.</li>
+<li>The registrational bar in myositis is unusually legible: a validated endpoint (TIS), a single arm, ~15–17 patients per subtype cohort, and a pooled ~100-patient safety database the FDA has already sized.</li>
+<li>At ~$36M of implied enterprise value, the market is not pricing even the myositis indication — it is pricing financing and execution risk.</li>
+</ul></article>
+<article class="thesis-card risk"><h3>What the low price is actually telling you</h3><ul>
+<li>Every efficacy number in this dossier is single-arm, open-label, small-n, and mostly company-reported from congress presentations. There is no randomized rese-cel data and no peer-reviewed rese-cel publication yet.</li>
+<li>The share count roughly quadrupled in fifteen months (50.7M at Dec 31, 2024 → ~213.7M est. after Sep 2026). Per-share upside math that ignores this is wrong by 4×.</li>
+<li>Kyverna is ahead: its SPS registrational trial met its primary endpoint and a rolling BLA is targeted for completion in Q4 2026. First approval in autoimmune CAR T will set the label, the safety bar and the payer template for everyone behind it.</li>
+<li>Autologous manufacturing at commercial scale — vein-to-vein logistics, cost of goods, capacity — is unproven for every sponsor in this class, Cabaletta included.</li>
+</ul></article>
+</div>
+<p class="source-note">Identity: Cabaletta Bio, Inc., Nasdaq: CABA, CIK 0001759138, Delaware corporation, HQ 2929 Arch Street, Suite 600, Philadelphia, PA (SEC EDGAR company record; Q2 2026 10-Q filed Aug 13, 2026). Market data: MarketBeat price history (Oct 15, 2026 close $1.55; 52-week range $1.51–$4.23).</p>
+</section>
+
+<section id="science">
+<div class="section-head"><div class="section-num">02 / SCIENCE</div><div><h2>Delete the B-cell compartment, let it grow back different</h2><p class="lede">Rese-cel does not block a pathway. It removes the CD19-positive B-cell lineage — including the autoreactive memory cells that antibodies and FcRn inhibitors cannot reach — and bets that the regenerated repertoire comes back without the autoimmune clones. That is the "immune reset" hypothesis. Cabaletta's founding platform, CAAR T, is the opposite philosophy: kill only the B cells that make one specific autoantibody.</p></div></div>
+<div class="science-chain" aria-label="Rese-cel mechanism chain">
+<article><b>01</b><h3>Autoreactive B cells</h3><p>In myositis, SLE, SSc, MG and PV, B cells present antigen, secrete cytokines and mature into autoantibody-producing plasmablasts. Chronic drugs suppress; they rarely erase the memory compartment.</p></article>
+<article><b>02</b><h3>One weight-based dose</h3><p>Patient T cells are collected, engineered with a lentiviral vector encoding a fully human anti-CD19 CAR (4-1BB co-stimulation, CD3ζ signaling), and reinfused once at 1×10⁶ cells/kg — after immunomodulators are stopped and, in most cohorts, after fludarabine/cyclophosphamide preconditioning.</p></article>
+<article><b>03</b><h3>Deep, transient depletion</h3><p>CAR T expansion peaks around week 2; peripheral B cells are depleted by ~day 15 across RESET cohorts. Tissue-resident B cells — the claimed advantage over monoclonal antibodies — are the mechanistic bet, not a measured endpoint in most cohorts.</p></article>
+<article><b>04</b><h3>Naïve reconstitution</h3><p>B cells return at a median of ~85 days in the MG cohort, dominated by transitional/naïve phenotypes. If autoreactive clones do not return with them, remission can persist off all immunomodulators — the entire value proposition, and still a hypothesis at registrational scale.</p></article>
+</div>
+<div class="moa-box"><h3>Rese-cel in 60 seconds <span class="ev interp">INTERPRETATION</span></h3>
+<p><strong>Plain English.</strong> Take the patient's own T cells, give them a homing device for CD19 — a protein on almost all B cells — and put them back. For a few weeks they hunt down B cells everywhere, including the ones making the autoantibodies driving disease. The B-cell system then regrows from scratch. If the regrown system has "forgotten" the autoimmune program, the patient stays well with no drugs at all.</p>
+<p><strong>Technical.</strong> Autologous, lentivirally transduced CAR T: fully human anti-CD19 scFv binder (licensed from IASO Biotherapeutics), 4-1BB co-stimulatory domain chosen over CD28 for slower, more persistent expansion kinetics, CD3ζ activation. Single infusion of 1×10⁶ CAR+ cells/kg. Standard cohorts use fludarabine/cyclophosphamide lymphodepletion; the preconditioning-free (PC-free) cohorts omit it. CD19 is expressed from pro-B cells through plasmablasts but is down-regulated on long-lived plasma cells — a real mechanistic ceiling: autoantibody production from established long-lived plasma cells is not directly targeted.</p></div>
+<div class="moa-box"><h3>The founding platform: CAAR T <span class="ev fact">FACT</span></h3>
+<p><strong>How it differs.</strong> A chimeric autoantibody receptor (CAAR) displays the <em>autoantigen itself</em> — e.g., desmoglein-3 (DSG3) for pemphigus vulgaris, MuSK for MuSK-positive MG — as the extracellular domain. Only B cells whose surface immunoglobulin (BCR) recognizes that autoantigen engage the CAAR T cell and are killed. Protective B cells are spared in principle. The concept was demonstrated preclinically by Ellebrecht et al. (Science, 2016) from the University of Pennsylvania — Cabaletta's scientific home (co-founders Aimee Payne and Michael Milone; Carl June on the scientific advisory board).</p>
+<p><strong>Where it stands.</strong> DSG3-CAART (mucosal PV) and MuSK-CAART (MuSK MG) reached Phase 1, but neither appears in the company's 2026 strategic priorities; the capital and the narrative have moved entirely to rese-cel's broad depletion strategy. The CAAR programs are option value, not the thesis — and the strategic pivot itself is information: broad CD19 depletion produced stronger clinical signals than antigen-specific deletion did.</p></div>
+<div class="fail-grid" aria-label="Ways the mechanism could fail">
+<article><h3>1 · The reset does not hold</h3><p>Reconstituted B cells are naïve-phenotype, but naïve repertoires can re-generate autoreactivity in a genetically primed host. ASyS durability was already described as "variable" in the company's own EULAR 2026 readout. Relapse at year 2–3 converts a "cure" into an expensive remission — with no redosing data.</p></article>
+<article><h3>2 · Long-lived plasma cells survive</h3><p>CD19 is lost as B cells mature into long-lived plasma cells. Diseases where LLPCs carry a large share of autoantibody production may show serology and symptoms that a CD19 CAR cannot fully extinguish — one plausible reason AChR-negative and seronegative MG cohorts matter scientifically.</p></article>
+<article><h3>3 · Conditioning is part of the drug</h3><p>Fludarabine/cyclophosphamide carries infertility, infection and secondary-malignancy baggage that is tolerated in refractory cancer but will be weighed differently in a 30-year-old with lupus. The PC-free data (PV, n=4) are encouraging and tiny; if PC-free does not replicate at dose, the addressable population shrinks to severe, refractory disease.</p></article>
+<article><h3>4 · Class toxicity lands on someone</h3><p>All approved CD19/BCMA CAR Ts carry an FDA boxed warning for secondary T-cell malignancies and 15-year follow-up obligations. In autoimmune trials of a competitor construct (Novartis rap-cel), three deaths from IEC-HS were reported (BioSpace, Sep 2026). One class-level safety event re-prices every sponsor, guilty or not.</p></article>
+<article><h3>5 · CRS/ICANS at registrational scale</h3><p>Rese-cel's reported profile is mild so far (mostly grade 1–2 CRS, no ICANS in the small PC-free cohort), but the pooled safety database is ~100 patients by design. Rare severe CRS/ICANS or late cytopenias will only declare themselves at exactly the scale the BLA requires.</p></article>
+<article><h3>6 · Manufacturing is the dose</h3><p>An autologous product is a process, not a pill. Out-of-spec runs, vein-to-vein delays and site-to-site variability are efficacy variables. Cabaletta is mid-transition to Lonza commercial process and Cellares automated Cell Shuttle production — comparability questions can become regulatory questions.</p></article>
+</div>
+<div class="safety-grid">
+<article><h3>What rese-cel safety shows so far</h3><p><span class="ev unverified">UNVERIFIED · CONGRESS</span> RESET-MG (n=13 dosed): low-grade CRS in 2 patients, two treatment-related SAEs (decreased appetite/functional decline; febrile neutropenia), one death ~1 year post-infusion assessed as unrelated. PC-free PV (n=4): no DLTs, no ICANS, one grade 1 CRS. No high-grade CRS/ICANS signal has been reported in any RESET cohort to date — on small denominators.</p></article>
+<article><h3>The academic anchor</h3><p><span class="ev fact">FACT · PEER-REVIEWED</span> Müller et al., NEJM 2024: 15 patients (8 SLE, 3 myositis, 4 SSc) treated with an academic CD19 CAR T — all SLE patients reached DORIS remission, drug-free; CRS was mostly low-grade. Mackensen et al., Nature Medicine 2022 first showed SLE remissions with the same approach. This is the evidence the whole field — Cabaletta included — is extrapolating from.</p></article>
+<article><h3>What remains unknowable</h3><p><span class="ev gap">GAP</span> No peer-reviewed rese-cel dataset exists yet; durability beyond ~1.5 years, pregnancy/fertility outcomes after conditioning (an NEJM 2026 letter on academic CAR T pregnancies is reassuring but is not rese-cel data), and late malignancy risk are all open.</p></article>
+</div>
+<p class="source-note">Mechanism and platform: Q2 2026 10-Q (CARTA/CAART strategy, IASO license, Lonza/Cellares/Oxford reliance); Ellebrecht et al., <em>Science</em> 2016 (DSG3 CAAR proof-of-concept); Müller et al., <em>NEJM</em> 2024; Mackensen et al., <em>Nature Medicine</em> 2022. Safety: AANEM 2026 RESET-MG presentation as reported by NeurologyLive; ASGCT 2026 PC-free PV data (company release, May 14, 2026); BioSpace, Sep 1, 2026 (class safety / rap-cel IEC-HS deaths).</p>
+</section>
+
+<section id="clinical">
+<div class="section-head"><div class="section-num">03 / CLINICAL</div><div><h2>One dose, six single-arm trials, no control groups anywhere</h2><p class="lede">Every RESET trial follows the same template: stop immunomodulators, precondition (except the PC-free cohorts), one infusion at 1×10⁶ cells/kg, then measure whether disease control survives without the drugs the patient came in on. The design makes the drug-free endpoint honest and the efficacy attribution weak — both at once.</p></div></div>
+<div class="signal-grid">
+<article class="paper-card">
+<div class="program-kicker">Lead program · registrational</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Rese-cel · RESET-Myositis <small>NCT06154252</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> Phase 1/2, single-arm, open-label. Cohorts: dermatomyositis (DM), antisynthetase syndrome (ASyS), immune-mediated necrotizing myopathy (IMNM), and juvenile DM. Phase 1/2 adult cohorts fully enrolled (Sep 30, 2025). RMAT + Fast Track (DM).</p>
+<div class="status-row"><span class="pill">Registrational cohorts enrolling</span><span class="pill">BLA guided 2H 2027</span></div>
+<table class="study-table"><thead><tr><th>Dataset</th><th>Result (company-reported)</th><th>Status</th></tr></thead><tbody>
+<tr><td data-label="Dataset">DM, Phase 1/2 (EULAR 2026)</td><td data-label="Result">5/6 (83%) achieved IM-free, moderate-to-major TIS response at week 16 — the registrational primary-endpoint definition; all 5 maintained response through latest follow-up, up to ~1.5 years</td><td data-label="Status">Congress data <span class="ev unverified">UNVERIFIED</span></td></tr>
+<tr><td data-label="Dataset">ASyS, Phase 1/2</td><td data-label="Result">3/4 (75%) met the same week-16 IM-free TIS response; durability described by the company as variable</td><td data-label="Status">Congress data <span class="ev unverified">UNVERIFIED</span></td></tr>
+<tr><td data-label="Dataset">Juvenile DM (first patient)</td><td data-label="Result">Moderate TIS response off immunomodulators, maintained at 32 weeks; JDM expected in the 2H27 BLA, which the company notes could support a priority review voucher</td><td data-label="Status">n=1 <span class="ev unverified">UNVERIFIED</span></td></tr>
+<tr><td data-label="Dataset">Registrational cohorts</td><td data-label="Result">Two single-arm, subtype-specific cohorts (DM/ASyS and IMNM), ~15 patients each per the Apr 2025 FDA Type C alignment; primary endpoint TIS-based within 26 weeks; company states ≤50% response suffices for a positive study against a conservatively high assumed control rate</td><td data-label="Status">FDA-aligned design <span class="ev fact">FACT</span></td></tr>
+</tbody></table>
+<p class="source-note">TIS (Total Improvement Score) is the ACR/EULAR myositis composite used in the IVIg (Octagam) DM approval — the endpoint precedent the FDA alignment rests on. No p-values are generated by a single-arm design; the "≤50%" bar is a company framing of the success criterion, not an FDA-published threshold.</p>
+</article>
+<article class="paper-card">
+<div class="program-kicker">Second pivotal indication · announced Jun 3, 2026</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Rese-cel · RESET-SSc <small>NCT06328777</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> Phase 1/2 in systemic sclerosis (skin ± organ cohorts). RMAT granted (Jan 2026) and Fast Track held. Company announced SSc as the second pivotal indication at EULAR 2026.</p>
+<div class="status-row"><span class="pill">Registrational start guided 4Q 2026</span><span class="pill">~25 patients, SSc-ILD</span></div>
+<p><span class="ev unverified">UNVERIFIED · CONGRESS</span> Phase 1/2 data showed improvements in skin and lung measures after a single dose with immunomodulators discontinued, with most patients' response magnitude still increasing at later follow-up (EULAR 2026). Patient-level n, effect sizes and confidence intervals are in the congress presentations, not in a peer-reviewed source — treat the direction as encouraging and the magnitude as unquantified here.</p>
+<p><span class="ev interp">INTERPRETATION</span> SSc-ILD is a strategically clean second indication: measurable (mRSS, FVC), high mortality, no B-cell-depleting standard that owns the space, and the academic NEJM series included SSc responders. It is also a slower, harder endpoint than TIS — the registrational readout will lag myositis by years, not months.</p>
+</article>
+</div>
+<div class="signal-grid" style="margin-top:20px">
+<article class="paper-card">
+<div class="program-kicker">Rheumatology · registrational path in design</div><h3>RESET-SLE <small>NCT06121297</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> Phase 1/2 in non-renal SLE and lupus nephritis cohorts. RMAT (SLE/LN) + Fast Track. Jan 2026 priorities: registrational cohort designs in SLE and LN of ~25 patients each.</p>
+<p><span class="ev unverified">UNVERIFIED · CONGRESS</span> EULAR 2026: the vast majority of DM and lupus patients maintained IM-free responses at latest follow-up; the first two PC-free lupus patients showed deep B-cell depletion at the lowest dose, with translational data the company describes as similar to preconditioned patients who achieved immune reset. SLE is the largest prize and the hardest endpoint in the program — SLE responder indices in single-arm data deserve the deepest discount in this dossier.</p>
+</article>
+<article class="paper-card">
+<div class="program-kicker">Neurology · data landed Sep–Oct 2026</div><h3>RESET-MG <small>NCT06359041</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> Phase 1/2 in refractory generalized MG, AChR-positive (n=7) and AChR-negative (n=6) cohorts, MGFA II–IV, MG-ADL ≥6 despite ≥2 prior therapies. Fast Track held.</p>
+<p><span class="ev unverified">UNVERIFIED · AANEM 2026</span> 10/13 patients achieved clinically meaningful MG-ADL improvement off immunomodulators (5 AChR+, 5 AChR−). Mean MG-ADL change among patients not receiving rescue: −7.4 at week 12 (n=11), −9.8 at week 24 (n=4). Three patients required rescue therapy (IVIg, efgartigimod) — they are part of the result, not an exclusion from it. B-cell reconstitution in 7/13 at median 85 days. The company had guided to announcing registrational plans for MG in mid-2026; the AANEM dataset is the input to that decision. <span class="ev gap">GAP</span> A formal registrational design for MG had not been published as of Oct 16, 2026.</p>
+</article>
+</div>
+<div class="signal-grid" style="margin-top:20px">
+<article class="paper-card">
+<div class="program-kicker">Regimen innovation · dermatology</div><h3>RESET-PV <small>NCT05938725</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> The PC-free test bed: rese-cel at the standard 1×10⁶ cells/kg <em>without</em> fludarabine/cyclophosphamide preconditioning, in refractory pemphigus vulgaris. (This trial is rese-cel, distinct from the older DSG3-CAART program in the same disease.)</p>
+<p><span class="ev unverified">UNVERIFIED · ASGCT 2026</span> Lowest-dose cohort (n=4, ≥24 weeks follow-up): 3/4 complete peripheral B-cell depletion, CAR expansion kinetics comparable to preconditioned patients, 2/4 with drug-free responses through 6 months; no DLTs, no ICANS, one grade 1 CRS. A higher-dose cohort is enrolling. If PC-free replicates, it is the single biggest access/COGS lever in the story — and it currently rests on four patients.</p>
+</article>
+<article class="paper-card">
+<div class="program-kicker">Neurology · earliest stage</div><h3>RESET-MS <small>NCT07069702</small></h3>
+<p class="mechanism"><span class="ev fact">FACT</span> Registry-verified study of rese-cel in multiple sclerosis (relapsing and progressive cohorts per company program materials); Fast Track held for MS. Enrollment-by-invitation status on ClinicalTrials.gov suggests investigator-network-driven early enrollment.</p>
+<p><span class="ev gap">GAP</span> No rese-cel MS clinical data had been disclosed as of Oct 16, 2026. MS is the most crowded B-cell market in medicine (anti-CD20 antibodies are entrenched, cheapening, and effective); a CAR T entrant needs a progressive-MS efficacy story, not a relapsing one, and none exists yet.</p>
+</article>
+</div>
+<p class="source-note">Registry records: ClinicalTrials.gov API, retrieved Oct 16, 2026 (NCT06154252, NCT06121297, NCT06328777, NCT06359041, NCT05938725, NCT07069702). Clinical results: EULAR 2026 (Jun 3, 2026 release / 8-K Ex-99.1), AANEM 2026 (NeurologyLive report), ASGCT 2026 (May 14, 2026 release). All rese-cel efficacy data are company-reported congress data — none peer-reviewed as of this dossier.</p>
+</section>
+
+<section id="pipeline">
+<div class="section-head"><div class="section-num">04 / PIPELINE</div><div><h2>Ranked by value: one asset, sequenced by regulatory distance</h2><p class="lede">There is no second asset to value. The ranking is an ordering of indications by how much of the equity story each carries — registrational proximity first, market size second, data quality as the tiebreak.</p></div></div>
+<div class="pipeline">
+<div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">Rese-cel — Myositis (DM / ASyS / IMNM / JDM)</div><div class="pipe-desc">Registrational single-arm cohorts, RMAT, BLA guided 2H 2027. ~80,000 US patients (company figure); IVIg is the only approved therapy, for a subset. The binary that decides whether CABA is a company or a science project.</div></div><div class="pipe-status">Registrational</div></div>
+<div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">Rese-cel — Systemic sclerosis (SSc-ILD)</div><div class="pipe-desc">Second pivotal indication (Jun 2026); ~25-patient single-arm registrational study guided to start 4Q 2026. RMAT + Fast Track. Slower endpoint, cleaner competitive field.</div></div><div class="pipe-status">Pivotal start 4Q26</div></div>
+<div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">Rese-cel — SLE / Lupus nephritis</div><div class="pipe-desc">Largest market in the program and the original academic proof-of-concept disease. Registrational cohorts (~25 each) in design since Jan 2026; PC-free cohorts may matter most here, where conditioning toxicity is hardest to justify in young patients.</div></div><div class="pipe-status">Phase 1/2</div></div>
+<div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">Rese-cel — Generalized MG</div><div class="pipe-desc">AANEM 2026 data (10/13 meaningful responders off immunomodulators, 3 rescues) support a registrational conversation, but Kyverna is already in a Phase 3 here with a head start measured in years.</div></div><div class="pipe-status">Phase 1/2</div></div>
+<div class="pipe-row"><div class="pipe-rank">05</div><div><div class="pipe-name">PC-free regimen (PV proof-of-mechanism → program-wide)</div><div class="pipe-desc">Not an indication — a regimen. Dropping lymphodepletion would cut cost, toxicity and site requirements across every indication above. Evidence today: 4 PV patients at the lowest dose.</div></div><div class="pipe-status">Dose escalation</div></div>
+<div class="pipe-row"><div class="pipe-rank">06</div><div><div class="pipe-name">Rese-cel — Multiple sclerosis</div><div class="pipe-desc">Registry-verified, no data. Option value only until a progressive-MS signal exists.</div></div><div class="pipe-status">Early</div></div>
+<div class="pipe-row"><div class="pipe-rank">07</div><div><div class="pipe-name">MuSK-CAART / DSG3-CAART (CAAR platform)</div><div class="pipe-desc">Phase 1 antigen-specific programs; absent from 2026 strategic priorities. Scientific heritage and partnering optionality, carried at ~zero in the scenarios.</div></div><div class="pipe-status dead">Deprioritized</div></div>
+</div>
+<p class="source-note">Ranking: Spark synthesis of registrational proximity (SEC filings, FDA designations), EULAR/AANEM/ASGCT 2026 data quality, and competitive position. US myositis prevalence is a company figure from its May 15, 2025 release — <span class="ev unverified">UNVERIFIED</span> as an epidemiological estimate.</p>
+</section>
+
+<section id="competition">
+<div class="section-head"><div class="section-num">05 / LANDSCAPE</div><div><h2>Kyverna is the clock; everyone else is the context</h2><p class="lede">Autoimmune CAR T has no approved product, one sponsor (Kyverna) at the BLA threshold, one big-pharma safety failure (Novartis), and a crowd of alternative B-cell strategies that do not require a cell-therapy center. Comparisons below are structural — trial design, regulatory position, regimen — not cross-trial efficacy claims, which the data do not support.</p></div></div>
+<div class="compare">
+<article class="compare-card"><div class="tag">The leader · KYTX</div><div class="name">Kyverna — miv-cel (KYV-101)</div><dl>
+<dt>Construct</dt><dd>Fully human CD19 CAR, <strong>CD28</strong> co-stimulation (rese-cel uses 4-1BB)</dd>
+<dt>Regulatory position</dt><dd>SPS registrational trial met its primary endpoint (T25FW, p=0.0003, n=26); rolling BLA completion targeted Q4 2026; gMG in registrational Phase 3 (Phase 2 portion n=7)</dd>
+<dt>Focus</dt><dd>Neuro-immunology first (SPS, gMG, progressive MS) — Cabaletta's rheum-first sequence is the mirror image</dd>
+<dt>Read-through</dt><dd>First approval in class sets label language, safety monitoring expectations and payer precedent for rese-cel's 2027 filing</dd></dl></article>
+<article class="compare-card"><div class="tag">The cautionary tale · Novartis</div><div class="name">Rap-cel (YTB323)</div><dl>
+<dt>What happened</dt><dd>Rapid-manufacturing CD19 CAR T; autoimmune development was halted after three patient deaths attributed to IEC-HS (hemophagocytic-like syndrome), as reported by BioSpace (Sep 2026)</dd>
+<dt>Why it matters here</dt><dd>Proves the class can kill in autoimmune patients, not just oncology patients. Any severe inflammatory toxicity in any sponsor's trial will be read against this precedent — by the FDA and by investors</dd></dl></article>
+<article class="compare-card"><div class="tag">The logistics threat · allogeneic + mRNA</div><div class="name">Adicet prula-cel · Cartesian Descartes-08</div><dl>
+<dt>Adicet</dt><dd>Off-the-shelf γδ CD19 CAR T in lupus: company reported 54% remission at 12 months (Oct 2026, n=24 safety set, no ICANS/no CRS &gt;grade 2). If allo durability holds, autologous vein-to-vein economics are the weakest link in the rese-cel model</dd>
+<dt>Cartesian</dt><dd>mRNA BCMA CAR T in MG: transient expression, no genomic integration, outpatient-oriented — trades depth/durability for safety and repeatability</dd>
+<dt>Non-cell bar</dt><dd>FcRn inhibitors, complement inhibitors and anti-CD19/CD20 antibodies keep improving in MG/LN. They are chronic and suppressive — and available at an infusion center today, which is the real benchmark payers will use</dd></dl></article>
+</div>
+<div class="readthrough"><strong>Differentiation that is actually Cabaletta's:</strong> (1) indication sequencing — myositis/SSc/SLE registrational path in rheumatology while Kyverna runs neuro; (2) a fixed, single weight-based dose with a pooled cross-program safety database (~100 patients) negotiated with FDA up front; (3) the PC-free program — nobody else has shown CAR expansion and responses with <em>no</em> lymphodepletion, on however few patients; (4) automated Cell Shuttle manufacturing data (first 2 patients' PK/PD consistent with conventional product). Differentiation that is <em>not</em>: "immune reset" (the whole class claims it), fully-human binder (Kyverna has one too), and RMAT (shared with Kyverna in overlapping indications).</div>
+<p class="source-note">Competitor facts: Kyverna Q2 2026 results and Sep 24, 2026 release (via StockTitan/GlobeNewswire); AAN 2026 SPS late-breaker (GlobeNewswire, Apr 21, 2026); BioSpace Sep 1, 2026 (rap-cel IEC-HS deaths); Adicet Oct 2026 data (company release via news reports). No head-to-head trials exist between any of these products.</p>
+</section>
+
+<section id="financials">
+<div class="section-head"><div class="section-num">06 / FINANCIALS</div><div><h2>The warrant expiry rebuilt the balance sheet — and the float</h2><p class="lede">In September 2026 the June 2025 financing's $2.50 warrants expired. Holders exercised 46,011,900 of them in the final ten weeks, handing Cabaletta ~$115M in gross proceeds and handing the float ~46M new shares at the same time. Any CABA number dated before that window — share count, market cap, cash, runway — is stale.</p></div></div>
+<div class="fin-grid"><div>
+<div class="metric-stack">
+<div class="metric"><b>$225.1M</b><span>Cash &amp; equivalents · Jun 30, 2026 (10-Q) · ST investments ~$0 at quarter-end</span></div>
+<div class="metric"><b>~$295M</b><span>Est. pro-forma cash · + $115.0M warrant proceeds (Jul–Sep 2026, gross) − ~$45M est. Q3 burn <span class="ev interp">ESTIMATE</span></span></div>
+<div class="metric"><b>$84.1M</b><span>Operating cash used · H1 2026 (~$42M/quarter and rising with registrational enrollment)</span></div>
+<div class="metric"><b>~$94M</b><span>Net loss · H1 2026 (Q2 alone: $51.0M; opex $52.0M in Q2) · accumulated deficit $611.5M</span></div>
+</div>
+<div class="runway"><b>Runway: guided into mid-2027 on the June cash balance; the warrant money extends the arithmetic, not yet the guidance.</b><p><span class="ev fact">FACT</span> The mid-2027 guide was given with $225.1M in hand. <span class="ev interp">INTERPRETATION</span> Adding ~$115M gross and subtracting Q3 burn gives ~$295M, or ~6–7 quarters at the current ~$42–45M/quarter pace — into roughly mid-2028 — before any launch spend. Registrational + pre-commercial burn will not stay at the current pace; expect the company to raise again before or alongside a BLA filing rather than after approval.</p></div>
+</div><div>
+<table class="cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>Note</th></tr></thead><tbody>
+<tr><td>Common outstanding · Dec 31, 2024</td><td>50,743,101</td><td>10-K / equity statement <span class="ev fact">FACT</span></td></tr>
+<tr><td>Common outstanding · Jun 30, 2026</td><td>167,726,537</td><td>Q2 2026 10-Q equity statement <span class="ev fact">FACT</span></td></tr>
+<tr><td>Common outstanding · Aug 7, 2026 (cover)</td><td>169,545,445</td><td>10-Q cover — already stale on publication <span class="ev fact">FACT</span></td></tr>
+<tr><td>Warrant exercises · Jul 1–Sep 12, 2026</td><td>+46,011,900</td><td>$2.50 strike; ~$115.0M gross (Sep 14, 2026 8-K) <span class="ev fact">FACT</span></td></tr>
+<tr><td><strong>Est. shares outstanding now</strong></td><td><strong>~213.7M</strong></td><td>167,726,537 + 46,011,900; excludes minor Q3 option/RSU issuance <span class="ev interp">ESTIMATE</span></td></tr>
+<tr><td>Stock options · Jun 30, 2026</td><td>17,823,140</td><td>Anti-dilutive table, 10-Q. <span class="ev gap">GAP</span> WAEP not isolated in this pass — treasury-method net adds cannot be computed exactly</td></tr>
+<tr><td><strong>FD (face) for scenarios</strong></td><td><strong>~231.6M</strong></td><td>~213.7M basic + 17.8M options at face (conservative vs treasury method)</td></tr>
+<tr><td>June 2025 warrants remaining</td><td>1,803,190 expired</td><td>53,090,190 issued; 51,287,000 exercised in total for ~$128.2M gross; remainder expired Sep 12, 2026 unexercised <span class="ev fact">FACT</span></td></tr>
+</tbody></table>
+<div class="overhang"><b>$567.0M</b><span> — aggregate net equity proceeds raised since inception through Jun 30, 2026 (10-Q MD&amp;A), before the ~$115M of Q3 warrant money. The dilution history is the story: Jun 2025 unit offering (39.2M shares + 53.09M warrants at $2.50), May 2026 underwritten offering (51,725,000 shares at $2.90, ~$140.2M net), then the warrant exercises. The 2024 ATM ($200M) was terminated Jun 11, 2025. There is no debt other than finance leases.</span></div>
+</div></div>
+<p class="source-note">All figures: Q2 2026 10-Q (filed Aug 13, 2026) and Sep 14, 2026 Form 8-K (Item 8.01, warrant exercises). Aggregator market caps (~$263M) still divide by the stale Aug 7 share count; on the post-expiry count the Oct 15 close of $1.55 implies ~$331M of equity value and ~$1.38 of estimated cash per share — the stock trades close to its own cash, which is the market's verdict on execution risk, not on the science.</p>
+</section>
+
+<section id="catalysts">
+<div class="section-head"><div class="section-num">07 / CATALYSTS</div><div><h2>What moves this, in order</h2><p class="lede">Date quality is tagged on every item: <span class="date-tag hard">Hard</span> a fixed date, <span class="date-tag guidance">Guidance</span> a company window, <span class="date-tag inferred">Inferred</span> an estimate from cadence or registry.</p></div></div>
+<div class="timeline">
+<div class="event"><div class="event-date">Q3 2026 report · ~Nov 2026 <span class="date-tag inferred">Inferred</span></div><div class="event-body"><b>First post-warrant balance sheet</b>Q3 10-Q will print the actual post-expiry share count and cash balance — resolving this dossier's two biggest estimates (~213.7M shares, ~$295M cash). Modest as catalysts go, but it reprices every per-share model on the street, most of which still run on stale counts.</div></div>
+<div class="event"><div class="event-date">4Q 2026 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>SSc registrational study initiation</b>Single-arm, ~25 SSc-ILD patients. Confirms the second pivotal program is real and starts its multi-year clock.</div></div>
+<div class="event"><div class="event-date">4Q 2026 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Kyverna rolling BLA completion (SPS)</b>Competitor event, class-defining: the first autoimmune CAR T filing package the FDA reviews will telegraph review standards — safety database expectations, REMS, label scope — for rese-cel's 2027 submission.</div></div>
+<div class="event"><div class="event-date">2H 2026 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>PC-free dose-escalation data (PV + SLE)</b>Higher-dose PC-free cohorts. A clean replication at higher dose is the strongest available evidence that conditioning can eventually come out of the regimen.</div></div>
+<div class="event primary"><div class="event-date">Mid-2027 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Myositis registrational cohort data</b>The binary. TIS-based primary endpoint within 26 weeks in the DM/ASyS (and IMNM) single-arm cohorts, judged against the company's ≤50%-response success framing. Also the moment the ~100-patient pooled safety database gets its first full public airing.</div></div>
+<div class="event"><div class="event-date">2H 2027 <span class="date-tag guidance">Guidance</span></div><div class="event-body"><b>Myositis BLA submission</b>Includes the juvenile DM patient data, which the company expects could support a priority review voucher. Assumes registrational data hit the bar and CMC (Lonza commercial process + Cell Shuttle comparability) is file-ready.</div></div>
+<div class="event"><div class="event-date">2027–2028 <span class="date-tag inferred">Inferred</span></div><div class="event-body"><b>SLE/LN registrational initiation; MG registrational design</b>Sequenced expansion if myositis works. Failure or drift here is how "platform" stories quietly become single-indication stories.</div></div>
+</div>
+</section>
+
+<section id="scenarios">
+<div class="section-head"><div class="section-num">08 / SCENARIOS</div><div><h2>Soft ranges, shown arithmetic, post-dilution share counts</h2><p class="lede">Scenario values are illustrative, assumption-labeled, and computed on the post-September-2026 share count — the single most common error in third-party CABA models today is dividing by a share count that no longer exists. Divisors: bear uses basic (~213.7M; options expire worthless); base/bull use FD at face (~231.6M) because the option WAEP needed for a true treasury-method calculation was not isolated in this pass — stated here rather than hidden. <span class="ev gap">GAP</span></p></div></div>
+<div class="scen-grid">
+<article class="scen-card bear"><div class="tag">Bear</div><div class="pt">$0.56–$0.75</div><div class="soft">Soft range · center ~$0.66</div><ul>
+<li>Registrational myositis cohort misses the TIS bar or FDA declines to file on single-arm n≈15–17 cohorts</li>
+<li>Program reverts to exploratory status; burn is cut hard</li>
+<li>Equity ≈ residual cash: ~$295M est. cash − ~$150M curtailment burn ≈ $120–160M</li>
+<li>$120–160M ÷ 213.7M basic = $0.56–$0.75 ✓</li></ul></article>
+<article class="scen-card base"><div class="tag">Base</div><div class="pt">$5.83–$7.13</div><div class="soft">Soft range · center ~$6.48</div><ul>
+<li>Myositis BLA approved (~2028) with a refractory-population label; SSc registrational positive and filed behind it</li>
+<li>Commercial uptake constrained by cell-therapy-center capacity and Kyverna's class precedent; at least one more raise before launch</li>
+<li>Operating EV ~$1.06–1.35B + ~$295M cash ≈ $1.35–1.65B equity</li>
+<li>$1.35–1.65B ÷ 231.6M FD = $5.83–$7.13 ✓</li></ul></article>
+<article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$12.52–$15.11</div><div class="soft">Soft range · center ~$13.82</div><ul>
+<li>Myositis + SSc approvals, SLE/LN registrational success, PC-free regimen validated — rese-cel becomes the rheumatology CAR T franchise</li>
+<li>Operating EV ~$2.6–3.2B + ~$295M cash ≈ $2.9–3.5B equity</li>
+<li>$2.9–3.5B ÷ 231.6M FD = $12.52–$15.11 ✓</li>
+<li>Capped deliberately: the top of this range sits at the current street consensus average (~$15.60, MarketBeat) — and those targets largely predate the September dilution</li></ul></article>
+</div>
+<div class="assump"><b>Assumptions register.</b> Price $1.55 (Oct 15, 2026 close). Shares ~213.7M basic (estimate — Q3 10-Q pending) and ~231.6M FD at face. Cash ~$295M pro-forma (estimate — gross warrant proceeds less assumed Q3 burn at the H1 run rate). No value assigned to MuSK-CAART, DSG3-CAART, a priority review voucher, or partnering. No DCF is presented: with zero revenue and a single binary asset, a discounted-cash-flow output would be false precision; the EV builds above are the honest version of the same judgment. Trial success ≠ approval ≠ commercial success — the base case already assumes all three, in sequence, which is why it is not the bear case.</div>
+</section>
+
+<section id="management">
+<div class="section-head"><div class="section-num">09 / PEOPLE</div><div><h2>UPenn science, first-time commercial test</h2><p class="lede">Cabaletta is a University of Pennsylvania spinout built by the people who invented CAAR T. The scientific pedigree is real. The management question is narrower: nobody here has launched an autologous cell therapy commercially, and the financing record shows a company that has repeatedly had to sell equity at falling prices to keep the program funded.</p></div></div>
+<div class="people-grid">
+<article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+<dt>Steven Nichtberger, M.D.</dt><dd>Co-founder, President &amp; CEO, Chairman. Led the company from the 2019 IPO through the CAAR-to-rese-cel pivot.</dd>
+<dt>Gwendolyn Binder, Ph.D.</dt><dd>Co-founder, President of Science &amp; Technology. From the UPenn CAAR program lineage; the scientific continuity of the company.</dd>
+<dt>David J. Chang, M.D., M.P.H.</dt><dd>Chief Medical Officer — the public voice of the RESET data and the FDA registrational alignment.</dd>
+<dt>Samik Basu, M.D.</dt><dd>Chief Scientific Officer; presented the first PC-free data (ESGCT 2025).</dd>
+<dt>Anup Marda</dt><dd>Chief Financial Officer — owns a capital structure that has required three raises in fifteen months.</dd>
+<dt>Arun Das, M.D.</dt><dd>Chief Business Officer.</dd></dl></article>
+<article class="paper-card"><h3>Scientific founders / advisors</h3><dl class="people-list">
+<dt>Aimee Payne, M.D., Ph.D.</dt><dd>Co-founder; co-inventor of CAAR T (UPenn dermatology).</dd>
+<dt>Michael Milone, M.D., Ph.D.</dt><dd>Co-founder; CAR T engineering (UPenn).</dd>
+<dt>Carl June, M.D.</dt><dd>Scientific advisory board — the field's founding figure.</dd>
+<dt>Georg Schett, M.D.</dt><dd>Scientific advisory board — ran the Erlangen academic autoimmune CAR T program whose NEJM data anchor the class.</dd></dl></article>
+<article class="paper-card"><h3>Insider &amp; holder signals</h3><ul class="check-list">
+<li><span class="ev fact">FACT</span> Five Form 4 filings on Jun 10, 2026 (annual-meeting-cycle equity events) — routine pattern, no directional signal extracted.</li>
+<li><span class="ev unverified">UNVERIFIED · AGGREGATOR</span> A small open-market purchase attributed to G. Binder in Jan 2026 (~$25K, per WallStreetZen) — token-sized if accurate; not a conviction signal either way.</li>
+<li><span class="ev fact">FACT</span> Multiple institutional Schedule 13G/A updates Jul–Aug 2026 following the May offering — the register was substantially rebuilt by the 2025–26 financings.</li>
+<li><span class="ev interp">INTERPRETATION</span> The honest insider signal is the financing record itself: insiders and institutions have funded this company repeatedly — at $2.90 in May 2026 and via $2.50 warrant exercises into Sep 2026 — but the stock has made every one of those entries a losing position so far.</li></ul></article>
+</div>
+</section>
+
+<section id="risks">
+<div class="section-head"><div class="section-num">10 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+<ol class="risk-list">
+<li><b>Single-arm registrational risk</b><span>The entire BLA path rests on ~15–17-patient single-arm cohorts and an assumed control response rate. If the registrational response rate lands in the 40s instead of replicating the Phase 1/2 83% (n=6), there is no statistical rescue available — the design is the risk.</span></li>
+<li><b>Dilution is structural, not episodic</b><span>Shares went 50.7M → ~213.7M in under two years and the company still needs launch capital. Every scenario in this dossier can be right about the science and wrong per-share if the count keeps compounding.</span></li>
+<li><b>Class safety contagion</b><span>Three IEC-HS deaths on Novartis's rap-cel ended that program. A similar event on rese-cel — or on Kyverna's miv-cel during its review — would hit CABA regardless of its own clean-to-date record. The pooled BLA safety database is only ~100 patients by design.</span></li>
+<li><b>Durability beyond ~1.5 years is unproven</b><span>ASyS responses were already "variable." Autoimmune relapse after B-cell reconstitution converts the one-time-treatment premium into an ordinary remission drug with extraordinary delivery costs. No redosing data exist.</span></li>
+<li><b>Manufacturing &amp; CMC comparability</b><span>Commercial supply depends on a Lonza process transfer and Cellares automated production becoming the filed process. A comparability failure is the classic silent BLA delay in cell therapy — and it would arrive exactly when cash is tightest.</span></li>
+<li><b>Kyverna sets the terms of the market</b><span>First approval (SPS, filing completing Q4 2026) fixes label precedents, REMS burden and payer posture. A restrictive label or a safety-driven REMS for miv-cel becomes rese-cel's starting point, not its floor.</span></li>
+<li><b>Conditioning burden limits the market</b><span>Flu/Cy lymphodepletion plus immunomodulator washout is a heavy intervention for lupus and PV patients who are not refractory. PC-free rests on 4 patients at the lowest dose; if it fails at scale, the realistic market is the severe/refractory tail of each indication.</span></li>
+<li><b>Open-label, patient-reported endpoints</b><span>MG-ADL and TIS both contain subjective components, measured unblinded, in patients who stopped all other therapy — expectation effects are unconstrained. The 3/13 MG rescue rate is the honest counterweight inside the company's own data.</span></li>
+<li><b>Cash reaches data, not market</b><span>~$295M estimated pro-forma cash against ~$45M+/quarter and rising registrational/commercial spend means at least one more large raise is the base case — at whatever price the myositis data produce.</span></li>
+<li><b>Platform concentration</b><span>One asset, one dose, one binder license (IASO), external manufacturers (Lonza, Oxford Biomedica, Cellares). The 10-Q's own risk factors name each of these dependencies; there is no second program to absorb a rese-cel failure.</span></li>
+</ol>
+</section>
+
+<section id="open">
+<div class="section-head"><div class="section-num">11 / OPEN</div><div><h2>What this dossier could not resolve</h2><p class="lede">Disclosed, not filled.</p></div></div>
+<div class="open-grid">
+<article><span>GAP 01</span><h3>Exact post-expiry cap table</h3><p>Post-Sep 12, 2026 share count and cash balance are arithmetic estimates from the 10-Q plus the Sep 14 8-K. The Q3 10-Q (~Nov 2026) is the confirming document. Option WAEP and the RSU count were not isolated, so scenario FD uses options at face.</p></article>
+<article><span>GAP 02</span><h3>Registrational cohort final sizes</h3><p>Apr 2025 FDA alignment described two ~15-patient myositis cohorts; Jan 2026 company priorities described a "17-patient registrational cohort." Whether 17 is the DM/ASyS cohort size, a total, or a design revision is not resolved in public materials reviewed.</p></article>
+<article><span>GAP 03</span><h3>MG registrational design</h3><p>Guide was to announce MG registrational plans in mid-2026; the AANEM data landed Sep–Oct 2026 but no formal registrational design for MG was published in materials reviewed as of Oct 16, 2026.</p></article>
+<article><span>GAP 04</span><h3>Patient-level registrational-grade data</h3><p>SSc effect sizes, SLE response rates by cohort, IMNM Phase 1/2 results and full safety tables live in congress presentations; several are cited here only at the level the company's releases support. No peer-reviewed rese-cel publication exists yet.</p></article>
+<article><span>GAP 05</span><h3>Commercial manufacturing readiness</h3><p>Cell Shuttle comparability has 2 patients of PK/PD data. Whether the BLA files on the Lonza process, the Cellares process, or both — and the COGS at each — is undisclosed.</p></article>
+<article><span>GAP 06</span><h3>CAAR program status</h3><p>DSG3-CAART and MuSK-CAART remain on the pipeline page and in Fast Track listings but absent from 2026 priorities. Active, paused, or partnering-seeking is not stated — carried at zero either way.</p></article>
+</div>
+<div class="verdict-box"><div><div class="tag" style="font:700 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#9db6b1">Verdict</div><h3>A real registrational story, priced as if the financing tail risk is the whole story — it is only most of it.</h3></div><p>Cabaletta has the second-most-advanced autoimmune CAR T program in the world, an FDA-aligned path in myositis, and data that — on tiny numbers — look like the academic results that launched the field. It also has a quadrupled share count, an autologous cost structure, and a BLA that depends on ~15-patient cohorts behaving like the 6-patient cohort before them. At ~$36M of implied enterprise value the market is paying for none of the science; the question for a holder is whether the mid-2027 registrational data arrive before the next dilutive raise, and whether ~214M shares is finally the denominator. Both are financing questions wearing a lab coat. The science, so far, is not the problem.</p></div>
+</section>
+
+<section id="sources">
+<div class="section-head"><div class="section-num">12 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/registry → peer-reviewed literature → company releases/congress → trade press.</p></div></div>
+<div class="sources">
+<div class="source-group"><h3>SEC filings (primary)</h3>
+<a href="https://www.sec.gov/Archives/edgar/data/1759138/000175913826000039/caba-20260630.htm" target="_blank" rel="noopener">Q2 2026 Form 10-Q (filed Aug 13, 2026)<small>Cash $225.1M; shares 167,726,537 at Jun 30, 2026; cover 169,545,445 at Aug 7, 2026; H1 operating cash use $84.1M; May 2026 offering 51,725,000 sh @ $2.90 (~$140.2M net); anti-dilutive options 17,823,140</small></a>
+<a href="https://www.sec.gov/Archives/edgar/data/1759138/000175913826000041/caba-20260914.htm" target="_blank" rel="noopener">Form 8-K (Sep 14, 2026, Item 8.01)<small>46,011,900 warrants exercised Jul 1–Sep 12, 2026 for ~$115.0M gross; total exercises 51,287,000 for ~$128.2M</small></a>
+<a href="https://www.sec.gov/Archives/edgar/data/1759138/000175913826000030/caba-20260603.htm" target="_blank" rel="noopener">Form 8-K (Jun 3, 2026, Item 7.01/8.01)<small>EULAR 2026 data release furnished as Ex-99.1</small></a>
+<a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001759138&amp;type=10-K" target="_blank" rel="noopener">FY2025 Form 10-K (filed Mar 23, 2026)<small>Program history, IASO license, risk factors, CAAR/CARTA strategy</small></a>
+</div>
+<div class="source-group"><h3>Registry &amp; literature</h3>
+<a href="https://clinicaltrials.gov/study/NCT06154252" target="_blank" rel="noopener">ClinicalTrials.gov — RESET program<small>NCT06154252 (myositis) · NCT06121297 (SLE) · NCT06328777 (SSc) · NCT06359041 (MG) · NCT05938725 (PV) · NCT07069702 (MS) — retrieved via CT.gov API, Oct 16, 2026</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/38381673/" target="_blank" rel="noopener">Müller F, et al. NEJM 2024<small>CD19 CAR T in 15 patients with SLE, myositis and SSc — drug-free remissions; the academic anchor for the class</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/36329355/" target="_blank" rel="noopener">Mackensen A, et al. Nature Medicine 2022<small>Anti-CD19 CAR T in refractory SLE — first systematic remissions</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/27365313/" target="_blank" rel="noopener">Ellebrecht CT, et al. Science 2016<small>DSG3 CAAR T proof-of-concept — Cabaletta's founding platform</small></a>
+</div>
+<div class="source-group"><h3>Company &amp; congress (UNVERIFIED tier)</h3>
+<a href="https://www.cabalettabio.com/news-media/press-releases/detail/149/cabaletta-bio-announces-new-rese-cel-data-and-development" target="_blank" rel="noopener">EULAR 2026 data release (Jun 3, 2026)<small>DM 5/6 TIS response; ASyS 3/4; JDM n=1; SSc second pivotal indication; PC-free lupus</small></a>
+<a href="https://www.cabalettabio.com/news-media/press-releases/detail/147/cabaletta-bio-presents-preconditioning-free-clinical-data" target="_blank" rel="noopener">ASGCT 2026 PC-free release (May 14, 2026)<small>RESET-PV lowest dose n=4: 2/4 drug-free at 6 months; Cell Shuttle first-2-patient data</small></a>
+<a href="https://www.neurologylive.com/view/single-infusion-rese-cel-yields-meaningful-responses-off-immunomodulators-phase-1-2-reset-mg-trial" target="_blank" rel="noopener">AANEM 2026 RESET-MG (NeurologyLive)<small>n=13; 10/13 meaningful MG-ADL improvement; 3 rescues; B-cell reconstitution median 85 days</small></a>
+</div>
+<div class="source-group"><h3>Competitor &amp; market</h3>
+<a href="https://www.biospace.com/drug-development/weighing-the-risks-of-car-t-in-autoimmune-disease-as-kyverna-nears-the-market" target="_blank" rel="noopener">BioSpace (Sep 1, 2026)<small>Class safety review; rap-cel IEC-HS deaths; Kyverna BLA timing</small></a>
+<a href="https://www.marketbeat.com/stocks/NASDAQ/CABA/chart/" target="_blank" rel="noopener">MarketBeat — CABA price history<small>Oct 15, 2026 close $1.55; 52-week range $1.51–$4.23</small></a>
+<a href="https://www.marketbeat.com/stocks/NASDAQ/CABA/forecast/" target="_blank" rel="noopener">MarketBeat — analyst targets<small>Consensus average ~$15.60; range $3–$30 (Oct 2026) — largely pre-dilution vintage</small></a>
+</div>
+</div>
+<p class="method"><strong>Method &amp; limits.</strong> Every number in this dossier is traceable to the sources above or labeled an estimate with its bridge shown. Rese-cel efficacy data are single-arm, open-label and company-reported from congress presentations; no peer-reviewed rese-cel dataset exists as of Oct 16, 2026, and no cross-trial efficacy comparisons are made. Scenario ranges are illustrative valuations on stated share counts, not recommendations. No personal data is contained in this dossier.</p>
+</section>
+</main>
+<footer><strong>Cabaletta Bio, Inc. (NASDAQ: CABA) — deep-dive dossier.</strong> As of October 16, 2026. Research document, not investment advice.</footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+(function(){var r=document.documentElement;var b=document.getElementById('themeToggle');var saved=null;try{saved=localStorage.getItem('caba-theme')}catch(e){}if(saved){r.setAttribute('data-theme',saved);b.setAttribute('aria-pressed',saved==='dark'?'true':'false')}b.addEventListener('click',function(){var cur=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',cur);b.setAttribute('aria-pressed',cur==='dark'?'true':'false');try{localStorage.setItem('caba-theme',cur)}catch(e){}});
+var t=document.getElementById('toTop');window.addEventListener('scroll',function(){t.classList.toggle('show',window.scrollY>700)},{passive:true});t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+document.querySelectorAll('section').forEach(function(s){var h=s.querySelector('.section-head');if(!h)return;var btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.textContent='–';btn.setAttribute('aria-label','Collapse section');btn.addEventListener('click',function(){s.classList.toggle('collapsed');btn.textContent=s.classList.contains('collapsed')?'+':'–'});h.appendChild(btn);var body=document.createElement('div');body.className='section-body';var nodes=[];for(var i=0;i<s.childNodes.length;i++){if(s.childNodes[i]!==h)nodes.push(s.childNodes[i])}nodes.forEach(function(n){body.appendChild(n)});s.appendChild(body);});})();
+</script>
+</body>
+</html>

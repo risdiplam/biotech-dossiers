@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>PROK — ProKidney · Deep-Dive Dossier · 2026-10-16</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · PROK</span><span class="stamp">Deep-dive dossier · October 16, 2026</span></div>
+        <h1>One sham-controlled trial decides whether kidney cell therapy is real.</h1>
+        <p class="hero-dek">ProKidney's rilparencel — a patient's own expanded kidney cells, reinjected into both kidneys — produced a striking Phase 2 slope signal in an open-label, within-patient comparison. The FDA has agreed that eGFR slope can carry a BLA under accelerated approval. What has never been tested is whether the effect survives a sham control — and the company's cash runs out at roughly the moment that answer arrives.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$1.46</div>
+        <div class="quote-label">Fixed market snapshot · Oct 15, 2026 close (MarketBeat)</div>
+        <div class="quote-meta"><strong>~$440M</strong> market cap (302.3M shares, Class A + B) · <strong>~$260M</strong> est. EV<br>$181.6M cash &amp; securities (Jun 30, 2026) · 52-wk range $1.30–$3.48</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#cmc">CMC &amp; Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A real surrogate agreement wrapped around an uncontrolled signal</h2><p class="lede">ProKidney Corp. (CIK 1850270) is a Winston-Salem, NC cell-therapy company whose only product candidate, rilparencel (formerly REACT®), is in a single registrational Phase 3 — REGEN-006 / PROACT 1 — in type 2 diabetes with advanced CKD. Everything else about the company is scaffolding around that trial.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Next decisive readout</div><div class="big">Q2 2027</div><p><span class="ev unverified">UNVERIFIED · COMPANY GUIDE</span> PROACT 1 eGFR-slope topline for accelerated approval; enrollment of the ~320-patient slope cohort is complete. The FDA has said an effect of ≥1.5 mL/min/1.73m²/yr is an acceptable demonstration of efficacy.</p></article>
+        <article class="decision warn"><div class="tag">Cash vs. the readout</div><div class="big">$181.6M</div><p><span class="ev fact">FACT</span> Cash + marketable securities at Jun 30, 2026 against ~$41M/quarter operating cash use. The Q2 2026 10-Q carries an explicit going-concern substantial-doubt statement; the company guides runway "into mid-2027" — i.e., to the readout, not past it.</p></article>
+        <article class="decision"><div class="tag">Est. enterprise value</div><div class="big">~$260M</div><p><span class="ev interp">INTERPRETATION</span> ~$440M market cap less $181.6M cash/securities; no debt (total liabilities $26.2M, mostly operating). The market is paying a real, but heavily discounted, price for the Phase 3 option.</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">RMAT · Type B aligned</div><p><span class="ev fact">FACT</span> RMAT designation held; July 2025 Type B meeting confirmed eGFR slope as the surrogate basis for a BLA under accelerated approval and PROACT 1 as both the accelerated and confirmatory trial. BLA guided Q4 2027.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What is genuinely de-risked</h3><ul><li>The regulatory path is unusually explicit for a cell therapy: endpoint, effect-size bar (≥1.5), and single-trial accelerated + confirmatory structure were all confirmed with FDA in writing-tier disclosures.</li><li>Phase 2 (REGEN-007, published in CJASN, Jan 2026) showed a 4.57 mL/min/1.73m² slope improvement (78%, p&lt;0.001) in the bilateral-dosing group — far above the 1.5 bar, if it is real and transferable.</li><li>Safety to date is procedure-level (biopsy-like); no rilparencel-related SAEs in Phase 2 and no immunosuppression is required (autologous).</li><li>The slope-analysis cohort (~320 patients) is fully enrolled; the remaining enrollment risk is confined to the confirmatory cohort (~470).</li></ul></article>
+        <article class="thesis-card risk"><h3>What the de-risking does not touch</h3><ul><li>Every efficacy datapoint so far is a within-patient pre/post slope comparison in open-label studies with no concurrent control — the design most vulnerable to regression to the mean and slope-measurement artifacts. PROACT 1 is the first sham-controlled test.</li><li>The 10-Q states substantial doubt about continuing as a going concern within one year. A financing before or around the readout is close to certain; dilution lands on top of 39.8M options and 17.5M SPAC earnout rights.</li><li>Manufacturing already failed once at audit (2023 EU GMP findings → program pause). Autologous CMC — potency, comparability, per-patient lots — is the part of a BLA that kills cell therapies most often.</li><li>The timeline has slipped for years (SPAC-era readout expectations → Q3 2027 → Q2 2027), and the second Phase 3 (PROACT 2) was discontinued in 2024. There is no second asset.</li></ul></article>
+      </div>
+      <p class="source-note">Identity/structure: <a href="https://www.sec.gov/Archives/edgar/data/1850270/000119312526342373/prok-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> (filed Aug 10, 2026) · <a href="https://www.sec.gov/Archives/edgar/data/1850270/000119312526113881/prok-20251231.htm" target="_blank" rel="noopener">FY2025 10-K</a>. FDA alignment and Phase 2 data are company disclosures (GlobeNewswire) corroborated in part by the CJASN publication — see §04 and §14.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Priced as a discounted binary, not as a shell</h2><p class="lede">At $1.46 the equity is worth ~$440M against $181.6M of cash and securities — an operating EV of roughly $260M for a single Phase 3 readout eleven months of cash away. The stock has roughly halved in a year (52-week $1.30–$3.48) on no single company event: a slow de-rating of timeline and financing risk.</p></div></div>
+      <div class="metric-stack" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric"><b>$1.46</b><span>Close · Oct 15, 2026 (MarketBeat)</span></div>
+        <div class="metric"><b>~$440M</b><span>Market cap · 302.32M shares (A+B)</span></div>
+        <div class="metric"><b>$0.60</b><span>Cash &amp; securities per share · Jun 30</span></div>
+        <div class="metric"><b>~$12.00</b><span>Consensus avg PT (MarketBeat, few analysts — treat as thin)</span></div>
+      </div>
+      <div class="readthrough"><strong>How to read the price.</strong> <span class="ev interp">INTERPRETATION</span> A ~$260M EV for a trial powered at 90% to detect exactly the effect size the FDA pre-agreed to accept (1.5–1.75) implies the market is discounting some combination of: (i) the open-label Phase 2 signal not surviving sham control, (ii) dilution from the near-certain pre-readout financing, and (iii) CMC/BLA execution after approval of the surrogate. The July 2025 FDA-alignment announcement roughly tripled the stock intraday at the time (secondary reports); the subsequent slide to near the 52-week low says the market now prices the financing and the wait, not the pathway.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">JUL 2022</span><h3>SPAC close at $10</h3><p>Business combination with Social Capital Suvretta Holdings Corp. III closed Jul 11, 2022 — up to $825M gross proceeds were projected at announcement ($250M trust + $575M PIPE), before redemptions; pro-forma equity value ~$2.64B. The stock now trades ~85% below the SPAC price.</p></article>
+        <article><span class="event-mark">NOV 2023</span><h3>Manufacturing pause + CEO change</h3><p>EU GMP audit findings forced a manufacturing/program pause into 1H 2024; founder Tim Bertram handed the CEO role to Bruce Culleton (Nov 15, 2023).</p></article>
+        <article><span class="event-mark">JUL–NOV 2025</span><h3>FDA alignment + Phase 2 publication</h3><p>July 2025 Type B alignment on the slope pathway; full REGEN-007 results at ASN Kidney Week (Nov 2025) and in CJASN (Jan 2026). The shares peaked for the year in this window ($3.48 high) and have de-rated since.</p></article>
+      </div>
+      <p class="source-note">Price/market-cap series: MarketBeat PROK price history (Oct 15, 2026 close $1.46; displayed mcap $439.9M) and Finnhub snapshot (52-wk $1.30–$3.48). Share count: Q2 2026 10-Q cover (Class A 208,926,941 + Class B 93,395,714 at Aug 10, 2026). SPAC terms: Jan 18, 2022 BusinessWire transaction release (company/secondary tier).</p>
+    </section>
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Selected renal cells: a repair hypothesis, not an established mechanism</h2><p class="lede">Diabetic CKD progression is driven by tubular injury, interstitial fibrosis, microvascular loss, and chronic inflammation that the surviving nephrons cannot reverse. Rilparencel's premise is that returning an expanded population of the patient's own regenerative-phenotype kidney cells to the cortex can interrupt that loop.</p></div></div>
+      <div class="science-chain" aria-label="Rilparencel mechanism chain">
+        <article><b>01</b><h3>Biopsy</h3><p>A percutaneous kidney biopsy harvests cortical tissue from a patient with stage 3b/4 diabetic CKD — the starting material is itself diseased, diabetic kidney.</p></article>
+        <article><b>02</b><h3>Selection &amp; expansion</h3><p>Selected Renal Cells (SRC) are isolated and expanded ex vivo over roughly 3–4 weeks into a population enriched for tubular/epithelial cells expressing regenerative, anti-fibrotic and anti-inflammatory markers. No gene editing or exogenous modification.</p></article>
+        <article><b>03</b><h3>Cryo-logistics</h3><p>The formulated product is cryopreserved and shipped (Cryoport/CryoStork system) to the treating site — decoupling manufacturing from the procedure date and enabling a central facility model.</p></article>
+        <article><b>04</b><h3>Bilateral reinjection</h3><p>Cells are injected into the renal cortex of each kidney under image guidance (one kidney per procedure, weeks apart). No immunosuppression — the product is autologous.</p></article>
+      </div>
+      <div class="moa-box"><h3>Rilparencel in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> Take a small piece of the patient's own kidney, grow the "repair crew" cells from it in a lab until there are billions, then put them back into both kidneys. The hope is that the returned cells calm scarring and inflammation and help the remaining kidney tissue work better for longer — delaying dialysis. Nothing is genetically changed, and because the cells are the patient's own, there is no rejection problem.</p><p><strong>Technical.</strong> SRC are a heterogeneous, density/phenotype-selected population derived from cortical biopsy, enriched for proximal tubular epithelial cells with a regenerative secretory profile. The proposed mechanism is predominantly paracrine — anti-fibrotic and anti-inflammatory signaling that remodels the tubulointerstitial microenvironment — rather than durable engraftment and nephron replacement; the company itself is still running mechanism-of-action studies (presentations planned through 2026), so the operative biology at clinical dose is not settled. <span class="ev gap">GAP</span> No validated potency assay tied to clinical effect has been publicly described — for an autologous biologic, that assay <em>is</em> the product definition the FDA will judge at BLA.</p></div>
+      <div class="fail-grid" aria-label="Ways the mechanism could fail">
+        <article><h3>1 · The signal is an artifact of the design</h3><p>All Phase 2 efficacy is pre-injection vs post-injection slope within the same patients, open-label. Patients enroll while declining fast; slopes naturally flatten after enrollment (regression to the mean), background care gets optimized, and eGFR measurement noise is large in stage 4. A sham arm is precisely the control for this — and has never been run.</p></article>
+        <article><h3>2 · Diseased starting material</h3><p>The biopsy comes from a diabetic, fibrotic kidney. Expanded cells from such tissue may carry the senescent/metabolic phenotype of the disease; cell "dose" (viability, potency) will vary patient to patient in ways a small-molecule never does.</p></article>
+        <article><h3>3 · Paracrine effects may not persist</h3><p>If the benefit is secretory signaling rather than engraftment, it can wane while the underlying diabetic injury continues. The accelerated-approval slope window (~2 years) could look fine while the confirmatory composite (dialysis/kidney failure over up to 5 years) fails to convert.</p></article>
+        <article><h3>4 · Procedure at scale</h3><p>Two image-guided renal injections in stage-4 patients (bleeding risk, hematomas seen in Phase 2) is a specialist procedure. Trial-center performance may not generalize to commercial nephrology practice.</p></article>
+      </div>
+      <p class="source-note">Cell sourcing/expansion description: company disclosures and a 2025 trade-press interview account (Inside Precision Medicine) — process parameters (starting cell counts, expansion fold) are company-described, <span class="ev unverified">UNVERIFIED</span> tier. Foundational clinical literature: Stavas et al., REGEN-003 (NCT03270956) design and early results; REGEN-007 full results, <em>Clin J Am Soc Nephrol</em>, Jan 2026.</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Phase 2: a big slope number from a small, open-label study</h2><p class="lede">REGEN-007 (Phase 2, open-label, no sham control) compared each patient's eGFR slope before injection with the slope after the last injection. That design can generate hypotheses and support a pivotal trial — it cannot separate drug effect from slope artifacts. PROACT 1 can.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card">
+          <div class="program-kicker">Registrational · Phase 3 · REGEN-006 (PROACT 1)</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Rilparencel · diabetic CKD stage 3b/4</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> Randomized, blinded, sham-controlled (simulated biopsy and simulated injection procedure in the control arm). Protocol amended to focus on Stage 4 (eGFR 20–30) and late Stage 3b (eGFR 30–35) patients. Registry enrollment estimate 685; the company's two analysis populations are ~320 (eGFR-slope, accelerated approval) and ~470 (confirmatory composite).</p>
+          <div class="status-row"><span class="pill">Slope cohort enrolled</span><span class="pill">RMAT designation</span><span class="pill">Sham-controlled</span></div>
+          <table class="study-table"><thead><tr><th>Element</th><th>Design</th><th>Status</th></tr></thead><tbody>
+            <tr><td data-label="Element">Slope analysis<br><small>Accelerated approval</small></td><td data-label="Design">Annualized eGFR slope; ~320 patients with ≥6 months follow-up after first injection; powered 90% for a 1.75 effect, 80% for 1.5 (company).</td><td data-label="Status">Enrollment complete (Q2 2026 10-Q); topline guided Q2 2027.</td></tr>
+            <tr><td data-label="Element">Confirmatory analysis<br><small>Full approval</small></td><td data-label="Design">Composite time-to-event: ≥40% eGFR decline, eGFR &lt;15, chronic dialysis/transplant, renal or cardiovascular death; follow-up up to ~5 years (registry).</td><td data-label="Status">Full enrollment (~470) guided to complete 2H 2026; topline guided 2H 2029.</td></tr>
+            <tr><td data-label="Element">Registry nuance</td><td data-label="Design" colspan="2">On ClinicalTrials.gov (NCT05099770) the composite is the listed primary outcome and slope a secondary — the slope-first BLA basis rests on the July 2025 Type B agreement, not the registry hierarchy. Both are disclosed here because reviewers will see both.</td></tr>
+          </tbody></table>
+          <p class="source-note"><a href="https://clinicaltrials.gov/study/NCT05099770" target="_blank" rel="noopener">NCT05099770 registry</a> · Q2 2026 10-Q protocol description · Q1 2026 results release (powering).</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">Phase 2 · REGEN-007 · open-label · CJASN Jan 2026</div><h3>Annual eGFR slope, pre vs post injection (mL/min/1.73m²)</h3>
+          <div class="bar-set" aria-label="REGEN-007 slope results">
+            <div class="bar-row"><div class="bar-label">G1 pre</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red)"></div></div><div class="bar-value">−5.84</div></div>
+            <div class="bar-row"><div class="bar-label">G1 post</div><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><div class="bar-value">−1.27</div></div>
+            <div class="bar-row"><div class="bar-label">G2 pre</div><div class="bar-track"><div class="bar-fill" style="width:58%;background:var(--red)"></div></div><div class="bar-value">−3.40</div></div>
+            <div class="bar-row"><div class="bar-label">G2 post</div><div class="bar-track"><div class="bar-fill" style="width:29%"></div></div><div class="bar-value">−1.71</div></div>
+          </div>
+          <p class="source-note"><span class="ev fact">FACT · PEER-REVIEWED</span> Group 1 (bilateral dosing, n=24 mITT): improvement 4.57 (95% CI 1.95–7.18), +78%, p&lt;0.001. Subgroup meeting Phase 3 criteria (n=15): +5.5, +85%, p=0.005. Group 2 (exploratory regimen, n=25; 10 received only one injection): +1.70 (95% CI −0.24–3.63), +50%, p=0.085 — not significant. No rilparencel-related SAEs; safety described as comparable to kidney biopsy.</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">Read the design, not just the number</div><p style="font-size:13px;margin:8px 0 0">The comparison is each patient's own pre-treatment slope — there is no placebo or sham arm, follow-up slopes are measured over a different (post-procedure) window, and Group 1's pre-slope (−5.84) was much steeper than Group 2's (−3.40), which is exactly the pattern regression to the mean produces. The honest statement is: <em>the Phase 2 result is consistent with a large treatment effect and equally consistent with a substantial artifact component</em>. PROACT 1's sham control exists to split those two explanations.</p></div>
+        </article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Earlier Phase 2 evidence</h3><p><span class="ev fact">FACT</span> REGEN-003 (n=10, stage 4 DKD, eGFR 14–20, single-arm): pre-injection slope −6.5 vs post −3.9 mL/min/1.73m²; 19 injections; two procedure-related hematomas managed with observation; no product-related SAEs; dialysis delayed a mean of 16 months (range 6–28) in an early analysis. Hypothesis-generating only — n=10, uncontrolled.</p></article>
+        <article><h3>What PROACT 1 must show</h3><p><span class="ev fact">FACT</span> Per the July 2025 Type B meeting as disclosed by the company: a rilparencel effect of ≥1.5 mL/min/1.73m²/yr on eGFR slope in patients on appropriate standard of care is an acceptable demonstration of efficacy for accelerated approval — and the same trial's composite endpoint is the confirmatory basis for full approval.</p></article>
+        <article><h3>What remains unknowable</h3><p><span class="ev gap">GAP</span> Blinded PROACT 1 data (no interim efficacy disclosed), the sham arm's slope behavior in this population, durability beyond ~2 years, and whether slope separation converts into fewer dialysis starts — the endpoint payers and the confirmatory analysis will ultimately judge.</p></article>
+      </div>
+      <p class="source-note">REGEN-007: ASN Kidney Week 2025 late-breaking presentation (Nov 2025) and <em>Clin J Am Soc Nephrol</em> publication (Jan 2026) — figures above are the published mITT values. REGEN-003: Stavas et al. design/early-results publication (NCT03270956). Earlier Phase 2 RMCL-002 interim data (Nov 2023) reported preservation signals without a controlled comparison — not relied on here.</p>
+    </section>
+    <section id="cmc">
+      <div class="section-head"><div class="section-num">05 / CMC &amp; REGULATORY</div><div><h2>The pathway is agreed; the factory has already failed one audit</h2><p class="lede">For autologous cell therapies the BLA is usually lost on CMC, not efficacy. ProKidney's history contains the canonical version of that risk — and its regulatory file contains an unusually complete set of FDA agreements. Both facts belong in the same section.</p></div></div>
+      <div class="timeline">
+        <div class="event"><div class="event-date">2021–2022</div><div class="event-body"><b>RMAT designation; Phase 3 starts; SPAC close</b>PROACT 1 (REGEN-006) begins enrolling (registry start Nov 2021). Rilparencel holds Regenerative Medicine Advanced Therapy designation, giving intensive FDA interaction. The company lists via SPAC (Jul 2022) to fund the Phase 3 program and manufacturing build-out.<span class="date-tag guidance">Registry / filings</span></div></div>
+        <div class="event"><div class="event-date">2023</div><div class="event-body"><b>EU GMP audit findings → manufacturing and program pause</b><span class="ev fact">FACT</span> Following a European GMP audit that identified systems/documentation deficiencies, the company paused manufacturing into 1H 2024 to optimize GMP capabilities and paused PROACT 1 for concurrent protocol changes. This is the program's most concrete regulatory setback: not an FDA clinical hold, but a quality-systems failure that cost roughly a year.</div></div>
+        <div class="event"><div class="event-date">SEPT 2024</div><div class="event-body"><b>PROACT 2 discontinued</b><span class="ev fact">FACT</span> The ex-US Phase 3 (REGEN-016 / PROACT 2) was terminated to concentrate resources on PROACT 1, with the company estimating $150–175M of expense savings and concluding (after review with ex-FDA advisors) that PROACT 2 was not required for initial US registration. A strategic narrowing, and an admission the original two-trial plan was unaffordable.</div></div>
+        <div class="event"><div class="event-date">JULY 2025</div><div class="event-body"><b>Type B meeting: the accelerated-approval contract</b><span class="ev fact">FACT · COMPANY-REPORTED FDA FEEDBACK</span> FDA confirmed (i) eGFR slope from PROACT 1 can serve as the surrogate endpoint and primary basis for a BLA under accelerated approval, (ii) an effect size of ≥1.5 mL/min/1.73m²/yr is acceptable, and (iii) PROACT 1 may support both accelerated and confirmatory approval. Ongoing dialogue continues under RMAT.</div></div>
+        <div class="event primary"><div class="event-date">Q2 2027 → 2H 2028</div><div class="event-body"><b>Readout → BLA → decision (guided)</b>Slope topline Q2 2027; BLA submission guided Q4 2027; approval and launch guided 2H 2028. Every date after the readout depends on the slope result and on a pre-approval inspection of a manufacturing process that has been re-built once already.<span class="date-tag guidance">Guidance</span></div></div>
+      </div>
+      <div class="delivery-panel">
+        <div><span class="ev interp">INTERPRETATION</span><h3>Why CMC is the second binary</h3><p>Each commercial "lot" is one patient's cells: identity, potency, sterility and comparability must be demonstrated per-patient, at scale, in a facility that must pass a pre-approval inspection. The 180,000 sq ft Winston-Salem manufacturing expansion (two adjacent owned facilities, initiated 2025) is being built before the pivotal readout — capital committed ahead of proof, and a fixed cost base that drives the ~$41M/quarter burn.</p></div>
+        <div><span class="ev gap">GAP</span><h3>Potency &amp; comparability</h3><p>No public description of a validated potency assay correlated with clinical outcome, and no disclosed FDA feedback on commercial-process comparability vs the Phase 3 process. Both are standard late-stage cell-therapy failure points and both are invisible until the BLA review.</p></div>
+        <div><span class="ev fact">FACT</span><h3>RTOR / expedited programs</h3><p>No Real-Time Oncology Review analog applies here (RTOR is an oncology program). The operative expedited levers are RMAT designation and the accelerated-approval surrogate framework agreed in July 2025 — both held, neither a substitute for an adequate CMC package.</p></div>
+      </div>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>No cell-therapy rival — but the drug standard of care keeps getting better</h2><p class="lede">Rilparencel's competitive problem is not another cell therapy; it is that PROACT 1 patients receive modern background therapy (SGLT2 inhibitors, finerenone, GLP-1 agents) that already slows eGFR decline, shrinking the headroom for an incremental effect — while those same drugs set the commercial bar for a costly one-time procedure.</p></div></div>
+      <div class="compare">
+        <article class="compare-card"><div class="program-kicker">Background standard</div><div class="name">SGLT2 inhibitors</div><dl><dt>Evidence</dt><dd>DAPA-CKD and EMPA-KIDNEY: large outcome trials showing materially slower progression and fewer kidney events in CKD with/without diabetes.</dd><dt>Read-through</dt><dd>Oral, generic-trajectory, guideline-embedded. They flatten the sham arm's slope in PROACT 1 — good for patients, harder for showing separation.</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker">Background standard</div><div class="name">Finerenone + GLP-1 RA</div><dl><dt>Evidence</dt><dd>Finerenone (FIDELIO-DKD program) and semaglutide (FLOW: kidney composite benefit in T2D CKD) add further slope/event benefit on top of RAS/SGLT2 therapy.</dd><dt>Read-through</dt><dd>The Phase 2 post-hoc claim that rilparencel is incremental to SOC is exactly what PROACT 1 must prove prospectively; payers will compare a procedure's price against pennies-per-day drugs.</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker">The alternative pathway</div><div class="name">Dialysis / transplant</div><dl><dt>Evidence</dt><dd>Stage 4 patients who progress face dialysis (high annual cost, high mortality) or transplant (organ scarcity, lifelong immunosuppression).</dd><dt>Read-through</dt><dd>This is rilparencel's economic argument: even a 1–2 year delay in kidney failure is valuable. But the argument only prices if the confirmatory composite — dialysis starts and ≥40% declines — actually moves.</dd></dl></article>
+      </div>
+      <div class="readthrough"><span class="ev interp">INTERPRETATION</span> <strong>Differentiation, stated clinically:</strong> rilparencel is the only Phase 3-stage cell therapy in CKD (company claim, consistent with the registry landscape) and the only candidate aiming at function <em>preservation</em> via a one-time procedure rather than chronic pharmacotherapy. Its moat, if the data hold, is categorical. Its vulnerability is equally categorical: there is no approved autologous renal cell therapy precedent, no established reimbursement pathway for one, and no partial credit — the same trial must carry accelerated approval, confirmatory conversion, and the payer story.</div>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>One asset, one trial, no bench behind it</h2><p class="lede">Ranked by value, the pipeline is a list of one — plus the option value of the platform and facilities if the one works.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">Rilparencel — diabetic CKD (stage 3b/4)</div><div class="pipe-desc">Autologous SRC therapy; Phase 3 PROACT 1 slope readout Q2 2027 is the company's entire equity story. Carries effectively all enterprise value.</div></div><div class="pipe-status">Phase 3</div></div>
+        <div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">Rilparencel — label/population expansion</div><div class="pipe-desc">Earlier-stage CKD, non-diabetic CKD, and repeat dosing are logical extensions management references; none has a registered trial. Value is contingent on a PROACT 1 win and is carried at option value only.</div></div><div class="pipe-status">Concept</div></div>
+        <div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">Manufacturing platform &amp; facilities</div><div class="pipe-desc">Winston-Salem footprint (incl. the 180,000 sq ft expansion) and the SRC process. An asset in a takeout or partnership scenario; a fixed-cost liability in a failure scenario.</div></div><div class="pipe-status">Infrastructure</div></div>
+        <div class="pipe-row"><div class="pipe-rank">—</div><div><div class="pipe-name">PROACT 2 (REGEN-016)</div><div class="pipe-desc">Ex-US Phase 3, discontinued Sept 2024. No residual value; listed so its absence is a decision on record, not an oversight.</div></div><div class="pipe-status dead">Discontinued</div></div>
+      </div>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>One date matters; everything else is financing weather</h2><p class="lede">Date quality is tagged honestly: nothing in the near term is a hard date; the pivotal readout is company guidance.</p></div></div>
+      <div class="timeline">
+        <div class="event"><div class="event-date">2H 2026</div><div class="event-body"><b>Full PROACT 1 enrollment complete (~470, confirmatory cohort)</b>Removes the last enrollment risk; a slip here pushes the 2029 confirmatory timeline, not the 2027 slope readout.<span class="date-tag guidance">Guidance</span></div></div>
+        <div class="event"><div class="event-date">~NOV 2026</div><div class="event-body"><b>Q3 2026 results</b>Watch cash balance and any financing language more than R&amp;D line items; also any ASN Kidney Week MoA presentations (company guided MoA data through 2026).<span class="date-tag inferred">Inferred</span></div></div>
+        <div class="event"><div class="event-date">BY MID-2027</div><div class="event-body"><b>Financing event</b>The 10-Q's going-concern statement makes a raise (ATM under the ~$175M remaining 2025 sales agreement, a marketed offering, or a partnership) a near-certainty before or around the readout. Size and price are the dilution variable in every scenario below.<span class="date-tag inferred">Inferred</span></div></div>
+        <div class="event primary"><div class="event-date">Q2 2027</div><div class="event-body"><b>PROACT 1 eGFR-slope topline — the binary</b>Pre-agreed bar: ≥1.5 mL/min/1.73m²/yr effect vs sham. A result at/above ~1.75 (the 90%-power point) with a clean safety profile opens the BLA path; anything below 1.5, or a sham-arm slope that flattens enough to erase separation, effectively ends the equity story.<span class="date-tag guidance">Guidance</span></div></div>
+        <div class="event"><div class="event-date">Q4 2027</div><div class="event-body"><b>BLA submission</b>Contingent on the readout and on CMC readiness — the submission date is where manufacturing risk becomes visible.<span class="date-tag guidance">Guidance</span></div></div>
+        <div class="event"><div class="event-date">2H 2028</div><div class="event-body"><b>BLA decision / launch (guided)</b>Assumes accelerated approval on slope with the confirmatory composite still running.<span class="date-tag guidance">Guidance</span></div></div>
+        <div class="event"><div class="event-date">2H 2029</div><div class="event-body"><b>Confirmatory composite topline</b>The event-based verdict (≥40% decline, kidney failure, renal/CV death) that converts — or revokes — accelerated approval.<span class="date-tag guidance">Guidance</span></div></div>
+      </div>
+    </section>
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario values are illustrative equity builds divided by stated share counts — not price targets or recommendations. Divisors use the treasury method: the 39.8M options (WAEP ~$3.23) add nothing at prices below their strike and are partially counted above it; the 17.5M SPAC earnout rights are excluded unless noted (price-triggered, terms set in 2022 when the stock traded near $10).</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear · slope misses or CMC blocks</div><div class="pt">$0.18–0.35</div><div class="soft">Soft range · illustrative</div><ul><li>PROACT 1 slope effect &lt;1.5 vs sham, or a BLA path blocked on potency/comparability</li><li>Equity → residual value: cash at readout (~$40–60M after burn) + facilities/IP optionality ≈ $60–115M</li><li>Arithmetic: $60–115M ÷ ~330M shares (incl. a distressed pre-readout raise)</li></ul></article>
+        <article class="scen-card base"><div class="tag">Base · slope hits, approval 2028</div><div class="pt">$3.00–4.00</div><div class="soft">Soft range · illustrative</div><ul><li>Slope effect ≥1.5–2.0, accelerated approval 2H 2028, staged launch into stage-4 diabetic CKD, further raises fund the commercial build</li><li>Equity ≈ $1.05–1.40B (operating EV ~$0.95–1.25B + forward cash)</li><li>Arithmetic: $1,050–1,400M ÷ ~350M FD shares (treasury-method options at these prices)</li></ul></article>
+        <article class="scen-card bull"><div class="tag">Bull · large effect, clean conversion path</div><div class="pt">$10–12</div><div class="soft">Soft range · capped at street average</div><ul><li>Slope effect ≥3 (Phase 2-like), confirmatory composite trending positive, partnership or premium takeout economics on a category-defining asset</li><li>Equity ≈ $3.6–4.3B</li><li>Arithmetic: $3,600–4,300M ÷ ~360M FD shares. Top of range set at the ~$12 MarketBeat consensus average rather than above it</li></ul></article>
+      </div>
+      <div class="assump"><b>Assumptions on the table.</b> All three cases assume at least one financing before the Q2 2027 readout (going-concern language in the Q2 2026 10-Q). None assumes the confirmatory composite succeeds — that is a 2029 question that re-rates the base and bull cases later. At $1.46 (~$260M EV), the market sits far below the base case and well above bear-case residual value: it is pricing a minority probability of a clean slope hit <em>after</em> dilution, which is a defensible prior given the open-label origin of the Phase 2 signal — and the reason the sham arm's slope, not the treatment arm's, is the number to watch.</div>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>A going-concern statement with a readout at the end of the runway</h2><p class="lede">ProKidney is pre-revenue (the only reported revenue is ~$0.4M/half of facility leasing income). The financial question is singular: does the cash reach Q2 2027, and at what share count?</p></div></div>
+      <div class="fin-grid">
+        <div>
+          <div class="metric-stack">
+            <div class="metric"><b>$181.6M</b><span>Cash + marketable securities · Jun 30, 2026 ($74.9M cash + $106.7M securities)</span></div>
+            <div class="metric"><b>$82.1M</b><span>Operating cash use · H1 2026 (~$41M/quarter)</span></div>
+            <div class="metric"><b>$89.1M</b><span>Net loss before noncontrolling interest · H1 2026 (R&amp;D $69.9M, G&amp;A $23.7M)</span></div>
+            <div class="metric"><b>$270.0M</b><span>Cash + securities · Dec 31, 2025 (from $295M at Jun 30, 2025)</span></div>
+          </div>
+          <div class="runway"><b>Runway: into mid-2027 (company guide) — with substantial doubt attached</b><p><span class="ev fact">FACT</span> The Q2 2026 10-Q states the Jun 30 balance "will not be sufficient to fund its obligations for the 12 months following" the Aug 10, 2026 filing and that substantial doubt exists about continuing as a going concern. At ~$41M/quarter of operating cash use, $181.6M covers ~4.4 quarters — landing almost exactly on the Q2 2027 readout. Any enrollment, CMC, or timeline slip is a financing event; any financing is dilutive at a ~$1.46 share price.</p></div>
+        </div>
+        <div>
+          <table class="cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>Note</th></tr></thead><tbody>
+            <tr><td>Class A common</td><td>208,926,941</td><td>10-Q cover, Aug 10, 2026</td></tr>
+            <tr><td>Class B common</td><td>93,395,714</td><td>Paired 1:1 with ProKidney LLC units (Up-C); exchangeable into Class A</td></tr>
+            <tr><td><strong>Total economic shares</strong></td><td><strong>302,322,655</strong></td><td>A + B — the correct basic denominator</td></tr>
+            <tr><td>Stock options (2022 plan)</td><td>39,826,692</td><td>Time-vested 38.55M at WAEP $3.23 — out of the money at $1.46; treasury method adds 0 today</td></tr>
+            <tr><td>SPAC earnout rights</td><td>17,500,000</td><td>Price-triggered (2022 terms); unvested at Jun 30, 2026</td></tr>
+            <tr><td>Unvested restricted stock rights</td><td>0</td><td>742,684 at Dec 31, 2025 vested during H1 2026</td></tr>
+            <tr><td><strong> FD (face)</strong></td><td><strong>~359.6M</strong></td><td>Total + options + earnout; treasury FD at $1.46 ≈ 302.3M</td></tr>
+          </tbody></table>
+          <div class="overhang"><b>Dilution overhang is structural, not incidental.</b> ~$175M remained available under the 2025 ATM sales agreement at Jun 30, 2026 (H1 sales were insignificant); the Up-C structure's redeemable noncontrolling interest is carried at $1,106M (an accounting redemption value, not debt — total liabilities are only $26.2M and there is no borrowings balance). The SPAC closed in July 2022 at $10/share on announced terms of up to $825M gross proceeds ($575M PIPE + trust cash, before redemptions); four years of burn later, the next dollar of capital will be raised near $1.46, not $10.</div>
+        </div>
+      </div>
+      <p class="source-note">All figures: Q2 2026 10-Q (balance sheet, cash-flow statement, EPS anti-dilutive table, liquidity note) and FY2025 10-K. Class B/A exchange: on Apr 28, 2026 Control Empresarial de Capitales exchanged 63,118,645 LLC units and an equal number of Class B shares for Class A — a conversion inside the structure, not a purchase or sale.</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>A nephrologist CEO, a founder-scientist exit, and a very patient anchor holder</h2><p class="lede">Management quality here is best judged on two decisions: the 2023 quality-systems reset and the 2024 decision to kill PROACT 2 — both were admissions made earlier than most teams make them.</p></div></div>
+      <div class="people-grid">
+        <article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+          <dt>Bruce Culleton, M.D. — CEO (since Nov 15, 2023)</dt><dd>Nephrologist; ~25 years in kidney care; executive roles at Baxter Healthcare and CVS Kidney Care; joined ProKidney Jul 2023 as EVP Clinical Development &amp; Commercialization. Presided over the manufacturing reset, PROACT 2 termination, and the July 2025 FDA alignment. <span class="ev fact">FACT</span></dd>
+          <dt>Tim Bertram, Ph.D. — Founder, ex-CEO</dt><dd>Founded/led the company and the SRC platform; moved to a scientific advisory role in Nov 2023. The selected-renal-cell technology descends from his earlier work at Tengion, whose own cell-therapy commercialization effort ended in a 2014 wind-down — relevant lineage for how hard autologous CMC commercialization is. <span class="ev unverified">UNVERIFIED · SECONDARY</span></dd>
+          <dt>Pablo Legorreta — founding investor</dt><dd>ProKidney was founded by an investor group led by Legorreta (founder/CEO of Royalty Pharma). Strategic/financing sophistication at the sponsor level is high; it has not, to date, translated into a partnership or non-dilutive capital event for the company. <span class="ev fact">FACT</span> (founding, BioSpace) / <span class="ev interp">INTERPRETATION</span></dd>
+        </dl></article>
+        <article class="paper-card"><h3>Insider &amp; holder signals</h3><ul class="check-list">
+          <li><strong>Anchor conversion, not buying:</strong> Control Empresarial de Capitales (Slim family vehicle) exchanged 63.1M Up-C units into Class A on Apr 28, 2026 and filed a 13D/A on Apr 30, 2026 — it remains the anchor holder; the exchange simplifies its position without adding cash to the company or signaling new conviction either way. <span class="ev fact">FACT</span></li>
+          <li><strong>No open-market insider purchases</strong> were identified in the 2026 Form 4 record reviewed; the May 29, 2026 Form 4 cluster is the annual equity-grant cycle, and two Form 144 proposed-sale notices were filed Aug 18, 2026. Against a going-concern statement, the absence of insider buying is a soft negative. <span class="ev fact">FACT</span> (filing record) / <span class="ev interp">INTERPRETATION</span></li>
+          <li><strong>Institutional:</strong> Morgan Stanley filed a 13G/A on Aug 12, 2026 (passive-tier). No activist or strategic holder has emerged. <span class="ev fact">FACT</span></li>
+          <li><strong>Lock-up legacy:</strong> SPAC-era lock-ups (50% of legacy holders' equity until the earlier of five years from Jul 2022 or regulatory authorization) expire around the BLA window — a supply consideration for 2027, not today. <span class="ev fact">FACT</span> (10-K terms)</li>
+        </ul></article>
+        <article class="paper-card"><h3>Track-record verdict</h3><p><span class="ev interp">INTERPRETATION</span> This team inherited — and disclosed — a manufacturing quality failure, cut a Phase 3 it could not afford, and converted a vague expedited-pathway hope into a written endpoint agreement with a numeric bar. That is above-average regulatory-operational competence. The counterweight is time: the program is on its second CEO, its timelines have slipped by years against SPAC-era expectations, and the company now has to raise money from a position of stated substantial doubt. Execution credit is real; it is not the same as a financed plan.</p></article>
+      </div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to destroy the thesis, not by probability.</p></div></div>
+      <ol class="risk-list">
+        <li><b>Sham-arm slope flattening</b><span>The entire Phase 2 signal is uncontrolled. If PROACT 1's sham arm declines more slowly than the Phase 2 pre-treatment slopes (the natural-history assumption baked into the design), separation can vanish even if treated patients replicate their Phase 2 post-slopes exactly.</span></li>
+        <li><b>Going concern / forced financing</b><span>Substantial doubt is stated in the 10-Q. The raise must happen into a ~$1.46 stock with a binary readout pending — the worst negotiating position in biotech finance — and lands on a cap table already carrying 39.8M options and 17.5M earnout rights.</span></li>
+        <li><b>CMC / potency at BLA</b><span>Autologous, per-patient manufacturing with no publicly described validated potency assay, in facilities that failed a GMP audit in 2023. A complete-response letter on CMC grounds is a base-rate outcome for first-in-class cell therapies, not a tail risk.</span></li>
+        <li><b>Confirmatory conversion risk</b><span>Accelerated approval (if won) rests on slope; the 2029 composite must still convert. A slope-positive/composite-negative pattern strands a marketed product under a withdrawal cloud — the exact scenario that has burned other accelerated-approval sponsors.</span></li>
+        <li><b>Single-asset, single-trial concentration</b><span>PROACT 2 is discontinued; there is no second indication in the clinic and no pipeline behind rilparencel. One protocol amendment or enrollment problem has no hedge.</span></li>
+        <li><b>Timeline credibility</b><span>Readout expectations have moved repeatedly since 2022 (program pause, PROACT 2 cut, cohort redefinition to stage 4/late-3b). Each slip shortens a runway that ends at the readout.</span></li>
+        <li><b>Commercial procedure economics</b><span>Biopsy + two image-guided injections + centralized cell manufacturing is a high-touch product competing against oral drugs on background therapy. No reimbursement precedent exists; the payer case depends on dialysis-delay evidence that arrives, at earliest, with the 2029 composite.</span></li>
+        <li><b>Up-C / anchor-holder complexity</b><span>Class B/LLC-unit structure, a $1.1B redeemable-NCI balance-sheet line, and a single dominant anchor holder (Control Empresarial) complicate both takeout mechanics and any distressed recapitalization.</span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>Open questions the next filings should answer</h2><p class="lede">Gaps are stated, not filled.</p></div></div>
+      <div class="open-grid">
+        <article><span>GAP 01</span><h3>Financing plan</h3><p>No disclosed committed capital beyond the ATM shelf. Whether the raise comes before or after full-enrollment confirmation — and whether the anchor holder participates — is the single largest unknown in the share count.</p></article>
+        <article><span>GAP 02</span><h3>Potency assay &amp; comparability</h3><p>No public detail on the potency strategy or FDA's view of the commercial process vs the Phase 3 process after the 2023–24 rebuild.</p></article>
+        <article><span>GAP 03</span><h3>Sham-arm behavior</h3><p>No blinded data are available; the assumed natural-history slope for the control arm in this exact population (stage 4/late-3b on modern SOC) will not be known until the readout.</p></article>
+        <article><span>GAP 04</span><h3>Durability &amp; re-dosing</h3><p>Whether one course of rilparencel holds its slope effect beyond ~2 years, and whether re-dosing is safe/effective, is untested in any controlled setting.</p></article>
+        <article><span>GAP 05</span><h3>Earnout triggers</h3><p>The 17.5M SPAC earnout rights remain outstanding; their exact price hurdles (set in 2022) were not re-verified from the merger agreement for this dossier — treat any earnout dilution as unmodeled above the bull case.</p></article>
+        <article><span>GAP 06</span><h3>EU/ex-US path</h3><p>With PROACT 2 discontinued after an EU GMP audit cycle, no current ex-US registrational plan is disclosed.</p></article>
+      </div>
+      <div class="verdict-box"><div><div class="tag" style="color:#9db6b1">VERDICT</div><h3>A well-negotiated pathway around an unproven effect, financed to the wire</h3></div><p>ProKidney did the hardest regulatory work in its field: a written surrogate-endpoint agreement with a numeric bar, inside a single sham-controlled trial that also serves as its own confirmatory study. What it has not done — what no one has done — is show that renal cell therapy beats a sham procedure. The Phase 2 number (4.57) is either one of the largest real effects in nephrology or a textbook open-label slope artifact, and Q2 2027 settles it. Until then the equity is a financing story attached to a science binary: the cash ends where the answer begins, so the position that exists at the readout will be smaller per share than the one that exists today. Deep-dive warranted on the readout and on any financing terms — both are knowable, dated, and decisive.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/labels → CT.gov → papers/conferences → company PRs/decks → trade press.</p></div></div>
+      <div class="sources">
+        <article class="source-group"><h3>SEC filings (primary)</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1850270/000119312526342373/prok-20260630.htm" target="_blank" rel="noopener">Q2 2026 Form 10-Q<small>Filed Aug 10, 2026 · cash, going concern, cap table, PROACT 1 status</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1850270/000119312526113881/prok-20251231.htm" target="_blank" rel="noopener">FY2025 Form 10-K<small>Filed Mar 18, 2026 · structure, SPAC terms, lock-ups</small></a>
+          <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001850270&amp;type=8-K" target="_blank" rel="noopener">2026 Form 8-K series<small>Jan 12 &amp; Feb 2 (Item 7.01 decks) · Mar 18 / May 15 / Aug 10 (results) · May 29 (annual meeting)</small></a>
+          <p class="source-note">EDGAR filing index for CIK 1850270 also used for: Control Empresarial 13D/A (Apr 30, 2026), Morgan Stanley 13G/A (Aug 12, 2026), 2026 Form 4 / Form 144 record.</p>
+        </article>
+        <article class="source-group"><h3>Registry &amp; literature</h3>
+          <a href="https://clinicaltrials.gov/study/NCT05099770" target="_blank" rel="noopener">REGEN-006 / PROACT 1<small>ClinicalTrials.gov · NCT05099770 · design, sham control, composite outcome</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT03270956" target="_blank" rel="noopener">REGEN-003<small>ClinicalTrials.gov · NCT03270956</small></a>
+          <p class="source-note">REGEN-007 full results — <em>Clinical Journal of the American Society of Nephrology</em>, Jan 2026 (ASN Kidney Week 2025 late-breaking presentation, Nov 2025): Group 1 +4.57 (95% CI 1.95–7.18), p&lt;0.001; Group 2 +1.70 (−0.24–3.63), p=0.085.<br>Stavas et al. — REGEN-003 design and early results (n=10): slopes −6.5 → −3.9; dialysis delayed mean 16 months.<br>Background-therapy context: DAPA-CKD (<em>NEJM</em> 2020), EMPA-KIDNEY (<em>NEJM</em> 2023), FLOW semaglutide (<em>NEJM</em> 2024), FIDELIO-DKD (<em>NEJM</em> 2020) — class-level, no head-to-head claims made.</p>
+        </article>
+        <article class="source-group"><h3>Company disclosures · unverified tier</h3>
+          <p class="source-note">GlobeNewswire releases (company claims until corroborated): July 2025 FDA alignment on the accelerated-approval pathway; Nov 6, 2025 full REGEN-007 results; FY2025 results (Mar 18, 2026) and Q1 2026 results (May 2026) — milestones, powering (90% at 1.75 / 80% at 1.5), BLA guidance (Q4 2027 submission, 2H 2028 approval); Sept 3, 2024 Phase 3 strategic update (PROACT 2 discontinuation, $150–175M savings); Nov 13, 2023 RMCL-002 interim data, manufacturing pause and CEO transition releases; Jan 18, 2022 SPAC transaction release (BusinessWire).</p>
+        </article>
+        <article class="source-group"><h3>Market &amp; trade press</h3>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/PROK/chart/" target="_blank" rel="noopener">MarketBeat PROK price history<small>$1.46 close, Oct 15, 2026 · consensus avg PT ~$12.00</small></a>
+          <a href="https://finnhub.io/?q=%22PROK%22" target="_blank" rel="noopener">Finnhub PROK snapshot<small>52-week range $1.30–$3.48</small></a>
+          <p class="source-note">BioSpace (Jan 2022, SPAC/founding-investor context) and Inside Precision Medicine (2025, process description) used as secondary context only, tagged accordingly in the text.</p>
+        </article>
+      </div>
+      <div class="method"><strong>Method.</strong> Built Oct 16, 2026. Filings used: Q2 2026 10-Q, FY2025 10-K, 2026 8-K series, EDGAR ownership record. Evidence labels distinguish primary/peer-reviewed fact, interpretation, gap, and unverified company or secondary claims. Cross-trial comparisons are not head-to-head. Scenario ranges in §09 are soft, assumption-labeled illustrations — not recommendations. Nothing in this dossier is invented: figures without a source above are labeled INTERPRETATION or GAP.</div>
+    </section>
+  </main>
+
+  <footer><strong>PROK deep-dive dossier</strong> · Built October 16, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const b=document.createElement('div'); b.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; b.appendChild(n); n=nx}
+      sec.appendChild(b);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

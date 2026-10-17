@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>PEPG — PepGen · Deep-Dive Dossier · 2026-10-11</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · PCVX</span><span class="stamp">Deep-dive dossier · October 16, 2026</span></div>
+        <h1>The broadest pneumococcal vaccine ever tested just cleared its pivotal bar. Now it has to become a product.</h1>
+        <p class="hero-dek">A source-weighted investigation of Vaxcyte's 31-valent conjugate vaccine VAX-31 after the OPUS-1 Phase 3 readout: the immunogenicity question is largely answered, so the remaining risk sits in FDA review of two missed individual comparisons, a manufacturing consistency study that has not run yet, an infant program with no data, and a commercial fight against Pfizer and Merck — funded by roughly $3.4 billion of pro-forma cash and a burn rate above $1 billion a year.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$65.27</div>
+        <div class="quote-label">Market snapshot · Oct 15, 2026 close (MarketBeat)</div>
+        <div class="quote-meta"><strong>~$10.7B</strong> est. economic market value (163.25M economic shares, est.) · <strong>~$8.3B</strong> implied enterprise value on pro-forma cash<br>$56.48 close Oct 2 (pre-data) → $73.82 close Oct 5, intraday high $90.75</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#pipeline">Pipeline</a><a href="#competition">Landscape</a><a href="#financials">Financials</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The pivotal question changed on October 5</h2><p class="lede">Before OPUS-1, the bet was whether a 31-valent conjugate vaccine could match two licensed vaccines serotype by serotype. It did, on every prespecified primary analysis. The bet now is whether that dataset — plus two supportive Phase 3 studies, a lot-consistency study, and an infant dataset that does not exist yet — converts into a 2028 BLA, an ACIP recommendation, and adult market share against two of the strongest vaccine franchises in the industry.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Single swing factor</div><div class="big">BLA → ACIP → share</div><p><span class="ev interp">INTERPRETATION</span> No further adult immunogenicity result can add much: OPUS-1 was the cornerstone trial. Value now turns on FDA review (including serotypes 3 and 12F vs PCV21), CMC consistency, and whether ACIP/payers treat one 31-valent shot as the default for adults 50+.</p></article>
+        <article class="decision"><div class="tag">OPUS-1 (Oct 5, 2026)</div><div class="big">All primaries met</div><p><span class="ev unverified">UNVERIFIED · COMPANY TOPLINE</span> All 28 shared serotypes met the noninferiority criterion (OPA GMR lower bound &gt;0.667) in adults 50+; 3 unique serotypes + 20B met superiority (&gt;2.0); immunobridging 32/32 in ages 18–49; safety similar to PCV20/PCV21. Full dataset not yet published.</p></article>
+        <article class="decision"><div class="tag">Pro-forma cash (est.)</div><div class="big">~$3.4B</div><p><span class="ev interp">INTERPRETATION</span> ~$2.3B preliminary cash/investments at Sep 30, 2026 plus ~$1.10B est. net proceeds from the Oct 9, 2026 concurrent offerings ($1.15B gross). Reported balance at Jun 30, 2026 was $2.51B. Q3 10-Q is the first reported post-raise figure.</p></article>
+        <article class="decision warn"><div class="tag">Next decisive readouts</div><div class="big">1H 2027</div><p><span class="ev unverified">UNVERIFIED · COMPANY GUIDANCE</span> OPUS-2 (influenza coadministration) and OPUS-3 (previously vaccinated adults) topline, plus VAX-31 infant Phase 2 primary-series/booster data by end of 1H 2027. Planned BLA submission: first half of 2028.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>Why the OPUS-1 result is genuinely strong</h3><ul><li>The co-primary framework was prespecified with FDA alignment and used a <em>more stringent</em> noninferiority margin (lower-bound &gt;0.667) than the historical &gt;0.5 standard — and VAX-31 cleared it for every shared serotype on the primary (one-or-both-comparator) analysis.</li><li>Against PCV20 head-to-head in the same trial, VAX-31 met noninferiority for 20 of 20 shared serotypes; the three serotypes no licensed adult vaccine contains, plus cross-reactive 20B, met a demanding superiority bar (lower bound &gt;2.0).</li><li>Safety was similar to both licensed comparators across 4,047 participants, with no vaccine-related serious adverse events reported in topline.</li><li>The platform had already de-risked the mechanism twice: VAX-24 Phase 1/2 in <em>The Lancet Infectious Diseases</em> and the VAX-31 Phase 1/2 (n=1,015), where the high dose beat PCV20 point estimates on 18 of 20 shared serotypes.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the headline does not settle</h3><ul><li>In the prespecified <em>individual</em> comparison vs PCV21, serotypes 3 and 12F missed &gt;0.667 and only met the historical &gt;0.5 bar — and management itself expects the PCV21 comparison to be a particular focus of FDA review.</li><li>Immunogenicity is a bridge, not efficacy: no PCV is licensed on disease-outcome data in adults, and OPA titers do not map linearly to prevented cases — especially for serotype 3, the class's known problem serotype.</li><li>The BLA package is incomplete: OPUS-2, OPUS-3 and a manufacturing consistency (lot-to-lot) study are still ahead, and the BLA is guided to 1H 2028 — approval, if it comes, is a 2028–29 event.</li><li>The infant indication — half the franchise logic — has no VAX-31 data yet, and the VAX-24 infant Phase 2 showed mid-dose noninferiority on only 20 of 24 serotypes post-dose 3.</li><li>Burn is industrial-scale: $513.1M operating cash use in H1 2026 alone, before a launch that requires building inventory and a sales infrastructure against Pfizer and Merck.</li></ul></article>
+      </div>
+      <p class="source-note">Primary sources: Vaxcyte OPUS-1 release, Oct 5, 2026 (furnished as Ex. 99.1 to the Oct 5, 2026 Form 8-K) · Q2 2026 Form 10-Q (filed Aug 5, 2026) · Oct 9, 2026 Form 8-K (convertible notes closing) and Oct 6–9, 2026 offering releases. Market data: MarketBeat price history.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>The stock kept the trial win and paid for the financing in the same week</h2><p class="lede">PCVX rose about 31% on the OPUS-1 close (Oct 5) after touching $90.75 intraday, then gave back ground as the company priced roughly $1.15 billion of concurrent equity, pre-funded warrants and convertible notes into the strength. At $65.27 (Oct 15) the market still capitalizes the company at roughly $10.7 billion on an economic share count — a valuation that already assumes adult approval and meaningful share capture.</p></div></div>
+      <div class="event-tape">
+        <article><span class="event-mark">OCT 2</span><h3>Pre-data close $56.48</h3><p>Market cap ≈$8.4B on the pre-offering share count. The Street was paying for a high probability of OPUS-1 success before it printed — Guggenheim had adult success odds at 85% pre-data (raised to 95% after).</p></article>
+        <article><span class="event-mark">OCT 5</span><h3>OPUS-1 lands; stock +30.7%</h3><p>Close $73.82 on 14.9M shares; intraday high $90.75. Same day, option exercise-and-sell Form 4s by the CSO/COO and the CAO executed at $86.74 (see §10).</p></article>
+        <article><span class="event-mark">OCT 6–9</span><h3>$1.15B concurrent raise</h3><p>8,584,375 shares at $64.00, pre-funded warrants for 400,000 shares, and $575M of 1.50% convertible notes due 2032 (conversion price ≈$89.60) — both underwriter options exercised in full. Stock closed Oct 6 at $66.70 (−9.7%).</p></article>
+      </div>
+      <div class="readthrough"><strong>How to read the price.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the implied operating enterprise value is ≈$8.3B (see §07 bridge) for a company with no revenue and a first possible launch in 2028–29. Consensus targets cluster around $109–117 on average with a $146 street high (BofA/Jefferies, Oct 2026; secondary-source tallies) — i.e., the sell-side base case is roughly "approval plus leading adult share," and the current price sits between that base case and a failure/delay case. The scenario framework in §09 is built to that anchor and does not exceed it.</div>
+      <p class="source-note">Prices: MarketBeat PCVX price history (Oct 2026) · Finnhub snapshot (52-week range $39.87–$90.75). Analyst targets: MarketBeat/Investing.com tallies, Oct 5–12, 2026 (<span class="ev unverified">UNVERIFIED</span> secondary tallies).</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Why valency is easy to add and hard to keep</h2><p class="lede">Pneumococcal conjugate vaccines work by chemically linking each serotype's capsular polysaccharide to a carrier protein so infants and older adults can mount a T-cell-dependent, memory antibody response. The historical ceiling on valency is not manufacturing the polysaccharides — it is that piling more conjugates onto the same carrier blunts responses to each one. Vaxcyte's entire platform is an attempt to break that trade-off.</p></div></div>
+      <div class="science-chain" aria-label="Pneumococcal vaccine mechanism">
+        <article><b>01</b><h3>~100 serotypes, a shifting subset causes disease</h3><p><em>S. pneumoniae</em> serotypes differ by capsule. Vaccination suppresses vaccine serotypes and non-vaccine serotypes expand into the niche (serotype replacement) — the reason valency keeps rising from PCV7 to PCV13, 15, 20, 21 and now a 31-valent candidate.</p></article>
+        <article><b>02</b><h3>Polysaccharide alone is a weak antigen</h3><p>Capsular polysaccharides are T-cell-independent: poor responses in infants, no memory. Conjugation to a carrier protein (classically CRM197, a detoxified diphtheria toxin) recruits T-cell help and makes the response durable and boostable.</p></article>
+        <article><b>03</b><h3>The carrier ceiling</h3><p>With conventional random (lysine) conjugation, more serotypes means more carrier protein and more epitope masking; carrier-induced epitopic suppression and antigenic competition can depress per-serotype responses — visible in the class record whenever valency jumps.</p></article>
+        <article><b>04</b><h3>OPA is the regulatory currency</h3><p>Licensure is bridged on opsonophagocytic activity (OPA) — a functional assay measuring antibody-mediated bacterial killing — plus IgG concentrations, not on counting prevented infections. Noninferiority of OPA geometric mean ratios is therefore the whole game, and its limits matter (§03 failure modes).</p></article>
+      </div>
+      <div class="moa-box"><h3>The platform in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> A normal conjugate vaccine glues sugars to a carrier protein at random spots, and the glue covers up parts of the carrier the immune system needs to see. Vaxcyte builds its carrier with a handful of precisely placed attachment points, clicks each serotype's sugar onto only those spots, and uses far less carrier per sugar. Result, in principle: more serotypes in one shot without the usual dilution of each serotype's response.</p><p><strong>Technical.</strong> The carrier is eCRM — CRM197 engineered with the non-natural amino acid para-azidomethyl-L-phenylalanine (pAMF) substituted at selected lysine positions — produced in XpressCF, a cell-free protein synthesis system exclusively licensed from Sutro Biopharma. pAMF azide groups enable site-specific, copper-free click conjugation of polysaccharides at defined sites, preserving carrier T-cell epitopes and allowing a lower carrier-to-polysaccharide ratio ("carrier-sparing"). OPUS-1's adult formulation ("High Dose") doses most serotypes at 3.3 mcg with serotypes 1, 5 and 22F at 4.4 mcg.</p></div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Peer-reviewed platform proof</div><h3>VAX-24 Phase 1/2, <em>Lancet Infectious Diseases</em></h3><p>The 24-valent predecessor met or exceeded regulatory immunogenicity standards for all 24 serotypes at the conventional 2.2 mcg dose in adults 18–64, with a safety profile comparable to PCV20 — the first human evidence that site-specific, carrier-sparing conjugation preserves per-serotype responses at higher valency. Preclinical site-specific conjugation data were published in <em>Vaccine</em> (2021; Fairman et al., DOI 10.1016/j.vaccine.2021.03.070).</p><p class="source-note"><span class="ev fact">FACT · HUMAN</span> Vaxcyte VAX-24 Phase 1/2 publication, <em>Lancet Infect Dis</em> (announced Dec 4, 2023).</p></article>
+        <article class="paper-card"><div class="program-kicker">Epidemiology anchor</div><h3>Coverage is estimated, not measured in the trial</h3><p>Serotype-coverage percentages come from surveillance, not from OPUS-1: King et al. (<em>J Infect Dis</em> 2025;232:e609–e620, CDC authors) mapped serotype distribution and coverage of existing and pipeline PCVs. Vaxcyte's ~95% IPD / ~88% pneumonia coverage estimates for ages 50+ derive from CDC Active Bacterial Core surveillance 2022–2024 and assume cross-protection for 6A/6C and 15B/15C — reasonable, but assumptions, and they drift as serotype ecology shifts.</p><p class="source-note"><span class="ev fact">FACT</span> King et al. 2025 · Vaxcyte OPUS-1 release footnotes 5–6.</p></article>
+      </div>
+      <div class="fail-grid" aria-label="Ways the science could fail">
+        <article><h3>1 · Noninferiority is not protection</h3><p>OPA GMR noninferiority shows antibody function is statistically comparable, not that disease is prevented at the same rate. The adult PCV class has never been validated against clinical endpoints at licensure; effectiveness is inferred from pediatric PCV13 efficacy and post-licensure studies. A vaccine can win every comparison and still underperform epidemiologically.</p></article>
+        <article><h3>2 · Serotype 3</h3><p>Serotype 3 has resisted every PCV generation — its thick, shedding capsule blunts opsonophagocytosis, and PCV13 never demonstrated clear effectiveness against serotype 3 IPD. In OPUS-1's individual PCV21 comparison, serotype 3 (and 12F) missed the &gt;0.667 bar. If any serotype draws an FDA labeling fight, it is this one.</p></article>
+        <article><h3>3 · Infant immunology is a different regime</h3><p>Infants receive a 3-dose priming series plus booster alongside five-plus other vaccines; interference and carrier load bite harder. VAX-24's infant mid dose met seroconversion noninferiority for only 20 of 24 serotypes post-dose 3. VAX-31's infant formulation (optimized dose, data 2027) cannot be assumed to inherit the adult result.</p></article>
+        <article><h3>4 · Replacement and drift</h3><p>Every PCV generation has been partly undone by serotype replacement over a decade. A 31-valent vaccine maximizes today's coverage; it does not stop ecology from moving toward the remaining ~65 serotypes, and non-typeable strains sit outside the frame entirely.</p></article>
+      </div>
+      <p class="source-note">Platform and mechanism: Vaxcyte 10-K/10-Q program descriptions · Fairman et al., <em>Vaccine</em> 2021 · XpressCF license from Sutro Biopharma (10-Q). Serotype 3 problem: PCV13 effectiveness literature (e.g., Andrews et al., <em>Lancet Infect Dis</em> 2014) — serotype-3-specific effectiveness not demonstrated.</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>OPUS-1: a clean primary win with one documented soft spot</h2><p class="lede">The OPUS program was finalized in consultation with FDA after the End-of-Phase 2 meeting. OPUS-1 is the pivotal noninferiority trial; OPUS-2 (flu coadministration) and OPUS-3 (previously vaccinated) are supportive; a manufacturing consistency study completes the BLA package.</p></div></div>
+      <article class="paper-card">
+        <div class="program-kicker">Pivotal · NCT07284654 · topline Oct 5, 2026</div>
+        <h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">OPUS-1 · VAX-31 vs PCV20 and PCV21</h3>
+        <p class="mechanism"><span class="ev fact">FACT · DESIGN</span> Randomized, double-blind, active-controlled. Adults 50+ (n=3,572) randomized 1:1:1 to a single dose of VAX-31 High Dose, Prevnar 20 (PCV20) or Capvaxive (PCV21); separate cohort ages 18–49 (n=475) randomized 3:1 VAX-31 vs PCV20. Total dosed 4,047 at ~30 U.S. sites. Immunogenicity at Month 1; safety followed 6 months. Population: pneumococcal-naïve healthy adults.</p>
+        <table class="study-table"><thead><tr><th>Analysis</th><th>Prespecified criterion</th><th>Result (company topline)</th></tr></thead><tbody>
+          <tr><td data-label="Analysis">Co-primary, 11 serotypes in PCV20 + PCV21 + VAX-31</td><td data-label="Criterion">OPA GMR LBCI &gt;0.667 vs one or both comparators (Hochberg-adjusted)</td><td data-label="Result">11 of 11 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Co-primary, 9 serotypes in PCV20 only</td><td data-label="Criterion">LBCI &gt;0.667</td><td data-label="Result">9 of 9 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Co-primary, 8 serotypes in PCV21 only</td><td data-label="Criterion">LBCI &gt;0.667</td><td data-label="Result">8 of 8 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Co-primary, 3 unique serotypes + 20B</td><td data-label="Criterion">Superiority, LBCI &gt;2.0</td><td data-label="Result">4 of 4 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Immunobridging, ages 18–49 vs 50–64</td><td data-label="Criterion">LBCI &gt;0.667, all 32 comparisons</td><td data-label="Result">32 of 32 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Individual vs PCV20</td><td data-label="Criterion">LBCI &gt;0.667</td><td data-label="Result">20 of 20 met <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Individual vs PCV21</td><td data-label="Criterion">LBCI &gt;0.667</td><td data-label="Result"><strong>17 of 19 met</strong>; serotypes 3 and 12F met only the historical &gt;0.5 threshold (prespecified key secondary) <span class="ev unverified">UNVERIFIED</span></td></tr>
+          <tr><td data-label="Analysis">Safety (primary safety endpoint)</td><td data-label="Criterion">Descriptive vs comparators</td><td data-label="Result">Similar profile to PCV20/PCV21; solicited reactions mostly mild–moderate, resolving ≤48h; no vaccine-related SAEs; no AE discontinuations <span class="ev unverified">UNVERIFIED</span></td></tr>
+        </tbody></table>
+        <p class="source-note">All OPUS-1 results are company-reported topline (GlobeNewswire, Oct 5, 2026; 8-K Ex. 99.1). Per-serotype GMR point estimates, confidence intervals and the full safety tables have not been published — <span class="ev gap">GAP</span> until the full dataset/conference presentation. The &gt;0.667 margin is more stringent than the &gt;0.5 margin used historically for PCV licensure; the trial was designed with FDA alignment on this framework. No efficacy (disease-endpoint) data exist for VAX-31; cross-trial comparisons to PCV20/PCV21 pivotal trials run in other populations are not valid head-to-head evidence — OPUS-1's within-trial comparisons are.</p>
+      </article>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Supporting Phase 3 · data 1H 2027</div><h3>OPUS-2 and OPUS-3</h3><p><strong>OPUS-2</strong> (NCT07365826): VAX-31 coadministered with licensed seasonal influenza vaccine vs sequential administration, pneumococcal-naïve adults 50+; endpoints Month-1 OPA GMTs/GMFRs for all 31 serotypes + 20B, IgG secondary. <strong>OPUS-3</strong> (n≈720): adults previously vaccinated with licensed PCVs (including PCV20 and/or PPSV23 histories); does VAX-31 boost shared-serotype responses while adding the incremental ones? Across OPUS-1/2/3, ~6,000 adults were expected, ~3,400 receiving VAX-31 — the safety database for the BLA. Status per Oct 2026 offering documents: both enrolled.</p><p class="source-note"><span class="ev fact">FACT · DESIGN</span> Company releases Jan–Mar 2026; offering use-of-proceeds (Oct 2026 424B5).</p></article>
+        <article class="paper-card"><div class="program-kicker">Phase 1/2 · NCT (adult) · reported Sep 3, 2024</div><h3>The result that selected the dose</h3><p>n=1,015 adults 50+, three dose levels vs PCV20. At mid and high doses, noninferiority criteria were met for all 20 PCV20-shared serotypes; at the high dose, OPA point estimates exceeded PCV20 on 18 of 20 (GMR &gt;1.0), seven statistically higher; all 11 serotypes unique to VAX-31 met superiority criteria at every dose. Safety similar to PCV20 over six months. The High Dose (3.3 mcg; 4.4 mcg for 1, 5, 22F) advanced into OPUS.</p><p class="source-note"><span class="ev unverified">UNVERIFIED · COMPANY TOPLINE</span> Vaxcyte release, Sep 3, 2024. Breakthrough Therapy designation for adult IPD followed; expanded to pneumococcal pneumonia in May 2025 <span class="ev fact">FACT</span>.</p></article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Regulatory path as guided</h3><p><span class="ev unverified">UNVERIFIED · COMPANY</span> OPUS-2/OPUS-3 topline 1H 2027 → manufacturing consistency study → BLA submission 1H 2028 → FDA review (BTD may support priority interactions; a standard 10-month or priority 6-month review clock is not confirmed — <span class="ev gap">GAP</span>). ACIP recommendation follows licensure and is a separate, decisive gate for adult uptake.</p></article>
+        <article><h3>What FDA will argue about</h3><p><span class="ev interp">INTERPRETATION</span> Serotypes 3 and 12F vs PCV21 under the new &gt;0.667 standard: the company pre-registered the &gt;0.5 historical comparison as a key secondary, and management has already told investors the PCV21 comparison will be a particular focus of review. A label that carves out or footnotes those serotypes is a plausible middle outcome — not a CRL, but not the clean "broadest coverage" claim either.</p></article>
+        <article><h3>What is not in the package yet</h3><p><span class="ev gap">GAP</span> No lot-consistency data, no OPUS-2/3 data, no published per-serotype OPUS-1 tables, no immunocompromised-population data, and no coadministration data beyond influenza. The adult safety database (~3,400 VAX-31 recipients across OPUS) is adequate for common reactions, not rare ones.</p></article>
+      </div>
+    </section>
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">05 / PIPELINE</div><div><h2>One franchise, two age bands, then optionality</h2><p class="lede">Ranked by descending value. The adult VAX-31 program is the company; the infant program is the second leg; everything else is early optionality that the market currently prices close to zero — correctly, on the evidence available.</p></div></div>
+      <div class="pipeline-grid">
+        <article class="candidate-card hero-candidate">
+          <div><div class="program-kicker">Rank 1 · Adults · Phase 3</div><h3>VAX-31 — adult indication</h3><p class="mechanism">31-valent PCV for prevention of IPD and pneumococcal pneumonia in adults. OPUS-1 positive (Oct 5, 2026); OPUS-2/OPUS-3 read out 1H 2027; BLA guided 1H 2028. Company-estimated coverage ~95% of IPD and ~88% of pneumococcal pneumonia in U.S. adults 50+ (CDC ABCs 2022–2024; cross-protection assumptions noted in §03) — an estimated 13–36 points of incremental IPD coverage and 19–31 points of incremental pneumonia coverage over today's adult PCVs. Breakthrough Therapy designation (IPD + pneumonia).</p></div>
+          <div class="candidate-foot"><span class="badge core">Core value</span><span>Adults 18+ · BLA 1H 2028 [guidance]</span></div>
+        </article>
+        <article class="candidate-card">
+          <div><div class="program-kicker">Rank 2 · Infants · Phase 2</div><h3>VAX-31 — infant indication</h3><p class="mechanism">Phase 2 dose-finding study (NCT06720038): enrollment complete, n=905 healthy infants, vs PCV20, 3-dose priming series at 2/4/6 months plus booster at 12–15 months, using an optimized dose formulation informed by VAX-24 infant data. Topline (primary series ± booster) by end of 1H 2027 [guidance]. Company-estimated potential to lift U.S. under-5 IPD coverage from ~69% (PCV20) to ~91–92% and otitis-media coverage to ~96% — company estimates, not trial results. A Phase 3 infant program (VAX-31 or VAX-24) follows the dose decision.</p></div>
+          <div class="candidate-foot"><span class="badge option">Second leg</span><span>Data by end-1H 2027 [guidance]</span></div>
+        </article>
+        <article class="candidate-card">
+          <div><div class="program-kicker">Rank 3 · Backup / infant alternate</div><h3>VAX-24</h3><p class="mechanism">24-valent PCV. Adults: positive Phase 1/2 (<em>Lancet Infect Dis</em>); pivotal adult program was displaced by VAX-31 in 2024. Infants: Phase 2 dose-finding positive topline (Mar 2025; n=802 enrolled) — mid dose (2.2 mcg) met precedent seroconversion NI criteria for the highest-circulating serotypes and 20 of 24 serotypes overall post-dose 3; the four unique serotypes met all criteria; little to no carrier suppression observed. Retained as the fallback infant Phase 3 candidate if VAX-31 infant data disappoint.</p></div>
+          <div class="candidate-foot"><span class="badge option">Hedge</span><span>Infant Ph3 candidate pending VAX-31 data</span></div>
+        </article>
+        <article class="candidate-card">
+          <div><div class="program-kicker">Rank 4 · Preclinical / early</div><h3>VAX-XL · VAX-A1 · VAX-GI</h3><p class="mechanism"><strong>VAX-XL:</strong> next-generation PCV designed to push coverage beyond 31 valents on the same platform (announced Mar 2025). <strong>VAX-A1:</strong> Group A Streptococcus vaccine — Phase 1 in adults initiated, topline guided 2H 2027. <strong>VAX-GI:</strong> Shigella vaccine, preclinical. No clinical proof for any of the three; GAS and Shigella have no licensed vaccine anywhere, which cuts both ways — open field, unproven regulatory path.</p></div>
+          <div class="candidate-foot"><span class="badge early">Optionality</span><span>VAX-A1 Ph1 topline 2H 2027 [guidance]</span></div>
+        </article>
+      </div>
+      <p class="source-note">Pipeline status: Q2 2026 Form 10-Q · company releases Jan 22, 2026 (infant enrollment complete), Mar 2025 (VAX-24 infant topline, VAX-XL) · OPUS-3 initiation release (n≈720; ~6,000 total OPUS enrollment expected).</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Differentiation is a coverage table plus one within-trial comparison — nothing more</h2><p class="lede">Four licensed PCVs compete in the U.S. VAX-31's claim is arithmetic — it contains every serotype in PCV20 and PCV21 except PCV21's de-O-acetylated 15B component, plus three more — and immunologic: within OPUS-1 it matched both comparators on the prespecified primaries. There are no disease-endpoint comparisons between any of these products, and none are planned.</p></div></div>
+      <div class="comp-grid">
+        <article><div class="program-kicker">Pfizer · approved 2021 (adults) / 2023 (infants)</div><h3>Prevnar 20 (PCV20, Apexxnar)</h3><p>The incumbent standard: 20 serotypes, the comparator every new PCV must match. Merck's epidemiology framing credits PCV20 serotypes with ~52% of IPD in adults 50+ (CDC 2018–2021) — it covers the historic pediatric serotypes (incl. 4, 19F) that PCV21 drops. Pfizer's moat is contracting, pharmacy-channel incumbency and the Prevnar brand across pediatrics.</p></article>
+        <article><div class="program-kicker">Merck · approved Jun 2024 (adults)</div><h3>Capvaxive (PCV21)</h3><p>The adult-designed challenger: 21 serotypes including 8 not in other PCVs (15A, 15C, 16F, 23A, 23B, 24F, 31, 35B), ~84% estimated IPD coverage in adults 50+ (CDC 2018–2021) per Merck. It deliberately omits several historic serotypes. Pediatric at-risk indication (ages 2–17) added June 2026. OPUS-1's two soft comparisons (serotypes 3, 12F) were against this product.</p></article>
+        <article><div class="program-kicker">Merck · approved 2021 (adults) / 2022 (peds)</div><h3>Vaxneuvance (PCV15)</h3><p>15-valent; largely a pediatric and transitional product in the U.S. now that PCV20/PCV21 anchor the adult market. Included for completeness: VAX-31 contains all 15 of its serotypes.</p></article>
+        <article><div class="program-kicker">Merck · Phase 3 (pediatric)</div><h3>V116 in children (STRIDE-PEDS)</h3><p>Merck is running PCV21 down into pediatric populations (Phase 3 STRIDE-PEDS in toddlers/children), which matters for VAX-31's infant timeline: Vaxcyte will not have the pediatric field to itself even if the infant data are clean.</p></article>
+      </div>
+      <div class="readthrough"><strong>The honest differentiation statement.</strong> <span class="ev fact">FACT</span> Within a single randomized trial (OPUS-1), VAX-31 demonstrated noninferior OPA responses to both licensed adult standards for the shared serotypes and adds three serotypes (plus 20B cross-reactivity claims) that neither contains. <span class="ev interp">INTERPRETATION</span> Everything beyond that — fewer infections, better pneumonia prevention, replacement dynamics — is inference from serotype-coverage arithmetic, not comparative evidence. ACIP's October 2024 decision to lower the routine adult recommendation age to 50 expanded the eligible population for whoever ACIP prefers after 2028; that committee decision, not the coverage table, will decide the share fight.</div>
+      <p class="source-note">Approvals/coverage: FDA approval records and Merck Capvaxive materials (Jun 2024; pediatric expansion Jun 2026) · ACIP adult age-50 recommendation, Oct 2024 (MMWR 2025;74(1):1–8) · King et al., <em>J Infect Dis</em> 2025.</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">07 / FINANCIALS</div><div><h2>Funded like a launch company before it has a product</h2><p class="lede">Vaxcyte has raised capital ahead of need at every step since its 2020 IPO — February 2024 at $64, September 2024 at $103, February 2026 at $50, and $1.15 billion gross in the week of the OPUS-1 readout. The balance sheet is the strongest part of the story; the burn it must fund is the constraint.</p></div></div>
+      <div class="stats">
+        <article><span>Cash + investments · Jun 30, 2026 (reported)</span><strong>$2.51B</strong><p>$183.2M cash + $1,303.6M short-term + $1,020.9M long-term investments (10-Q).</p></article>
+        <article><span>Pro-forma cash · ~Oct 9, 2026 (est.)</span><strong>~$3.4B</strong><p>~$2.3B preliminary at Sep 30 (company, offering prospectus) + ~$1.10B est. net offering proceeds. Estimate — Q3 10-Q will report the actual figure.</p></article>
+        <article><span>Operating cash use · H1 2026</span><strong>$513.1M</strong><p>≈$1.03B annualized before OPUS-2/3 completion, consistency study, inventory build and launch prep. H1 net loss $604.9M; accumulated deficit $2.8B.</p></article>
+        <article><span>Convertible notes · Oct 2026</span><strong>$575M · 1.50% · due 2032</strong><p>Conversion price ≈$89.60 (11.1607 shares per $1,000) = 6,417,402 shares if converted. The company's first debt.</p></article>
+      </div>
+      <div class="two-col">
+        <div class="panel"><h3>Share count and dilution bridge</h3>
+          <p><span class="ev fact">FACT</span> Common outstanding: <strong>148,805,278</strong> (Aug 3, 2026; 10-Q cover). October offering adds 8,584,375 shares (full greenshoe) → <strong>157,389,653</strong> estimated pro-forma common <span class="ev interp">INTERPRETATION</span> (excludes any Aug–Oct option exercises — <span class="ev gap">GAP</span> until Q3 10-Q).</p>
+          <p><span class="ev fact">FACT</span> Pre-funded warrants: 5,463,793 outstanding at Jun 30, 2026 ($0.001 strike) + 400,000 issued Oct 2026 = <strong>5,863,793</strong> — economically common stock. Options 12,111,431 (weighted-average exercise ≈$46–47, est.), RSUs 3,019,377, ESPP shares 275,396 (all Jun 30, 2026).</p>
+          <p>At $65.27 (Oct 15, 2026): basic market cap ≈$9.71B (Aug 3 count) · economic ≈$10.66B (163,253,446 shares incl. PFW) · treasury-method FD ≈170.0M shares → FD market cap ≈$11.10B · implied EV ≈$8.27B on ~$3.4B pro-forma cash less $575M notes.</p>
+        </div>
+        <div class="panel"><h3>Runway — read the commitment, not the estimate</h3>
+          <p><span class="ev fact">FACT</span> The Q2 2026 10-Q liquidity language commits only to the standard ≥12 months from filing. <strong>No multi-year runway guidance exists</strong> — any longer figure is arithmetic, including this one: <span class="ev interp">INTERPRETATION</span> at the H1 2026 burn pace (~$1.0B/yr, rising with launch prep), ~$3.4B pro-forma cash funds operations into roughly 2029 — through the BLA and the initial launch window, with little room for a CRL cycle or a second Phase 3 surprise.</p>
+          <p><span class="ev fact">FACT</span> Committed spend ahead: North Carolina fill-finish expansion (long-term commitment up to $1B per Sep 2025 update; property &amp; equipment already $260.4M net at Jun 30, 2026), Lonza/Patheon manufacturing agreements, and pre-launch inventory build per the offering's stated use of proceeds.</p>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:20px"><h3>Financing history — dilution is the business model's other half</h3>
+        <table class="study-table"><thead><tr><th>When</th><th>Instrument</th><th>Size / price</th></tr></thead><tbody>
+          <tr><td data-label="When">Jun 2020</td><td data-label="Instrument">IPO</td><td data-label="Size">Nasdaq listing (File No. 001-39323)</td></tr>
+          <tr><td data-label="When">Feb 2024</td><td data-label="Instrument">Common offering</td><td data-label="Size">≈$862.5M gross at $64.00</td></tr>
+          <tr><td data-label="When">Sep 2024</td><td data-label="Instrument">Common + pre-funded warrants (2,427,184 PFW)</td><td data-label="Size">$1.5B gross at $103.00</td></tr>
+          <tr><td data-label="When">Feb 2026</td><td data-label="Instrument">Common offering, 12,650,000 shares</td><td data-label="Size">$50.00; net proceeds $601.8M</td></tr>
+          <tr><td data-label="When">Oct 2026</td><td data-label="Instrument">Common (8,584,375) + PFW (400,000) + converts</td><td data-label="Size">$64.00 equity pricing; $575M 1.50% notes due 2032; total gross ≈$1.15B</td></tr>
+        </tbody></table>
+        <p class="source-note">SEC filings and offering releases. Equity net proceeds Oct 2026 estimated at ~$545M (applying the priced-tranche disclosed net/gross ratio) and notes net ~$559M — <span class="ev interp">INTERPRETATION</span>; closing releases state gross only.</p>
+      </div>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>Two data semesters, then a filing year</h2><p class="lede">Date quality is tagged per the library convention: <strong>HARD</strong> = fixed disclosed date · <strong>GUIDE</strong> = company guidance window · <strong>INF</strong> = inferred.</p></div></div>
+      <div class="timeline">
+        <article class="done"><time>Oct 5, 2026 · HARD · LANDED</time><h3>OPUS-1 topline — positive</h3><p>All primary endpoints met in adults 50+; immunobridging 32/32 (§04). The event the valuation was waiting for.</p></article>
+        <article class="done"><time>Oct 9, 2026 · HARD · LANDED</time><h3>$1.15B offerings close</h3><p>Equity + PFW + $575M converts; both greenshoes exercised in full.</p></article>
+        <article><time>Early Nov 2026 · INF</time><h3>Q3 2026 10-Q</h3><p>First reported post-raise balance: actual Sep 30 cash, updated share count, any change to the preliminary ~$2.3B figure, burn trajectory into the launch build. Also the first filing that could disclose OPUS-1 detail beyond topline.</p></article>
+        <article><time>1H 2027 · GUIDE</time><h3>OPUS-2 + OPUS-3 topline</h3><p>Coadministration and previously-vaccinated data complete the adult BLA dataset. A miss here (esp. coadministration interference) narrows the label, not the approval — unless it is severe.</p></article>
+        <article><time>By end-1H 2027 · GUIDE</time><h3>VAX-31 infant Phase 2 topline</h3><p>Primary-series and booster immunogenicity vs PCV20 (n=905). This is the true second binary: it selects the infant Phase 3 candidate (VAX-31 vs VAX-24) and dose.</p></article>
+        <article><time>2H 2027 · GUIDE</time><h3>VAX-A1 (Group A Strep) Phase 1 topline</h3><p>Platform-breadth signal only; no value hinges on it.</p></article>
+        <article><time>2027 · GUIDE</time><h3>Manufacturing consistency study + infant Phase 3 start</h3><p>Lot-to-lot consistency is a BLA prerequisite and the least visible risk in the program — no start date has been disclosed <span class="ev gap">GAP</span>.</p></article>
+        <article><time>1H 2028 · GUIDE</time><h3>Adult BLA submission</h3><p>Acceptance, review clock (standard vs priority — undisclosed), advisory-committee possibility, and the serotypes 3/12F negotiation all price off this.</p></article>
+        <article><time>2028–29 · INF</time><h3>Approval + ACIP vote + launch</h3><p>The commercial binary. Also watch Merck STRIDE-PEDS progress and any Pfizer higher-valency response in the interim — competitors get two-plus years to position.</p></article>
+      </div>
+    </section>
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit machinery</h2><p class="lede">Framework: scenario equity value = scenario operating EV + forward cash bridge − debt, divided by a treasury-method fully diluted share count solved at the scenario price. Forward cash bridge (shared): ≈$3.4B pro-forma cash − ~$1.5B burn through end-2027 ≈ $1.9B; the $575M converts are treated as debt except in the bull case, where the scenario price exceeds the $89.60 conversion price and they are treated as converted (debt extinguished, 6,417,402 shares added). Base FD counts: 163,253,446 economic shares + option treasury add-back at ≈$46.50 weighted-average strike + 3,019,377 RSUs + 275,396 ESPP shares. Bear/base/bull operating EVs are judgment inputs — the arithmetic on them is exact.</p></div></div>
+      <div class="scenario-grid">
+        <article class="scenario"><h3>Bear</h3><div class="range">$12–15</div><p class="point">$13.36 point estimate</p><ul><li>FDA review hardens on serotypes 3/12F and/or CMC consistency; approval slips past 2029 or lands with a carved-up label.</li><li>Infant Phase 2 selects VAX-24 or disappoints; VAX-31 infant path stalls.</li><li>ACIP gives no preferential position; incumbents hold share with contracting; operating EV ≈$0.9B (franchise residual + platform).</li><li class="scenario-math">Equity = $0.90B EV + $1.90B cash − $0.575B notes = $2.225B ÷ 166.5M FD shares (at $14.50; most options out of the money) = $13.36.</li></ul></article>
+        <article class="scenario featured"><h3>Base</h3><div class="range">$58–70</div><p class="point">$63.73 point estimate</p><ul><li>BLA filed 1H 2028, approval 2028–29 with a label that keeps the coverage claim materially intact (3/12F handled via the historical-threshold argument).</li><li>OPUS-2/3 supportive; infant Phase 3 starts with VAX-31; ACIP lists VAX-31 as a co-equal/preferred adult option and it takes leading adult share over time.</li><li>Operating EV ≈$9.5B — i.e., the market roughly holds today's operating value while the cash bridge burns down.</li><li class="scenario-math">Equity = $9.50B EV + $1.90B cash − $0.575B notes = $10.825B ÷ 169.9M FD shares (at $64.00) = $63.73.</li></ul></article>
+        <article class="scenario"><h3>Bull</h3><div class="range">$100–115</div><p class="point">$107.86 point estimate</p><ul><li>Clean label, preferred ACIP positioning, adult standard-of-care share; infant Phase 2 strong and Phase 3 underway; ex-U.S. partnership adds validation.</li><li>Operating EV ≈$17.5B. Point estimate sits at the October 2026 consensus average (~$109–117 tallies) and below the $146 street high — per library rule, maximum cases do not overshoot the Street.</li><li class="scenario-math">Equity = $17.50B EV + $1.90B cash + converts extinguished = $19.40B ÷ 179.9M FD shares (at $108.00, incl. 6.42M conversion shares) = $107.86.</li></ul></article>
+      </div>
+      <div class="readthrough"><strong>What the current price implies.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the market pays slightly <em>above</em> this base case — meaning today's holder needs the base case to arrive on schedule, or the bull case to start forming (clean BLA acceptance, strong infant data), just to stand still. The asymmetry from here is thinner than the +$25 intraday spike on October 5 suggested and thinner than consensus targets imply, because consensus EVs embed minimal value for the two-year pre-revenue burn.</div>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">10 / PEOPLE</div><div><h2>A founder-led team that has executed the plan it described</h2><p class="lede">Vaxcyte's record is unusually legible: the 2024 VAX-31 selection, the OPUS timeline, and the raise-into-strength financing pattern all happened roughly when and how management said they would. The open questions are commercial, not clinical-operational — this team has never launched a product.</p></div></div>
+      <div class="two-col">
+        <div class="panel"><h3>Leadership</h3>
+          <p><strong>Grant Pickering</strong> — CEO and co-founder. Has led the company from its SutroVax origins through the June 2020 IPO, the VAX-24 → VAX-31 succession, and the OPUS program; the public face of every major readout.</p>
+          <p><strong>Andrew Guggenhime</strong> — President and CFO. Owner of the financing cadence in §07: four major raises since Feb 2024, each executed into clinical strength, plus the company's first convertible issue.</p>
+          <p><strong>James (Jim) Wassil</strong> — CSO and COO (Form 4 title: EVP, Chief Scientific Officer, COO). Senior scientific author on the platform's peer-reviewed papers; publicly carried the OPUS-1 FDA-review framing on the PCV21 comparison.</p>
+          <p><strong>Luis Jodar</strong> — Chief Medical Officer, appointed in the September 2026 leadership update (Form 8-K, Sep 3, 2026), weeks before the OPUS-1 readout; quoted in the OPUS-1 release on the coverage trade-offs between current adult PCVs. <strong>David McAvoy</strong> — Chief Legal Officer, appointed Aug 31, 2026.</p>
+          <p class="source-note">Track record <span class="ev fact">FACT</span>: OPUS-1 guided "Q4 2026" in January 2026, then narrowed to early October by the Sep 3, 2026 8-K, and delivered Oct 5. The 2024 guidance to start the pivotal trial by mid-2025 and read out in 2026 was met. Financing guidance (raise post-data) was executed within 24 hours of the readout.</p>
+        </div>
+        <div class="panel"><h3>Insider signals (EDGAR Form 4)</h3>
+          <p><span class="ev fact">FACT</span> <strong>Oct 5, 2026 (readout day):</strong> Wassil exercised 18,000 options at $5.35 and sold 18,000 shares at $86.74; SVP Finance/CAO Elvia Cowan exercised 19,000 options at $25.92 and sold 19,000 at $86.74. Two Form 144 proposed-sale notices were also filed Oct 5. These are exercise-and-sell transactions monetizing deep-in-the-money options into the intraday spike — liquidity events, not open-market purchases or discretionary position-building; whether they ran under pre-arranged 10b5-1 plans is not established from the filings reviewed — <span class="ev gap">GAP</span>.</p>
+          <p><span class="ev fact">FACT</span> <strong>Oct 1, 2026:</strong> Wassil exercised 2,250 options at $5.35 and sold 2,250 shares at ≈$56.65–57.09, pre-data. <strong>Sep 9, 2026:</strong> a six-filer cluster of Form 4s consistent with a compensation-cycle event. <strong>Sep 2026:</strong> Guggenhime disposed of ~2,705 shares in a tax-withholding surrender (secondary summary of Form 4) — neutral mechanics.</p>
+          <p><span class="ev interp">INTERPRETATION</span> Net signal: no insider has made an open-market purchase in the record reviewed, and the two largest recent transactions sold into the best price of the year on the day it printed. That is ordinary executive monetization of expiring/valuable options, but it is not alignment evidence — treat management's confidence claims as claims, and the absence of buying as mildly negative, not disqualifying.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by expected damage to the thesis, not by probability alone.</p></div></div>
+      <div class="risk-list">
+        <article><span class="risk-num">1</span><div><h3>FDA review of serotypes 3 and 12F (vs PCV21)</h3><p>Management has already flagged the PCV21 comparison as a review focus. Outcomes range from a footnote to a narrowed label to a refuse-to-file/CRL on CMC — any of which reprices the "one vaccine replaces both" premise. <span class="ev fact">FACT</span> basis: OPUS-1 release prespecified analyses.</p></div></article>
+        <article><span class="risk-num">2</span><div><h3>Manufacturing consistency is unrun and binary-ish</h3><p>A 31-valent conjugate with a novel cell-free-produced carrier must demonstrate lot-to-lot consistency at commercial scale, in parallel with a fill-finish build carrying up to $1B of long-term commitments. CMC is the most common cause of vaccine BLA delay, and no consistency data exist yet. <span class="ev gap">GAP</span></p></div></article>
+        <article><span class="risk-num">3</span><div><h3>The infant program is a full second binary with an early warning on file</h3><p>VAX-24's infant mid dose met seroconversion NI for only 20 of 24 serotypes post-dose 3. If VAX-31's infant data (2027) repeat that pattern at 31 valents, the pediatric half of the franchise — and the "one brand across the lifespan" strategy — shrinks to the VAX-24 hedge. <span class="ev fact">FACT</span></p></div></article>
+        <article><span class="risk-num">4</span><div><h3>Burn vs clock</h3><p>~$1.0B/yr operating cash use and rising (inventory build, launch prep, NC plant) against a first possible approval in 2028–29. The raise solved the next ~3 years; a single major delay re-opens the dilution question at worse prices. <span class="ev fact">FACT</span> H1 2026 burn · <span class="ev interp">INTERPRETATION</span> trajectory.</p></div></article>
+        <article><span class="risk-num">5</span><div><h3>ACIP and channel are outside the company's control</h3><p>Adult uptake runs through ACIP preference language, pharmacy stocking and payer contracting. Pfizer and Merck have two-plus years and existing contracts to entrench before VAX-31 launches; a merely co-equal recommendation caps share well below the coverage table's suggestion. <span class="ev interp">INTERPRETATION</span></p></div></article>
+        <article><span class="risk-num">6</span><div><h3>Immunobridging's ceiling</h3><p>No efficacy data exist or will exist pre-approval; if post-licensure effectiveness studies (especially serotype 3 or pneumonia endpoints) disappoint, the premium positioning erodes after launch, when the equity story can least afford it. <span class="ev fact">FACT</span> class-wide limitation.</p></div></article>
+        <article><span class="risk-num">7</span><div><h3>Topline-only disclosure so far</h3><p>Every OPUS-1 number in this dossier is company-reported; per-serotype GMRs, CIs and full safety tables are unpublished. The one soft spot management chose to disclose (3/12F) may not be the only one in the full dataset. <span class="ev gap">GAP</span></p></div></article>
+        <article><span class="risk-num">8</span><div><h3>Platform dependency</h3><p>XpressCF is exclusively licensed from Sutro Biopharma and eCRM is a single-carrier architecture: a platform-level CMC or IP problem touches every program at once. Insider exercise-and-sell into the readout-day spike (see §10) adds a minor alignment deduction. <span class="ev fact">FACT</span> license · <span class="ev interp">INTERPRETATION</span> signal weight.</p></div></article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">12 / SOURCEBOOK</div><div><h2>References</h2><p class="lede">As of October 16, 2026. Source order follows the house rule: SEC first, then FDA/regulatory, ClinicalTrials.gov, peer-reviewed literature, company releases (flagged), and trade press.</p></div></div>
+      <div class="sourcebook">
+        <h3>SEC filings (primary)</h3>
+        <ol>
+          <li>Vaxcyte Q2 2026 Form 10-Q (filed Aug 5, 2026): share count 148,805,278 (Aug 3, 2026 cover); cash/investments $2,507.7M; H1 2026 net loss $604.9M; operating cash use $513.1M; options 12,111,431, RSUs 3,019,377, ESPP 275,396; pre-funded warrants on 5,463,793 shares.</li>
+          <li>Form 8-K, Oct 5, 2026, Ex. 99.1: OPUS-1 topline data release (GlobeNewswire).</li>
+          <li>Form 8-K, Oct 9, 2026 and Oct 6–9, 2026 offering releases: pricing at $64.00; closing with full greenshoe exercise — 8,584,375 shares, pre-funded warrants on 400,000 shares, $575M 1.50% convertible senior notes due Oct 15, 2032, conversion price ≈$89.60; aggregate gross ≈$1.15B.</li>
+          <li>Form 8-K, Sep 3, 2026: leadership appointments (CMO; CLO appointed Aug 31, 2026) and OPUS-1 timing narrowing.</li>
+          <li>Form 424B5 prospectus supplement (Oct 2026): preliminary cash and investments ≈$2.3B at Sep 30, 2026; OPUS-2/OPUS-3 enrolled; use of proceeds.</li>
+          <li>Form 4 filings: Wassil (Oct 2 and Oct 7, 2026 filings; transactions Oct 1 and Oct 5, 2026), Cowan (Oct 7, 2026 filing; transactions Oct 5, 2026), six-filer cluster Sep 9, 2026; Form 144 notices Oct 1 and Oct 5, 2026.</li>
+          <li>Prior offering records: Feb 2024 (≈$862.5M gross at $64.00), Sep 2024 ($1.5B gross at $103.00 incl. pre-funded warrants), Feb 2026 (12,650,000 shares at $50.00; net $601.8M).</li>
+        </ol>
+        <h3>FDA / regulatory / CDC</h3>
+        <ol>
+          <li>FDA approval of Capvaxive (PCV21), June 2024; pediatric at-risk indication expansion, June 2026. Prevnar 20 (PCV20) approvals 2021/2023; Vaxneuvance (PCV15) approvals 2021/2022.</li>
+          <li>VAX-31 Breakthrough Therapy designation (adult IPD); expanded May 2025 to include pneumococcal pneumonia prevention.</li>
+          <li>ACIP: routine adult PCV recommendation lowered to age 50 (Oct 2024); Kobayashi et al., MMWR 2025;74(1):1–8.</li>
+        </ol>
+        <h3>ClinicalTrials.gov</h3>
+        <ol>
+          <li>NCT07284654 — OPUS-1, VAX-31 Phase 3 pivotal, adults (4,047 dosed).</li>
+          <li>NCT07365826 — OPUS-2, VAX-31 + seasonal influenza coadministration, adults 50+.</li>
+          <li>NCT06720038 — VAX-31 Phase 2 dose-finding in healthy infants (n=905, enrollment complete).</li>
+          <li>OPUS-3 (previously vaccinated adults, n≈720) and the VAX-24 infant Phase 2 (n=802) per company releases; program enrollment totals ~6,000 adults across OPUS-1/2/3.</li>
+        </ol>
+        <h3>Peer-reviewed literature (mandatory layer)</h3>
+        <ol>
+          <li>King LM, Andrejko KL, Kobayashi M, et al. Pneumococcal serotype distribution and coverage of existing and pipeline pneumococcal vaccines. <em>J Infect Dis</em>. 2025;232(4):e609–e620.</li>
+          <li>VAX-24 Phase 1/2 adult proof-of-concept results. <em>The Lancet Infectious Diseases</em> (published Dec 2023): all 24 serotypes met/exceeded regulatory immunogenicity standards at 2.2 mcg; safety comparable to PCV20.</li>
+          <li>Fairman J, Agarwal P, Barbanel S, et al. Non-clinical immunological comparison of a next-generation 24-valent pneumococcal conjugate vaccine (VAX-24) using site-specific carrier protein conjugation to PCV13 and PPV23. <em>Vaccine</em>. 2021;39(23). DOI: 10.1016/j.vaccine.2021.03.070.</li>
+          <li>Grant LR, et al. Distribution of serotypes causing invasive pneumococcal disease in U.S. children. <em>Front Pediatr</em>. 2024 (children's coverage estimates cited in company materials).</li>
+          <li>Andrews NJ, et al. Serotype-specific effectiveness and correlates of protection for the 13-valent pneumococcal conjugate vaccine. <em>Lancet Infect Dis</em>. 2014 — serotype 3 effectiveness not demonstrated for PCV13.</li>
+        </ol>
+        <h3>Company releases (UNVERIFIED tier — used for topline data, guidance and estimates)</h3>
+        <ol>
+          <li>OPUS-1 topline release, Oct 5, 2026 (all OPUS-1 results herein).</li>
+          <li>VAX-31 adult Phase 1/2 topline release, Sep 3, 2024 (n=1,015).</li>
+          <li>Program update release, Jan 22, 2026 (OPUS-2 first dosing; infant enrollment complete, n=905; timing guidance).</li>
+          <li>VAX-24 infant Phase 2 topline release, Mar 31, 2025; Q1 2025 results release, May 7, 2025 (booster interim detail).</li>
+          <li>OPUS-3 initiation release, 2026 (n≈720; ~6,000 OPUS adults expected; ~3,400 VAX-31 recipients).</li>
+          <li>North Carolina fill-finish expansion update, Sep 2025 (long-term commitment up to $1B).</li>
+        </ol>
+        <h3>Trade press / market data</h3>
+        <ol>
+          <li>Fierce Biotech, Oct 2026: OPUS-1 coverage including Wassil's FDA-review framing on the PCV21 comparison (paraphrased; brief verified figures only).</li>
+          <li>Pharmacy Times, Oct 2026: OPUS program summary and OPUS-2 NCT07365826.</li>
+          <li>MarketBeat PCVX price history and analyst-target tallies (Oct 2026 closes; consensus average ≈$109–117; street high $146 BofA, Oct 5, 2026); Finnhub snapshot (52-week range $39.87–$90.75).</li>
+          <li>Financing net-proceeds ratios for the October 2026 tranches as reported in offering coverage (pharmadevicenews summary of the 424B5) — used only to estimate net proceeds, flagged in §07.</li>
+        </ol>
+        <p class="source-note">Gaps carried openly: full OPUS-1 dataset (per-serotype GMRs/CIs, complete safety tables) unpublished · manufacturing consistency study timing undisclosed · Q3 2026 reported financials pending · 10b5-1 plan status of October 2026 insider sales not established from filings reviewed · adult review clock (standard vs priority) undisclosed. No personal data of any kind is contained in this dossier.</p>
+      </div>
+    </section>
+  </main>
+<footer><strong>PCVX deep-dive dossier</strong> · Built October 16, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+  <script>
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

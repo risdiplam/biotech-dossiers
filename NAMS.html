@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>NAMS — NewAmsterdam Pharma · Deep-Dive Dossier · 2026-10-16</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+
+<body>
+<div class="topline"></div>
+<header class="hero"><div class="hero-grid"><div>
+<div class="ticker-line"><span class="ticker">NASDAQ · NAMS</span><span class="stamp">Deep-dive dossier · As of October 16, 2026</span></div>
+<h1>Obicetrapib already won in Europe. The stock now trades on one question: does it prevent heart attacks?</h1>
+<p class="hero-dek">NewAmsterdam Pharma Company N.V. (Naarden, Netherlands and Miami; a Dutch public limited company listed on Nasdaq as NAMS, warrants NAMSW) won the first regulatory approval any CETP inhibitor has ever received — European Commission authorization on September 21, 2026 for Ubeslo&reg; (obicetrapib 10 mg) and Evlarco&reg; (obicetrapib/ezetimibe fixed-dose combination), commercialized in Europe by Menarini. The U.S. is unfiled, Europe pays royalties rather than sales, and the entire premium over cash now rests on the PREVAIL cardiovascular outcomes trial, whose interim analysis reaches its event target in Q4 2026 with a DSMB result expected in Q1 2027.</p>
+</div><div class="hero-quote" aria-label="Market snapshot">
+<div class="quote-price">$20.62</div>
+<div class="quote-label">Close · Oct 15, 2026 (Finnhub)</div>
+<div class="quote-meta"><strong>~$2.43B</strong> market cap (117.65M shares, Jun 30, 2026) · <strong>~$1.75B</strong> enterprise value vs <strong>$678.3M</strong> cash &amp; securities<br>52-week range $19.58–$42.21 — the low was set Oct 14, 2026, three weeks after EU approval</div>
+</div></div></header>
+
+<div class="jump-wrap"><nav class="jump" aria-label="Jump to section">
+<a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+<button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button></nav></div>
+
+<main>
+<section id="frame">
+<div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The question is whether LDL-C lowering by this mechanism converts to events — again</h2><p class="lede">Four CETP inhibitors reached Phase 3 before obicetrapib. One increased mortality, two were futile, and the one that worked (anacetrapib, REVEAL) was abandoned for fat accumulation. Obicetrapib is the most ApoB-potent molecule the class has produced and the first to be approved anywhere — on a lipid endpoint. PREVAIL is the trial that decides whether it is a drug or another footnote.</p></div></div>
+<div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+<div class="decision-grid">
+<article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$1.75B</div><p><span class="ev interp">INTERPRETATION</span> $20.62 × 117.65M shares (Jun 30, 2026) = ~$2.43B equity, less $678.3M cash &amp; securities (Jun 30, 2026). No borrowings; $54.5M of derivative warrant liabilities are non-cash fair-value items. Basic-share basis.</p></article>
+<article class="decision"><div class="tag">Cash per share</div><div class="big">~$5.77</div><p><span class="ev interp">INTERPRETATION</span> $678.3M ÷ 117.65M shares. Roughly 28% of the share price is cash; the other ~$14.85/share is the market's price for PREVAIL, the U.S. opportunity, and EU royalties.</p></article>
+<article class="decision warn"><div class="tag">Next decisive event</div><div class="big">Q1 2027</div><p><span class="ev unverified">UNVERIFIED · COMPANY</span> PREVAIL interim analysis: event target expected to be reached Q4 2026, independent DSMB review and result expected Q1 2027. An early stop requires significance on both the 4-point primary and the 3-point MACE secondary, per company statements.</p></article>
+<article class="decision"><div class="tag">Regulatory state</div><div class="big">EU yes · US no</div><p><span class="ev fact">FACT</span> EC marketing authorization granted Sep 21, 2026 (Ubeslo + Evlarco). UK and Swiss decisions were guided for 2H 2026 and are not confirmed landed. No U.S. NDA has been submitted and no FDA timeline has been disclosed.</p></article>
+</div>
+<div class="thesis">
+<article class="thesis-card"><h3>Why this molecule is not torcetrapib</h3><ul><li>Potency where it matters: LDL-C −32.6% (BROADWAY) to −41.5% at one year (BROOKLYN), ApoB ~−25%, Lp(a) −33% to −54% — the earlier failures either barely lowered ApoB (dalcetrapib) or carried off-target toxicity (torcetrapib's aldosterone/blood-pressure effect, absent here).</li><li>REVEAL proved the mechanism can work: anacetrapib reduced major coronary events (RR 0.91, p=0.004) in 30,449 patients, proportional to ApoB lowering — genetics (Ference et al.) says CETP benefit tracks ApoB, not HDL.</li><li>Regulators have now seen the full package: the EC approved on three Phase 3 lipid trials published in NEJM, The Lancet, and Nature Medicine.</li><li>The balance sheet does not force a bad decision: $678.3M of cash against ~$35M/quarter of H1 2026 operating cash use funds PREVAIL to completion without a raise at current burn.</li></ul></article>
+<article class="thesis-card risk"><h3>What the EU approval does not remove</h3><ul><li>Approval was granted on LDL-C, a surrogate. No CETP inhibitor has ever shown an outcomes benefit in its own sponsor's pivotal CVOT except anacetrapib — modestly, in a trial Merck chose not to file.</li><li>The PREVAIL interim is a genuine binary: futility or a weak trend at interim reprices the U.S. opportunity toward zero, because there is no disclosed U.S. filing path that does not run through outcomes data.</li><li>Europe is a royalty stream (low-double-digits to mid-20s percent of Menarini's net sales), not product revenue — the largest market, the U.S., is retained but unbuilt and unfiled.</li><li>Merck's oral PCSK9 (enlicitide) is Phase 3-positive on LDL-C and targets the same "potent oral" slot without a class graveyard behind it.</li><li>The stock fell ~43% in 2026 into its own approval — the market is paying for the interim risk, not ignoring it.</li></ul></article>
+</div>
+<p class="source-note">Identity and listing: <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001936258" target="_blank" rel="noopener">SEC EDGAR, CIK 1936258</a> · EC approval: <a href="https://www.globenewswire.com/news-release/2026/09/21/3365512/0/en/newamsterdam-pharma-and-menarini-group-receive-european-commission-approval-for-ubeslo-obicetrapib-monotherapy-and-evlarco-obicetrapib-plus-ezetimibe-fixed-dose-combination.html" target="_blank" rel="noopener">Company/Menarini release, Sep 21, 2026</a> · Financials: Q2 2026 Form 10-Q (filed Aug 5, 2026). Market data: Finnhub (Oct 15, 2026 close).</p>
+</section>
+
+<section id="market">
+<div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Approved in Europe, marked down at home</h2><p class="lede">NAMS peaked at $42.21 within the last year and set its 52-week low ($19.58) on October 14, 2026 — after the CHMP opinion, after EC approval. The de-rating is not about Europe; it is the market charging full price for PREVAIL interim risk and discounting a royalty model whose first euro of sales has not yet been reported.</p></div></div>
+<div class="readthrough"><strong>Price action.</strong> <span class="ev fact">FACT · MARKET DATA</span> Finnhub: −43.5% year-to-date and −45.5% over one year into Oct 16, 2026; Oct 15 close $20.62. The December 2024 offering priced at $24.50 — the stock trades ~16% below the price at which the company last raised primary capital, despite delivering EU approval since. <span class="ev interp">INTERPRETATION</span> Institutions that funded the outcomes trial at $24.50 are underwater; the marginal buyer is being asked to underwrite a CVOT interim, not a launch.</div>
+<div class="event-tape">
+<article><span class="event-mark">NOV 2022</span><h3>SPAC close</h3><p>Business combination with Frazier Lifesciences Acquisition Corp (FLAC) closed Nov 22, 2022; ~$328M gross including a ~$235M PIPE led by Frazier and Bain Capital Life Sciences. NAMS/NAMSW began trading Nov 23, 2022.</p></article>
+<article><span class="event-mark">DEC 2024</span><h3>$452.6M net raise</h3><p>Underwritten offering at $24.50/share (12.1M shares plus 4.9M pre-funded warrants, greenshoe exercised) — the financing that funds PREVAIL, REMBRANDT, and RUBENS and the U.S. commercial build.</p></article>
+<article><span class="event-mark">SEP 2026</span><h3>Approval, no re-rating</h3><p>CHMP positive opinion (July 2026) and EC authorization (Sep 21, 2026) landed on schedule — and the shares made a new 52-week low within a month. Priced as a binary again.</p></article>
+</div>
+<p class="source-note">The price series is a dated snapshot, not a live quote. Sources: Finnhub instrument data (Oct 2026) · SPAC closing release (GlobeNewswire, Nov 23, 2022) · Offering pricing release (Dec 2024).</p>
+</section>
+<section id="science">
+<div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>CETP: the target that ate four Phase 3 programs</h2><p class="lede">CETP shuttles cholesteryl esters from HDL to ApoB-containing particles (VLDL/LDL) in exchange for triglycerides. Blocking it raises HDL-C dramatically and — only if the molecule is potent enough — lowers LDL-C and ApoB. The class's history is a controlled experiment in which of those effects matters: events track ApoB, not HDL.</p></div></div>
+<div class="science-chain" aria-label="CETP mechanism chain">
+<article><b>01</b><h3>CETP transfer</h3><p>CETP moves cholesteryl esters from HDL into ApoB lipoproteins. High CETP activity = cholesterol loaded onto the particles that drive atherosclerosis.</p></article>
+<article><b>02</b><h3>Blockade</h3><p>Obicetrapib (10 mg, once daily, oral) is a highly selective CETP inhibitor. HDL-C rises ~+139% (BROOKLYN) because cholesteryl esters stay in HDL.</p></article>
+<article><b>03</b><h3>ApoB clearance</h3><p>A stable-isotope tracer study (Bajaj, Rader et al.) found obicetrapib substantially increases LDL-ApoB fractional clearance — the liver removes ApoB particles faster; production is not the driver.</p></article>
+<article><b>04</b><h3>Net lipid effect</h3><p>LDL-C −33% to −42%, ApoB ~−25%, non-HDL-C ~−33%, Lp(a) −33% to −54% across Phase 3. Whether that converts to fewer MACE is the PREVAIL question.</p></article>
+</div>
+<div class="moa-box"><h3>CETP inhibition in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> Think of CETP as a courier moving cholesterol from the "return" trucks (HDL) onto the "delivery" trucks (LDL and relatives) that deposit it in artery walls. Obicetrapib stops the courier. Cholesterol stays on the return trucks (HDL soars — a cosmetic effect), and, more importantly, the liver clears the delivery trucks faster, so fewer ApoB particles circulate. Fewer ApoB particles over years should mean fewer heart attacks. "Should" is doing real work in that sentence — it is exactly what PREVAIL is testing.</p><p><strong>Technical.</strong> Obicetrapib is a potent, selective, orally bioavailable CETP inhibitor dosed at 10 mg QD. Unlike torcetrapib it shows no aldosterone-mediated blood-pressure signal (TANDEM pre-specified systolic BP analyses were neutral); unlike anacetrapib it is not known to accumulate in adipose tissue — though, as with any long-half-life lipophilic molecule, multi-decade tissue exposure is unobservable in 1-year trials and remains a monitored unknown rather than a demonstrated negative. Mendelian randomization (Ference et al., JAMA 2017) shows genetically lower CETP activity reduces cardiovascular risk in proportion to ApoB/LDL lowering, the same proportionality as statins and PCSK9 — the strongest available evidence that the mechanism, dosed hard enough, should work.</p></div>
+<div class="splice-table-wrap">
+<h3>The class graveyard — what each failure actually proved</h3>
+<table class="study-table"><thead><tr><th>Drug / trial</th><th>Scale</th><th>Result</th><th>Failure mode</th></tr></thead><tbody>
+<tr><td data-label="Drug">Torcetrapib (Pfizer) · ILLUMINATE</td><td data-label="Scale">15,067 pts</td><td data-label="Result"><span class="ev fact">FACT</span> Terminated Dec 2006: increased mortality (HR ~1.58 for death) and CV events despite HDL +72% and LDL −25%.</td><td data-label="Lesson">Off-target toxicity — aldosterone up, systolic BP +5.4 mmHg, electrolytes off. A molecule failure, not a target failure.</td></tr>
+<tr><td data-label="Drug">Dalcetrapib (Roche) · dal-OUTCOMES</td><td data-label="Scale">15,871 pts</td><td data-label="Result"><span class="ev fact">FACT</span> Futility (NEJM 2012). HDL +31–40%, LDL-C essentially unchanged.</td><td data-label="Lesson">Too weak. Partial CETP inhibition that moves only HDL does nothing — the first hard evidence HDL is not the mediator.</td></tr>
+<tr><td data-label="Drug">Evacetrapib (Lilly) · ACCELERATE</td><td data-label="Scale">12,092 pts</td><td data-label="Result"><span class="ev fact">FACT</span> Stopped for futility Oct 2015; LDL −31%, HDL +133%, primary HR ~1.01 (NEJM 2017).</td><td data-label="Lesson">The uncomfortable one: real LDL lowering, no benefit — but mean follow-up was only ~26 months at termination and absolute ApoB reduction was modest; duration and magnitude both remain live defenses.</td></tr>
+<tr><td data-label="Drug">Anacetrapib (Merck) · REVEAL</td><td data-label="Scale">30,449 pts</td><td data-label="Result"><span class="ev fact">FACT</span> Major coronary events RR 0.91 (p=0.004) over 4.1 yrs (NEJM 2017) — the class's only outcomes win.</td><td data-label="Lesson">Proof of mechanism at scale; killed commercially by adipose accumulation and a years-long terminal half-life, not by efficacy. Merck never filed.</td></tr>
+<tr><td data-label="Drug">Obicetrapib · PREVAIL</td><td data-label="Scale">&gt;9,500 pts</td><td data-label="Result"><span class="ev gap">GAP</span> Ongoing. Interim DSMB review expected Q1 2027; final completion guided through end-2027 if not stopped.</td><td data-label="Lesson">Designed after all four lessons: most potent ApoB/Lp(a) lowering in class, no BP signal, shorter exposure profile. The design being right is not the same as the result being positive.</td></tr>
+</tbody></table>
+</div>
+<div class="fail-grid" aria-label="Ways CETP inhibition could still fail">
+<article><h3>1 · Magnitude × duration</h3><p>Event reduction scales with absolute ApoB reduction × years of exposure (Cholesterol Treatment Trialists' proportionality). BROADWAY's exploratory 21% MACE reduction at one year (HR 0.79, 95% CI 0.54–1.15) is far larger than proportionality predicts — expect regression toward ~10% in PREVAIL's larger, longer dataset; the trial was re-powered toward a 15% effect for a reason.</p></article>
+<article><h3>2 · The interim boundary</h3><p>Early stopping requires overwhelming benefit on both the 4-point primary and 3-point MACE. A "positive trend, continue" outcome — statistically the most likely good outcome — gives the market no U.S. filing catalyst until the final readout.</p></article>
+<article><h3>3 · Kidney signal to watch</h3><p><span class="ev fact">FACT</span> In pooled BROADWAY/BROOKLYN safety analyses, eGFR declined significantly more on obicetrapib than placebo, even as new-onset diabetes and glycemic worsening were less frequent. Small renal effects in a chronic, elderly, comorbid population are a label-negotiation topic if PREVAIL is positive.</p></article>
+<article><h3>4 · HDL is decoration</h3><p>If any part of the investment case rests on the +139% HDL-C, discard it: dalcetrapib and evacetrapib both raised HDL massively and did nothing. The pooled mediation analysis (company; BROADWAY+BROOKLYN) attributes 84.5% of the observed MACE effect jointly to LDL-C and Lp(a) — that is the only mechanistic bridge worth underwriting, and it is post hoc.</p></article>
+</div>
+<p class="source-note">Literature: Barter et al., NEJM 2007 (ILLUMINATE) · Schwartz et al., NEJM 2012 (dal-OUTCOMES) · Lincoff et al., NEJM 2017 (ACCELERATE) · REVEAL Collaborative Group, NEJM 2017 · Ference et al., JAMA 2017 (CETP genetics) · Bajaj et al. (ApoB kinetics, presented 2025/26).</p>
+</section>
+
+<section id="clinical">
+<div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Three clean lipid trials, one unfinished outcomes trial</h2><p class="lede">BROADWAY, BROOKLYN, and TANDEM all hit their primary endpoints with p&lt;0.0001 and placebo-like tolerability, and all three are published in top journals. None was powered for events. PREVAIL is the only outcomes evidence that will ever exist for this molecule — its design and interim mechanics deserve more attention than the lipid data.</p></div></div>
+<table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Evidence status</th></tr></thead><tbody>
+<tr><td data-label="Study">BROADWAY<br><small>NEJM 2025</small></td><td data-label="Design">Phase 3, double-blind; 2,530 pts with ASCVD and/or HeFH on maximally tolerated LLT; obicetrapib 10 mg vs placebo 2:1, 52 weeks. Primary: LDL-C % change at Day 84.</td><td data-label="Evidence"><span class="ev fact">FACT</span> LS-mean LDL-C −29.9% vs +2.7% (difference −32.6%, p&lt;0.0001). Exploratory 4-point MACE at 1 yr: HR 0.79 (0.54–1.15) — not significant, not powered. Discontinuation 11.1% vs 12.4%.</td></tr>
+<tr><td data-label="Study">BROOKLYN<br><small>NCT05425745 · Nat Med</small></td><td data-label="Design">Phase 3, double-blind; 354 HeFH pts, LDL-C ≥70 mg/dL on maximally tolerated therapy; 2:1, 52 weeks. Primary: LDL-C at Day 84.</td><td data-label="Evidence"><span class="ev fact">FACT</span> Placebo-adjusted LDL-C −36.3% (95% CI −42.2 to −30.4, p&lt;0.0001) at Day 84 and −41.5% at 1 yr; ApoB −24.4%, non-HDL-C −34.5%, Lp(a) −45.9%, HDL-C +138.7% (all Day 84).</td></tr>
+<tr><td data-label="Study">TANDEM<br><small>NCT06005597 · Lancet 2025</small></td><td data-label="Design">Phase 3, double-blind, 4-arm; 407 pts with ASCVD/high risk/HeFH; FDC obicetrapib 10 mg + ezetimibe 10 mg vs each monotherapy vs placebo, 84 days.</td><td data-label="Evidence"><span class="ev fact">FACT</span> FDC vs placebo LDL-C −48.6% (95% CI −58.3 to −38.9); vs ezetimibe −27.9%; vs obicetrapib −16.8%; obicetrapib mono vs placebo −31.9% (all p&lt;0.0001). ~70% of FDC pts reached LDL-C &lt;55 mg/dL.</td></tr>
+<tr><td data-label="Study">PREVAIL (CVOT)</td><td data-label="Design">Phase 3 outcomes; &gt;9,500 pts with established ASCVD, enrollment completed Apr 2024. Primary: 4-point MACE (CV death, nonfatal MI, nonfatal stroke, total coronary revascularization — amended from urgent revascularization).</td><td data-label="Evidence"><span class="ev gap">GAP</span> Blinded. Initially powered around a 20% RRR; company expanded the event target to support detecting ~15%. Interim at event target in Q4 2026; DSMB outcome expected Q1 2027; if not stopped, completion guided through end-2027.</td></tr>
+<tr><td data-label="Study">RUBENS</td><td data-label="Design">Phase 3; ~300 pts with type 2 diabetes and/or metabolic syndrome needing further LDL-C lowering; obicetrapib ± ezetimibe. Started Dec 2025.</td><td data-label="Evidence"><span class="ev unverified">UNVERIFIED · COMPANY</span> Topline guided by year-end 2026.</td></tr>
+<tr><td data-label="Study">REMBRANDT</td><td data-label="Design">Phase 3 imaging; 323 pts with high-risk ASCVD and coronary plaque; FDC vs placebo, coronary CT angiography plaque endpoints. Enrollment completed Mar 2026.</td><td data-label="Evidence"><span class="ev gap">GAP</span> Topline timing not firmly guided in sources reviewed; treat as a 2027 event [inferred].</td></tr>
+</tbody></table>
+<div class="signal-grid" style="margin-top:20px">
+<article class="paper-card"><div class="program-kicker">Placebo-adjusted LDL-C reduction</div><h3>Consistency across three pivotal trials</h3>
+<div class="bar-set" aria-label="LDL-C reduction by trial">
+<div class="bar-row"><div class="bar-label">BROADWAY</div><div class="bar-track"><div class="bar-fill" style="width:67%"></div></div><div class="bar-value">−32.6%</div></div>
+<div class="bar-row"><div class="bar-label">BROOKLYN</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-value">−36.3%</div></div>
+<div class="bar-row"><div class="bar-label">TANDEM Ø</div><div class="bar-track"><div class="bar-fill" style="width:66%"></div></div><div class="bar-value">−31.9%</div></div>
+<div class="bar-row"><div class="bar-label">TANDEM FDC</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">−48.6%</div></div>
+</div>
+<p class="source-note"><span class="ev fact">FACT</span> Day 84 primary endpoints, LS-mean/placebo-adjusted, all p&lt;0.0001. Lp(a): pooled Phase 3 reductions ~45% in patients with baseline Lp(a) 50–150 nmol/L (company analyses); BROOKLYN −45.9% at Day 84.</p></article>
+<article class="paper-card"><div class="program-kicker">Safety · pooled BROADWAY + BROOKLYN (n=2,884)</div><h3>Placebo-like — with two footnotes</h3><p class="mechanism"><span class="ev fact">FACT</span> Treatment-emergent AEs 60.2% (obicetrapib) vs 62.0% (placebo); AEs leading to discontinuation 4.1% vs 5.3% in the pooled safety publication (JACC-family, 2026). New-onset diabetes and worsening glycemic control were less frequent on drug.</p><p class="mechanism"><span class="ev fact">FACT</span> Footnote one: eGFR declined significantly more on obicetrapib. Footnote two: one-year exposure in ~2,900 patients cannot exclude the slow-accumulation failure mode that killed anacetrapib commercially — PREVAIL's multi-year exposure is the first real test.</p></article>
+</div>
+<div class="outlier-box"><div class="program-kicker" style="color:#963e1f">The Alzheimer's side-quest</div><h3 style="margin-top:6px">Real biomarker signal, unproven indication</h3><p style="font-size:13px;margin:0"><span class="ev fact">FACT</span> A pre-specified BROADWAY biomarker analysis (n=1,535; 367 ApoE4 carriers) showed statistically significant lower 12-month increases in plasma p-tau217 vs placebo (full set p=0.002; ApoE4 carriers p=0.02), with favorable trends in NfL, GFAP, p-tau181 and Aβ42/40. <span class="ev interp">INTERPRETATION</span> Intriguing and mechanistically narratable (CETP/APOE lipid biology), but it is a biomarker subset of a lipid trial, not a cognition result. The follow-on is real: SPINOZA, a Phase 2b in ~400 patients with preclinical Alzheimer's (first patient dosed Sep 29, 2026; primary = p-tau217 change at Week 52). Carry it at option value only — it is not in the scenarios below.</p></div>
+<p class="source-note">Trials: Nicholls et al., NEJM 2025 (BROADWAY) · Sarraju et al., Lancet 2025 (TANDEM) · BROOKLYN, Nature Medicine 2026 · PREVAIL design/powering: company disclosures and May 2026 PREVAIL update call reporting.</p>
+</section>
+
+<section id="regulatory">
+<div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Europe: done. United States: not started.</h2><p class="lede">The EU pathway is complete and first-in-class. The U.S. pathway is the dossier's largest single unknown: no NDA has been filed, no timeline disclosed, and the company is spending on a U.S. commercial build as if a filing follows PREVAIL — without saying so.</p></div></div>
+<div class="harbor-grid">
+<article class="harbor-fact"><h3>Europe — authorized</h3><ul>
+<li><span class="ev fact">FACT</span> MAA validated by EMA (8-K, Aug 18, 2025) for obicetrapib monotherapy and the obicetrapib/ezetimibe FDC in primary hypercholesterolemia (HeFH and non-familial) or mixed dyslipidemia.</li>
+<li><span class="ev fact">FACT</span> CHMP positive opinion, July 2026; European Commission marketing authorization Sep 21, 2026 — Ubeslo&reg; (mono) and Evlarco&reg; (FDC). First CETP approval worldwide.</li>
+<li><span class="ev fact">FACT</span> Menarini holds exclusive European commercialization and leads regional regulatory interactions; guided first launches in Germany/UK around Q4 2026, subject to pricing/reimbursement processes that can delay actual availability by country.</li>
+<li><span class="ev gap">GAP</span> UK (MHRA) and Swiss (Swissmedic) decisions were guided for 2H 2026; neither is confirmed landed in sources reviewed as of Oct 16, 2026.</li>
+</ul></article>
+<article class="harbor-gap"><h3>United States — unfiled</h3><ul>
+<li><span class="ev fact">FACT</span> No NDA submission or FDA review timeline appears in the FY2025 10-K, Q1 or Q2 2026 updates; U.S. commentary is limited to commercial-capability hires (market access, public affairs).</li>
+<li><span class="ev interp">INTERPRETATION</span> The practical read: management expects FDA to want outcomes data for a first-in-class CETP approval, so the filing decision rides on PREVAIL — a positive interim (Q1 2027) plausibly triggers an NDA on the full lipid package plus interim outcomes; a "continue" outcome pushes any filing to the final readout (end-2027) or beyond.</li>
+<li><span class="ev gap">GAP</span> Whether FDA would accept an LDL-C-based filing now (as EMA did) has never been publicly tested — no pre-NDA meeting outcome has been disclosed. This is a question the company could answer at any earnings call, and hasn't.</li>
+<li><span class="ev fact">FACT</span> Corporate form: Dutch N.V. that now files as a U.S. domestic issuer (FY2025 Form 10-K filed Feb 18, 2026; 10-Qs, 8-Ks, DEF 14A) — insider Form 4 reporting applies, unlike its earlier 20-F period.</li>
+</ul></article>
+</div>
+</section>
+<section id="competition">
+<div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>The "potent oral" slot has exactly one serious rival</h2><p class="lede">Obicetrapib does not compete with statins (it is an add-on) or with ezetimibe (it is sold combined with it). Its real contest is for the patient who needs ≥30–50% more LDL-C reduction: today that patient gets an injection; tomorrow Merck wants to give them a pill too.</p></div></div>
+<div class="compare">
+<article class="compare-card"><div class="tag">Incumbent · injectable</div><div class="name">PCSK9 antibodies</div><dl>
+<dt>Products</dt><dd>Repatha (Amgen), Praluent (Sanofi/Regeneron)</dd>
+<dt>LDL-C</dt><dd>~−59% on top of statins; outcomes-proven (FOURIER HR 0.85)</dd>
+<dt>Weakness</dt><dd>Self-injection every 2–4 weeks; adherence and prior-auth friction leave most eligible patients untreated — the gap obicetrapib's pitch is built on</dd>
+</dl></article>
+<article class="compare-card"><div class="tag">Incumbent · siRNA</div><div class="name">Leqvio (inclisiran)</div><dl>
+<dt>Products</dt><dd>Novartis; twice-yearly clinic-administered injection</dd>
+<dt>LDL-C</dt><dd>~−50%; outcomes trial (ORION-4) still pending</dd>
+<dt>Read-through</dt><dd>Proof that payers reimburse non-statin LDL lowering at scale — and that convenience alone does not guarantee outcomes data</dd>
+</dl></article>
+<article class="compare-card"><div class="tag">Direct oral rival</div><div class="name">Enlicitide (Merck)</div><dl>
+<dt>Status</dt><dd>Oral PCSK9 inhibitor; Phase 3 CORALreef program reported LDL-C reductions in the ~−50% range (company-reported)</dd>
+<dt>Threat</dt><dd>Same pill, same slot, no class graveyard, Merck's commercial machine. If enlicitide files first in the U.S. with clean data, obicetrapib's differentiation narrows to Lp(a) lowering and the FDC</dd>
+<dt>Obicetrapib edge</dt><dd>Lp(a) −33% to −54% (enlicitide's Lp(a) effect is smaller); EU approval in hand; FDC with ezetimibe in one pill</dd>
+</dl></article>
+</div>
+<div class="compare" style="margin-top:18px">
+<article class="compare-card"><div class="tag">Oral incumbent</div><div class="name">Bempedoic acid</div><dl><dt>Products</dt><dd>Nexletol / Nexlizet (Esperion)</dd><dt>LDL-C / outcomes</dt><dd>~−17–18% mono; CLEAR Outcomes HR 0.87 for MACE</dd><dt>Read-through</dt><dd>Shows an oral non-statin can win an outcomes label — and how modest the commercial prize is when potency is low. Obicetrapib is ~2–3× as potent per pill</dd></dl></article>
+<article class="compare-card"><div class="tag">Lp(a) pipeline</div><div class="name">Pelacarsen / olpasiran</div><dl><dt>Status</dt><dd>ASO/siRNA agents lowering Lp(a) 80%+; outcomes trials (Lp(a)HORIZON, OCEAN(a)) read out before PREVAIL finishes</dd><dt>Read-through</dt><dd>If Lp(a) lowering independently reduces events, obicetrapib's moderate Lp(a) effect is a supporting claim, not a franchise. If those trials fail, its Lp(a) story deflates too</dd></dl></article>
+<article class="compare-card"><div class="tag">Baseline</div><div class="name">Generics</div><dl><dt>Products</dt><dd>High-intensity statins, ezetimibe — pennies per day</dd><dt>Reality</dt><dd>Every premium agent, obicetrapib included, is priced against near-free therapy that most patients under-use. No head-to-head trial of obicetrapib vs any active comparator exists — all differentiation is cross-trial <span class="ev fact">FACT</span></dd></dl></article>
+</div>
+</section>
+
+<section id="pipeline">
+<div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>One molecule, ranked by what each program can prove</h2><p class="lede">This is a single-asset company. "Pipeline" means the same 10 mg tablet in different regulatory and evidentiary wrappers — ranked here by value at stake, not by chronology.</p></div></div>
+<div class="pipeline">
+<div class="pipe-row"><div class="pipe-rank">#1</div><div><div class="pipe-name">PREVAIL — cardiovascular outcomes (obicetrapib, ASCVD)</div><div class="pipe-desc">The value of everything else is conditional on this trial. A positive final (or an early interim stop) converts an EU lipid drug into a global outcomes drug and unlocks the U.S.; a miss strands the asset as a European royalty stream.</div></div><div class="pipe-status">Ph3 · interim Q1 2027</div></div>
+<div class="pipe-row"><div class="pipe-rank">#2</div><div><div class="pipe-name">Ubeslo&reg; — obicetrapib monotherapy (EU)</div><div class="pipe-desc">Approved Sep 21, 2026. Menarini commercializes; NewAmsterdam books tiered royalties (low-double-digits to mid-20s %) plus possible milestones. First sales expected from late 2026 launches (Germany first).</div></div><div class="pipe-status">Approved · EU</div></div>
+<div class="pipe-row"><div class="pipe-rank">#3</div><div><div class="pipe-name">Evlarco&reg; — obicetrapib + ezetimibe FDC (EU)</div><div class="pipe-desc">The commercially sharper product: −48.6% LDL-C in a single pill (TANDEM). Approved with Ubeslo; likely the volume driver in Europe and the template for a U.S. FDC filing.</div></div><div class="pipe-status">Approved · EU</div></div>
+<div class="pipe-row"><div class="pipe-rank">#4</div><div><div class="pipe-name">RUBENS — T2D / metabolic syndrome (Ph3)</div><div class="pipe-desc">~300 patients; obicetrapib ± ezetimibe in a population where the pooled data already hint at glycemic benefit (less new-onset diabetes vs placebo). Topline guided by year-end 2026 — the nearest data catalyst after the EC decision.</div></div><div class="pipe-status">Ph3 · data YE 2026</div></div>
+<div class="pipe-row"><div class="pipe-rank">#5</div><div><div class="pipe-name">REMBRANDT — coronary plaque imaging (Ph3)</div><div class="pipe-desc">323 patients, CCTA plaque endpoints for the FDC. Supportive-evidence value for guidelines and payer dossiers; not registrational. Enrollment complete (Mar 2026).</div></div><div class="pipe-status">Ph3 · enrolled</div></div>
+<div class="pipe-row"><div class="pipe-rank">#6</div><div><div class="pipe-name">Alzheimer's prevention — SPINOZA (Ph2b)</div><div class="pipe-desc">~400 patients with preclinical AD; p-tau217 primary at Week 52; first dosed Sep 2026. Follows the BROADWAY biomarker signal. Option value only; a cognition claim is years and at least one large trial away.</div></div><div class="pipe-status">Ph2b · started</div></div>
+</div>
+<p class="source-note">Also completed: Phase 2 VINCENT (obicetrapib + PCSK9 inhibitor in elevated Lp(a)) — topline detail not isolated in sources reviewed; treated as a GAP in this dossier rather than summarized from secondary snippets.</p>
+</section>
+
+<section id="catalysts">
+<div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>What moves the stock, in order</h2><p class="lede">One binary towers over the calendar. Everything before Q1 2027 is positioning; everything after it is consequence.</p></div></div>
+<div class="timeline">
+<div class="event"><div class="event-date">Q4 2026</div><div class="event-body"><b>RUBENS topline data</b>Phase 3 in T2D/metabolic syndrome (~300 pts). <span class="date-tag guidance">Guidance</span> — company: "by year-end 2026." A clean result widens the label story; a miss is survivable but narrows it.</div></div>
+<div class="event"><div class="event-date">Q4 2026</div><div class="event-body"><b>Menarini EU launch begins</b>First commercial sales (Germany guided first), with country-by-country reimbursement pacing the ramp. First royalty revenue would appear in 2027 reporting. <span class="date-tag guidance">Guidance</span></div></div>
+<div class="event"><div class="event-date">2H 2026</div><div class="event-body"><b>UK and Swiss approval decisions</b>Guided for 2H 2026 alongside the EMA decision; not yet confirmed as landed at this dossier's as-of date. <span class="date-tag guidance">Guidance</span></div></div>
+<div class="event"><div class="event-date">~Nov 2026</div><div class="event-body"><b>Q3 2026 results</b>First post-approval update: launch readiness, any U.S. filing language, burn trajectory. Date is an aggregator estimate. <span class="date-tag inferred">Inferred</span></div></div>
+<div class="event primary"><div class="event-date">Q1 2027</div><div class="event-body"><b>PREVAIL interim DSMB result — the binary</b>Interim event target reached Q4 2026; DSMB recommendation expected Q1 2027. Outcomes range from early stop for overwhelming benefit (requires both 4-point primary and 3-point MACE significance) to futility stop. A "continue" is the modal good outcome and defers the U.S. story to the final readout. <span class="date-tag guidance">Guidance</span></div></div>
+<div class="event"><div class="event-date">End-2027</div><div class="event-body"><b>PREVAIL final completion (if not stopped)</b>Company guides the trial runs through end-2027 to preserve power for the final analysis. <span class="date-tag guidance">Guidance</span></div></div>
+<div class="event"><div class="event-date">2027</div><div class="event-body"><b>U.S. NDA decision point</b>No filing or timeline disclosed. A positive PREVAIL interim is the earliest plausible trigger identified in this dossier. <span class="date-tag inferred">Inferred</span></div></div>
+<div class="event"><div class="event-date">Nov 23, 2027</div><div class="event-body"><b>SPAC warrants expire</b>Remaining 2,420,733 warrants ($11.50 strike, NAMSW) expire — modest, dated dilution overhang resolves either way. <span class="date-tag hard">Hard</span></div></div>
+</div>
+</section>
+
+<section id="scenarios">
+<div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit arithmetic</h2><p class="lede">Scenario ranges are illustrative, assumption-labeled, and computed below — not price targets or recommendations. Divisors use the treasury method at each scenario's center price (options WAEP $13.62; warrants $11.50), consistent with the library's dilution-honest convention.</p></div></div>
+<div class="scen-grid">
+<article class="scen-card bear"><div class="tag">Bear</div><div class="pt">$4.00–5.50</div><div class="soft">Soft range</div><ul>
+<li>PREVAIL interim futility, or final HR ≈ 1.0 — the ACCELERATE outcome</li>
+<li>U.S. never filed; EU royalties ramp slowly under Menarini</li>
+<li>Equity ≈ eroding cash + royalty option: $475–650M ÷ 118.4M shares (basic + RSUs; options/warrants out of the money)</li>
+</ul></article>
+<article class="scen-card base"><div class="tag">Base</div><div class="pt">$23–29</div><div class="soft">Soft range</div><ul>
+<li>PREVAIL continues at interim; final positive end-2027 (HR ~0.85)</li>
+<li>U.S. NDA filed 2027–28 on final data; EU royalties build steadily</li>
+<li>Equity $3.05–3.75B (operating EV $2.6–3.3B + ~$0.45B residual cash) ÷ ~129.6M treasury FD shares at ~$26</li>
+</ul></article>
+<article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$45–57</div><div class="soft">Soft range</div><ul>
+<li>PREVAIL stops early at interim (both MACE endpoints significant)</li>
+<li>U.S. filing accelerates; enlicitide delayed or label-limited; EU milestones trigger</li>
+<li>Equity $6.1–7.7B (operating EV $5.6–7.2B + ~$0.5B cash) ÷ ~135.5M treasury FD shares at ~$52</li>
+</ul></article>
+</div>
+<div class="assump"><b>Check the math.</b> Basic shares 117,651,697 (Jun 30, 2026). Treasury increments at $20.62 (today): options 20,625,368 × (1 − 13.62/20.62) ≈ +7.00M; warrants 2,420,733 × (1 − 11.50/20.62) ≈ +1.07M; RSUs 728,283 at face → FD ≈ 126.5M shares today. At the base center ($26): FD ≈ 129.6M; at the bull center ($52): FD ≈ 135.5M. $3.05B ÷ 129.6M = $23.5 and $3.75B ÷ 129.6M = $28.9 (base); $6.1B ÷ 135.5M = $45.0 and $7.7B ÷ 135.5M = $56.8 (bull); $475M ÷ 118.4M = $4.0 and $650M ÷ 118.4M = $5.5 (bear). The bull top is held at the highest street target found in sources reviewed (~$52, H.C. Wainwright) on a center basis. At $20.62 the market is pricing the shares just below the base range — i.e., EU approval plus a substantial, but not full, PREVAIL probability.</div>
+</section>
+<section id="financials">
+<div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>Funded to the binary, and past it</h2><p class="lede">NewAmsterdam's financial story is simple: Menarini money and one large equity raise built a $678M cash pile; the spend is three Phase 3 trials plus a U.S. commercial organization being built before it has a U.S. filing.</p></div></div>
+<div class="fin-grid">
+<div>
+<div class="metric-stack">
+<div class="metric"><b>$678.3M</b><span>Cash, equivalents &amp; marketable securities · Jun 30, 2026 (10-Q)</span></div>
+<div class="metric"><b>$64.1M</b><span>Q2 2026 net loss (R&amp;D $41.7M; SG&amp;A $26.9M)</span></div>
+<div class="metric"><b>$69.8M</b><span>H1 2026 operating cash use (~$35M/quarter)</span></div>
+<div class="metric"><b>$3.7M</b><span>Q2 2026 revenue — Menarini supply agreement (vs $19.1M in Q2 2025, which included license cost contributions)</span></div>
+</div>
+<div class="runway"><b>Runway: no forced raise before PREVAIL completes</b><p><span class="ev interp">INTERPRETATION</span> At the H1 2026 operating cash-use rate (~$140M/yr), $678.3M covers ~4+ years — through the PREVAIL final readout and into a U.S. launch window. No explicit company runway guidance was isolated in the Q2 2026 materials reviewed <span class="ev gap">GAP</span>; the arithmetic is stated instead. The caveat is trajectory: SG&A already runs ~$27M/quarter with U.S. pre-commercial hiring, and burn rises into any launch.</p></div>
+</div>
+<div>
+<table class="cap-table"><thead><tr><th>Capitalization</th><th>Shares</th><th>Basis</th></tr></thead><tbody>
+<tr><td>Ordinary shares outstanding</td><td>117,651,697</td><td>Jun 30, 2026 (10-Q); €0.12 par</td></tr>
+<tr><td>Options outstanding</td><td>20,625,368</td><td>Dec 31, 2025 (10-K); WAEP $13.62</td></tr>
+<tr><td>RSUs outstanding</td><td>728,283</td><td>Dec 31, 2025 (10-K)</td></tr>
+<tr><td>SPAC warrants (NAMSW)</td><td>2,420,733</td><td>$11.50 strike; expire Nov 23, 2027 (Q2 10-Q)</td></tr>
+<tr><td>Pre-funded warrants (Dec 2024 offering)</td><td><span class="ev gap">GAP</span></td><td>4,882,653 issued at $24.4999 ($0.0001 strike); count still outstanding not isolated in sources reviewed</td></tr>
+<tr><td><strong>Fully diluted (treasury, at $20.62)</strong></td><td><strong>~126.5M</strong></td><td>Basic + 7.00M option increment + 1.07M warrant increment + 0.73M RSUs; excludes any unexercised pre-funded warrants</td></tr>
+</tbody></table>
+<div class="overhang"><b>$54.5M</b> derivative warrant liabilities on the Jun 30, 2026 balance sheet (fair-value, non-cash; total liabilities only $73.0M, no borrowings). The warrant overhang that defined the SPAC era is nearly gone: only 2.42M of the original public/private warrants remain after exercises and expirations, worth up to ~$27.8M of proceeds if fully exercised at $11.50.</div>
+</div>
+</div>
+<h3 style="margin-top:26px">Financing &amp; partner history</h3>
+<table class="study-table"><thead><tr><th>Date</th><th>Transaction</th><th>Terms that matter</th></tr></thead><tbody>
+<tr><td data-label="Date">Jun 2022</td><td data-label="Transaction">Menarini Europe license</td><td data-label="Terms"><span class="ev fact">FACT</span> €115M upfront + €27.5M committed R&amp;D funding (€142.5M committed); up to €863M total milestones originally; tiered royalties from the teens to mid-20s %. As of the Sep 2026 approval release, up to €833M of milestones remain potentially payable.</td></tr>
+<tr><td data-label="Date">Nov 2022</td><td data-label="Transaction">FLAC SPAC merger + PIPE</td><td data-label="Terms"><span class="ev fact">FACT</span> ~$328M gross (~$93M trust after ~32% redemptions + ~$235M PIPE led by Frazier Healthcare Partners and Bain Capital Life Sciences).</td></tr>
+<tr><td data-label="Date">Dec 2024</td><td data-label="Transaction">Underwritten offering</td><td data-label="Terms"><span class="ev fact">FACT</span> ~$452.6M net at $24.50/share (12,117,347 shares + 4,882,653 pre-funded warrants + full greenshoe). The raise that funds the current trial slate.</td></tr>
+<tr><td data-label="Date">2026 H1</td><td data-label="Transaction">Share count drift</td><td data-label="Terms"><span class="ev fact">FACT</span> 114,399,326 (Dec 31, 2025) → 117,651,697 (Jun 30, 2026), driven by option and warrant exercises (a cash inflow that partly offset burn). Expect continued single-digit-percent annual dilution from the 20.6M-option pool.</td></tr>
+</tbody></table>
+<p class="source-note">Menarini retains Europe; NewAmsterdam retains the U.S. and rest-of-world ex-Europe — the retained rights are the equity case, and they are currently unpartnered and unfiled. Royalty income begins only when Menarini sells product; no sales or royalty figure exists yet.</p>
+</section>
+
+<section id="management">
+<div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>The team that has lived inside this target for a decade</h2><p class="lede">Unusually for a one-asset company, the leadership's history with CETP is the asset's history — including its previous sale to Amgen and return.</p></div></div>
+<div class="people-grid">
+<article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+<dt>Michael Davidson, M.D. — CEO &amp; co-founder</dt><dd>Preventive cardiologist and clinical lipidologist; led the company through the SPAC merger and all three pivotal lipid trials. <span class="ev unverified">UNVERIFIED · BIO</span> Company biographies also credit him as a co-founder of Corvidia Therapeutics (acquired by Novo Nordisk in 2020).</dd>
+<dt>John J.P. Kastelein, M.D., Ph.D. — co-founder</dt><dd>Amsterdam UMC lipidologist; founder of Dezima Pharma, the original developer of obicetrapib (TAK-085 lineage via Mitsubishi Tanabe), which Amgen acquired in 2015 before rights returned and NewAmsterdam was formed to develop it. He has now run this molecule through two owners and three Phase 3 programs — the deepest institutional knowledge of CETP biology in any sponsor.</dd>
+<dt>Ian Somaiya — CFO</dt><dd><span class="ev fact">FACT</span> Signs the company's SEC reports as CFO (8-Ks through 2026). Financial communications have been disciplined: guidance given (interim timing, RUBENS) has so far been met.</dd>
+</dl></article>
+<article class="paper-card"><h3>Track record scorecard</h3><ul class="check-list">
+<li>Delivered: three positive, published pivotal lipid trials on schedule; EU approval — the class's first.</li>
+<li>Delivered: PREVAIL fully enrolled (&gt;9,500) since Apr 2024; blinded event rate tracking BROADWAY, per company updates.</li>
+<li>Bought credibility cheaply: the 2022 Menarini deal (€142.5M committed) funded development without U.S. commercial infrastructure.</li>
+<li>Open debit: no U.S. regulatory strategy has ever been articulated in public — for a company hiring U.S. market-access leadership, the silence is a choice, and it concentrates all U.S. value into one DSMB meeting.</li>
+<li>Open debit: the Alzheimer's expansion (SPINOZA) spends PREVAIL-era cash on a second indication before the first one's outcomes trial has read out.</li>
+</ul></article>
+<article class="paper-card"><h3>Ownership &amp; insider signals</h3><ul class="check-list">
+<li><span class="ev fact">FACT</span> Anchor holders from the SPAC/PIPE era: Frazier Healthcare Partners (sponsor) and Bain Capital Life Sciences (PIPE co-leads); founding investor Forbion's vehicles reported ~9.4% and ~4.1% stakes in Schedule 13D/A filings — a specialist-heavy register.</li>
+<li><span class="ev unverified">UNVERIFIED · AGGREGATOR</span> Aggregator insider trackers classified recent Form 4 activity as net selling into mid-2026; no open-market insider buying program was identified in sources reviewed. Treat as a soft negative, not a signal with a denominator.</li>
+<li><span class="ev fact">FACT</span> 45 hedge funds reported positions at end-Q2 2026 (up from 34 in Q1) per aggregator 13F summaries — institutional sponsorship broadened into the EC decision.</li>
+<li>Warrant line (NAMSW) is thin and volatile (52-week $9.79–$30.45) — a levered proxy on the same binary, not an independent signal.</li>
+</ul></article>
+</div>
+</section>
+
+<section id="risks">
+<div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by capacity to impair the thesis, not by probability.</p></div></div>
+<ul class="risk-list">
+<li><b>PREVAIL is the company</b><span>A futility stop or a final HR near 1.0 (the evacetrapib outcome) leaves an EU royalty stream worth a fraction of the current $1.75B EV. No pipeline item behind it can replace it.</span></li>
+<li><b>The interim can "succeed" and still disappoint</b><span>The modal positive path — no early stop, trial continues — delivers no filing, no launch, and another year of burn before the next catalyst. A stock priced for a binary does not reward a deferral.</span></li>
+<li><b>U.S. regulatory path is undisclosed</b><span>No NDA, no timeline, no disclosed FDA meeting outcome. If FDA requires the completed CVOT for any approval, the U.S. revenue start is 2028 at the earliest — against an enlicitide clock.</span></li>
+<li><b>Enlicitide (Merck oral PCSK9)</b><span>A potent oral from a sponsor with outcomes-trial infrastructure and primary-care reach. Cross-trial LDL-C parity would erase obicetrapib's convenience moat in the U.S.; only Lp(a) and the FDC would remain.</span></li>
+<li><b>Europe is a royalty, at partner pace</b><span>NewAmsterdam does not control launch sequencing, pricing negotiations, or salesforce effort. EU lipid launches are historically slow, country-staggered, and reimbursement-gated; the €833M milestone tail is mostly commercial and back-ended.</span></li>
+<li><b>Class-history residue in the label</b><span>eGFR decline (BROADWAY pooled), plus the class's accumulation precedent, invite conservative labeling and post-marketing requirements that can cap the addressable population if PREVAIL succeeds.</span></li>
+<li><b>Dilution is structural, not episodic</b><span>20.6M options at a $13.62 average strike — 17.5% of basic shares — plus RSUs and residual warrants. Every scenario above already pays this tax via the treasury method; headline per-share upside that ignores it is overstated.</span></li>
+<li><b>Single-molecule concentration with an expensive side-quest</b><span>SPINOZA (Alzheimer's) and REMBRANDT consume cash and management attention while the core asset is mid-binary. If PREVAIL fails, the AD biomarker story will not support the market cap.</span></li>
+<li><b>FX and domicile friction</b><span>A Dutch N.V. earning euro royalties, spending dollars, reporting in USD — with a warrant line and a €0.12-par share structure inherited from the SPAC. None of it is disqualifying; all of it adds noise to per-share math that casual screens get wrong.</span></li>
+</ul>
+</section>
+
+<section id="open">
+<div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>Questions this dossier could not close</h2><p class="lede">Stated as gaps rather than filled — each is answerable from a primary source the company has not yet provided.</p></div></div>
+<div class="open-grid">
+<article><span>Q1</span><h3>U.S. filing strategy</h3><p>Has a pre-NDA interaction occurred, and would FDA accept the EU-style LDL-C package? Nothing disclosed through Q2 2026.</p></article>
+<article><span>Q2</span><h3>PREVAIL interim mechanics</h3><p>Exact interim event count, alpha boundary, and whether a "continue" outcome gets publicly characterized beyond the DSMB recommendation itself.</p></article>
+<article><span>Q3</span><h3>UK / Swiss decisions</h3><p>Guided for 2H 2026; unconfirmed as of Oct 16, 2026 — and UK launch sequencing under Menarini depends on them.</p></article>
+<article><span>Q4</span><h3>EU economics in practice</h3><p>Launch prices, first-country reimbursement outcomes, and the size/timing of the first approval-linked Menarini milestone are all undisclosed.</p></article>
+<article><span>Q5</span><h3>Residual capital structure</h3><p>Pre-funded warrants still outstanding (4,882,653 issued Dec 2024) and the split of the $54.5M derivative liability between warrants and any remaining earnout instruments were not isolated in sources reviewed.</p></article>
+<article><span>Q6</span><h3>Long-horizon safety</h3><p>Multi-year tissue-accumulation and renal (eGFR) trajectories beyond one-year exposure — PREVAIL's later years are the first dataset that can answer either.</p></article>
+</div>
+</section>
+
+<section id="sources">
+<div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">As-of date: <b>October 16, 2026</b>. Source order: SEC → FDA/EMA → ClinicalTrials.gov → papers/conferences → company PRs/decks → trade press.</p></div></div>
+<div class="sources">
+<div class="source-group"><h3>SEC filings (primary)</h3>
+<a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001936258" target="_blank" rel="noopener">EDGAR company file — CIK 1936258<small>Form 10-K FY2025 (filed Feb 18, 2026); Form 10-Q Q2 2026 (filed Aug 5, 2026) — balance sheet, share count, warrant note; 8-Ks of Sep 21, 2026 (EC approval) and Sep 29, 2026 (SPINOZA); DEF 14A (May 6, 2026)</small></a>
+<a href="https://www.globenewswire.com/en/news-release/2022/11/23/2561557/0/en/NewAmsterdam-Pharma-Debuts-as-Publicly-Traded-Company-Focused-on-Developing-Obicetrapib-a-Low-Dose-Once-Daily-Oral-LDL-Lowering-Agent-with-Promising-Safety-and-Efficacy-Clinical-Da.html" target="_blank" rel="noopener">SPAC business-combination closing (Nov 23, 2022)<small>FLAC merger terms, ~$235M PIPE, ~$328M gross proceeds</small></a>
+</div>
+<div class="source-group"><h3>Regulators &amp; registries</h3>
+<a href="https://www.ema.europa.eu/en/medicines/human/EPAR/ubeslo" target="_blank" rel="noopener">EMA — Ubeslo EPAR<small>EU authorization, Sep 2026 (SmPC via EMA)</small></a>
+<a href="https://www.ema.europa.eu/en/medicines/human/EPAR/evlarco" target="_blank" rel="noopener">EMA — Evlarco EPAR<small>FDC authorization, Sep 2026</small></a>
+<a href="https://clinicaltrials.gov/study/NCT05425745" target="_blank" rel="noopener">ClinicalTrials.gov — BROOKLYN (NCT05425745)<small>HeFH Phase 3 record</small></a>
+<a href="https://clinicaltrials.gov/study/NCT06005597" target="_blank" rel="noopener">ClinicalTrials.gov — TANDEM (NCT06005597)<small>FDC Phase 3 record</small></a>
+</div>
+<div class="source-group"><h3>Academic literature (mandatory)</h3>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=obicetrapib+BROADWAY+NEJM+2025" target="_blank" rel="noopener">Nicholls et al., NEJM 2025 — BROADWAY<small>LDL-C −32.6% primary; exploratory MACE HR 0.79 (0.54–1.15)</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=TANDEM+obicetrapib+ezetimibe+Lancet+2025" target="_blank" rel="noopener">Sarraju et al., Lancet 2025 — TANDEM<small>FDC −48.6% vs placebo; mono −31.9%</small></a>
+<a href="https://www.newamsterdampharma.com/wp-content/uploads/2026/02/Obicetrapib-in-Patients-with-Heterozygous-Familial-Hypercholesterolemia-1.pdf" target="_blank" rel="noopener">BROOKLYN, Nature Medicine 2026<small>HeFH: −36.3% Day 84; Lp(a) −45.9%</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=torcetrapib+ILLUMINATE+NEJM+2007" target="_blank" rel="noopener">Barter et al., NEJM 2007 — ILLUMINATE<small>Torcetrapib mortality signal</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=anacetrapib+REVEAL+NEJM+2017" target="_blank" rel="noopener">REVEAL Collaborative, NEJM 2017<small>Anacetrapib RR 0.91 major coronary events</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=evacetrapib+ACCELERATE+NEJM+2017" target="_blank" rel="noopener">Lincoff et al., NEJM 2017 — ACCELERATE<small>Evacetrapib futility</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=dalcetrapib+dal-OUTCOMES+NEJM+2012" target="_blank" rel="noopener">Schwartz et al., NEJM 2012 — dal-OUTCOMES<small>Dalcetrapib futility</small></a>
+<a href="https://pubmed.ncbi.nlm.nih.gov/?term=Ference+CETP+JAMA+2017+genetic" target="_blank" rel="noopener">Ference et al., JAMA 2017<small>CETP genetics: benefit proportional to ApoB</small></a>
+</div>
+<div class="source-group"><h3>Company &amp; trade (UNVERIFIED tier)</h3>
+<a href="https://www.globenewswire.com/news-release/2026/09/21/3365512/0/en/newamsterdam-pharma-and-menarini-group-receive-european-commission-approval-for-ubeslo-obicetrapib-monotherapy-and-evlarco-obicetrapib-plus-ezetimibe-fixed-dose-combination.html" target="_blank" rel="noopener">EC approval release (Sep 21, 2026)<small>Brand names, indication, Menarini royalty/milestone recap (€833M remaining)</small></a>
+<a href="https://www.menarini.com/en-us/news/news-detail/newamsterdam-pharma-and-the-menarini-group-sign-licensing-deal-to-commercialize-obicetrapib-in-europe.html" target="_blank" rel="noopener">Menarini license release (Jun 2022)<small>€115M upfront + €27.5M R&amp;D; up to €863M milestones; teens-to-mid-20s royalties</small></a>
+<a href="https://www.stocktitan.net/news/NAMS/new-amsterdam-pharma-provides-corporate-update-and-reports-second-fyivmhhs8af8.html" target="_blank" rel="noopener">Q2 2026 update (Aug 5, 2026, Aug 5, 2026)<small>CHMP opinion, PREVAIL interim timing, RUBENS/REMBRANDT status, Q2 financials</small></a>
+<a href="https://finnhub.io/?q=%22NAMS%22" target="_blank" rel="noopener">Finnhub — NAMS market data<small>Oct 15, 2026 close $20.62; 52-week range $19.58–$42.21</small></a>
+</div>
+</div>
+<div class="method"><strong>Method &amp; gaps disclosed.</strong> Every number above is traceable to the sources listed; company-only figures are tagged UNVERIFIED and registry/filing figures FACT. Not isolated in sources reviewed, and therefore flagged rather than estimated: pre-funded warrants still outstanding; the warrants-vs-earnout split of derivative liabilities; VINCENT topline detail; REMBRANDT topline timing; explicit company runway guidance; UK/Swiss decision outcomes. Nothing in this dossier is invented — unlabeled gaps are deliberate.</div>
+</section>
+</main>
+<footer><strong>NAMS · NewAmsterdam Pharma Company N.V.</strong> — Deep-dive dossier, as of October 16, 2026. For research only; not investment advice. Scenario ranges are illustrative and authorized only for this library batch.</footer>
+<button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='\u2212';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'\u2212';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>
