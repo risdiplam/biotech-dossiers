@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>LRMR — Larimar Therapeutics Deep-Dive Dossier</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head><body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · LRMR</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>The first drug that replaces the missing protein — if FDA accepts skin frataxin as proof</h1>
+        <p class="hero-dek">A source-weighted investigation of Larimar Therapeutics and nomlabofusp: a TAT-peptide fusion protein that measurably restores frataxin in skin, is already inside a rolling BLA seeking accelerated approval, and carries an anaphylaxis problem concentrated in exactly the patients who took the drug before.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$2.44</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$109M</strong> est. enterprise value · <strong>~$1.44</strong> cash per economic share<br>$266M implied equity (108.88M shares incl. preferred as-converted) · $156.3M cash &amp; securities (Jun 30, 2026)</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A surrogate-endpoint BLA, priced like a failed one</h2><p class="lede">Larimar is no longer a science project looking for a path to FDA. Following a START pilot meeting and a multidisciplinary Type B pre-BLA meeting, FDA agreed Larimar could submit a rolling BLA seeking accelerated approval on skin frataxin concentration as a novel surrogate “reasonably likely” to predict clinical benefit. The first module went in on June 29, 2026. The stock has still lost more than half its value in 2026 — because the efficacy file is a 43-person open-label study, the safety file contains anaphylaxis in roughly one in four exposed open-label participants, and the balance sheet carries a going-concern paragraph.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$109M</div><p><span class="ev interp">INTERPRETATION</span> Oct 20 close $2.44 × 108.88M economic shares (103.88M common + 5.00M Series A preferred as-converted) = ~$266M equity, less $156.3M cash, equivalents and marketable securities at Jun 30, 2026 (Q2 10-Q). No debt identified.</p></article>
+        <article class="decision warn"><div class="tag">The swing factor</div><div class="big">BLA review</div><p><span class="ev fact">FACT</span> Rolling BLA module 1 submitted Jun 29, 2026; remaining modules guided for 2H 2026. Approval is explicitly “a matter of review” — FDA has agreed the package can be submitted, not that skin FXN will carry an approval.</p></article>
+        <article class="decision warn"><div class="tag">Dominant safety issue</div><div class="big">Anaphylaxis</div><p><span class="ev fact">FACT</span> 10 of 43 open-label participants had anaphylaxis; 9 of the 10 had prior nomlabofusp exposure. In treatment-naïve participants the rate was 1 of 11. All returned to usual health with standard treatment; 21 of 43 participants discontinued the study overall.</p></article>
+        <article class="decision"><div class="tag">Cash runway</div><div class="big">Into Q3 2027</div><p><span class="ev fact">FACT</span> Company guidance from the Q2 2026 10-Q — which simultaneously states substantial doubt about going-concern status, because planned spending exceeds resources within one year of the filing date. A raise before any approval decision is the base case.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What is genuinely different here</h3><ul><li>Nomlabofusp is the only FA therapy that replaces the deficient protein itself: a TAT cell-penetrating peptide fused to human frataxin, cleaved inside mitochondria to mature FXN (peer-reviewed, <em>AAPS Journal</em> 2025).</li><li>The pharmacodynamic effect is large and internally consistent: mean skin FXN rose from 3.7 to 12.1 pg/µg after one year of daily dosing, and 9 of 9 evaluable participants exceeded 50% of healthy-volunteer levels — the range seen in asymptomatic heterozygous carriers.</li><li>Regulatory alignment is unusually documented: START pilot participation, Breakthrough Therapy Designation (Feb 2026), agreed rolling submission, and FDA-stated willingness to consider skin FXN as a surrogate endpoint.</li><li>Clinical measures moved the right direction in the small 1-year cohort (mFARS −1.0 on drug vs +1.6 worsening in matched FACOMS natural history) — supportive, not confirmatory.</li><li>The confirmatory Phase 3 (N=150, Week-72 mFARS/USS) is registered to begin Oct 26, 2026, satisfying the structural requirement of accelerated approval before the decision lands.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the low price is actually pricing</h3><ul><li>There is no randomized efficacy trial. Every clinical-outcome claim rests on open-label data against a matched external natural-history cohort — the weakest evidence architecture FDA accepts, and only under accelerated approval.</li><li>Anaphylaxis in 10 of 43 open-label participants (23%) with a clear re-exposure pattern is a label-shaping, possibly approval-shaping, liability — and the confirmatory trial re-exposes a population in which prior-exposure patients are the highest-risk group.</li><li>Attrition is heavy: 21 of 43 open-label participants discontinued; only 13 contribute 1-year clinical data. Survivorship bias flatters open-label cohorts.</li><li>Going-concern language in the Q2 2026 10-Q plus a 100M-share increase in authorized capital (May 2026) telegraphs dilution ahead of the PDUFA window.</li><li>Skin is a surrogate of a surrogate: skin FXN correlates with frataxin in heart and dorsal root ganglia in mice; human CNS and cardiac target engagement have never been measured.</li></ul></article>
+      </div>
+      <p class="source-note">Identity verified against SEC EDGAR (Larimar Therapeutics, Inc., CIK 0001374690, Delaware, File No. 001-36510; HQ Three Bala Plaza East, Bala Cynwyd, PA). Valuation inputs: <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526331529/lrmr-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> and Finnhub market snapshot (Oct 20, 2026 close, $2.44).</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Priced for a CRL, positioned for a review</h2><p class="lede">At $2.44, the market pays roughly $109M of enterprise value for a company whose BLA is already partially inside FDA, whose incumbent competitor sells at a ~$600M+ global run rate, and whose own auditor-facing filing raises going-concern doubt. Both halves of that sentence are true; the dossier’s job is to weigh them.</p></div></div>
+      <div class="readthrough"><strong>October price action.</strong> <span class="ev fact">FACT</span> LRMR closed at $2.44 on October 20, 2026 (+15.1% on the day, Finnhub), off a 52-week range of $1.92–$6.42. The stock fell from ~$3.19 at Sept 30 to an intraday 52-week low of $1.92 on Oct 15–16 before the Oct 20 bounce — a slide with no identified company-specific disclosure, in a tape that has de-rated the name all year (1-month return −36% per Finnhub). Short interest was ~13.9% of float (secondary reporting). <span class="ev interp">INTERPRETATION</span> This is financing-and-review risk being priced, not new clinical information.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">FEB 2026</span><h3>Breakthrough + a $5.00 raise</h3><p>FDA granted Breakthrough Therapy Designation (Feb 24, 2026 per trade coverage of the company announcement); days earlier Larimar closed an underwritten offering of 23.0M shares at $5.00 for ~$107.6M net. The stock’s 52-week high ($6.42) dates from this window.</p></article>
+        <article><span class="event-mark">JUN 29</span><h3>BLA module 1 + OLE data</h3><p>Rolling BLA submission began with positive 1-year open-label data. Baird nonetheless cut its target from $7 to $5 on Jun 30 (secondary reporting) — the street’s caution is about approvability of the surrogate, not the data’s direction.</p></article>
+        <article><span class="event-mark">SEP–OCT</span><h3>Grind to the lows</h3><p>Leerink assumed coverage at Outperform with a $13 target on Sept 14 (secondary reporting), yet the stock kept sliding into mid-October — consistent with a market focused on the going-concern paragraph, anaphylaxis, and the un-started confirmatory trial rather than on sell-side targets (consensus average ~$10.33–$11.86 across aggregators; high forecast $21).</p></article>
+      </div>
+      <p class="source-note">Prices: Finnhub instrument data via search snapshot, Oct 20, 2026. Analyst targets are third-party aggregator data (MarketBeat/TickerNerd), cited as market context, not endorsed. Offering terms: Q2 2026 10-Q financing note.</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Replace the protein the gene cannot make</h2><p class="lede">Friedreich’s ataxia is a frataxin-dose disease. Nomlabofusp is an attempt to dose the protein directly — which means solving three delivery problems in sequence: cross the cell membrane, reach the mitochondrion, and survive as functional mature frataxin. The published evidence says the molecule does all three in cells and animals. Human proof exists only where a biopsy can reach: skin and cheek.</p></div></div>
+      <div class="science-chain" aria-label="FA disease mechanism">
+        <article><b>01</b><h3>GAA repeat expansion</h3><p>An expanded GAA trinucleotide repeat in intron 1 of the <em>FXN</em> gene silences transcription. Patients typically produce roughly 5–35% of normal frataxin; heterozygous carriers at ~50% are asymptomatic — the dose benchmark the whole program is calibrated against.</p></article>
+        <article><b>02</b><h3>Mitochondrial iron–sulfur failure</h3><p>Frataxin supports iron–sulfur cluster assembly. Its loss cripples aconitase and respiratory-chain complexes, accumulates mitochondrial iron, and generates oxidative stress — worst in dorsal root ganglia, dentate nucleus, heart, and pancreatic beta cells.</p></article>
+        <article><b>03</b><h3>Progressive multi-system disease</h3><p>Gait and limb ataxia, dysarthria, and loss of ambulation define the neurology; hypertrophic cardiomyopathy is the leading cause of death. Onset is typically in childhood or adolescence; the disease is relentlessly progressive and fatal.</p></article>
+        <article><b>04</b><h3>~20,000 patients worldwide</h3><p><span class="ev fact">FACT</span> Company-stated epidemiology (FY2025 10-K): ~20,000 people living with FA globally, ~5,000 in the United States. Small, genetically diagnosable, and concentrated in specialist centers — commercially tractable at orphan pricing, with no room for a mass-market thesis.</p></article>
+      </div>
+      <div class="moa-box"><h3>Frataxin replacement in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> FA patients’ cells cannot make enough frataxin, a small mitochondrial protein. Nomlabofusp is factory-made human frataxin with a molecular “hall pass” (a TAT-derived cell-penetrating peptide) bolted to its front. Injected under the skin daily, it is designed to slip through cell membranes, get routed into mitochondria, have the hall pass snipped off by the mitochondrion’s own enzyme, and emerge as ordinary mature frataxin.</p><p><strong>Technical.</strong> A 224-amino-acid, 24.9 kDa recombinant fusion protein: a short TAT-sequence-based cationic cell-penetrant peptide, joined by a diglycine linker to full-length human FXN including its native mitochondrial targeting sequence (MTS). After uptake, mitochondrial processing peptidase (MPP) cleaves the CPP–MTS, yielding mature FXN. Peer-reviewed work (<em>AAPS Journal</em>, 2025) detected mature frataxin inside mitochondria of treated cells and showed mature-FXN increases plus gene-expression changes in buccal samples from Phase 1 participants — direct evidence the construct survives delivery in humans, in accessible tissue.</p></div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Why protein replacement is hard here</div><h3>Four failure modes are structural, not incidental</h3><p><strong>Access.</strong> The tissues that kill and disable — DRG neurons, dentate nucleus, cardiomyocytes — sit behind membranes and, for CNS, the blood–brain barrier. Skin FXN is measurable; neuronal FXN restoration in humans is inferred, never observed. <strong>Immunogenicity.</strong> A bacterially expressed fusion protein with a viral-derived peptide, injected daily for life, is an anti-drug-antibody experiment with no endpoint; the anaphylaxis signal (Section 04) is the clinical face of this risk. <strong>Dose geometry.</strong> Tissue FXN gains required daily dosing; alternate-day dosing did not maintain levels in Phase 2 — there is no dosing holiday in this regimen, for life, starting in childhood. <strong>Assay dependence.</strong> The entire regulatory case runs through a proprietary skin-FXN assay; its validation, variability, and site-to-site reproducibility are review issues, not footnotes.</p></article>
+        <article class="paper-card"><div class="program-kicker">Nonclinical bridge</div><h3>Distribution data are the surrogate’s foundation</h3><p><span class="ev fact">FACT</span> In mouse studies (De Toni et al., <em>AAPS J</em> 2025), subcutaneous nomlabofusp distributed dose-dependently to dorsal root ganglia, heart, and skeletal muscle; tissue frataxin increases correlated across tissues — most importantly with skin — and in the conditional knockout mouse model, treatment extended median survival from ~107.5 days (vehicle mean) to 166 days (p=0.0001, per FY2025 10-K). <span class="ev interp">INTERPRETATION</span> This cross-tissue correlation is exactly what FDA is being asked to extrapolate to humans. It is coherent, published, and still a mouse.</p></article>
+      </div>
+      <div class="fail-grid" aria-label="Ways the mechanism could fail">
+        <article><h3>1 · Skin ≠ cord, heart, or brain</h3><p>The surrogate requires skin FXN to track FXN in the tissues that determine outcomes. Human evidence for that linkage does not exist; the cardiac program of a competitor (LX2006) exists precisely because cardiac engagement must be demonstrated, not assumed.</p></article>
+        <article><h3>2 · Immunogenicity ceiling</h3><p>Anaphylaxis clustered in previously exposed participants (9 of 10 cases). If sensitization grows with cumulative exposure, long-term adherence — the entire value proposition of a chronic replacement therapy — erodes from inside the treated population.</p></article>
+        <article><h3>3 · Restored level ≠ restored function</h3><p>Carriers at ~50% FXN are asymptomatic from birth. Restoring a degenerating adult nervous system to carrier-range skin levels at age 20 may not reverse established neuronal loss; the plausible best case is slowing, and the confirmatory trial must detect slowing on mFARS over 72 weeks.</p></article>
+        <article><h3>4 · Daily-injection burden vs one-time rivals</h3><p>Gene therapies in FA aim at one-time treatment. A daily self-injected biologic with premedication and epinephrine auto-injectors competes against that trajectory even if it wins the next three years unopposed.</p></article>
+      </div>
+      <p class="source-note">Mechanism and construct: <a href="https://link.springer.com/article/10.1208/s12248-025-01054-5" target="_blank" rel="noopener">AAPS Journal mechanism paper (2025)</a> · De Toni et al., <em>AAPS J</em> 2025 (doi:10.1208/s12248-025-01093-y) · FY2025 10-K program description. Epidemiology: FY2025 10-K.</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>A big biomarker effect, a thin clinical dataset, a real safety problem</h2><p class="lede">Four completed studies establish that daily nomlabofusp raises tissue frataxin dose-dependently and is tolerated in short exposures. Everything about long-term benefit comes from one open-label study of 43 dosed participants — of whom 21 discontinued and 13 provide the one-year clinical readout. Both the promise and the fragility of the BLA live in that arithmetic.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card">
+          <div class="program-kicker">Completed controlled studies</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Nomlabofusp · FA</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> Orphan Drug, Fast Track, Rare Pediatric Disease, and Breakthrough Therapy designations (FDA); Orphan + PRIME (EU); ILAP (UK); START pilot program participant.</p>
+          <div class="status-row"><span class="pill">Rolling BLA in progress</span><span class="pill">Phase 3 confirmatory starting</span><span class="pill">Daily SC · 50 mg</span></div>
+          <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Key results</th></tr></thead><tbody>
+            <tr><td data-label="Study">Phase 1 SAD<br><small>NCT04176991</small></td><td data-label="Design">Single dose 25/50/75/100 mg SC vs placebo; N=28 adults.</td><td data-label="Results">No SAEs or deaths; T<sub>max</sub> ~15 min; ISRs universal on drug, mostly mild (peer-reviewed).</td></tr>
+            <tr><td data-label="Study">Phase 1 MAD<br><small>NCT04519567</small></td><td data-label="Design">13 days; 25 mg, 50 mg, 100 mg cohorts vs placebo; N=27.</td><td data-label="Results">Dose-dependent FXN increases in skin, buccal cells, platelets; no SAEs (peer-reviewed).</td></tr>
+            <tr><td data-label="Study">Phase 2 dose exploration<br><small>NCT05579691</small></td><td data-label="Design">Double-blind, placebo-controlled; 19 drug / 9 placebo adults; 25 mg and 50 mg daily × 14 days.</td><td data-label="Results">Skin FXN from &lt;17% of healthy-volunteer levels at baseline to 33–59% after 14 days at 50 mg; ≥100% skin FXN increase in all 50 mg participants; placebo flat. Gains not maintained on alternate-day dosing. No SAEs; one severe allergic reaction (25 mg) resolved, participant withdrew.</td></tr>
+            <tr><td data-label="Study">Adolescent PK run-in<br><small>NCT06681766</small></td><td data-label="Design">Ages 12–17, weight-based dose ≈ adult 50 mg, 7 days; N=14 dosed (completed Mar 2025).</td><td data-label="Results">PK/exposure similar to adults; participants rolled into the open-label study. Planned 2–11 cohort was cancelled in favor of direct open-label enrollment; the registry lists this study as terminated.</td></tr>
+          </tbody></table>
+          <p class="source-note">Registry-verified designs (ClinicalTrials.gov). Results: FY2025 10-K; Phase 1 peer-reviewed report (SAD/MAD).</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">Open-label study · NCT06447025 · the BLA’s clinical core</div><h3>Skin frataxin at one year</h3>
+          <div class="bar-set" aria-label="Mean skin frataxin, baseline vs one year">
+            <div class="bar-row"><div class="bar-label">Baseline</div><div class="bar-track"><div class="bar-fill" style="width:30.6%"></div></div><div class="bar-value">3.7 pg/µg</div></div>
+            <div class="bar-row"><div class="bar-label">1 year</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">12.1 pg/µg</div></div>
+          </div>
+          <p class="source-note"><span class="ev fact">FACT</span> Company-reported (Jun 29, 2026). 9/9 evaluable participants at 1 year exceeded 50% of mean healthy-volunteer skin FXN (8.2 pg/µg = 50% HV benchmark) — carrier-range levels — sustained at 18 months. Buccal FXN rose from 15% to 30% of HV by Day 90 in earlier cuts.</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">Clinical outcomes · n=13 at 1 year · external control</div><h3 style="margin-top:6px">Directionally favorable, statistically untested</h3><div class="outlier-metrics"><div><b>−1.0</b><span>mFARS change on drug</span></div><div><b>+1.6</b><span>Matched FACOMS worsening</span></div><div><b>1 of 6</b><span>Non-ambulatory → ambulatory</span></div></div><p style="font-size:13px;margin:0">FARS-ADL, 9-HPT, and MFIS also moved favorably vs the matched natural-history reference. No p-values are possible against a non-randomized comparator; the treated n is the surviving, tolerating subset of the enrolled cohort. This is supporting evidence for a surrogate-based filing — it is not an efficacy demonstration, and the dossier does not treat it as one.</p></div>
+        </article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Anaphylaxis — the dominant liability</h3><p><span class="ev fact">FACT</span> As of the June 2026 update: 10 of 43 open-label participants experienced anaphylaxis, 9 with prior nomlabofusp exposure; among 11 prior-unexposed participants, 1 case. In the Sept 2025 cut the pattern was the same (7 cases in the first 6 weeks of dosing). Larimar’s own Safety Monitoring Team deemed anaphylaxis an adverse drug reaction likely associated with nomlabofusp (Mar 2025). Mitigations now in protocol: first-month antihistamine premedication, epinephrine auto-injectors, and a graded 5 mg → 25 mg observed first-dose regimen before escalation to 50 mg. All cases resolved with standard treatment and no sequelae were reported.</p></article>
+        <article><h3>Attrition</h3><p><span class="ev fact">FACT</span> 21 of 43 dosed participants discontinued the open-label study (10 anaphylaxis, 3 generalized urticaria, 8 withdrawals of which 3 were for other adverse events, per the June 2026 release’s accounting); 22 remain on study, maximum exposure &gt;800 days, &gt;10,000 doses administered. Injection-site reactions were the most common AE — mild-to-moderate, decreasing over time, and caused no withdrawals.</p></article>
+        <article><h3>What is not yet characterized</h3><p><span class="ev gap">GAP</span> Anti-drug antibody incidence, neutralizing activity, and their relationship to hypersensitivity and to FXN response have not been disclosed in the sources reviewed. Cardiac outcomes — the mortality driver in FA — are tracked for safety (echo/ECG) but no cardiac efficacy dataset (LV mass, strain) has been reported for nomlabofusp. Long-term exposure remains thin: 13 participants at 1 year, 7 at 18 months, 3 at 2 years.</p></article>
+      </div>
+      <p class="source-note">Clinical data: FY2025 10-K (studies, Sept 2025 OL cut, hold history) · Jun 29, 2026 press release via 8-K Ex. 99.1 (June 2026 OL cut) · ClinicalTrials.gov records NCT04176991 / NCT04519567 / NCT05579691 / NCT06447025 / NCT06681766.</p>
+    </section>
+
+    <section id="regulatory">
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Accelerated approval on a biomarker FDA helped design — and has not yet judged</h2><p class="lede">The regulatory story has two chapters. The first (2021–2024) is a full clinical hold for primate deaths, lifted in stages. The second (2024–2026) is one of the most collaborative FDA tracks in rare disease: START pilot, Breakthrough designation, an agreed surrogate, and a rolling BLA. The second chapter does not erase the review risk created by the first — and FDA has said, in writing, that the surrogate’s acceptability “would ultimately be a matter of review of the data.”</p></div></div>
+      <div class="quote-panel"><blockquote>“The FDA stated… they are open to considering the use of FXN concentration as an RLSE [reasonably likely surrogate endpoint] and the acceptability of FXN’s use as an RLSE would ultimately be a matter of review of the data.”</blockquote><cite>FY2025 10-K · Larimar’s summary of FDA written correspondence (START pilot meeting)</cite></div>
+      <div class="hold-grid">
+        <article><span class="ev fact">FACT</span><h3>The 2021 hold: primate deaths, not patient deaths</h3><p>In the then-ongoing 26-week nonhuman-primate toxicology study, mortalities occurred at the two highest dose levels. Larimar notified FDA in May 2021; on May 25, 2021 FDA placed the program on full clinical hold pending the complete study report. No interventional patient trials were enrolling at the time, and no deaths have been reported in any human nomlabofusp study — the Phase 1 papers report no SAEs or deaths. The complete response was submitted Jan 2022; FDA lifted the full hold in Sept 2022 with a partial hold, and removed the partial hold in May 2024 after further clinical data.</p></article>
+        <article><span class="ev fact">FACT</span><h3>Safety database: FDA-specified, now the filing’s spine</h3><p>In June 2025 FDA recommended the BLA safety database include ≥30 participants with continuous exposure for 6 months, a subset of ≥10 with 1 year, with the large majority on the 50 mg dose. The June 2026 data cut (13 at 1 year, 7 at 18 months) is built to that specification — and FDA has stated database adequacy remains “a matter of review at the time of the BLA submission.”</p></article>
+        <article><span class="ev fact">FACT</span><h3>Rolling BLA, started</h3><p>Module 1 was submitted June 29, 2026 after multidisciplinary Type B pre-BLA meeting minutes in which, per the company, the existing package “appears capable of supporting submission and review” of an accelerated-approval application, the exposure–response analysis may support submission, and a rolling schedule was agreed. Remaining modules — including CMC/manufacturing — are guided for 2H 2026. A Rare Pediatric Disease designation makes the program potentially eligible for a priority review voucher on approval (company-stated expectation).</p></article>
+        <article><span class="ev gap">GAP</span><h3>What would make this fail at review</h3><p>(1) Reviewers reject skin FXN as reasonably likely to predict benefit — the surrogate has no precedent approval behind it. (2) The anaphylaxis rate forces a REMS, a boxed warning, or a pre-approval demand for more exposed patients, stretching the database beyond runway. (3) CMC for a daily-dose recombinant fusion protein at commercial scale is unreviewed and undisclosed in detail. (4) The vatiquinone precedent (Section 06): FDA refused PTC’s FA filing in Aug 2025 despite subscale wins — this review division demands substantial evidence, and a surrogate-only package is a bigger ask than PTC’s.</p></article>
+      </div>
+      <p class="source-note">Hold history and FDA correspondence summaries: FY2025 10-K. Rolling submission and Type B minutes: Jun 29, 2026 8-K / Ex. 99.1 release. Designations: FY2025 10-K.</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>One approved rival that doesn’t touch the cause; a queue behind it</h2><p class="lede">Skyclarys owns the market today on an Nrf2 mechanism with an unknown relationship to frataxin. Nomlabofusp’s differentiation is mechanistic and demonstrable — it raises the missing protein — but the commercial bar is set by an oral once-daily drug with a randomized win, and the technological bar is being set by one-time gene therapies behind it.</p></div></div>
+      <div class="compare-four">
+        <article class="compare-card"><div class="program-kicker">Approved · Biogen</div><h3>Skyclarys (omaveloxolone)</h3><p><span class="ev fact">FACT</span> Oral Nrf2 activator, approved Feb 2023 (US) for ages ≥16; EU approval followed. MOXIe Part 2 (N=103; primary population n=82 without severe pes cavus): placebo-adjusted mFARS −2.41 at Week 48 (p=0.0138). Global revenue $150.7M in Q1 2026 and $168M in Q2 2026 (+29% YoY) per Biogen reports — a ~$600M+ annualized run rate in a ~20,000-patient global disease. Label carries transaminase, BNP, and lipid monitoring. No effect on frataxin; patients remained eligible to take it inside Larimar’s open-label study.</p></article>
+        <article class="compare-card"><div class="program-kicker">Refused · PTC Therapeutics</div><h3>Vatiquinone</h3><p><span class="ev fact">FACT</span> Oral 15-lipoxygenase inhibitor. Phase 3 MOVE-FA missed its primary endpoint; FDA declined the NDA in August 2025 and told PTC (Dec 2025 meeting) an additional study is needed. PTC’s remedy — an open-label study vs FACOMS natural history with 24-month mFARS, started 2026 — is structurally the same external-control architecture Larimar’s clinical-outcome data use, now being run as a pre-approval requirement for PTC. Read-across: FDA’s FA bar is evidence-shaped, not mechanism-shaped.</p></article>
+        <article class="compare-card"><div class="program-kicker">Gene therapy · Lexeo</div><h3>LX2006 (AAVrh10-FXN)</h3><p><span class="ev fact">FACT</span> One-time IV AAV gene therapy aimed at FA cardiomyopathy. Interim SUNRISE-FA data (Apr 2025) reported cardiac biomarker and functional improvements and increased frataxin in cardiac biopsies — the only program with direct human cardiac target-engagement data. It targets the mortality driver Larimar cannot yet measure. Pivotal development is years behind Larimar’s BLA, but it defines the long-run standard: one-time, tissue-proven.</p></article>
+        <article class="compare-card"><div class="program-kicker">Earlier-stage field</div><h3>Expression &amp; neuroprotection approaches</h3><p>Design Therapeutics’ DT-216P2 (small molecule targeting the GAA repeat to restore endogenous FXN expression), Minoryx’s leriglitazone (PPARγ; Phase 2), Solid Biosciences’ SGT-212 (dual-route AAV), and Neurocrine/Voyager’s NBIB-223 (preclinical AAV) all attack the same deficit with different risk. None is within two years of a filing on public timelines. <span class="ev interp">INTERPRETATION</span> Larimar’s window — first disease-modifying label claim, pediatric-inclusive — is real but time-boxed.</p></article>
+      </div>
+      <div class="readthrough"><strong>The differentiation, stated clinically.</strong> Nomlabofusp is additive to Skyclarys, not mutually exclusive with it (concomitant use was permitted in the OL study), works in children down to age 2 by design (Skyclarys is ≥16), and is the only approach with a biomarker that moves by multiples rather than fractions. Its disadvantages are equally clinical: daily injections vs a daily pill, a 23% open-label anaphylaxis rate vs Skyclarys’s lab-monitoring burden, and zero randomized efficacy data vs a positive controlled trial. Prescribers will weigh exactly that list.</div>
+      <p class="source-note">Skyclarys efficacy: FDA approval reporting of MOXIe Part 2 (label-supported). Revenue: Biogen Q1/Q2 2026 reports via Quartr-summarized releases. Vatiquinone: PTC/FDA reporting via Ataxia UK research updates and trade press. LX2006: Lexeo Apr 2025 interim release.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>One asset, three value layers, no second program</h2><p class="lede">Larimar has devoted “substantially all” of its resources to nomlabofusp since inception (FY2025 10-K). Ranked by value, the company is a single binary with an age-expansion option and a platform story that currently prices at zero.</p></div></div>
+      <div class="pipeline">
+        <article class="pipe-row"><div class="pipe-rank">1</div><div><div class="pipe-name">Nomlabofusp — adults &amp; adolescents with FA (accelerated approval)</div><p class="pipe-desc">Rolling BLA in progress on the skin-FXN surrogate; safety database built to FDA’s June 2025 specification. This is ~all of the enterprise value: success converts $156M of cash and a filing into the first disease-modifying FA franchise; failure strands the platform.</p></div><div class="pipe-status">BLA MODULE 1 FILED</div></article>
+        <article class="pipe-row"><div class="pipe-rank">2</div><div><div class="pipe-name">Nomlabofusp — children 2–11 &amp; confirmatory Phase 3</div><p class="pipe-desc">Pediatric inclusion is both a label expansion and the PRV trigger. The global Phase 3 (NCT07778836; N=150; randomized, double-blind, placebo-controlled; region-specific primaries of USS subscale E and total mFARS change at Week 72; CGI-S secondary) is the accelerated-approval confirmatory obligation and the long-run full-approval asset. Registry start: Oct 26, 2026; primary completion estimated 2029.</p></div><div class="pipe-status">STARTING</div></article>
+        <article class="pipe-row"><div class="pipe-rank">3</div><div><div class="pipe-name">CPP platform — other intracellular-deficiency rare diseases</div><p class="pipe-desc">The TAT-CPP delivery platform is the stated corporate strategy for follow-on indications, but no second candidate has been nominated in the sources reviewed. Value today: optionality only; it does not support the current market cap and should not be paid for.</p></div><div class="pipe-status">UNDISCLOSED</div></article>
+      </div>
+      <p class="source-note">Pipeline structure: FY2025 10-K. Phase 3 design: ClinicalTrials.gov NCT07778836 (registry-verified).</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>The sequence that resolves the thesis</h2><p class="lede">Catalysts are tagged by date quality: <span class="date-tag hard">HARD</span> confirmed date · <span class="date-tag guidance">GUIDANCE</span> company-guided window · <span class="date-tag inferred">INFERRED</span> estimated, not committed · <span class="date-tag gap">GAP</span> no timeline · <span class="date-tag landed">LANDED</span> already occurred. As of October 20, 2026.</p></div></div>
+      <div class="timeline">
+        <article class="event"><div class="event-date">2H 2026</div><div class="event-body"><h3>Remaining rolling BLA modules submitted, incl. CMC <span class="date-tag guidance">GUIDANCE</span></h3><p>Completion converts a started submission into a filed application; the FDA filing-acceptance decision and any PDUFA clock follow from it. Watch for disclosure of the completed submission and review timeline in the Q3 report.</p></div></article>
+        <article class="event"><div class="event-date">Q3 2026 report</div><div class="event-body"><h3>Q3 2026 results (10-Q) <span class="date-tag inferred">INFERRED</span></h3><p>Expected early November by filing cadence (Q2 report landed Aug 4). Key items: cash after a heavy H1 burn ($88.6M operating cash use), Phase 3 first-patient status, BLA module progress, any new anaphylaxis cases in an expanding naïve population.</p></div></article>
+        <article class="event"><div class="event-date">Oct 26, 2026</div><div class="event-body"><h3>Confirmatory Phase 3 start (registry) <span class="date-tag guidance">GUIDANCE</span></h3><p>ClinicalTrials.gov lists NCT07778836 start as Oct 26, 2026 (estimated), after the company guided first-patient dosing for Q3 2026 in June. A confirmed first-patient-dosed announcement closes a visible slippage question; silence extends it.</p></div></article>
+        <article class="event"><div class="event-date">2027</div><div class="event-body"><h3>BLA review outcome — accelerated approval decision <span class="date-tag inferred">INFERRED</span></h3><p>No PDUFA date exists until the completed BLA is accepted for filing. Company framing has pointed to a potential mid-2027 launch if approved (secondary reporting of company guidance). Advisory committee scheduling, mid-cycle review communications, and label negotiations on anaphylaxis risk management are the telltales to track.</p></div></article>
+        <article class="event"><div class="event-date">Before decision</div><div class="event-body"><h3>Financing <span class="date-tag inferred">INFERRED</span></h3><p>Runway into Q3 2027 at planned spend, a going-concern statement, and 215M authorized shares make a pre-decision raise the base case. Timing, size, and price of that raise are a direct read on institutional conviction — Deerfield (34.3%) and Blue Owl (8.1%) participation is the signal that matters.</p></div></article>
+        <article class="event"><div class="event-date">2029</div><div class="event-body"><h3>Phase 3 Week-72 readout <span class="date-tag guidance">GUIDANCE</span></h3><p>Registry-estimated primary completion July 2029. This is the confirmatory verdict that either converts accelerated approval into a durable franchise or triggers the withdrawal pathway — the true long-duration binary behind the near-term regulatory one.</p></div></article>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Bear, base, bull — with soft price anchors</h2><p class="lede">Scenario-based soft ranges built from this dossier’s own numbers, using treasury-method share counts. These are illustrative anchors around the BLA review, not price targets or recommendations. Street context (aggregator data): consensus average ~$10.33–$11.86; highest published forecast $21 — the bull top is held below it.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear</div><div class="big">$0.80–1.10</div><p><span class="ev interp">INTERPRETATION</span> FDA refuses the surrogate at review (CRL or filing-stage rejection), demands a controlled efficacy trial Larimar cannot fund, or anaphylaxis forces a pre-approval database expansion that breaks the runway. Equity converges to residual cash net of wind-down and program salvage: $90–120M over 110.1M shares (options out of the money).</p></article>
+        <article class="scen-card base"><div class="tag">Base</div><div class="big">$6.35–8.00</div><p><span class="ev interp">INTERPRETATION</span> Accelerated approval is granted — with anaphylaxis risk-management labeling, a pediatric-inclusive indication, and the confirmatory trial as a live overhang — followed by a launch that ramps against Skyclarys rather than around it, with at least one more dilutive raise along the way. Equity value $700–900M; divisor 110.1–112.2M treasury-method shares.</p></article>
+        <article class="scen-card bull"><div class="tag">Bull</div><div class="big">$14.60–17.95</div><p><span class="ev interp">INTERPRETATION</span> Clean accelerated approval, manageable label, fast uptake as the first disease-modifying, cause-directed FA therapy across adults and children; PRV monetized; Phase 3 enrolls cleanly and de-risks conversion to full approval; platform gets its first second-indication validation. Equity value $1.7–2.1B; divisor 116.3–117.2M treasury-method shares. Top held below the $21 street high.</p></article>
+      </div>
+      <div class="assump"><h3>Method &amp; assumptions</h3><p class="method"><span class="ev fact">FACT</span> Share inputs (Q2 2026 10-Q, Jun 30, 2026): 103,882,937 common shares; 500,000 Series A preferred convertible into 5,000,000 common (Blue Owl exchange, 10:1); 11,056,215 options (WAEP $6.51 as of Dec 31, 2025 — the closest disclosed pool average; the June pool WAEP is not separately stated, a disclosed approximation); 1,028,107 unvested restricted shares; 200,000 performance shares. Treasury method: option proceeds at $6.51 repurchase shares at scenario price; the option pool adds 0 shares below $6.51, ~2.1M at $8.02, ~6.1–7.0M across the bull range. Gross fully diluted count at face: 121,167,259. Equity-value anchors are judgment inputs: bear = net-cash salvage; base = a discounted, risk-shared version of the Skyclarys revenue benchmark (~$600M+ run rate supports a low-single-digit-$B incumbent value inside Biogen, which paid $7.3B for Reata); bull = full first-mover franchise value with PRV. No DCF is presented; per-share results are equity value ÷ treasury-method divisor, iterated to consistency (arithmetic re-verified: bear $90M÷110.11M=$0.82, $120M→$1.09; base $700M→$6.36, $900M→$8.02; bull $1.7B→$14.62, $2.1B→$17.93).</p></div>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>$156M of cash, a going-concern paragraph, and a raise already authorized</h2><p class="lede">Larimar funded a BLA submission by selling stock at $3.20 (Jul 2025) and $5.00 (Feb 2026). The same filings that report $156.3M of liquidity also state substantial doubt about going-concern status — not because cash is gone, but because the planned spend (Phase 3 + launch preparation) outruns it inside twelve months.</p></div></div>
+      <div class="fin-grid">
+        <article class="metric"><div class="tag">Cash &amp; securities · Jun 30, 2026</div><div class="big">$156.3M</div><p><span class="ev fact">FACT</span> Cash and equivalents $92.7M + marketable securities $63.6M (Q2 2026 10-Q). No debt identified. Accumulated deficit $497.2M.</p></article>
+        <article class="metric"><div class="tag">Burn</div><div class="big">~$31M/qtr P&amp;L</div><p><span class="ev fact">FACT</span> Net loss Q2 2026 $32.8M; H1 2026 $62.4M (R&amp;D H1 $53.0M; G&amp;A $12.4M). Operating cash use was heavier — $88.6M in H1 2026 — including a ~$30.0M working-capital use the filing attributes mainly to decreases in prepaid and accrued expenses.</p></article>
+        <article class="metric"><div class="tag">Runway</div><div class="big">Into Q3 2027</div><p><span class="ev fact">FACT</span> Company guidance (Q2 2026 10-Q), which adds that resources are insufficient for at least one year from the filing date at planned operations and that “these conditions raise substantial doubt” about going-concern status. The raise is not optional; only its timing and price are.</p></article>
+        <article class="metric"><div class="tag">Dilution capacity</div><div class="big">215M authorized</div><p><span class="ev fact">FACT</span> Stockholders approved raising authorized common from 115M to 215M shares on May 19, 2026 — roughly 111M shares of headroom over the current count, approved before the BLA was even submitted.</p></article>
+      </div>
+      <table class="study-table cap-table"><thead><tr><th>Capital structure (Jun 30, 2026)</th><th>Shares</th><th>Note</th></tr></thead><tbody>
+        <tr><td data-label="Item">Common outstanding</td><td data-label="Shares">103,882,937</td><td data-label="Note">10-Q cover (Aug 2, 2026) confirms unchanged.</td></tr>
+        <tr><td data-label="Item">Series A preferred (Blue Owl)</td><td data-label="Shares">500,000 → 5,000,000</td><td data-label="Note">Created by exchanging 5.0M common shares (2.5M in 2025, 2.5M Jan 2026); convertible 10:1 at holder option, conversion capped by beneficial-ownership limits; ranks pari passu, votes/losses on as-converted basis.</td></tr>
+        <tr><td data-label="Item">Options</td><td data-label="Shares">11,056,215</td><td data-label="Note">WAEP $6.51 (Dec 31, 2025 pool disclosure).</td></tr>
+        <tr><td data-label="Item">Unvested restricted + performance shares</td><td data-label="Shares">1,228,107</td><td data-label="Note">1,028,107 restricted + 200,000 performance-based.</td></tr>
+        <tr><td data-label="Item">Gross fully diluted</td><td data-label="Shares">121,167,259</td><td data-label="Note">All instruments at face; treasury-method divisor used in scenarios is lower (110.1–117.2M).</td></tr>
+        <tr><td data-label="Item">At $2.44 (Oct 20, 2026)</td><td data-label="Shares">~$266M equity</td><td data-label="Note">On 108.88M economic shares (common + preferred as-converted); EV ≈ $266M − $156.3M ≈ $109M; cash ≈ $1.44 per economic share.</td></tr>
+      </tbody></table>
+      <div class="overhang"><h3>Financing history — the pattern matters</h3><p><span class="ev fact">FACT</span> Jul 2025: 21,562,500 shares at $3.20 (~$65.0M net). Feb 2026: 23,000,000 shares at $5.00 (~$107.6M net). Both underwritten deals included full greenshoe exercise — demand existed at those prices. Share count went 63.8M (Dec 2024) → 83.1M (Dec 2025) → 103.9M (Mar 2026): +63% in fifteen months. <span class="ev interp">INTERPRETATION</span> Management has consistently chosen to fund ahead of catalysts rather than after them; expect the same into the review window, at whatever price the window offers.</p></div>
+      <p class="source-note">All financials: Q2 2026 10-Q (balance sheet, equity statement, anti-dilutive table, liquidity/going-concern note) and FY2025 10-K. Preferred terms: Q2 2026 10-Q equity note. Authorized-share increase: May 19, 2026 8-K (annual meeting results).</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>A founder-CEO, a dominant specialist holder, and one director buying</h2><p class="lede">Larimar is the former Chondrial Therapeutics, taken public through the May 2020 reverse merger with Zafgen and led since then by the same physician-CEO who ran Chondrial from 2016. The register is unusually concentrated for a company this size — which cuts both ways: sophisticated sponsorship, and a register that can move as a bloc.</p></div></div>
+      <div class="people-grid">
+        <article><h3>Carole S. Ben-Maimon, M.D. — President &amp; CEO</h3><p><span class="ev fact">FACT</span> CEO since May 2020; previously CEO of Chondrial (Dec 2016–2020), the private company built around CTI-1601 with FARA-linked origins. Beneficial ownership 1,890,321 shares (1.8%), predominantly options. Track record is the program itself: IND through a primate-tox clinical hold, hold lifted in two stages, START/BTD alignment, and a rolling BLA started — a credible regulatory-execution record against a genuinely difficult asset. The open questions are commercial, and the Sept 29, 2026 appointment of John Harlow (ex-Esperion/Melinta CCO) as President &amp; COO is the company’s own acknowledgment of that gap.</p></article>
+        <article><h3>Ownership — concentrated and specialist</h3><ul class="people-list"><li><span class="ev fact">FACT</span> Deerfield Management affiliates: 35,686,474 shares (34.3%) — the controlling fact of this register; Deerfield partner Jonathan Leff sits on the board.</li><li><span class="ev fact">FACT</span> Blue Owl Capital: 8,464,663 shares (8.1%) at Dec 31, 2025, and the holder of all 500,000 Series A preferred (5.0M common-equivalent by Jan 2026) — a structured, downside-aware position, not a passive one.</li><li><span class="ev fact">FACT</span> Millennium Management: 5,206,364 shares (5.0%). Officers and directors as a group: ~4.0%.</li></ul></article>
+        <article><h3>Insider signals</h3><ul class="people-list"><li><span class="ev fact">FACT</span> Director Thomas E. Hamilton bought 50,000 shares on the open market on Jul 6, 2026 at a $3.3378 weighted average — one week after the BLA module-1 announcement — bringing his direct holding to 714,798 shares (Form 4). A small but real-money, post-catalyst buy.</li><li><span class="ev fact">FACT</span> Oct 1, 2026 Form 4 for incoming President/COO Harlow shows award grants (transaction code A) — standard inducement/appointment equity, not purchases.</li><li><span class="ev gap">GAP</span> No open-market purchases by the CEO or CFO were identified in the 2026 Form 4 record reviewed; insider conviction is expressed through the register (Deerfield/Blue Owl) rather than executive buying.</li></ul></article>
+      </div>
+      <p class="source-note">Bios and ownership: DEF 14A (Apr 20, 2026). Form 4s: EDGAR filings Jul 8, 2026 (Hamilton) and Oct 1, 2026 (Harlow). Harlow appointment: Sept 29, 2026 8-K/press release.</p>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">The first three can each independently reprice the stock before any efficacy question is reached. The rest determine what an approval would actually be worth.</p></div></div>
+      <ol class="risk-list">
+        <li><strong>Surrogate rejection at review.</strong> Skin FXN has no approval precedent; FDA’s written position is “open to considering,” with adequacy “a matter of review.” A CRL here is not a delay — it removes the only viable approval route on the current evidence.</li>
+        <li><strong>Anaphylaxis at commercial scale.</strong> 10/43 in the OL study, clustered on re-exposure, in a drug dosed daily for life from age 2. Label remedies (premedication, graded first dose, epinephrine, possible REMS) all tax uptake; a single severe outcome in a naïve commercial patient re-opens the approval itself.</li>
+        <li><strong>Financing before the decision.</strong> Going-concern doubt is stated in the Q2 2026 10-Q; runway ends ~Q3 2027, likely before or around the review outcome; 215M authorized shares stand ready. Dilution into a $2–3 stock is the base case, and it lands on a register where two holders own ~42%.</li>
+        <li><strong>Open-label evidence fragility.</strong> 21/43 discontinued; the 1-year clinical story rests on 13 participants against a matched external cohort. Any re-analysis (assay drift, matching sensitivity) moves the whole narrative because there is no controlled dataset underneath it.</li>
+        <li><strong>Confirmatory-trial execution.</strong> The Phase 3 already shows registry slippage vs June guidance (Oct 26 start vs “first patient Q3”), needs 150 patients from a ~5,000-patient US / 20,000 global pool already mined by the OL study and competitors, and reads out in 2029 — accelerated approval can be withdrawn if it stalls.</li>
+        <li><strong>Assay and CMC opacity.</strong> The pivotal biomarker is a proprietary assay; its validation package and the commercial manufacturing module are unreviewed and largely undisclosed. Biologics fail reviews on CMC more often than on biology.</li>
+        <li><strong>Commercial squeeze.</strong> Skyclarys is entrenched, oral, and growing (~$168M in Q2 2026); nomlabofusp launches — if approved — as a daily injection with hypersensitivity management into the same ~20,000-patient world, against a one-time gene-therapy narrative forming behind it.</li>
+        <li><strong>Single-asset, single-indication concentration.</strong> No second candidate is nominated. Any program-level event (safety, CMC, regulatory) is a company-level event; there is no portfolio shock absorber.</li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>The evidence that would change the view</h2><p class="lede">A deep dive should end with falsifiers, not a verdict. These are the highest-value missing pieces as of October 20, 2026.</p></div></div>
+      <div class="open-grid">
+        <article><h3>BLA completion &amp; review clock</h3><p>Submission of the remaining modules (esp. CMC), FDA acceptance, and the assigned review goal date convert this from a narrative into a dated binary. Any refuse-to-file or mid-cycle information request on the assay or safety database is decisive negative evidence.</p></article>
+        <article><h3>Anaphylaxis in naïve patients, at scale</h3><p>The 1-of-11 naïve rate vs 9-of-32 re-exposed rate is the single most decision-relevant safety split in the program. Phase 3 and continued OL enrollment will enlarge the naïve denominator; watch whether mitigation (premedication, graded dosing) holds the naïve rate near ~5–10% or whether it converges upward.</p></article>
+        <article><h3>Anti-drug antibody data</h3><p>Incidence, titers, neutralization, and correlation with hypersensitivity and FXN response are undisclosed in the sources reviewed. ADA data — likely in the BLA and any advisory-committee briefing book — would mechanistically explain (or complicate) the anaphylaxis pattern.</p></article>
+        <article><h3>Cardiac signal</h3><p>FA kills through the heart. Even exploratory echo/CMR trends (LV mass index) from the OL study would materially change the value discussion versus LX2006’s biopsy-proven cardiac engagement; continued absence keeps nomlabofusp a neurology story only.</p></article>
+        <article><h3>The raise</h3><p>Size, price, and Deerfield/Blue Owl participation in the next financing will say more about informed-holder conviction than any presentation. A strategic or royalty component would change the dilution math entirely.</p></article>
+        <article><h3>Phase 3 enrollment reality</h3><p>Site activation and first-patient dosing confirmation for NCT07778836 — plus any protocol amendments — test whether the 2029 confirmatory timeline is real. Accelerated approvals live or die on confirmatory-trial diligence.</p></article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Filings, registries, and peer-reviewed literature carry the most weight. Company claims remain labeled unverified until corroborated.</p></div></div>
+      <div class="sources">
+        <div class="source-group"><h3>SEC filings (primary)</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526115878/lrmr-20251231.htm" target="_blank" rel="noopener">FY2025 Form 10-K<small>Program history, clinical data, hold record, FDA correspondence summaries, IP</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526331529/lrmr-20260630.htm" target="_blank" rel="noopener">Q2 2026 Form 10-Q<small>Cash $156.3M, going-concern note, share count, Series A preferred terms, offering history</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526286780/lrmr-20260629.htm" target="_blank" rel="noopener">8-K · Jun 29, 2026<small>Rolling BLA module 1; Ex. 99.1 release with June 2026 OL data</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526163942/lrmr-20260416.htm" target="_blank" rel="noopener">DEF 14A · Apr 20, 2026<small>Ownership (Deerfield 34.3%, Blue Owl 8.1%), management bios</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526230852/lrmr-20260519.htm" target="_blank" rel="noopener">8-K · May 19, 2026 (meeting results)<small>Authorized shares increased 115M → 215M; record-date shares 103,882,937</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1374690/000119312526407331/lrmr-20260929.htm" target="_blank" rel="noopener">8-K · Sept 29, 2026<small>John Harlow appointed President &amp; COO</small></a>
+        </div>
+        <div class="source-group"><h3>Registries &amp; labels</h3>
+          <a href="https://clinicaltrials.gov/study/NCT07778836" target="_blank" rel="noopener">NCT07778836 · Phase 3 confirmatory<small>N=150, Week-72 USS/mFARS primaries, start Oct 26, 2026 (est.)</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06447025" target="_blank" rel="noopener">NCT06447025 · Open-label study<small>Long-term safety, FXN, clinical outcomes</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05579691" target="_blank" rel="noopener">NCT05579691 · Phase 2 dose exploration<small>19 drug / 9 placebo, completed 2023</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT04176991" target="_blank" rel="noopener">NCT04176991 / NCT04519567 · Phase 1 SAD/MAD<small>Design records for the peer-reviewed Phase 1 report</small></a>
+          <a href="https://www.drugs.com/newdrugs/fda-approves-skyclarys-omaveloxolone-friedreich-s-ataxia-5979.html" target="_blank" rel="noopener">Skyclarys approval &amp; MOXIe data<small>Placebo-adjusted mFARS −2.41, p=0.0138, Week 48</small></a>
+        </div>
+        <div class="source-group"><h3>Peer-reviewed literature</h3>
+          <a href="https://link.springer.com/article/10.1208/s12248-025-01054-5" target="_blank" rel="noopener">Nomlabofusp mechanism paper · AAPS J 2025<small>TAT-CPP fusion delivers mature, functional FXN into mitochondria; Phase 1 buccal PD</small></a>
+          <a href="https://link.springer.com/article/10.1208/s12248-025-01093-y" target="_blank" rel="noopener">De Toni et al. · AAPS J 2025<small>Nonclinical PK/PD: tissue distribution incl. DRG/heart; skin correlation; mouse survival</small></a>
+          <a href="https://visualize.jove.com/38311797" target="_blank" rel="noopener">Phase 1 SAD/MAD report<small>Safety, PK, PD of nomlabofusp in adults with FA (N=28 / N=27)</small></a>
+        </div>
+        <div class="source-group"><h3>Market &amp; trade (context)</h3>
+          <a href="https://finnhub.io/?q=%22LRMR%22" target="_blank" rel="noopener">Finnhub · LRMR snapshot<small>Oct 20, 2026 close $2.44; 52-week range $1.92–$6.42</small></a>
+          <a href="https://www.neurologylive.com/view/whats-next-ataxia-pipeline-overview-investigational-therapeutics" target="_blank" rel="noopener">NeurologyLive · ataxia pipeline overview<small>Cross-check of June 2026 OL data and program status</small></a>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/LRMR/chart/" target="_blank" rel="noopener">MarketBeat · LRMR price history &amp; targets<small>Daily closes; consensus target context (avg ~$10.33; high forecast $21)</small></a>
+        </div>
+      </div>
+      <p class="source-note">As-of date: October 20, 2026. Prices are fixed snapshots, not live quotes. Figures labeled GAP were not disclosed in the sources reviewed and were not estimated. This dossier is research, not investment advice.</p>
+    </section>
+</main>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>

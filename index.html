@@ -32,7 +32,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;paddi
 <div class="wrap">
 <header>
 <h1>Biotech Dossiers</h1>
-<p>Deep-dive research library — 30 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
+<p>Deep-dive research library — 32 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
 </header>
 <div class="controls">
 <input type="search" id="q" placeholder="Search tickers or companies…" aria-label="Search dossiers">
@@ -64,7 +64,7 @@ const D=[
 {t:"PHVS",c:"Pharvaris",d:"2026-10-16",cat:"Deucrictibant (HAE attacks) PDUFA — Apr 23, 2027 [hard]",sc:"Bear $8.30 / Base $48.60 / Bull $73.60"},
 {t:"NKTR",c:"Nektar Therapeutics",d:"2026-10-11",cat:"Rezpeg ZENITH-AD Ph3 topline — mid-2028 [guidance]",sc:"Bear $7.60 / Base $92 / Bull $185"},,
 {t:"EWTX",c:"Edgewise Therapeutics",d:"2026-10-16",cat:"EDG-7500 Ph3 initiation + Servier Becker topline — Q4 2026 [guidance]",sc:"Bear $14–19 / Base $32–42 / Bull $56–68"},
-{t:"LXEO",c:"Lexeo Therapeutics",d:"2026-10-16",cat:"LX2020 12-mo high-dose PKP2 data — Q4 2026 [guidance]",sc:"Bear $0.90–1.50 / Base $4.50–6.35 / Bull $10–13.05"},
+{t:"LXEO",c:"Lexeo Therapeutics",d:"2026-10-16",cat:"LX2020 12-mo high-dose PKP2 data — Q4 2026 [guidance]",sc:"Bear $0.90–1.50 / Base $4.50–6.35 / Bull $10–13.04"},
 {t:"ZURA",c:"Zura Bio",d:"2026-10-16",cat:"TibuSHIELD hidradenitis suppurativa topline — Q4 2026 [guidance]",sc:"Bear $0.50–1.00 / Base $4–5.50 / Bull $11–15"},
 {t:"BLSM",c:"BlossomHill Therapeutics",d:"2026-10-16",cat:"BH-30643 end-of-Phase 1 FDA meeting — Q4 2026 [guidance]",sc:"Bear $4–6 / Base $16–22 / Bull $30–40"},
 {t:"CTNM",c:"Contineum Therapeutics",d:"2026-10-16",cat:"PROPEL-IPF topline — mid/H2 2028 [guidance]",sc:"Bear $1.75–2.50 / Base $7.50–9.50 / Bull $19–25"},
@@ -74,7 +74,9 @@ const D=[
 {t:"CABA",c:"Cabaletta Bio",d:"2026-10-16",cat:"Rese-cel myositis registrational data — mid-2027 [guidance]",sc:"Bear $0.56–0.75 / Base $5.83–7.13 / Bull $12.52–15.11"},
 {t:"NAMS",c:"NewAmsterdam Pharma",d:"2026-10-16",cat:"PREVAIL outcomes interim DSMB result — Q1 2027 [guidance]",sc:"Bear $4–5.50 / Base $23–29 / Bull $45–57"},
 {t:"VIR",c:"Vir Biotechnology",d:"2026-10-16",cat:"ECLIPSE 1 HDV Ph3 topline — Q4 2026 [guidance]",sc:"Bear $3.50–5 / Base $12–16 / Bull $23–29"},
-{t:"PCVX",c:"Vaxcyte",d:"2026-10-16",cat:"OPUS-2/OPUS-3 + infant Ph2 toplines — 1H 2027 [guidance]",sc:"Bear $12–15 / Base $58–70 / Bull $100–115"}
+{t:"PCVX",c:"Vaxcyte",d:"2026-10-16",cat:"OPUS-2/OPUS-3 + infant Ph2 toplines — 1H 2027 [guidance]",sc:"Bear $12–15 / Base $58–70 / Bull $100–115"},
+{t:"RAPP",c:"Rapport Therapeutics",d:"2026-10-20",cat:"RAP-219 FDA EOP2 meeting — 1Q 2027 [guidance]",sc:"Bear $10–14 / Base $30–38 / Bull $58–72"},
+{t:"LRMR",c:"Larimar Therapeutics",d:"2026-10-20",cat:"Nomlabofusp rolling BLA remaining modules — 2H 2026 [guidance]",sc:"Bear $0.80–1.10 / Base $6.35–8.00 / Bull $14.60–17.95"}
 ];
 const grid=document.getElementById('grid'),q=document.getElementById('q');
 function render(f=""){

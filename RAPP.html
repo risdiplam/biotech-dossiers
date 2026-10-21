@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>RAPP — Rapport Therapeutics · Deep-Dive Dossier · 2026-10-20</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · RAPP</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>It hit. The argument is over how much a 3.1-point hit is worth.</h1>
+        <p class="hero-dek">A source-weighted adjudication of Rapport's October 20, 2026 Phase 2 bipolar mania readout for RAP-219 — a prespecified statistical win (YMRS −3.1 points vs placebo, p=0.045) that the market, after an +84% premarket spike, chose to price as the low end of competitive. The epilepsy Phase 3 program, not mania, still carries most of the value.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$29.37</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub / MarketBeat)</div>
+        <div class="quote-meta"><strong>~$972M</strong> est. enterprise value · <strong>~$9.09</strong> cash per share<br>$1.41B market cap (47.96M shares) · $436.1M cash &amp; short-term investments (Jun 30, 2026)</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#readout">The Readout</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>A real hit, a thin margin, and a valuation that was never really about mania alone</h2><p class="lede">Rapport Therapeutics (Nasdaq: RAPP; CIK 0002012593; Delaware; HQ Boston, MA) is a clinical-stage precision-neuroscience company built on receptor-associated protein (RAP) biology. Its lead asset, RAP-219 — a TARPγ8-selective AMPA-receptor negative allosteric modulator in-licensed from Janssen (as JNJ-64300912) — is simultaneously in Phase 3 for focal onset seizures (FOS), freshly Phase 2-positive in bipolar mania, and headed for Phase 3 in primary generalized tonic-clonic seizures (PGTCS). On October 20, 2026 the mania trial met its primary and secondary endpoints. The stock's premarket spike into the $50s fully round-tripped within the session. This dossier adjudicates the dispute with the disclosed numbers.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$972M</div><p><span class="ev interp">INTERPRETATION</span> Oct 20 close $29.37 × 47.96M shares (Jun 30, 2026) = ~$1.41B market cap, less $436.1M cash &amp; short-term investments; no debt identified in the Q2 2026 10-Q. See §10.</p></article>
+        <article class="decision"><div class="tag">Cash per share</div><div class="big">~$9.09</div><p><span class="ev fact">FACT</span> $436.1M ÷ 47.96M shares. Runway guided into 2H 2029 — past the FOS Phase 3 program. Cash is a cushion, not a floor: H1 2026 operating cash use was $54.5M and rising trial spend lies ahead.</p></article>
+        <article class="decision warn"><div class="tag">The disputed readout</div><div class="big">−3.1 pts, p=0.045</div><p><span class="ev fact">FACT</span> Phase 2 bipolar mania (N=253): LS-mean YMRS improvement −15.4 on RAP-219 0.75 mg vs −12.3 on placebo at Week 3. Statistically significant; at the low end of the ~3–4-point range analysts call competitive for approved antimanic agents.</p></article>
+        <article class="decision"><div class="tag">Single swing factor</div><div class="big">FOS Phase 3</div><p><span class="ev interp">INTERPRETATION</span> Two pivotal FOS trials (FOCUS 1/2, ~645 patients planned) are the value engine. Mania is now a genuine second indication, but its Phase 3 does not start until 2H 2027 and must first survive a dose question the Phase 2 did not answer.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What the "it hit" camp has right</h3><ul>
+          <li>The primary endpoint was prespecified and met (p=0.045), and the prespecified secondary (CGI-BP mania severity, −0.4, p=0.024) hit too — two aligned wins, not one cherry-picked scale.</li>
+          <li>All 11 YMRS items moved in the drug's favor; the four nominally significant items (irritability, thought content, disruptive-aggressive behavior, sexual interest) are core mania symptoms, not filler items.</li>
+          <li>Separation was still widening at Week 3 (−0.9 → −2.2 → −3.1), at a single 0.75 mg dose that sits <em>below</em> the 1.25 mg regimen used in epilepsy — with no akathisia, no EPS, no orthostatic hypotension reported and somnolence below placebo (0.8% vs 3.1%).</li>
+          <li>Stifel — the most quoted skeptic on the day — still called it a "clear positive" against low expectations and said safety "actually looks pretty good." H.C. Wainwright <em>raised</em> its target to $66 from $40 after the print.</li>
+        </ul></article>
+        <article class="thesis-card"><h3>What the "mediocre" camp has right</h3><ul>
+          <li>p=0.045 is a near-boundary result in a trial where 24.6% of the drug arm discontinued treatment (vs 11.8% on placebo) and the estimate rests on a missing-at-random model — sensitivity analyses are not yet public.</li>
+          <li>The placebo arm improved −12.3 points (a ~34% drop from baseline), and the drug's 3.1-point delta is at the low end of the historical antimanic range (§05) — below the ~4.9-point pooled monotherapy average in the asenapine-era meta-analysis.</li>
+          <li>The company disclosed no responder (≥50% YMRS reduction) or remission rates — the numbers clinicians usually anchor on, and the numbers sponsors usually lead with when they are strong.</li>
+          <li>All-cause discontinuation ran 2:1 against the drug, driven by consent withdrawal (16.7% vs 4.7%). In a 21-day inpatient trial, patients voting with their feet is itself tolerability-relevant information, whatever the AE table says.</li>
+        </ul></article>
+      </div>
+      <p><span class="ev interp">INTERPRETATION — dossier verdict:</span> The readout is best read as <strong>proof of mechanism at a probably submaximal dose, not proof of a competitive product</strong>. It converts mania from a free option into a real, financeable Phase 3 program, and it validates TARPγ8 pharmacology in a second, placebo-controlled setting — which also de-risks the epilepsy thesis modestly. It does not yet show an antimanic effect that would win share from $0.10 generic atypicals on efficacy; the commercial case would have to be won on tolerability and adherence. Whether the October 20 price (~$972M EV) over- or under-pays for that package depends mostly on FOS Phase 3 — see §09 scenarios.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Anatomy of a round trip: +84% premarket, +2.7% by the close</h2><p class="lede">The popular retelling — "stock fell from the $50s to $28–30 on the news" — compresses two different moves. The $50s print existed only in premarket trading on readout morning. The regular-session prior close was $28.60, after a month-long slide from ~$41 that had already de-rated the name into the print.</p></div></div>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>Anchor</th><th>Price</th><th>Market cap (47.96M sh)</th><th>Est. EV (less $436.1M cash)</th><th>Source</th></tr></thead><tbody>
+        <tr><td data-label="Anchor">Sep 22, 2026 close (recent local high)</td><td data-label="Price">$41.47</td><td data-label="Mcap">~$1.99B</td><td data-label="EV">~$1.55B</td><td data-label="Source">MarketBeat price history</td></tr>
+        <tr><td data-label="Anchor">Oct 19, 2026 close (pre-readout)</td><td data-label="Price">$28.60</td><td data-label="Mcap">~$1.37B</td><td data-label="EV">~$935M</td><td data-label="Source">Finnhub / MarketBeat</td></tr>
+        <tr><td data-label="Anchor">Oct 20 premarket peak (+84% per Barron's)</td><td data-label="Price">~$52.6</td><td data-label="Mcap">~$2.52B</td><td data-label="EV">~$2.09B</td><td data-label="Source">Barron's (premarket move); price derived</td></tr>
+        <tr><td data-label="Anchor">Oct 20, 2026 session (O/H/L/C)</td><td data-label="Price">30.33 / 31.31 / 26.73 / 29.37</td><td data-label="Mcap">~$1.41B at close</td><td data-label="EV">~$972M at close</td><td data-label="Source">Finnhub / MarketBeat</td></tr>
+        <tr><td data-label="Anchor">52-week range</td><td data-label="Price">$23.75 – $52.93</td><td data-label="Mcap">—</td><td data-label="EV">—</td><td data-label="Source">Finnhub</td></tr>
+      </tbody></table></div>
+      <ul>
+        <li><span class="ev fact">FACT</span> Oct 20 volume was ~8.20M shares vs 0.30M on Oct 19 — roughly 27× the prior session and far above the ~0.3–0.6M/day typical of September–October. The day's range ($26.73–$31.31) entirely retraced the premarket spike; the close was +2.69% on the day, −29% from Sep 22, and −44% from the premarket peak. After-hours prints (~$28.37 at 7:08 p.m. ET, stockanalysis.com) drifted lower still.</li>
+        <li><span class="ev interp">INTERPRETATION</span> This was not a "sell the miss" tape; the trial hit. It was a "sell the magnitude" tape: fast money bought the headline premarket, then the p=0.045 / 3.1-point details — and Stifel's "just hits" framing — set the regular-session price. The pre-readout month (-26% Sep 22 → Oct 19) also means positioning into the print was already light; expectations, per Stifel, were low.</li>
+        <li><span class="ev fact">FACT</span> Analyst map around the print (stockanalysis.com / TheFly, as of Oct 20, 2026): H.C. Wainwright (Tsao) raised PT $40 → <strong>$66</strong>, Buy, calling efficacy "consistent but modest" with higher dosing/longer treatment a potential enhancer; Wells Fargo (Burnett) maintained <strong>$51</strong>, Buy — "efficacy looks good, flags some questions on safety" (TheFly headline); Wolfe Research initiated <strong>$50</strong> (Oct 15); Guggenheim initiated <strong>$65</strong> (Oct 5); BTIG maintained <strong>$75</strong> (Oct 2); Goldman Sachs maintained <strong>$62</strong> (Sep 23). Aggregator consensus average ≈ $64 (WallStreetZen, pre-readout reference). Jefferies (Tsai), via Barron's, models multi-billion-dollar peak sales for RAP-219.</li>
+        <li><span class="ev fact">FACT</span> Trade-press framing was genuinely split: BioSpace's headline was "Rapport ekes out bipolar mania win as lead asset 'just hits' in mid-stage trial," quoting Stifel that the 3.1-point effect "just met statistical significance (p=0.045) and was on the lower-end of the range that's considered competitive with available drugs today (3–4 pts)" — while also quoting Stifel that safety "actually looks pretty good." Barron's led with the blockbuster framing and the premarket spike.</li>
+      </ul>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>TARPγ8: selling anatomical precision in a pathway famous for blunt instruments</h2><p class="lede">Plain version first, then the technical case — and the specific ways the precision story can fail.</p></div></div>
+      <h3>The plain-English version</h3>
+      <p>Glutamate is the brain's main "go" signal, and most fast go-signaling runs through one receptor family: AMPA receptors. Drugs that turn down AMPA signaling work — perampanel (Fycompa), a broad AMPA blocker, is an approved epilepsy drug — but because AMPA receptors are everywhere, turning them down everywhere causes dizziness, unsteadiness, sedation and behavioral effects. RAP-219 tries to turn down AMPA signaling <em>only where a specific helper protein, TARPγ8, is present</em>. TARPγ8 lives mostly in the hippocampus, neocortex and amygdala — regions where focal seizures start and that sit inside the mood circuits implicated in mania — and is largely absent from the hindbrain, where many dose-limiting effects are generated. Same pathway, narrower address.</p>
+      <h3>The technical case</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> RAP-219 is a selective negative allosteric modulator (NAM) of TARPγ8-containing AMPA receptors. TARPs (transmembrane AMPAR regulatory proteins) control AMPAR trafficking, localization and gating; γ8 is the dominant TARP in hippocampal/neocortical principal neurons. The molecule originated at Janssen as JNJ-64300912 and was licensed to Rapport in August 2022; Rapport's scientific founder David Bredt (ex-Global Head of Neuroscience Discovery, Janssen) pioneered RAP targeting there. [R5][R13]</li>
+        <li><span class="ev fact">FACT</span> Human PET work with a companion radiotracer confirmed γ8 distribution and receptor occupancy (RO): the 10-K cites predicted therapeutic exposure of ~2 ng/mL (≈50% RO) to ~3.5 ng/mL (≈70% RO), with once-daily dosing able to meet/exceed those levels and low CYP-mediated drug-interaction risk in Phase 1. A Phase 1 PET abstract (AES) dosed healthy volunteers at 0.25–1.25 mg QD in RO cohorts. [R5][R14]</li>
+        <li><span class="ev fact">FACT</span> Preclinical proof: Matta et al. (Epilepsia, 2026) showed selective TARPγ8 NAMs (RAP-219 and analog RTX-1738) produced dose-dependent antiseizure effects in corneal-kindling and PTZ models, maintained over 7 days of dosing, at exposures that did not impair motor function (rotarod) — the preclinical basis for a wide therapeutic index claim. [R15]</li>
+        <li><span class="ev fact">FACT</span> The mania rationale is glutamatergic: manic states show elevated cortical glutamate/glutamine and cortico-limbic hypermetabolism (Brooks 2010; Yüksel &amp; Öngür 2010; Gigante 2012, as cited in the company's Oct 20 deck), and lithium, valproate and lamotrigine each attenuate glutamatergic transmission in part. No dedicated antimanic drug has been developed against this biology before; every approved acute-mania agent works primarily through dopamine D2 blockade or ion-channel/mood-stabilizer pharmacology. [R16]</li>
+      </ul>
+      <h3>Why it might fail</h3>
+      <ul>
+        <li><span class="ev interp">INTERPRETATION</span> <strong>γ8 may be the right address for seizures and only an approximate one for mania.</strong> Mania circuitry (ventral striatum, prefrontal-limbic loops) is broader than the hippocampal/neocortical γ8 map. A partial-circuit drug can produce a real but capped effect — which is one coherent reading of a 3.1-point delta that was still rising at Week 3.</li>
+        <li><span class="ev interp">INTERPRETATION</span> <strong>Exposure-response is unproven in mania.</strong> The mania trial tested one maintenance dose (0.75 mg) — below the 1.25 mg epilepsy maintenance dose — with two titration speeds pooled. There is no mania dose-response curve. The company's Phase 3 fix (1.25 mg, modeled to reach RO thresholds faster and higher by Day 21) is a hypothesis, not a result.</li>
+        <li><span class="ev fact">FACT</span> <strong>The class carries a behavioral shadow.</strong> Perampanel's US label carries a boxed warning for serious psychiatric and behavioral reactions (including aggression/hostility), and broad AMPAR antagonism is associated with dizziness/ataxia. In the mania trial, agitation was the most common TEAE on RAP-219 (16.7% vs 9.4%) — mostly week 1, median 2 days, investigator-judged unrelated in &gt;80% — but in a mania population an activation-type signal is exactly what a Phase 3 (and an FDA reviewer) will interrogate hardest. [R1][R17]</li>
+        <li><span class="ev interp">INTERPRETATION</span> <strong>Precision cuts both ways commercially.</strong> If efficacy tops out a point below the best D2 agents, the product must win on tolerability/adherence — a claim that requires long-term, real-world-style data Rapport will not have for years, in a market where the incumbents are cheap generics.</li>
+      </ul>
+    </section>
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>The trial inventory — one placebo-controlled hit, one single-arm biomarker win, two pivotals running</h2><p class="lede">Everything RAP-219 has done in humans, with designs and analysis sets stated exactly. Two results anchor the story: the single-arm RNS Phase 2a in focal epilepsy (Sep 2025) and the randomized Phase 2 in mania (Oct 2026).</p></div></div>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>Program / trial</th><th>Design</th><th>N</th><th>Status / key dates</th></tr></thead><tbody>
+        <tr><td data-label="Trial">Phase 1 SAD / MAD / MAD-2 / PET (healthy volunteers)</td><td data-label="Design">Dose escalation; PET receptor-occupancy with companion tracer; food-effect and DDI assessment</td><td data-label="N">—</td><td data-label="Status">Completed. QD dosing reaches/exceeds predicted therapeutic exposure (~2–3.5 ng/mL; 50–70% RO); low CYP DDI risk. Part 1 MAD TEAEs at 2–3 mg incl. sinus tachycardia 16.7%, anxiety/amnesia 13.3% each — doses above the clinical range. [R5]</td></tr>
+        <tr><td data-label="Trial">Phase 2a FOS proof-of-concept (NCT06377930)</td><td data-label="Design">Single-arm, open-label; drug-resistant FOS patients with implanted NeuroPace RNS systems; 0.75 mg × 5 days → 1.25 mg QD, 8 weeks; primary = RNS long-episode (LE) biomarker vs baseline</td><td data-label="N">30 enrolled/dosed; mITT N=27</td><td data-label="Status">Completed Sep 2025; topline Sep 2025, post-hoc Dec 2025. See detail below.</td></tr>
+        <tr><td data-label="Trial">Phase 2 bipolar mania (NCT07046494)</td><td data-label="Design">Randomized, double-blind, placebo-controlled, quadruple-masked; inpatient; RAP-219 0.75 mg QD (2- or 4-day titration, pooled) vs placebo, 3 weeks; primary = YMRS change at Week 3 (MMRM)</td><td data-label="N">253 randomized/dosed (126 drug / 127 placebo)</td><td data-label="Status">Topline Oct 20, 2026 — §05. Primary completion Aug 5, 2026 (registry).</td></tr>
+        <tr><td data-label="Trial">FOCUS 1 — Phase 3 FOS (NCT07563881)</td><td data-label="Design">Randomized, double-blind, placebo-controlled; high-dose and medium-dose RAP-219 vs placebo (adjunctive); primary = median % change in seizure frequency at Week 14</td><td data-label="N">~333 planned</td><td data-label="Status">Recruiting; started Jun 5, 2026. Registry primary-completion estimate Jul 2029. Exact mg doses not stated in registry. [R9]</td></tr>
+        <tr><td data-label="Trial">FOCUS 2 — Phase 3 FOS (NCT07594119)</td><td data-label="Design">Same framework; medium-dose and low-dose arms vs placebo; primary = median % change in seizure frequency at Week 14</td><td data-label="N">~312 planned</td><td data-label="Status">Recruiting; registry start Sep 2026 (est.). Registry primary-completion estimate Jul 2029. [R10]</td></tr>
+        <tr><td data-label="Trial">Open-label long-term safety, FOS (NCT07219407)</td><td data-label="Design">Single-arm extension for Phase 2a participants; safety primary; up to ~112 weeks</td><td data-label="N">~30</td><td data-label="Status">Recruiting since Dec 15, 2025. Initial data expected Q4 2026. [R11]</td></tr>
+        <tr><td data-label="Trial">Phase 3 PGTCS</td><td data-label="Design">Not yet registered at dossier date</td><td data-label="N">—</td><td data-label="Status"><span class="ev unverified">UNVERIFIED</span> Company: initiation expected 1H 2027.</td></tr>
+        <tr><td data-label="Trial">RAP-219 long-acting injectable, Phase 1 PK</td><td data-label="Design">Formulation PK study in development</td><td data-label="N">—</td><td data-label="Status"><span class="ev unverified">UNVERIFIED</span> Company: PK data expected 3Q 2027.</td></tr>
+        <tr><td data-label="Trial">RAP-641 (α6β4 nAChR agonist), Phase 1</td><td data-label="Design">First-in-human; chronic pain / migraine target</td><td data-label="N">—</td><td data-label="Status"><span class="ev unverified">UNVERIFIED</span> Company: IND-enabling underway; preliminary Phase 1 results expected 2H 2027.</td></tr>
+      </tbody></table></div>
+      <h3>Phase 2a focal epilepsy (the first proof) — read with its design caveat attached</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> Results over the 8-week treatment period (10-K): ≥30% LE reduction in <strong>85.2%</strong> (p&lt;0.0001 vs baseline); median LE reduction <strong>71.0%</strong> (p=0.0001); ≥50% clinical-seizure responder rate <strong>72.0%</strong> (mITT-CS N=25; p&lt;0.0001); seizure freedom <strong>24.0%</strong>; median clinical-seizure reduction <strong>77.8%</strong> (p=0.01). 26/30 (86.7%) completed dosing; 3 (10.0%) discontinued for AEs. [R5]</li>
+        <li><span class="ev interp">INTERPRETATION</span> These are large numbers against a hard endpoint (device-recorded electrographic long episodes), in genuinely drug-resistant patients, on stable background ASMs. But the trial is <strong>single-arm against baseline</strong> — no placebo group — in 30 highly selected RNS-implanted patients. Regression to the mean, expectancy and diary effects cannot be excluded by design; that is precisely what FOCUS 1/2 (placebo-controlled, n≈645 combined) exist to resolve. FDA's Dec 2025 end-of-Phase 2 feedback supported advancing to the two pivotals. [R5]</li>
+      </ul>
+      <h3>Regulatory state</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> FOS: FDA end-of-Phase 2 feedback (Dec 2025) supported two Phase 3 trials; both are enrolling. Mania: the Phase 2 was executed under an IND with a modified statistical analysis plan and increased enrollment during the trial — the Q2 2026 10-Q states this was done so the trial could "potentially be considered as confirmatory evidence of effectiveness"; the company nonetheless plans an end-of-Phase 2 meeting in 1Q 2027 and <em>two</em> Phase 3 mania trials from 2H 2027. Whether FDA treats the Phase 2 as supportive-only or as part of the confirmatory package is an open, value-relevant question for that meeting. [R4][R1]</li>
+        <li><span class="ev fact">FACT</span> China: Tenacia holds exclusive RAP-219 rights for mainland China/Hong Kong/Macau/Taiwan (Mar 2026 license; §10) and is obligated to run the territory portion of global FOS and mania trials. [R4]</li>
+      </ul>
+    </section>
+
+    <section id="readout">
+      <div class="section-head"><div class="section-num">05 / THE READOUT</div><div><h2>October 20, 2026: the numbers, exactly as disclosed — then the two cases</h2><p class="lede">Source: Oct 20, 2026 press release (8-K Exhibit 99.1) and investor deck (Exhibit 99.2), accession 0001193125-26-425647. Safety data are as of an interim database lock (Sep 16, 2026); 8-week post-treatment safety follow-up is not yet reported.</p></div></div>
+      <h3>Design</h3>
+      <p><span class="ev fact">FACT</span> Randomized, double-blind, placebo-controlled, US, inpatient. 253 adults with bipolar I disorder in an acute manic episode (YMRS ≥25 at screening/baseline; with/without psychotic features — ~40% had psychotic features; ~3% mixed features), washed out of bipolar medications and anxiolytics/hypnotics (protocol-dosed lorazepam rescue permitted, recorded as an AE). RAP-219 0.75 mg once daily after a 2- or 4-day titration (titration arms pooled for efficacy) vs placebo, 21 days. Baseline YMRS: 36.9 (drug) vs 35.8 (placebo). Primary: LS-mean change in YMRS total score at Week 3, MMRM (treatment, visit, treatment×visit, psychotic-symptom stratification, baseline YMRS covariate), full analysis set = all 253 dosed. Prespecified secondary: CGI-BP mania severity change at Week 3. [R1][R2]</p>
+      <h3>Efficacy — the trajectory matters</h3>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>Measure</th><th>Week 1</th><th>Week 2</th><th>Week 3</th></tr></thead><tbody>
+        <tr><td data-label="Measure">YMRS LS-mean change, RAP-219</td><td data-label="Week 1">−7.0</td><td data-label="Week 2">−11.8</td><td data-label="Week 3"><strong>−15.4</strong></td></tr>
+        <tr><td data-label="Measure">YMRS LS-mean change, placebo</td><td data-label="Week 1">−6.2</td><td data-label="Week 2">−9.6</td><td data-label="Week 3"><strong>−12.3</strong></td></tr>
+        <tr><td data-label="Measure">Placebo-adjusted difference</td><td data-label="Week 1">−0.9</td><td data-label="Week 2">−2.2</td><td data-label="Week 3"><strong>−3.1 (p=0.045)</strong></td></tr>
+        <tr><td data-label="Measure">CGI-BP mania severity, LS-mean change (drug / placebo)</td><td data-label="Week 1">−0.6 / −0.5</td><td data-label="Week 2">−1.0 / −0.8</td><td data-label="Week 3"><strong>−1.6 / −1.2 → −0.4 (p=0.024)</strong></td></tr>
+      </tbody></table></div>
+      <ul>
+        <li><span class="ev fact">FACT</span> All 11 YMRS items numerically favored RAP-219 at Week 3; irritability, thought content, disruptive-aggressive behavior and sexual interest reached nominal significance (prespecified exploratory analysis, no multiplicity adjustment). [R1][R2]</li>
+        <li><span class="ev gap">GAP</span> <strong>Not disclosed:</strong> ≥50% responder rates, remission rates (e.g., YMRS ≤12), LS-mean confidence intervals, lorazepam rescue use by arm, per-titration-arm results, and any sensitivity/tipping-point analyses for the missing data. The 8-week follow-up (durability/withdrawal) data are pending a future conference.</li>
+      </ul>
+      <h3>Disposition — the table the headline skipped</h3>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>Disposition (treatment period)</th><th>RAP-219 (N=126)</th><th>Placebo (N=127)</th></tr></thead><tbody>
+        <tr><td data-label="Item">Completed 21-day treatment</td><td data-label="RAP-219">95 (75.4%)</td><td data-label="Placebo">112 (88.2%)</td></tr>
+        <tr><td data-label="Item">Discontinued treatment, all causes</td><td data-label="RAP-219"><strong>31 (24.6%)</strong></td><td data-label="Placebo"><strong>15 (11.8%)</strong></td></tr>
+        <tr><td data-label="Item">— Withdrawal of consent</td><td data-label="RAP-219">21 (16.7%)</td><td data-label="Placebo">6 (4.7%)</td></tr>
+        <tr><td data-label="Item">— Adverse event</td><td data-label="RAP-219">4 (3.2%)</td><td data-label="Placebo">1 (0.8%)</td></tr>
+        <tr><td data-label="Item">— Protocol non-compliance / other</td><td data-label="RAP-219">4 (3.2%) / 2 (1.6%)</td><td data-label="Placebo">2 (1.6%) / 5 (3.9%)</td></tr>
+        <tr><td data-label="Item">— Lack of efficacy</td><td data-label="RAP-219">0</td><td data-label="Placebo">1 (0.8%)</td></tr>
+      </tbody></table></div>
+      <p><span class="ev fact">FACT</span> Deck footnotes attribute consent withdrawals to personal/subject-decision reasons (7 drug / 2 placebo), family reasons (6/3), wanting to leave the inpatient unit (5/0), and worsening symptoms or wanting care elsewhere (3/1). AE-led discontinuations on drug: agitation/anxiety (1, possibly related); shingles, ankle sprain, suicidal ideation (1 each, judged not related). One placebo patient reported suicidal ideation without discontinuing. [R2]</p>
+      <h3>Safety — what was and wasn't there</h3>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>TEAE (treatment period)</th><th>RAP-219 (N=126)</th><th>Placebo (N=127)</th></tr></thead><tbody>
+        <tr><td data-label="Item">Any TEAE</td><td data-label="RAP-219">51.6%</td><td data-label="Placebo">52.8%</td></tr>
+        <tr><td data-label="Item">Any psychiatric TEAE</td><td data-label="RAP-219">34.9%</td><td data-label="Placebo">33.1%</td></tr>
+        <tr><td data-label="Item">Severe TEAEs / SAEs</td><td data-label="RAP-219">0 / 0</td><td data-label="Placebo">0 / 0</td></tr>
+        <tr><td data-label="Item">Agitation</td><td data-label="RAP-219">16.7% (related 3.2%)</td><td data-label="Placebo">9.4% (related 1.6%)</td></tr>
+        <tr><td data-label="Item">Insomnia</td><td data-label="RAP-219">14.3%</td><td data-label="Placebo">15.0%</td></tr>
+        <tr><td data-label="Item">Restlessness / anxiety</td><td data-label="RAP-219">8.7% / 7.1%</td><td data-label="Placebo">7.9% / 5.5%</td></tr>
+        <tr><td data-label="Item">Headache / nausea</td><td data-label="RAP-219">5.6% / 5.6%</td><td data-label="Placebo">10.2% / 1.6%</td></tr>
+        <tr><td data-label="Item">Somnolence</td><td data-label="RAP-219">0.8%</td><td data-label="Placebo">3.1%</td></tr>
+        <tr><td data-label="Item">Akathisia / EPS / orthostatic hypotension</td><td data-label="RAP-219">Not reported</td><td data-label="Placebo">Not reported</td></tr>
+      </tbody></table></div>
+      <p><span class="ev fact">FACT</span> All TEAEs were mild or moderate. Nausea was the only common TEAE at ≥2× the placebo rate. Agitation clustered in Week 1 with a median duration of 2 days in both arms. No weight, metabolic, prolactin, ECG or laboratory signals were reported in the topline materials — a genuine differentiator if it holds, and an absence-of-data point until the full dataset is presented. [R1][R2]</p>
+      <h3>The benchmark the market used (cross-trial, with caveats — not head-to-head)</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> Yildiz et al.'s meta-analysis of 38 acute-mania RCTs (10,800 patients): pooled antimanic effect Hedges g = 0.42 (95% CI 0.36–0.48); most approved agents sit at g ≈ 0.26–0.46; pooled responder rates 48% drug vs 31% placebo (NNT ≈ 6). [R18]</li>
+        <li><span class="ev fact">FACT</span> In the asenapine meta-analysis, the pooled placebo-adjusted YMRS improvement for atypical-antipsychotic monotherapy comparators was ~4.9 points (95% CI 3.8–6.0); asenapine itself ~4.5. Cochrane's aripiprazole analysis: −3.66 points vs placebo at 3 weeks. Stifel's Oct 20 framing — "the range that's considered competitive with available drugs today (3–4 pts)" — matches this literature. [R19][R20]</li>
+        <li><span class="ev interp">INTERPRETATION</span> RAP-219's 3.1 points, converted at a typical mania-trial change-score SD of ~10–11, is a standardized effect of ~0.28–0.31 — the low end of the approved-agent distribution, below its pooled mean. Caveats that cut the other way: RAP-219's placebo arm improved an unusually large −12.3 points (inpatient milieu + rescue lorazepam + a 36-point baseline), which compresses any delta; cross-trial comparisons mix eras, baselines (~36 here is severe), designs and rescue rules, and are not evidence of inferiority in a head-to-head sense. They are, however, the comparison set prescribers and payers will use.</li>
+      </ul>
+      <h3>The adjudication</h3>
+      <p><span class="ev interp">INTERPRETATION</span> <strong>"It hit" is true and "mediocre" is also defensible — they are answers to different questions.</strong> As a proof-of-concept experiment, the trial did its job: a novel, non-dopaminergic mechanism produced a statistically significant, internally consistent (primary + secondary + all 11 items + still-widening trajectory) antimanic effect with a tolerability profile no D2 agent can match on paper. As a product preview, it showed the low end of the competitive efficacy range, at a sub-epilepsy dose, with a fragile p-value, a 2:1 all-cause discontinuation imbalance the AE table doesn't capture, and no responder analysis disclosed. The Phase 3 program the company outlined on the day — 1.25 mg dosing to reach receptor-occupancy thresholds faster, ex-US sites with historically cleaner neuropsych signal, protocol optimization — is a coherent attempt to widen the delta, and an implicit concession that 3.1 points at 0.75 mg is not the intended final number. What Phase 3 must show to settle the argument: (1) a placebo-adjusted YMRS delta ≥4 points at the higher dose with p comfortably below 0.05 in at least one of two trials; (2) disclosed responder/remission rates in line with the ~48%/31% historical frame; (3) all-cause discontinuation at parity with placebo; (4) the agitation signal resolved as dose/titration-manageable rather than mechanistic. Until then, mania is a credible option, not a priced asset.</p>
+    </section>
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Differentiation is a tolerability argument in mania, an efficacy argument in epilepsy</h2><p class="lede">RAP-219 will not be sold against placebo. In mania it faces generic dopamine blockers that work fast and cost little, with liabilities patients hate. In focal epilepsy it faces a crowded ASM shelf — including the one approved drug that shares its pathway.</p></div></div>
+      <h3>Acute bipolar mania</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> Approved antimanic agents (atypical antipsychotics — olanzapine, quetiapine, risperidone, aripiprazole, ziprasidone, asenapine, cariprazine; plus lithium, valproate, carbamazepine) deliver pooled placebo-adjusted YMRS effects in the ~3–5-point band (§05). Their class liabilities are the differentiation surface: EPS/akathisia (most D2 agents; aripiprazole akathisia is label-prominent), weight gain and metabolic effects (olanzapine, quetiapine worst-in-class), sedation/somnolence, prolactin elevation (risperidone/paliperidone), QT effects (ziprasidone), and for lithium/valproate/carbamazepine: blood-level monitoring, renal/thyroid toxicity, teratogenicity and drug interactions. [R18][R19][R20]</li>
+        <li><span class="ev interp">INTERPRETATION</span> RAP-219's Week-3 snapshot — no EPS/akathisia/orthostasis, somnolence below placebo, no reported weight/metabolic signal, no monitoring, once-daily oral — is exactly the profile that could win <em>maintenance-adjacent</em> acute use and psychiatrist mindshare, if Phase 3 efficacy lands ≥4 points. At 3.1 points with generic risperidone/olanzapine available, the tolerability case alone is a hard sell to payers. Note also what RAP-219 is not competing with in mania: xanomeline-trospium (Cobenfy) and lumateperone (Caplyta) are not approved for acute mania; the "first new mechanism in decades" framing is about mania specifically and is fair on the approved-label record.</li>
+      </ul>
+      <h3>Focal onset seizures</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> Perampanel (Fycompa) — the approved non-selective AMPAR NAM — sets the pathway benchmark. In its pivotal adjunctive FOS trials, median seizure-frequency change was −23.3% (4 mg) and −30.8% (8 mg) vs −10.7% placebo (Study 306), with 50% responder rates of 28.5%/34.9% vs 17.9%; pooled 8 mg: −28.8% median change, 35.3% responders vs −12.8%/19.3% placebo. Its label carries a boxed warning for serious psychiatric/behavioral reactions, and dizziness/somnolence/ataxia drive discontinuation (long-term extension withdrawal for TEAEs ~20%). This is the tolerability bar RAP-219's γ8 selectivity is designed to clear — FOCUS 1/2 use the same registrational yardstick (median % change at Week 14; 50% responder secondary). [R17][R9][R10]</li>
+        <li><span class="ev fact">FACT</span> The wider FOS shelf includes cenobamate (high seizure-freedom rates in drug-resistant patients, DRESS warning and slow titration), brivaracetam/levetiracetam (behavioral AEs), lacosamide, eslicarbazepine, and a deep generic base — plus device therapy (RNS, DBS, VNS) in the drug-resistant segment Rapport targets first. Differentiation claimed for RAP-219: once-daily low-milligram dosing, no titration burden of cenobamate's kind, low DDI risk in a polypharmacy population, and — if the Ph2a signal is real at all — effect sizes above the perampanel band. None of that is established against a placebo yet.</li>
+      </ul>
+      <h3>PGTCS</h3>
+      <p><span class="ev fact">FACT</span> Perampanel is also approved for PGTCS (adjunctive), as are lamotrigine, levetiracetam and topiramate; the segment is smaller than FOS but less crowded at the novel-mechanism end. Rapport's Phase 3 start (guided 1H 2027) extends the same molecule into generalized epilepsy — a label-breadth play that matters for ASM adoption, since clinicians prefer agents covering both seizure types.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>Ranked by descending value</h2><p class="lede">One molecule carries essentially all of the value; the platform behind it is optionality, not yet value.</p></div></div>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>#</th><th>Program</th><th>Stage</th><th>Why it ranks here</th></tr></thead><tbody>
+        <tr><td data-label="#">1</td><td data-label="Program"><strong>RAP-219 — focal onset seizures</strong></td><td data-label="Stage">Phase 3 (FOCUS 1/2 enrolling)</td><td data-label="Why">Largest near-term value driver. FDA-aligned pivotal program, RNS biomarker proof-of-concept with large (if uncontrolled) effects, drug-resistant population with real unmet need, runway funded past readout. Registry primary-completion estimates cluster in 2029 — this is a long-dated binary, which the valuation must respect.</td></tr>
+        <tr><td data-label="#">2</td><td data-label="Program"><strong>RAP-219 — bipolar mania</strong></td><td data-label="Stage">Phase 2 positive; Ph3 from 2H 2027 [guidance]</td><td data-label="Why">Placebo-controlled PoC achieved Oct 2026 at a likely submaximal dose. Value is real but discounted: efficacy at the competitive low end, two Phase 3 trials still to run, FDA meeting (1Q 2027) must first bless the design — and possibly the role of the Phase 2 as confirmatory evidence.</td></tr>
+        <tr><td data-label="#">3</td><td data-label="Program"><strong>RAP-219 — PGTCS</strong></td><td data-label="Stage">Phase 3 start guided 1H 2027</td><td data-label="Why">Label-breadth extension of the same asset; perampanel's PGTCS approval validates the pathway. No RAP-219 generalized-seizure human data yet.</td></tr>
+        <tr><td data-label="#">4</td><td data-label="Program"><strong>RAP-219 — long-acting injectable</strong></td><td data-label="Stage">Phase 1 PK guided (data 3Q 2027)</td><td data-label="Why">Adherence is the binding constraint in both epilepsy and bipolar care; a first-in-class ASM LAI would be genuinely differentiating. Formulation risk only, at this stage.</td></tr>
+        <tr><td data-label="#">5</td><td data-label="Program"><strong>RAP-641 — α6β4 nAChR agonist (chronic pain / migraine)</strong></td><td data-label="Stage">IND-enabling; Ph1 preliminary data guided 2H 2027</td><td data-label="Why">Human-genetics-validated, non-opioid, non-CNS (sensory-neuron) target from the Janssen nAChR license estate. Preclinical; carried at option value only.</td></tr>
+        <tr><td data-label="#">6</td><td data-label="Program"><strong>α9α10 nAChR modulators (hearing / vestibular)</strong></td><td data-label="Stage">Discovery</td><td data-label="Why">Third-party genetic rationale; lead optimization. No value ascribed in scenarios.</td></tr>
+        <tr><td data-label="#">—</td><td data-label="Program">RAP-219 — diabetic peripheral neuropathic pain</td><td data-label="Stage">Deprioritized</td><td data-label="Why"><span class="ev fact">FACT</span> The 10-K states the DPNP program is not being advanced at this time, in favor of the α6β4 program. Earlier characterizations of RAP-219 as a pain asset should be treated as stale. [R5]</td></tr>
+      </tbody></table></div>
+      <p><span class="ev fact">FACT</span> Geographic split: Rapport retains RAP-219 rights outside Greater China; Tenacia (Mar 2026) holds mainland China/Hong Kong/Macau/Taiwan across indications, funds its territory share of global trials, and pays royalties back to Rapport (§10). [R4]</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>What moves this, and how firm each date is</h2><p class="lede">Date-quality tags: [hard] = fixed/registry-anchored; [guidance] = company-guided window; [inferred] = reasoned from surrounding disclosures.</p></div></div>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>When</th><th>Event</th><th>Tag</th></tr></thead><tbody>
+        <tr><td data-label="When">Q4 2026</td><td data-label="Event">FOS open-label long-term safety trial — initial data (Phase 2a extension cohort)</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">Q4 2026</td><td data-label="Event">Full Phase 2 mania dataset + 8-week follow-up safety at a medical conference (company: "future medical meeting/conference"; specific venue not named)</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">1Q 2027</td><td data-label="Event">FDA end-of-Phase 2 meeting, bipolar mania — Phase 3 design, dose, and the confirmatory status of the Phase 2 are decided here</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">1H 2027</td><td data-label="Event">PGTCS Phase 3 initiation</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">2H 2027</td><td data-label="Event">Two bipolar mania Phase 3 trials initiate</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">3Q 2027</td><td data-label="Event">RAP-219 LAI Phase 1 PK data</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">2H 2027</td><td data-label="Event">RAP-641 Phase 1 preliminary results</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">2029 (registry est.)</td><td data-label="Event">FOCUS 1/2 primary completion (registry estimate Jul 2029) — the decisive epilepsy readouts; company runway guided "into 2H 2029, beyond expected FOS Phase 3 topline"</td><td data-label="Tag">[guidance]</td></tr>
+        <tr><td data-label="When">Ongoing</td><td data-label="Event">Use of the Jan 2026 ATM (up to $110M) — watch 10-Q share counts; the Oct 20 close still prices ~$436M of cash at a discount to combined program value, so issuance timing is a real signal</td><td data-label="Tag">[inferred]</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Bear, base, bull — with soft price anchors</h2><p class="lede">Scenario anchors built from this dossier's own numbers (47.96M shares basic at Jun 30, 2026; $436.1M cash; treasury-method dilution from 8.03M options at $16.43 WAEP). Illustrative, not price targets or recommendations. Bull top is held at/below the highest sourced sell-side target ($75, BTIG).</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear case</div><div class="pt">$10–$14</div><div class="soft">Soft · scenario-based</div><ul>
+          <li><strong>Trigger:</strong> FOCUS 1/2 fail to separate from placebo (the single-arm Ph2a proves to have been baseline-regression), or mania Phase 3 is shelved after the FDA meeting; RAP-219 reverts to a one-shot platform story.</li>
+          <li><strong>Math:</strong> equity ≈ cash stub + minimal platform value ≈ $480–672M ÷ 47.96M basic shares ≈ $10.01–$14.01. Cash alone is $9.09/share before further burn; two more years of ~$110M+/yr spend on the way to any readout erodes the stub, and a distressed raise would expand the count.</li>
+          <li><strong>Why it's bounded:</strong> $436.1M cash and no debt mean the bear case is a slow bleed toward cash value, not a zero — unless management spends the balance sheet into failed pivotals.</li>
+        </ul></article>
+        <article class="scen-card base"><div class="tag">Base case</div><div class="pt">$30–$38</div><div class="soft">Soft · scenario-based</div><ul>
+          <li><strong>Trigger:</strong> FOS Phase 3 executes on plan with efficacy in the perampanel-or-better band and a cleaner AE table; mania advances to Phase 3 at 1.25 mg as a credible second indication carried at option value; no pre-readout blow-up in spend.</li>
+          <li><strong>Math:</strong> equity ≈ $1.55–2.00B ÷ treasury-method FD shares at the scenario price (51.70M at $30; 52.63M at $38; options at $16.43 WAEP, RSUs/PSUs at face) ≈ $30–$38. This brackets the Oct 20 close ($29.37) at its low end — i.e., the post-readout price already discounts FOS execution substantially.</li>
+          <li><strong>Why this range:</strong> it prices the epilepsy program as more likely than not to produce an approvable, differentiated ASM, and mania as worth a few hundred million of risk-adjusted value — without paying for mania efficacy the data hasn't shown.</li>
+        </ul></article>
+        <article class="scen-card bull"><div class="tag">Bull case</div><div class="pt">$58–$72</div><div class="soft">Soft · scenario-based</div><ul>
+          <li><strong>Trigger:</strong> FOCUS trials hit with Ph2a-consistent separation and a perampanel-beating tolerability table; the mania FDA meeting blesses a 1.25 mg program (and ideally credits the Phase 2 as confirmatory evidence), and the higher dose widens the YMRS delta toward ≥4 points; LAI/PGTCS broaden the label story.</li>
+          <li><strong>Math:</strong> equity ≈ $3.12–3.91B ÷ treasury-method FD shares (53.82M at $58; 54.27M at $72) ≈ $58–$72. The top sits below BTIG's $75 target and near the top of the current $50–$75 target range; the range center (~$65) approximates the pre-readout consensus average (~$64).</li>
+          <li><strong>Why it's capped there:</strong> even the bull path runs through 2029 epilepsy readouts and a mania approval no earlier than ~2030; paying beyond the street's high for that timeline would require commercial, not clinical, evidence.</li>
+        </ul></article>
+      </div>
+    </section>
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>Well-funded for the plan on paper — with the bill back-loaded into the pivotals</h2><p class="lede">All figures from the Q2 2026 10-Q (filed Aug 5, 2026) and FY2025 10-K unless noted.</p></div></div>
+      <div class="splice-table-wrap"><table class="study-table splice-table"><thead><tr><th>Item</th><th>Value</th><th>Note</th></tr></thead><tbody>
+        <tr><td data-label="Item">Cash &amp; equivalents (Jun 30, 2026)</td><td data-label="Value">$63.6M</td><td data-label="Note">Plus $0.1M restricted cash</td></tr>
+        <tr><td data-label="Item">Short-term investments</td><td data-label="Value">$372.5M</td><td data-label="Note">Total cash + ST investments $436.1M</td></tr>
+        <tr><td data-label="Item">Debt</td><td data-label="Value">None identified</td><td data-label="Note">Operating leases only in the 10-Q</td></tr>
+        <tr><td data-label="Item">Net loss</td><td data-label="Value">H1 2026: $76.5M (Q2: $56.6M)</td><td data-label="Note">Pre-revenue apart from collaboration revenue (Tenacia)</td></tr>
+        <tr><td data-label="Item">Operating cash use</td><td data-label="Value">H1 2026: $54.5M (~$27M/qtr)</td><td data-label="Note">H1 2025: $45.3M — burn rising with Phase 3 starts</td></tr>
+        <tr><td data-label="Item">Runway guidance</td><td data-label="Value">Into 2H 2029</td><td data-label="Note"><span class="ev unverified">UNVERIFIED</span> Company estimate; explicitly framed as beyond FOS Phase 3 topline</td></tr>
+        <tr><td data-label="Item">Shares outstanding (Jun 30, 2026)</td><td data-label="Value">47,955,079</td><td data-label="Note">Apr 14, 2026 record date: 47,807,623 (incl. 414,113 unvested restricted shares)</td></tr>
+        <tr><td data-label="Item">Options outstanding</td><td data-label="Value">8,030,456 @ $16.43 WAEP</td><td data-label="Note">2,948,010 exercisable @ $11.78; 2024 Plan evergreen adds 5%/yr</td></tr>
+        <tr><td data-label="Item">RSUs / PSUs unvested</td><td data-label="Value">16,993 / 95,500</td><td data-label="Note">Immaterial to the count; PSUs are performance-based (Dec 2024 grant)</td></tr>
+        <tr><td data-label="Item">Market cap / EV at Oct 20 close</td><td data-label="Value">~$1.41B / ~$972M</td><td data-label="Note">$29.37 × 47.96M basic; treasury FD ~51.61M shares at that price</td></tr>
+      </tbody></table></div>
+      <h3>Dilution and capital history</h3>
+      <ul>
+        <li><span class="ev fact">FACT</span> <strong>IPO (Jun 2024):</strong> 9,200,000 shares, net $140.9M, plus a concurrent private placement of 1,058,824 shares at the $17.00 IPO price (net $16.7M). Founded Feb 2022 with Third Rock Ventures and Johnson &amp; Johnson Innovation–JJDC support. [R5][R13]</li>
+        <li><span class="ev fact">FACT</span> <strong>ATM #1 (Jul 2025):</strong> up to $150M authorized; terminated Sep 2025 when the follow-on priced. <strong>Follow-on (Sep 2025):</strong> 11,057,692 shares at $26.00 (incl. full greenshoe), net $269.4M — executed on the back of the Phase 2a epilepsy data. <strong>ATM #2 (Jan 2026):</strong> up to $110M under the Mar 2026 automatic shelf (S-3ASR); usage, if any, is a GAP at dossier date — Q3 2026 10-Q will show it. [R4]</li>
+        <li><span class="ev fact">FACT</span> <strong>Tenacia license (Mar 6, 2026):</strong> $20.0M non-refundable upfront received; up to $308.0M in sales-based milestones; tiered royalties mid-single-digits to mid-teens on Greater-China net sales; Tenacia funds its share of global FOS/mania trial costs. Recognized as collaboration revenue. [R4]</li>
+        <li><span class="ev fact">FACT</span> <strong>Janssen license obligations (the other direction):</strong> Rapport paid $1.0M upfront + $4.0M option fee (2022); Janssen is eligible for up to $76.0M development + $40.0M sales milestones for the lead TARPγ8 product (plus up to $42.0M sales milestones for other TARPγ8 products) and mid-to-high-single-digit royalties on worldwide net sales of TARPγ8-candidate products. This royalty stack sits on RAP-219 in every commercial scenario. [R5]</li>
+        <li><span class="ev interp">INTERPRETATION</span> The balance sheet funds the stated plan, but the plan's cost curve is back-loaded (two FOS pivotals + a PGTCS pivotal + two mania pivotals guided to start by 2H 2027). "Runway into 2H 2029" embeds today's trial slate at today's intensity; any expansion — or any trial that must be repeated — brings the $110M ATM and then the market back into the picture well before revenue.</li>
+      </ul>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>A team that has sold this exact kind of company before</h2><p class="lede">Management and board lineage is unusually relevant here: Rapport's leadership includes executives from Cerevel, Karuna and Janssen neuroscience — three of the defining CNS value-creation stories of the last decade. Track record is not evidence about RAP-219, but it is evidence about execution and exit patterning.</p></div></div>
+      <ul>
+        <li><span class="ev fact">FACT</span> <strong>Abraham N. Ceesay, CEO</strong> (since Feb 2023): previously <em>President of Cerevel Therapeutics</em> (2021–2023) — Cerevel was acquired by AbbVie in 2024 — and CEO of Tiburio before that. Beneficial ownership 1,547,282 shares (3.18%, incl. options) at Apr 14, 2026. [R12]</li>
+        <li><span class="ev fact">FACT</span> <strong>Troy Ignelzi, CFO</strong> (since Nov 2023): CFO of <em>Karuna Therapeutics</em> (2019–2023) through its acquisition by Bristol Myers Squibb — Karuna's karXT (now Cobenfy) is the modern template for a novel-mechanism psychiatry asset. Also sits on Contineum's board. [R12]</li>
+        <li><span class="ev fact">FACT</span> <strong>Jeffrey Sevigny, MD, CMO</strong> (since Mar 2025): previously CMO of Prevail Therapeutics (Lilly) and SVP Neuroscience at Eli Lilly (2021–2025). He fronted the Oct 20 mania data presentation. [R12]</li>
+        <li><span class="ev fact">FACT</span> <strong>David Bredt, MD PhD, CSO &amp; scientific founder:</strong> ex-Global Head of Neuroscience Discovery at Janssen, where the RAP/TARPγ8 program (incl. JNJ-64300912, now RAP-219) originated; the Aug 2022 Janssen license is the company's founding transaction. Board includes <strong>Steven M. Paul, MD</strong> (Karuna co-founder; ex-Lilly neuroscience) and <strong>John Maraganore, PhD</strong> (Alnylam founding CEO) — directors whose presence signals how the asset is expected to be valued. [R5][R12]</li>
+        <li><span class="ev fact">FACT</span> <strong>Ownership (proxy, Apr 14, 2026):</strong> Third Rock Ventures 16.95% (8,104,451 sh); Fidelity entities 11.48% (5,486,468); ARCH Venture Fund XII 7.80% (3,728,738); Cormorant 6.33% (3,027,521); Capital Research 5.44% (2,602,529); BlackRock 5.01% (2,397,549). Officers &amp; directors as a group: 12.48%. JJDC holds a founding-era stake (size not broken out in the 5% table). [R12]</li>
+        <li><span class="ev fact">FACT</span> <strong>Insider signals, 2026 (EDGAR Form 4, sampled Aug–Oct):</strong> the recurring pattern is <em>planned</em> selling, not discretionary exit. CEO Ceesay sold 8,210 sh on Sep 9 (~$45.6–46.0), 2,210 sh on Sep 24 (~$39.1–41.1) and 4,522 sh on Oct 8 (~$30.7–32.6) — all footnoted as Rule 10b5-1 plans adopted Mar 27, 2026. COO Cheryl Gault sold 10,000 sh on Oct 1 (~$33.0–33.8) under a 10b5-1 plan adopted Dec 10, 2025. Numerous Form 144 notices through 2026 are consistent with plan-driven distribution by early holders/employees. <span class="ev gap">GAP</span> No open-market insider <em>purchases</em> were found in the sampled 2026 Form 4s; a full-year transaction census was not performed. Read: neutral-to-mildly-negative optics (selling into a falling tape pre-readout, albeit pre-planned), not a red-flag pattern — plan adoption dates precede the sales by 6+ months, and the CEO's sales continued mechanically at successively lower prices, which discretionary sellers usually don't do. [R21]</li>
+      </ul>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ordered by expected value impact, not by order of appearance.</p></div></div>
+      <ol>
+        <li><strong>The value engine is uncontrolled data.</strong> FOS — the indication carrying most of the ~$972M EV — has never beaten placebo. The Ph2a was single-arm, n=30, in device-implanted patients. If FOCUS 1/2 shrink the effect toward the perampanel band (or below), the equity re-rates toward cash-plus-mania-option in one print, and that print is years away (registry: 2029), maximizing duration risk.</li>
+        <li><strong>Mania effect size is at the competitive floor.</strong> 3.1 points (g≈0.3) vs a ~3–4-point "competitive" band and ~4.9-point pooled atypical average. The entire mania thesis depends on the 1.25 mg Phase 3 dose producing a bigger number — an unproven exposure-response assumption in this population.</li>
+        <li><strong>p=0.045 fragility + missing-data structure.</strong> A near-boundary p-value with 24.6% drug-arm discontinuation under an MAR model. If FDA or a journal reviewer demands sensitivity analyses that move the estimate, the "hit" narrative weakens retroactively. The undisclosed responder/remission rates are a conspicuous omission until proven innocent.</li>
+        <li><strong>Discontinuation asymmetry.</strong> 2:1 all-cause discontinuation against the drug, consent-withdrawal-led, in an inpatient setting — the single most under-discussed number in the release, and a direct challenge to the company's adherence-based commercial story. Phase 3 must close this gap, not just the YMRS gap.</li>
+        <li><strong>Agitation as a potential mechanistic signal.</strong> 16.7% vs 9.4% in a class (AMPAR antagonism) whose approved member carries a boxed warning for psychiatric/behavioral reactions. Mostly mild, week-1, investigator-dismissed — but Wells Fargo's post-print note explicitly flagged "questions on safety," and any dose increase to 1.25 mg could amplify an activation signal.</li>
+        <li><strong>Five pivotal-scale trials, one balance sheet.</strong> FOCUS 1/2 running; PGTCS Ph3 (1H 2027) and two mania Ph3s (2H 2027) guided. Runway "into 2H 2029" assumes the current slate costs what management thinks; slippage anywhere creates a financing overhang directly on top of the FOS readout window.</li>
+        <li><strong>Royalty stack and license dependency.</strong> RAP-219 exists by license from Janssen, with up to ~$116M+ in milestones and mid-to-high-single-digit worldwide royalties owed on the lead candidate — a permanent margin tax and a counterparty dependency (including diligence obligations) embedded in the core asset.</li>
+        <li><strong>Single-asset concentration.</strong> Every clinical program is RAP-219. A class-level safety finding (e.g., in the long-term OLE) hits epilepsy, mania and PGTCS simultaneously; there is no second clinical asset to rotate into. RAP-641 is pre-Phase 1.</li>
+        <li><strong>Thin, momentum-driven tape.</strong> ~0.3M shares/day of baseline liquidity, a −36% slide in the month before a binary, and an 8.2M-share readout day: the stock's price discovery is flow-dominated, and the $110M ATM gives management a standing incentive to sell into strength — capping reflexive upside after good news.</li>
+        <li><strong>Insider optics.</strong> Pre-planned but persistent insider selling through 2026 (CEO included) with no offsetting open-market buys found. Benign in structure, negative in signal — and it will be re-litigated by the market at every future drawdown.</li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>Open questions and disclosed gaps</h2><p class="lede">What this dossier could not establish from primary sources as of Oct 20, 2026 — flagged rather than filled.</p></div></div>
+      <ul>
+        <li><span class="ev gap">GAP</span> Mania Phase 2 responder (≥50%) and remission rates, LS-mean CIs, rescue-lorazepam use by arm, titration-arm (2-day vs 4-day) splits, and missing-data sensitivity analyses — none disclosed in the PR or deck.</li>
+        <li><span class="ev gap">GAP</span> Mania 8-week post-treatment safety/durability data (rebound? withdrawal? delayed AEs given the molecule's pharmacology) — pending conference presentation.</li>
+        <li><span class="ev gap">GAP</span> Exact FOCUS 1/2 dose levels in mg (registry describes high/medium/low arms without amounts) and the trials' completion timing beyond registry estimates (Jul 2029 primary completion).</li>
+        <li><span class="ev gap">GAP</span> Whether FDA will credit the mania Phase 2 (SAP-modified, enrollment-increased) as confirmatory evidence — to be resolved at the 1Q 2027 end-of-Phase 2 meeting.</li>
+        <li><span class="ev gap">GAP</span> Jan 2026 ATM usage and the exact share count after Jun 30, 2026 (Q3 10-Q pending); Q3 2026 cash balance likewise.</li>
+        <li><span class="ev gap">GAP</span> Weight/metabolic/laboratory/ECG outcomes from the mania trial beyond the topline TEAE table; long-term safety beyond the interim Sep 16, 2026 database lock.</li>
+        <li><span class="ev gap">GAP</span> Conference-call color beyond the deck (Q&amp;A on dose rationale and discontinuations) — a transcript exists in trade coverage but was not treated as a primary source here.</li>
+        <li><span class="ev gap">GAP</span> Full-year 2026 insider-transaction census (this dossier sampled Aug–Oct Form 4s directly from EDGAR).</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Ordered by the dossier's evidence hierarchy: SEC → FDA/labels → registries → literature → company material → trade press.</p></div></div>
+      <ul>
+        <li>[R1] Rapport Therapeutics, press release (8-K Ex-99.1), "Positive Topline Results from Phase 2 Trial of RAP-219 for Bipolar Mania," Oct 20, 2026 — accession 0001193125-26-425647.</li>
+        <li>[R2] Rapport Therapeutics, investor presentation (8-K Ex-99.2), "RAP-219 Phase 2 in Bipolar Mania Topline Results," Oct 20, 2026 — disposition, baseline, trajectory and Phase 3 design slides.</li>
+        <li>[R3] SEC EDGAR company registry / submissions file, Rapport Therapeutics, Inc., CIK 0002012593, Nasdaq: RAPP, File No. 001-42121.</li>
+        <li>[R4] Rapport Therapeutics, Form 10-Q for Q2 2026 (filed Aug 5, 2026) — financials, share counts, option table, Tenacia license economics, ATM programs, mania-trial SAP/enrollment disclosure.</li>
+        <li>[R5] Rapport Therapeutics, Form 10-K for FY2025 (filed Mar 10, 2026) — Phase 1/2a data, pipeline, Janssen license terms, history, IPO use of proceeds.</li>
+        <li>[R6] Finnhub market data via search snapshot, Oct 20, 2026 — session O/H/L/C ($30.33/$31.31/$26.73/$29.37), prior close $28.60, 52-week range $23.75–$52.93.</li>
+        <li>[R7] MarketBeat, RAPP price-history table — Oct 20, 2026 volume 8.20M shares; daily closes Sep–Oct 2026 (incl. Sep 22 close $41.47; Oct 19 volume 299,933).</li>
+        <li>[R8] ClinicalTrials.gov: NCT07046494 (mania Ph2); NCT06377930 (FOS Ph2a); NCT07563881 (FOCUS 1); NCT07594119 (FOCUS 2); NCT07219407 (FOS OLE) — designs, enrollment, status and date fields as of Oct 20, 2026.</li>
+        <li>[R9]–[R11] (Registry entries as above, cited inline by section.)</li>
+        <li>[R12] Rapport Therapeutics, DEF 14A proxy (filed Apr 23, 2026) — beneficial ownership table (Apr 14, 2026) and executive/director biographies.</li>
+        <li>[R13] Rapport Therapeutics, Form 424B4 prospectus (Jun 2024) and 10-K history section — IPO structure ($17.00; 9.2M shares + 1,058,824-share concurrent placement) and Aug 2022 Janssen license.</li>
+        <li>[R14] Greene et al., AES abstract — RAP-219 Phase 1 PET receptor-occupancy study (cohorts 0.25–1.25 mg QD).</li>
+        <li>[R15] Matta, Shireman, Volak, Maher, Ameriks, Bredt et al., "Selective γ8 TARP AMPAR negative allosteric modulators: efficacy in preclinical antiseizure models," Epilepsia (2026), doi:10.1002/epi.70549.</li>
+        <li>[R16] Brooks et al., Psychiatry Res (2010); Yüksel &amp; Öngür, Biol Psychiatry (2010); Gigante et al., Bipolar Disord (2012) — glutamate/hypermetabolism in mania, as cited in the company's Oct 20, 2026 deck.</li>
+        <li>[R17] Fycompa (perampanel) US prescribing information and Eisai pivotal-trial disclosures (Studies 304/305/306) — median % change, 50% responder rates, boxed warning for serious psychiatric/behavioral reactions.</li>
+        <li>[R18] Yildiz et al., "Efficacy of antimanic treatments: meta-analysis of randomized, controlled trials," Neuropsychopharmacology (2011) — pooled Hedges g 0.42; responder 48% vs 31%.</li>
+        <li>[R19] Asenapine vs placebo meta-analysis, Eur Psychiatry (Cambridge) — pooled atypical monotherapy placebo-adjusted YMRS ≈ 4.9 points (95% CI 3.8–6.0).</li>
+        <li>[R20] Cochrane review, aripiprazole for acute mania — YMRS mean difference −3.66 (95% CI −5.82 to −2.05) at 3 weeks.</li>
+        <li>[R21] EDGAR Form 4 filings for RAPP insiders (filed Sep 9, Sep 24, Oct 1, Oct 8, 2026) — transaction codes, share counts, prices and 10b5-1 footnotes as parsed from ownership XML.</li>
+        <li>[R22] BioSpace, "Rapport ekes out bipolar mania win as lead asset 'just hits' in mid-stage trial," Oct 20, 2026 — Stifel commentary ("just hits"; 3–4-pt competitive range; safety "pretty good").</li>
+        <li>[R23] Barron's, "Inside the $1 Billion Blockbuster Opportunity Sending Rapport Therapeutics Stock Higher," Oct 20, 2026 — premarket +84% spike; Jefferies (Tsai) peak-sales framing; Stifel (Matteis) 3–4-pt benchmark.</li>
+        <li>[R24] TipRanks/TheFly and stockanalysis.com analyst-action summaries, Oct 2026 — H.C. Wainwright PT $40→$66 (Oct 20); Wells Fargo $51 maintained (Oct 20, "efficacy looks good; questions on safety"); Wolfe $50; Guggenheim $65; BTIG $75; Goldman Sachs $62. Aggregator consensus average ≈$64 (WallStreetZen).</li>
+      </ul>
+      <p><span class="ev interp">INTERPRETATION</span> Method note: every clinical number in §04–§05 is transcribed from the 8-K exhibits or the 10-K/10-Q; every benchmark in §05–§06 is from peer-reviewed meta-analyses or the perampanel label record, and cross-trial comparisons are framed as context, not head-to-head evidence. Company forward statements (Phase 3 timing, runway, market sizes in the deck) are tagged UNVERIFIED or [guidance] wherever they appear.</p>
+    </section>
+</main>
+
+  <footer><strong>RAPP deep-dive dossier</strong> · Built October 20, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    (function(){
+      var themeBtn=document.getElementById('themeToggle');
+      function applyTheme(t){document.documentElement.setAttribute('data-theme',t);if(themeBtn){themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');}try{localStorage.setItem('biotech-theme',t);}catch(e){}}
+      var startTheme='light';
+      try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}catch(e){}
+      applyTheme(startTheme);
+      if(themeBtn){themeBtn.addEventListener('click',function(){var cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(cur);});}
+      var toTop=document.getElementById('toTop');
+      function onScroll(){if(toTop){toTop.style.display=(window.scrollY>600)?'block':'none';}}
+      window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+      if(toTop){toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}
+    })();
+  </script>
+</body>
+</html>
