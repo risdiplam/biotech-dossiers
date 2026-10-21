@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href="data:," />
-  <title>PEPG — PepGen · Deep-Dive Dossier · 2026-10-11</title>
+  <title>PCVX — Vaxcyte · Deep-Dive Dossier · 2026-10-16</title>
   <style>
     :root{
       --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
@@ -231,7 +231,57 @@
       section.collapsed .section-body{display:block}
       .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
     }
-  </style>
+  
+/* ── Audit fix 2026-10-20: the PCVX body used 20 classes with no definitions in the
+   template CSS (pipeline cards, landscape grid, stats, panels, scenarios, risk list,
+   sourcebook, timeline articles). Definitions appended in the existing design tokens. ── */
+.pipeline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.candidate-card{border:1px solid var(--line);border-radius:8px;background:var(--raised);box-shadow:var(--shadow);padding:20px}
+.candidate-card h3{margin:0 0 8px;font-size:19px}
+.candidate-card p{color:var(--ink-2);font-size:14.5px}
+.candidate-foot{margin-top:14px;padding-top:13px;border-top:1px solid var(--line-soft);font:700 12.5px var(--mono);color:var(--teal-dark)}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font:700 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px}
+.badge.core{background:#dff3f1;color:#005f57}
+.badge.option{background:#f3ecff;color:#5a3aa6}
+.badge.early{background:#fff1e2;color:#8a4b00}
+.comp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.comp-grid article,.panel{border:1px solid var(--line);border-radius:8px;background:var(--raised);box-shadow:var(--shadow);padding:20px}
+.comp-grid article h3,.panel h3{margin:0 0 8px;font-size:18px}
+.comp-grid article p,.panel p,.panel li{color:var(--ink-2);font-size:14.5px}
+.two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:0 0 16px}
+.stats article{border:1px solid var(--line);border-radius:8px;background:var(--raised);box-shadow:var(--shadow);padding:16px}
+.stats span{display:block;font:700 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:6px}
+.stats strong{display:block;font:700 24px/1.1 var(--serif);color:var(--ink);margin-bottom:6px}
+.stats p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.scenario{border:1px solid var(--line);border-top:5px solid var(--red);border-radius:8px;background:var(--raised);box-shadow:var(--shadow);padding:20px}
+.scenario.featured{border-top-color:var(--teal)}
+.scenario-grid .scenario:last-child{border-top-color:var(--orange)}
+.scenario h3{margin:0 0 4px;font-size:19px}
+.scenario .range{display:block;font:700 30px/1.1 var(--serif);margin:4px 0 2px}
+.scenario .point{font:700 13px var(--mono);color:var(--teal-dark);margin:0 0 12px}
+.scenario ul{padding-left:18px;color:var(--ink-2);font-size:14px}
+.scenario-math{margin-top:16px;border:1px dashed var(--line);border-radius:8px;background:#fbfaf7;padding:16px 18px;font:600 13.5px/1.7 var(--mono);color:var(--ink)}
+.scenario-math p{margin:0 0 8px}
+.scenario-math p:last-child{margin:0}
+.hero-candidate{margin-top:18px}
+.risk-num{display:inline-block;font:700 12px var(--mono);color:#fff;background:var(--red);border-radius:999px;padding:3px 9px;margin-bottom:9px}
+.risk-list article{border:1px solid var(--line);border-left:5px solid var(--red);border-radius:8px;background:var(--raised);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}
+.risk-list article h3{margin:0 0 6px;font-size:17.5px}
+.risk-list article p{margin:0;color:var(--ink-2);font-size:14.5px}
+.timeline article{position:relative;padding:0 0 24px 18px}
+.timeline article:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+.timeline article.done:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+.timeline time{display:block;font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+.timeline article h3{margin:5px 0 6px;font-size:17px}
+.timeline article p{margin:0;font-size:14px;color:var(--ink-2)}
+.sourcebook h3{margin:22px 0 8px;font-size:17px}
+.sourcebook ol{padding-left:22px;color:var(--ink-2)}
+.sourcebook li{margin-bottom:7px;font-size:14.5px}
+@media(max-width:980px){.scenario-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.pipeline-grid,.comp-grid,.two-col{grid-template-columns:1fr}}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
   <div class="topline"></div>
@@ -245,7 +295,7 @@
       <div class="hero-quote" aria-label="Market snapshot">
         <div class="quote-price">$65.27</div>
         <div class="quote-label">Market snapshot · Oct 15, 2026 close (MarketBeat)</div>
-        <div class="quote-meta"><strong>~$10.7B</strong> est. economic market value (163.25M economic shares, est.) · <strong>~$8.3B</strong> implied enterprise value on pro-forma cash<br>$56.48 close Oct 2 (pre-data) → $73.82 close Oct 5, intraday high $90.75</div>
+        <div class="quote-meta"><strong>~$10.4B</strong> est. economic market value (159.31M economic shares, est.) · <strong>~$8.0B</strong> implied enterprise value on pro-forma cash<br>$56.48 close Oct 2 (pre-data) → $73.82 close Oct 5, intraday high $90.75</div>
       </div>
     </div>
   </header>
@@ -264,7 +314,7 @@
       <div class="decision-grid">
         <article class="decision accent"><div class="tag">Single swing factor</div><div class="big">BLA → ACIP → share</div><p><span class="ev interp">INTERPRETATION</span> No further adult immunogenicity result can add much: OPUS-1 was the cornerstone trial. Value now turns on FDA review (including serotypes 3 and 12F vs PCV21), CMC consistency, and whether ACIP/payers treat one 31-valent shot as the default for adults 50+.</p></article>
         <article class="decision"><div class="tag">OPUS-1 (Oct 5, 2026)</div><div class="big">All primaries met</div><p><span class="ev unverified">UNVERIFIED · COMPANY TOPLINE</span> All 28 shared serotypes met the noninferiority criterion (OPA GMR lower bound &gt;0.667) in adults 50+; 3 unique serotypes + 20B met superiority (&gt;2.0); immunobridging 32/32 in ages 18–49; safety similar to PCV20/PCV21. Full dataset not yet published.</p></article>
-        <article class="decision"><div class="tag">Pro-forma cash (est.)</div><div class="big">~$3.4B</div><p><span class="ev interp">INTERPRETATION</span> ~$2.3B preliminary cash/investments at Sep 30, 2026 plus ~$1.10B est. net proceeds from the Oct 9, 2026 concurrent offerings ($1.15B gross). Reported balance at Jun 30, 2026 was $2.51B. Q3 10-Q is the first reported post-raise figure.</p></article>
+        <article class="decision"><div class="tag">Pro-forma cash (est.)</div><div class="big">~$3.4B</div><p><span class="ev interp">INTERPRETATION</span> ~$2.3B preliminary cash/investments at Sep 30, 2026 plus ~$1.10B net proceeds from the Oct 9, 2026 concurrent offerings ($1.15B gross; net disclosed in the Oct 9, 2026 Form 8-K: $544.3M equity + $558.7M notes). Reported balance at Jun 30, 2026 was $2.51B. Q3 10-Q is the first reported post-raise figure.</p></article>
         <article class="decision warn"><div class="tag">Next decisive readouts</div><div class="big">1H 2027</div><p><span class="ev unverified">UNVERIFIED · COMPANY GUIDANCE</span> OPUS-2 (influenza coadministration) and OPUS-3 (previously vaccinated adults) topline, plus VAX-31 infant Phase 2 primary-series/booster data by end of 1H 2027. Planned BLA submission: first half of 2028.</p></article>
       </div>
       <div class="thesis">
@@ -275,13 +325,13 @@
     </section>
 
     <section id="market">
-      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>The stock kept the trial win and paid for the financing in the same week</h2><p class="lede">PCVX rose about 31% on the OPUS-1 close (Oct 5) after touching $90.75 intraday, then gave back ground as the company priced roughly $1.15 billion of concurrent equity, pre-funded warrants and convertible notes into the strength. At $65.27 (Oct 15) the market still capitalizes the company at roughly $10.7 billion on an economic share count — a valuation that already assumes adult approval and meaningful share capture.</p></div></div>
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>The stock kept the trial win and paid for the financing in the same week</h2><p class="lede">PCVX rose about 31% on the OPUS-1 close (Oct 5) after touching $90.75 intraday, then gave back ground as the company priced roughly $1.15 billion of concurrent equity, pre-funded warrants and convertible notes into the strength. At $65.27 (Oct 15) the market still capitalizes the company at roughly $10.4 billion on an economic share count — a valuation that already assumes adult approval and meaningful share capture.</p></div></div>
       <div class="event-tape">
-        <article><span class="event-mark">OCT 2</span><h3>Pre-data close $56.48</h3><p>Market cap ≈$8.4B on the pre-offering share count. The Street was paying for a high probability of OPUS-1 success before it printed — Guggenheim had adult success odds at 85% pre-data (raised to 95% after).</p></article>
+        <article><span class="event-mark">OCT 2</span><h3>Pre-data close $56.48</h3><p>Market cap ≈$8.4B on the pre-offering share count. The Street was paying for a high probability of OPUS-1 success before it printed — Guggenheim had adult success odds at 85% pre-data (raised to 95% after). <span class="ev unverified">UNVERIFIED · ANALYST VIA TRADE PRESS</span></p></article>
         <article><span class="event-mark">OCT 5</span><h3>OPUS-1 lands; stock +30.7%</h3><p>Close $73.82 on 14.9M shares; intraday high $90.75. Same day, option exercise-and-sell Form 4s by the CSO/COO and the CAO executed at $86.74 (see §10).</p></article>
         <article><span class="event-mark">OCT 6–9</span><h3>$1.15B concurrent raise</h3><p>8,584,375 shares at $64.00, pre-funded warrants for 400,000 shares, and $575M of 1.50% convertible notes due 2032 (conversion price ≈$89.60) — both underwriter options exercised in full. Stock closed Oct 6 at $66.70 (−9.7%).</p></article>
       </div>
-      <div class="readthrough"><strong>How to read the price.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the implied operating enterprise value is ≈$8.3B (see §07 bridge) for a company with no revenue and a first possible launch in 2028–29. Consensus targets cluster around $109–117 on average with a $146 street high (BofA/Jefferies, Oct 2026; secondary-source tallies) — i.e., the sell-side base case is roughly "approval plus leading adult share," and the current price sits between that base case and a failure/delay case. The scenario framework in §09 is built to that anchor and does not exceed it.</div>
+      <div class="readthrough"><strong>How to read the price.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the implied operating enterprise value is ≈$8.0B (see §07 bridge) for a company with no revenue and a first possible launch in 2028–29. The MarketBeat consensus average target is $108.60 with a $146 street high (BofA, raised Oct 6, 2026; secondary-source tallies) — i.e., the sell-side base case is roughly "approval plus leading adult share," and the current price sits between that base case and a failure/delay case. The scenario framework in §09 is built to that anchor and does not exceed it.</div>
       <p class="source-note">Prices: MarketBeat PCVX price history (Oct 2026) · Finnhub snapshot (52-week range $39.87–$90.75). Analyst targets: MarketBeat/Investing.com tallies, Oct 5–12, 2026 (<span class="ev unverified">UNVERIFIED</span> secondary tallies).</p>
     </section>
 
@@ -326,13 +376,13 @@
         <p class="source-note">All OPUS-1 results are company-reported topline (GlobeNewswire, Oct 5, 2026; 8-K Ex. 99.1). Per-serotype GMR point estimates, confidence intervals and the full safety tables have not been published — <span class="ev gap">GAP</span> until the full dataset/conference presentation. The &gt;0.667 margin is more stringent than the &gt;0.5 margin used historically for PCV licensure; the trial was designed with FDA alignment on this framework. No efficacy (disease-endpoint) data exist for VAX-31; cross-trial comparisons to PCV20/PCV21 pivotal trials run in other populations are not valid head-to-head evidence — OPUS-1's within-trial comparisons are.</p>
       </article>
       <div class="signal-grid" style="margin-top:20px">
-        <article class="paper-card"><div class="program-kicker">Supporting Phase 3 · data 1H 2027</div><h3>OPUS-2 and OPUS-3</h3><p><strong>OPUS-2</strong> (NCT07365826): VAX-31 coadministered with licensed seasonal influenza vaccine vs sequential administration, pneumococcal-naïve adults 50+; endpoints Month-1 OPA GMTs/GMFRs for all 31 serotypes + 20B, IgG secondary. <strong>OPUS-3</strong> (n≈720): adults previously vaccinated with licensed PCVs (including PCV20 and/or PPSV23 histories); does VAX-31 boost shared-serotype responses while adding the incremental ones? Across OPUS-1/2/3, ~6,000 adults were expected, ~3,400 receiving VAX-31 — the safety database for the BLA. Status per Oct 2026 offering documents: both enrolled.</p><p class="source-note"><span class="ev fact">FACT · DESIGN</span> Company releases Jan–Mar 2026; offering use-of-proceeds (Oct 2026 424B5).</p></article>
+        <article class="paper-card"><div class="program-kicker">Supporting Phase 3 · data 1H 2027</div><h3>OPUS-2 and OPUS-3</h3><p><strong>OPUS-2</strong> (NCT07365826): VAX-31 coadministered with licensed seasonal influenza vaccine vs sequential administration, pneumococcal-naïve adults 50+; endpoints Month-1 OPA GMTs/GMFRs for all 31 serotypes + 20B, IgG secondary. <strong>OPUS-3</strong> (n≈720): adults previously vaccinated with licensed PCVs (including PCV20 and/or PPSV23 histories); does VAX-31 boost shared-serotype responses while adding the incremental ones? Final program actuals (Q1 2026 results release): 6,191 adults dosed across OPUS-1/2/3, ~3,500 of them receiving VAX-31 — the safety database for the BLA; OPUS-2 dosed 1,390. Status per Oct 2026 offering documents: both enrolled.</p><p class="source-note"><span class="ev fact">FACT · DESIGN</span> Company releases Jan–Mar 2026; offering use-of-proceeds (Oct 2026 424B5).</p></article>
         <article class="paper-card"><div class="program-kicker">Phase 1/2 · NCT (adult) · reported Sep 3, 2024</div><h3>The result that selected the dose</h3><p>n=1,015 adults 50+, three dose levels vs PCV20. At mid and high doses, noninferiority criteria were met for all 20 PCV20-shared serotypes; at the high dose, OPA point estimates exceeded PCV20 on 18 of 20 (GMR &gt;1.0), seven statistically higher; all 11 serotypes unique to VAX-31 met superiority criteria at every dose. Safety similar to PCV20 over six months. The High Dose (3.3 mcg; 4.4 mcg for 1, 5, 22F) advanced into OPUS.</p><p class="source-note"><span class="ev unverified">UNVERIFIED · COMPANY TOPLINE</span> Vaxcyte release, Sep 3, 2024. Breakthrough Therapy designation for adult IPD followed; expanded to pneumococcal pneumonia in May 2025 <span class="ev fact">FACT</span>.</p></article>
       </div>
       <div class="safety-grid">
         <article><h3>Regulatory path as guided</h3><p><span class="ev unverified">UNVERIFIED · COMPANY</span> OPUS-2/OPUS-3 topline 1H 2027 → manufacturing consistency study → BLA submission 1H 2028 → FDA review (BTD may support priority interactions; a standard 10-month or priority 6-month review clock is not confirmed — <span class="ev gap">GAP</span>). ACIP recommendation follows licensure and is a separate, decisive gate for adult uptake.</p></article>
         <article><h3>What FDA will argue about</h3><p><span class="ev interp">INTERPRETATION</span> Serotypes 3 and 12F vs PCV21 under the new &gt;0.667 standard: the company pre-registered the &gt;0.5 historical comparison as a key secondary, and management has already told investors the PCV21 comparison will be a particular focus of review. A label that carves out or footnotes those serotypes is a plausible middle outcome — not a CRL, but not the clean "broadest coverage" claim either.</p></article>
-        <article><h3>What is not in the package yet</h3><p><span class="ev gap">GAP</span> No lot-consistency data, no OPUS-2/3 data, no published per-serotype OPUS-1 tables, no immunocompromised-population data, and no coadministration data beyond influenza. The adult safety database (~3,400 VAX-31 recipients across OPUS) is adequate for common reactions, not rare ones.</p></article>
+        <article><h3>What is not in the package yet</h3><p><span class="ev gap">GAP</span> No lot-consistency data, no OPUS-2/3 data, no published per-serotype OPUS-1 tables, no immunocompromised-population data, and no coadministration data beyond influenza. The adult safety database (~3,500 VAX-31 recipients across OPUS) is adequate for common reactions, not rare ones.</p></article>
       </div>
     </section>
     <section id="pipeline">
@@ -351,7 +401,7 @@
           <div class="candidate-foot"><span class="badge option">Hedge</span><span>Infant Ph3 candidate pending VAX-31 data</span></div>
         </article>
         <article class="candidate-card">
-          <div><div class="program-kicker">Rank 4 · Preclinical / early</div><h3>VAX-XL · VAX-A1 · VAX-GI</h3><p class="mechanism"><strong>VAX-XL:</strong> next-generation PCV designed to push coverage beyond 31 valents on the same platform (announced Mar 2025). <strong>VAX-A1:</strong> Group A Streptococcus vaccine — Phase 1 in adults initiated, topline guided 2H 2027. <strong>VAX-GI:</strong> Shigella vaccine, preclinical. No clinical proof for any of the three; GAS and Shigella have no licensed vaccine anywhere, which cuts both ways — open field, unproven regulatory path.</p></div>
+          <div><div class="program-kicker">Rank 4 · Preclinical / early</div><h3>VAX-XL · VAX-A1 · VAX-GI</h3><p class="mechanism"><strong>VAX-XL:</strong> next-generation PCV designed to push coverage beyond 31 valents on the same platform (announced 2025). <strong>VAX-A1:</strong> Group A Streptococcus vaccine — Phase 1 in adults initiated, topline guided 2H 2027. <strong>VAX-GI:</strong> Shigella vaccine, preclinical. No clinical proof for any of the three; GAS and Shigella have no licensed vaccine anywhere, which cuts both ways — open field, unproven regulatory path.</p></div>
           <div class="candidate-foot"><span class="badge early">Optionality</span><span>VAX-A1 Ph1 topline 2H 2027 [guidance]</span></div>
         </article>
       </div>
@@ -364,7 +414,7 @@
         <article><div class="program-kicker">Pfizer · approved 2021 (adults) / 2023 (infants)</div><h3>Prevnar 20 (PCV20, Apexxnar)</h3><p>The incumbent standard: 20 serotypes, the comparator every new PCV must match. Merck's epidemiology framing credits PCV20 serotypes with ~52% of IPD in adults 50+ (CDC 2018–2021) — it covers the historic pediatric serotypes (incl. 4, 19F) that PCV21 drops. Pfizer's moat is contracting, pharmacy-channel incumbency and the Prevnar brand across pediatrics.</p></article>
         <article><div class="program-kicker">Merck · approved Jun 2024 (adults)</div><h3>Capvaxive (PCV21)</h3><p>The adult-designed challenger: 21 serotypes including 8 not in other PCVs (15A, 15C, 16F, 23A, 23B, 24F, 31, 35B), ~84% estimated IPD coverage in adults 50+ (CDC 2018–2021) per Merck. It deliberately omits several historic serotypes. Pediatric at-risk indication (ages 2–17) added June 2026. OPUS-1's two soft comparisons (serotypes 3, 12F) were against this product.</p></article>
         <article><div class="program-kicker">Merck · approved 2021 (adults) / 2022 (peds)</div><h3>Vaxneuvance (PCV15)</h3><p>15-valent; largely a pediatric and transitional product in the U.S. now that PCV20/PCV21 anchor the adult market. Included for completeness: VAX-31 contains all 15 of its serotypes.</p></article>
-        <article><div class="program-kicker">Merck · Phase 3 (pediatric)</div><h3>V116 in children (STRIDE-PEDS)</h3><p>Merck is running PCV21 down into pediatric populations (Phase 3 STRIDE-PEDS in toddlers/children), which matters for VAX-31's infant timeline: Vaxcyte will not have the pediatric field to itself even if the infant data are clean.</p></article>
+        <article><div class="program-kicker">Merck · Phase 3 (pediatric) · read out Sep 2025</div><h3>V116 in at-risk children (STRIDE-13)</h3><p>Merck's pediatric beachhead is already established: STRIDE-13 (n=882, ages 2–17 at increased risk, vs PPSV23) met noninferiority for the 12 shared serotypes and superiority for the 9 unique to PCV21, and supported the June 2026 supplemental at-risk indication. Merck is not in the healthy-infant primary-series race, but it owns the at-risk pediatric niche — Vaxcyte will not have the broader pediatric field to itself even if the infant data are clean.</p></article>
       </div>
       <div class="readthrough"><strong>The honest differentiation statement.</strong> <span class="ev fact">FACT</span> Within a single randomized trial (OPUS-1), VAX-31 demonstrated noninferior OPA responses to both licensed adult standards for the shared serotypes and adds three serotypes (plus 20B cross-reactivity claims) that neither contains. <span class="ev interp">INTERPRETATION</span> Everything beyond that — fewer infections, better pneumonia prevention, replacement dynamics — is inference from serotype-coverage arithmetic, not comparative evidence. ACIP's October 2024 decision to lower the routine adult recommendation age to 50 expanded the eligible population for whoever ACIP prefers after 2028; that committee decision, not the coverage table, will decide the share fight.</div>
       <p class="source-note">Approvals/coverage: FDA approval records and Merck Capvaxive materials (Jun 2024; pediatric expansion Jun 2026) · ACIP adult age-50 recommendation, Oct 2024 (MMWR 2025;74(1):1–8) · King et al., <em>J Infect Dis</em> 2025.</p>
@@ -381,8 +431,8 @@
       <div class="two-col">
         <div class="panel"><h3>Share count and dilution bridge</h3>
           <p><span class="ev fact">FACT</span> Common outstanding: <strong>148,805,278</strong> (Aug 3, 2026; 10-Q cover). October offering adds 8,584,375 shares (full greenshoe) → <strong>157,389,653</strong> estimated pro-forma common <span class="ev interp">INTERPRETATION</span> (excludes any Aug–Oct option exercises — <span class="ev gap">GAP</span> until Q3 10-Q).</p>
-          <p><span class="ev fact">FACT</span> Pre-funded warrants: 5,463,793 outstanding at Jun 30, 2026 ($0.001 strike) + 400,000 issued Oct 2026 = <strong>5,863,793</strong> — economically common stock. Options 12,111,431 (weighted-average exercise ≈$46–47, est.), RSUs 3,019,377, ESPP shares 275,396 (all Jun 30, 2026).</p>
-          <p>At $65.27 (Oct 15, 2026): basic market cap ≈$9.71B (Aug 3 count) · economic ≈$10.66B (163,253,446 shares incl. PFW) · treasury-method FD ≈170.0M shares → FD market cap ≈$11.10B · implied EV ≈$8.27B on ~$3.4B pro-forma cash less $575M notes.</p>
+          <p><span class="ev fact">FACT</span> Pre-funded warrants: 5,463,793 outstanding at Jun 30, 2026 ($0.001 strike); 3,946,094 were exercised in July 2026 (3,946,020 shares issued — already inside the Aug 3 common count above), leaving 1,517,699; + 400,000 issued Oct 2026 = <strong>1,917,699</strong> — economically common stock. Options 12,111,431 (11,497,821 regular options at a $45.99 weighted-average strike, plus 613,610 performance-contingent options struck at $102.70), RSUs 3,019,377, ESPP shares 275,396 (all Jun 30, 2026).</p>
+          <p>At $65.27 (Oct 15, 2026): basic market cap ≈$9.71B (Aug 3 count) · economic ≈$10.40B (159,307,352 shares incl. PFW) · treasury-method FD ≈166.0M shares → FD market cap ≈$10.83B · implied EV ≈$8.01B on ~$3.4B pro-forma cash less $575M notes.</p>
         </div>
         <div class="panel"><h3>Runway — read the commitment, not the estimate</h3>
           <p><span class="ev fact">FACT</span> The Q2 2026 10-Q liquidity language commits only to the standard ≥12 months from filing. <strong>No multi-year runway guidance exists</strong> — any longer figure is arithmetic, including this one: <span class="ev interp">INTERPRETATION</span> at the H1 2026 burn pace (~$1.0B/yr, rising with launch prep), ~$3.4B pro-forma cash funds operations into roughly 2029 — through the BLA and the initial launch window, with little room for a CRL cycle or a second Phase 3 surprise.</p>
@@ -392,12 +442,12 @@
       <div class="panel" style="margin-top:20px"><h3>Financing history — dilution is the business model's other half</h3>
         <table class="study-table"><thead><tr><th>When</th><th>Instrument</th><th>Size / price</th></tr></thead><tbody>
           <tr><td data-label="When">Jun 2020</td><td data-label="Instrument">IPO</td><td data-label="Size">Nasdaq listing (File No. 001-39323)</td></tr>
-          <tr><td data-label="When">Feb 2024</td><td data-label="Instrument">Common offering</td><td data-label="Size">≈$862.5M gross at $64.00</td></tr>
+          <tr><td data-label="When">Feb 2024</td><td data-label="Instrument">Common + pre-funded warrants (781,250)</td><td data-label="Size">≈$862.5M gross at $64.00</td></tr>
           <tr><td data-label="When">Sep 2024</td><td data-label="Instrument">Common + pre-funded warrants (2,427,184 PFW)</td><td data-label="Size">$1.5B gross at $103.00</td></tr>
           <tr><td data-label="When">Feb 2026</td><td data-label="Instrument">Common offering, 12,650,000 shares</td><td data-label="Size">$50.00; net proceeds $601.8M</td></tr>
           <tr><td data-label="When">Oct 2026</td><td data-label="Instrument">Common (8,584,375) + PFW (400,000) + converts</td><td data-label="Size">$64.00 equity pricing; $575M 1.50% notes due 2032; total gross ≈$1.15B</td></tr>
         </tbody></table>
-        <p class="source-note">SEC filings and offering releases. Equity net proceeds Oct 2026 estimated at ~$545M (applying the priced-tranche disclosed net/gross ratio) and notes net ~$559M — <span class="ev interp">INTERPRETATION</span>; closing releases state gross only.</p>
+        <p class="source-note">SEC filings and offering releases. Net proceeds Oct 2026 are disclosed in the Oct 9, 2026 Form 8-K: $544.3M from the equity offering and $558.7M from the notes ($1,103.0M combined) — <span class="ev fact">FACT</span>.</p>
       </div>
     </section>
 
@@ -412,17 +462,17 @@
         <article><time>2H 2027 · GUIDE</time><h3>VAX-A1 (Group A Strep) Phase 1 topline</h3><p>Platform-breadth signal only; no value hinges on it.</p></article>
         <article><time>2027 · GUIDE</time><h3>Manufacturing consistency study + infant Phase 3 start</h3><p>Lot-to-lot consistency is a BLA prerequisite and the least visible risk in the program — no start date has been disclosed <span class="ev gap">GAP</span>.</p></article>
         <article><time>1H 2028 · GUIDE</time><h3>Adult BLA submission</h3><p>Acceptance, review clock (standard vs priority — undisclosed), advisory-committee possibility, and the serotypes 3/12F negotiation all price off this.</p></article>
-        <article><time>2028–29 · INF</time><h3>Approval + ACIP vote + launch</h3><p>The commercial binary. Also watch Merck STRIDE-PEDS progress and any Pfizer higher-valency response in the interim — competitors get two-plus years to position.</p></article>
+        <article><time>2028–29 · INF</time><h3>Approval + ACIP vote + launch</h3><p>The commercial binary. Also watch Merck pediatric PCV21 follow-ons (post-STRIDE-13) and any Pfizer higher-valency response in the interim — competitors get two-plus years to position.</p></article>
       </div>
     </section>
     <section id="scenarios">
-      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit machinery</h2><p class="lede">Framework: scenario equity value = scenario operating EV + forward cash bridge − debt, divided by a treasury-method fully diluted share count solved at the scenario price. Forward cash bridge (shared): ≈$3.4B pro-forma cash − ~$1.5B burn through end-2027 ≈ $1.9B; the $575M converts are treated as debt except in the bull case, where the scenario price exceeds the $89.60 conversion price and they are treated as converted (debt extinguished, 6,417,402 shares added). Base FD counts: 163,253,446 economic shares + option treasury add-back at ≈$46.50 weighted-average strike + 3,019,377 RSUs + 275,396 ESPP shares. Bear/base/bull operating EVs are judgment inputs — the arithmetic on them is exact.</p></div></div>
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit machinery</h2><p class="lede">Framework: scenario equity value = scenario operating EV + forward cash bridge − debt, divided by a treasury-method fully diluted share count solved at the scenario price. Forward cash bridge (shared): ≈$3.4B pro-forma cash − ~$1.5B burn through end-2027 ≈ $1.9B; the $575M converts are treated as debt except in the bull case, where the scenario price exceeds the $89.60 conversion price and they are treated as converted (debt extinguished, 6,417,402 shares added). Share counts: 159,307,352 economic shares + treasury-method option add-back (11,497,821 regular options at the $45.99 weighted-average strike; the 613,610 performance-contingent options struck at $102.70 enter only in the bull case) + 3,019,377 RSUs + 275,396 ESPP shares. Bear/base/bull operating EVs are judgment inputs — the arithmetic on them is exact.</p></div></div>
       <div class="scenario-grid">
-        <article class="scenario"><h3>Bear</h3><div class="range">$12–15</div><p class="point">$13.36 point estimate</p><ul><li>FDA review hardens on serotypes 3/12F and/or CMC consistency; approval slips past 2029 or lands with a carved-up label.</li><li>Infant Phase 2 selects VAX-24 or disappoints; VAX-31 infant path stalls.</li><li>ACIP gives no preferential position; incumbents hold share with contracting; operating EV ≈$0.9B (franchise residual + platform).</li><li class="scenario-math">Equity = $0.90B EV + $1.90B cash − $0.575B notes = $2.225B ÷ 166.5M FD shares (at $14.50; most options out of the money) = $13.36.</li></ul></article>
-        <article class="scenario featured"><h3>Base</h3><div class="range">$58–70</div><p class="point">$63.73 point estimate</p><ul><li>BLA filed 1H 2028, approval 2028–29 with a label that keeps the coverage claim materially intact (3/12F handled via the historical-threshold argument).</li><li>OPUS-2/3 supportive; infant Phase 3 starts with VAX-31; ACIP lists VAX-31 as a co-equal/preferred adult option and it takes leading adult share over time.</li><li>Operating EV ≈$9.5B — i.e., the market roughly holds today's operating value while the cash bridge burns down.</li><li class="scenario-math">Equity = $9.50B EV + $1.90B cash − $0.575B notes = $10.825B ÷ 169.9M FD shares (at $64.00) = $63.73.</li></ul></article>
-        <article class="scenario"><h3>Bull</h3><div class="range">$100–115</div><p class="point">$107.86 point estimate</p><ul><li>Clean label, preferred ACIP positioning, adult standard-of-care share; infant Phase 2 strong and Phase 3 underway; ex-U.S. partnership adds validation.</li><li>Operating EV ≈$17.5B. Point estimate sits at the October 2026 consensus average (~$109–117 tallies) and below the $146 street high — per library rule, maximum cases do not overshoot the Street.</li><li class="scenario-math">Equity = $17.50B EV + $1.90B cash + converts extinguished = $19.40B ÷ 179.9M FD shares (at $108.00, incl. 6.42M conversion shares) = $107.86.</li></ul></article>
+        <article class="scenario"><h3>Bear</h3><div class="range">$12–15</div><p class="point">$13.68 point estimate</p><ul><li>FDA review hardens on serotypes 3/12F and/or CMC consistency; approval slips past 2029 or lands with a carved-up label.</li><li>Infant Phase 2 selects VAX-24 or disappoints; VAX-31 infant path stalls.</li><li>ACIP gives no preferential position; incumbents hold share with contracting; operating EV ≈$0.9B (franchise residual + platform).</li><li class="scenario-math">Equity = $0.90B EV + $1.90B cash − $0.575B notes = $2.225B ÷ 162.6M FD shares (all options out of the money at these prices) = $13.68.</li></ul></article>
+        <article class="scenario featured"><h3>Base</h3><div class="range">$58–70</div><p class="point">$65.21 point estimate</p><ul><li>BLA filed 1H 2028, approval 2028–29 with a label that keeps the coverage claim materially intact (3/12F handled via the historical-threshold argument).</li><li>OPUS-2/3 supportive; infant Phase 3 starts with VAX-31; ACIP lists VAX-31 as a co-equal/preferred adult option and it takes leading adult share over time.</li><li>Operating EV ≈$9.5B — i.e., the market roughly holds today's operating value while the cash bridge burns down.</li><li class="scenario-math">Equity = $9.50B EV + $1.90B cash − $0.575B notes = $10.825B ÷ 166.0M FD shares (treasury-solved at the point estimate) = $65.21.</li></ul></article>
+        <article class="scenario"><h3>Bull</h3><div class="range">$100–115</div><p class="point">$110.37 point estimate</p><ul><li>Clean label, preferred ACIP positioning, adult standard-of-care share; infant Phase 2 strong and Phase 3 underway; ex-U.S. partnership adds validation.</li><li>Operating EV ≈$17.5B. Point estimate sits just above the October 2026 MarketBeat consensus average target ($108.60) and well below the $146 street high (BofA) — per library rule, maximum cases do not overshoot the Street.</li><li class="scenario-math">Equity = $17.50B EV + $1.90B cash + converts extinguished = $19.40B ÷ 175.8M FD shares (treasury-solved at the point estimate, incl. 6.42M conversion shares) = $110.37.</li></ul></article>
       </div>
-      <div class="readthrough"><strong>What the current price implies.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the market pays slightly <em>above</em> this base case — meaning today's holder needs the base case to arrive on schedule, or the bull case to start forming (clean BLA acceptance, strong infant data), just to stand still. The asymmetry from here is thinner than the +$25 intraday spike on October 5 suggested and thinner than consensus targets imply, because consensus EVs embed minimal value for the two-year pre-revenue burn.</div>
+      <div class="readthrough"><strong>What the current price implies.</strong> <span class="ev interp">INTERPRETATION</span> At $65.27 the market pays almost exactly this base case ($65.21) — meaning today's holder needs the base case to arrive on schedule, or the bull case to start forming (clean BLA acceptance, strong infant data), just to stand still. The asymmetry from here is thinner than the +$25 intraday spike on October 5 suggested and thinner than consensus targets imply, because consensus EVs embed minimal value for the two-year pre-revenue burn.</div>
     </section>
 
     <section id="management">
@@ -433,12 +483,12 @@
           <p><strong>Andrew Guggenhime</strong> — President and CFO. Owner of the financing cadence in §07: four major raises since Feb 2024, each executed into clinical strength, plus the company's first convertible issue.</p>
           <p><strong>James (Jim) Wassil</strong> — CSO and COO (Form 4 title: EVP, Chief Scientific Officer, COO). Senior scientific author on the platform's peer-reviewed papers; publicly carried the OPUS-1 FDA-review framing on the PCV21 comparison.</p>
           <p><strong>Luis Jodar</strong> — Chief Medical Officer, appointed in the September 2026 leadership update (Form 8-K, Sep 3, 2026), weeks before the OPUS-1 readout; quoted in the OPUS-1 release on the coverage trade-offs between current adult PCVs. <strong>David McAvoy</strong> — Chief Legal Officer, appointed Aug 31, 2026.</p>
-          <p class="source-note">Track record <span class="ev fact">FACT</span>: OPUS-1 guided "Q4 2026" in January 2026, then narrowed to early October by the Sep 3, 2026 8-K, and delivered Oct 5. The 2024 guidance to start the pivotal trial by mid-2025 and read out in 2026 was met. Financing guidance (raise post-data) was executed within 24 hours of the readout.</p>
+          <p class="source-note">Track record <span class="ev fact">FACT</span>: OPUS-1 guided "Q4 2026" in January 2026, then narrowed to "by end of October" in the Sep 3, 2026 release, and delivered Oct 5. The 2024 guidance to start the pivotal trial by mid-2025 and read out in 2026 was met. Financing guidance (raise post-data) was executed within 24 hours of the readout.</p>
         </div>
         <div class="panel"><h3>Insider signals (EDGAR Form 4)</h3>
-          <p><span class="ev fact">FACT</span> <strong>Oct 5, 2026 (readout day):</strong> Wassil exercised 18,000 options at $5.35 and sold 18,000 shares at $86.74; SVP Finance/CAO Elvia Cowan exercised 19,000 options at $25.92 and sold 19,000 at $86.74. Two Form 144 proposed-sale notices were also filed Oct 5. These are exercise-and-sell transactions monetizing deep-in-the-money options into the intraday spike — liquidity events, not open-market purchases or discretionary position-building; whether they ran under pre-arranged 10b5-1 plans is not established from the filings reviewed — <span class="ev gap">GAP</span>.</p>
-          <p><span class="ev fact">FACT</span> <strong>Oct 1, 2026:</strong> Wassil exercised 2,250 options at $5.35 and sold 2,250 shares at ≈$56.65–57.09, pre-data. <strong>Sep 9, 2026:</strong> a six-filer cluster of Form 4s consistent with a compensation-cycle event. <strong>Sep 2026:</strong> Guggenhime disposed of ~2,705 shares in a tax-withholding surrender (secondary summary of Form 4) — neutral mechanics.</p>
-          <p><span class="ev interp">INTERPRETATION</span> Net signal: no insider has made an open-market purchase in the record reviewed, and the two largest recent transactions sold into the best price of the year on the day it printed. That is ordinary executive monetization of expiring/valuable options, but it is not alignment evidence — treat management's confidence claims as claims, and the absence of buying as mildly negative, not disqualifying.</p>
+          <p><span class="ev fact">FACT</span> <strong>Oct 5, 2026 (readout day):</strong> Wassil exercised 18,000 options at $5.35 and sold 18,000 shares at $86.74; SVP Finance/CAO Elvia Cowan exercised 19,000 options at $25.92 and sold 19,000 at $86.74. Two Form 144 proposed-sale notices were also filed Oct 5. These are exercise-and-sell transactions monetizing deep-in-the-money options into the intraday spike — liquidity events, not open-market purchases or discretionary position-building; Both sales were executed under pre-arranged Rule 10b5-1 trading plans (per the Form 4 reporting) — pre-scheduled monetization, not discretionary selling into the print.</p>
+          <p><span class="ev fact">FACT</span> <strong>Oct 1, 2026:</strong> Wassil exercised 2,250 options at $5.35 and sold 2,250 shares at an average $56.67, pre-data. <strong>Aug–Sep 2026:</strong> recurring 10b5-1 sales by Wassil (2,250 @ $53.86 on Aug 3; 3,477 @ $61.07 on Sep 1; 1,381 @ $61.16 on Sep 4; 1,334 @ $59.52 on Sep 9) and a 10,000-share Guggenhime sale @ $53.89 on Aug 3, also under a 10b5-1 plan. <strong>Sep 2026:</strong> Guggenhime disposed of ~2,705 shares in a tax-withholding surrender (secondary summary of Form 4) — neutral mechanics.</p>
+          <p><span class="ev interp">INTERPRETATION</span> Net signal: no insider has made an open-market purchase in the record reviewed, and the two largest recent transactions were pre-arranged 10b5-1 exercise-and-sell programs that happened to settle on the day the year's best price printed. That is ordinary executive monetization of valuable options — not a discretionary bearish signal — but it is not alignment evidence either — treat management's confidence claims as claims, and the absence of buying as mildly negative, not disqualifying.</p>
         </div>
       </div>
     </section>
@@ -467,7 +517,7 @@
           <li>Form 8-K, Oct 9, 2026 and Oct 6–9, 2026 offering releases: pricing at $64.00; closing with full greenshoe exercise — 8,584,375 shares, pre-funded warrants on 400,000 shares, $575M 1.50% convertible senior notes due Oct 15, 2032, conversion price ≈$89.60; aggregate gross ≈$1.15B.</li>
           <li>Form 8-K, Sep 3, 2026: leadership appointments (CMO; CLO appointed Aug 31, 2026) and OPUS-1 timing narrowing.</li>
           <li>Form 424B5 prospectus supplement (Oct 2026): preliminary cash and investments ≈$2.3B at Sep 30, 2026; OPUS-2/OPUS-3 enrolled; use of proceeds.</li>
-          <li>Form 4 filings: Wassil (Oct 2 and Oct 7, 2026 filings; transactions Oct 1 and Oct 5, 2026), Cowan (Oct 7, 2026 filing; transactions Oct 5, 2026), six-filer cluster Sep 9, 2026; Form 144 notices Oct 1 and Oct 5, 2026.</li>
+          <li>Form 4 filings: Wassil (transactions Oct 1 and Oct 5, 2026; recurring Aug–Sep 2026 sales), Cowan (transactions Oct 5, 2026), Guggenhime (Aug 3, 2026 sale; Sep 2026 tax-withholding surrender); the Oct 5 exercise-and-sell transactions ran under pre-arranged Rule 10b5-1 plans; Form 144 notices Oct 1 and Oct 5, 2026.</li>
           <li>Prior offering records: Feb 2024 (≈$862.5M gross at $64.00), Sep 2024 ($1.5B gross at $103.00 incl. pre-funded warrants), Feb 2026 (12,650,000 shares at $50.00; net $601.8M).</li>
         </ol>
         <h3>FDA / regulatory / CDC</h3>
@@ -488,7 +538,7 @@
           <li>King LM, Andrejko KL, Kobayashi M, et al. Pneumococcal serotype distribution and coverage of existing and pipeline pneumococcal vaccines. <em>J Infect Dis</em>. 2025;232(4):e609–e620.</li>
           <li>VAX-24 Phase 1/2 adult proof-of-concept results. <em>The Lancet Infectious Diseases</em> (published Dec 2023): all 24 serotypes met/exceeded regulatory immunogenicity standards at 2.2 mcg; safety comparable to PCV20.</li>
           <li>Fairman J, Agarwal P, Barbanel S, et al. Non-clinical immunological comparison of a next-generation 24-valent pneumococcal conjugate vaccine (VAX-24) using site-specific carrier protein conjugation to PCV13 and PPV23. <em>Vaccine</em>. 2021;39(23). DOI: 10.1016/j.vaccine.2021.03.070.</li>
-          <li>Grant LR, et al. Distribution of serotypes causing invasive pneumococcal disease in U.S. children. <em>Front Pediatr</em>. 2024 (children's coverage estimates cited in company materials).</li>
+          <li>Grant LR, et al. Characterization of <em>Streptococcus pneumoniae</em> isolates obtained from the middle ear fluid of US children, 2011–2021. <em>Front Pediatr</em>. 2024;12:1383748 (otitis-media coverage estimates cited in company materials).</li>
           <li>Andrews NJ, et al. Serotype-specific effectiveness and correlates of protection for the 13-valent pneumococcal conjugate vaccine. <em>Lancet Infect Dis</em>. 2014 — serotype 3 effectiveness not demonstrated for PCV13.</li>
         </ol>
         <h3>Company releases (UNVERIFIED tier — used for topline data, guidance and estimates)</h3>
@@ -497,17 +547,17 @@
           <li>VAX-31 adult Phase 1/2 topline release, Sep 3, 2024 (n=1,015).</li>
           <li>Program update release, Jan 22, 2026 (OPUS-2 first dosing; infant enrollment complete, n=905; timing guidance).</li>
           <li>VAX-24 infant Phase 2 topline release, Mar 31, 2025; Q1 2025 results release, May 7, 2025 (booster interim detail).</li>
-          <li>OPUS-3 initiation release, 2026 (n≈720; ~6,000 OPUS adults expected; ~3,400 VAX-31 recipients).</li>
+          <li>OPUS-3 initiation release, 2026 (n≈720); Q1 2026 results release, May 6, 2026 (final OPUS enrollment: 6,191 adults dosed across OPUS-1/2/3, ~3,500 VAX-31 recipients; OPUS-2 dosed 1,390).</li>
           <li>North Carolina fill-finish expansion update, Sep 2025 (long-term commitment up to $1B).</li>
         </ol>
         <h3>Trade press / market data</h3>
         <ol>
           <li>Fierce Biotech, Oct 2026: OPUS-1 coverage including Wassil's FDA-review framing on the PCV21 comparison (paraphrased; brief verified figures only).</li>
           <li>Pharmacy Times, Oct 2026: OPUS program summary and OPUS-2 NCT07365826.</li>
-          <li>MarketBeat PCVX price history and analyst-target tallies (Oct 2026 closes; consensus average ≈$109–117; street high $146 BofA, Oct 5, 2026); Finnhub snapshot (52-week range $39.87–$90.75).</li>
+          <li>MarketBeat PCVX price history and analyst-target tallies (Oct 2026 closes; consensus average target $108.60, Oct 6, 2026; street high $146, BofA, raised Oct 6, 2026); Finnhub snapshot (52-week range $39.87–$90.75).</li>
           <li>Financing net-proceeds ratios for the October 2026 tranches as reported in offering coverage (pharmadevicenews summary of the 424B5) — used only to estimate net proceeds, flagged in §07.</li>
         </ol>
-        <p class="source-note">Gaps carried openly: full OPUS-1 dataset (per-serotype GMRs/CIs, complete safety tables) unpublished · manufacturing consistency study timing undisclosed · Q3 2026 reported financials pending · 10b5-1 plan status of October 2026 insider sales not established from filings reviewed · adult review clock (standard vs priority) undisclosed. No personal data of any kind is contained in this dossier.</p>
+        <p class="source-note">Gaps carried openly: full OPUS-1 dataset (per-serotype GMRs/CIs, complete safety tables) unpublished · manufacturing consistency study timing undisclosed · Q3 2026 reported financials pending · adult review clock (standard vs priority) undisclosed. No personal data of any kind is contained in this dossier.</p>
       </div>
     </section>
   </main>
