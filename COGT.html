@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>COGT — Cogent Biosciences Deep-Dive Dossier</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head><body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · COGT</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>Three NDAs, one selective KIT inhibitor — and a $5.4B price on a clean sweep</h1>
+        <p class="hero-dek">A source-weighted investigation of Cogent Biosciences and bezuclastinib (CGT9486): a type I KIT inhibitor engineered to hit D816V hard and the edema/CNS anti-targets barely at all. All three pivotal trials hit in 2025. The FDA decides on GIST on November 30, 2026 and on non-advanced systemic mastocytosis on December 30, 2026 — with advanced SM following June 29, 2027.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$31.24</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$4.79B</strong> est. enterprise value · <strong>~$4.99</strong> pro-forma cash per share<br>$5.42B implied equity (173.5M shares) · $865.9M pro-forma cash (Jun 30, 2026 + post-quarter ATM)</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The science risk is spent; what remains is regulatory and commercial</h2><p class="lede">Cogent is the largest name in this library's cohort — roughly a $5.4B market cap against ~$866M of pro-forma cash — and the only one whose pivotal-trial risk is already behind it. SUMMIT (non-advanced SM), APEX (advanced SM) and PEAK (second-line GIST) all read out positive in 2025. Three NDAs are under FDA review with hard PDUFA dates. The question is no longer whether bezuclastinib works; it is whether the labels come back clean enough — particularly on liver enzymes — for a tolerability-led drug to take share from Sanofi's Ayvakit, and whether a first-time commercial organization can execute three launches in seven months.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$4.79B</div><p><span class="ev interp">INTERPRETATION</span> Oct 20 close: $5.42B implied equity (173.5M shares × $31.24) less $865.9M pro-forma cash, plus $230M convertible notes at principal. On an as-converted basis (preferred included) equity is ~$5.87B and EV ~$5.23B. This is a commercial-stage valuation, not an option-value stub.</p></article>
+        <article class="decision"><div class="tag">Pro-forma cash per share</div><div class="big">~$4.99</div><p><span class="ev interp">INTERPRETATION</span> $865.9M ÷ 173.5M common shares. Cash is ~16% of the share price — downside protection is thin compared with the pre-revenue names in this library; the equity case must be carried by approvals and launch revenue.</p></article>
+        <article class="decision warn"><div class="tag">Next decisive event</div><div class="big">Nov 30, 2026</div><p><span class="ev fact">FACT</span> PDUFA for bezuclastinib + sunitinib in second-line GIST (PEAK), under Priority Review with Breakthrough Therapy Designation and Real-Time Oncology Review. FDA has said no advisory committee is planned and no review issues identified to date (company disclosures, May–Aug 2026).</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">3 NDAs filed</div><p><span class="ev fact">FACT</span> NonAdvSM (submitted Dec 2025, PDUFA Dec 30, 2026), GIST (completed Apr 2026 under RTOR, PDUFA Nov 30, 2026), AdvSM (submitted Jun 30, 2026, PDUFA Jun 29, 2027). No AdCom planned for any of the three, per company disclosures.</p></article>
+      </div>
+      <p><span class="ev fact">FACT</span> Identity, verified from SEC EDGAR: Cogent Biosciences, Inc., Nasdaq: COGT, CIK 0001622229, Delaware corporation, fiscal year-end Dec 31, headquartered Waltham, MA and Boulder, CO. The corporate shell began as Unum Therapeutics (IPO April 2018 under ticker UMRX, then a cell-therapy company) and was renamed Cogent Biosciences effective October 2020 in the pivot to the KIT program (FY2025 10-K). Lead asset bezuclastinib, also known as CGT9486 (originated as PLX9486), is an oral type I tyrosine kinase inhibitor of mutant KIT.</p>
+      <p><span class="ev interp">INTERPRETATION</span> The single swing factor is label quality across the first two decisions — above all, how the transaminase signal (grade ≥3 ALT/AST in ~6% of SUMMIT patients; grade 3+ liver-enzyme-driven dose reductions in 12.7% of PEAK combination patients) is rendered in the approved labels. Bezuclastinib's entire commercial thesis against avapritinib is tolerability-driven switching and first-line-of-therapy positioning in indolent disease; a burdensome hepatic monitoring schedule or warning language would compress that thesis in all three indications at once, because it is the same molecule and the same safety database.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Priced for approvals, not for a franchise</h2><p class="lede">At $31.24 the market pays ~$4.8B of enterprise value for a company with no revenue, three pending NDAs, and an incumbent competitor already selling ~$725M a year of the same target class. Consensus ($51.56 average, $62 high) prices a materially cleaner outcome than the current quote — the disagreement is about label and launch, not about the trial data, which are public and unambiguous.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card"><h3>What the price already assumes</h3><p><span class="ev interp">INTERPRETATION</span> An EV of ~$4.8B against zero current revenue cannot be carried by the smallest indication (AdvSM, a few thousand US patients). It requires GIST second-line to become a real commercial line and NonAdvSM — the largest SM population, mostly indolent patients treated for symptoms over years — to convert at orphan-drug pricing. In other words, the Nov 30 and Dec 30 decisions are not binary upside events here; they are substantially in the price, and a CRL on either is a de-rating event, not a disappointment.</p></article>
+        <article class="paper-card"><h3>Street posture</h3><p><span class="ev fact">FACT</span> Consensus average price target $51.56 (MarketBeat aggregation, Oct 2026); high is J.P. Morgan at $62 (Sep 9, 2026, also added COGT to its Analyst Focus List); UBS $60; a $55 cluster (Wedbush, H.C. Wainwright, LifeSci, Piper Sandler). Dissent exists: Needham rates Hold with no target (assigned Aug 11, 2026) and Baird Hold at $35 (Feb 19, 2026). 52-week range $13.78–$43.73 (Finnhub, Oct 20, 2026).</p></article>
+      </div>
+      <p class="source-note">Price, range and consensus: Finnhub and MarketBeat/TipRanks aggregations dated Oct 2026 — secondary sources, labeled accordingly; share count and cash are from SEC filings (see Financials).</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>One mutation, three diseases — and a selectivity argument that is measurable</h2><p class="lede">KIT D816V is a constitutively active kinase mutation in exon 17 that drives ~95% of systemic mastocytosis and appears as a secondary resistance mutation in GIST. Bezuclastinib is a type I inhibitor built to occupy the active conformation of mutant KIT while sparing the closely related kinases whose inhibition produces the class's dose-limiting toxicities — and to stay out of the brain.</p></div></div>
+      <p><span class="ev fact">FACT</span> Plain-language version: mast cells and many GIST tumors run on a stuck "on" switch called KIT. In most mastocytosis patients the switch is broken by a single-letter change, D816V, that imatinib-class drugs cannot touch because the mutation changes the shape they bind to. Bezuclastinib was designed against that exact shape. The engineering claim is precision: hit the mutant switch, leave its closest molecular cousins (wild-type KIT, PDGFRα/β, CSF1R, VEGFR2) alone, because hitting those cousins is what causes the swelling, effusions, bleeding and cognitive problems that limit the older drugs — and keep the drug out of the brain, where the incumbent, avapritinib, carries warnings for intracranial hemorrhage and cognitive effects.</p>
+      <h3>The selectivity data (cellular assays, head-to-head)</h3>
+      <p><span class="ev fact">FACT</span> In Cogent's comparative cellular profiling (AACR-NCI-EORTC 2021; company poster, corroborated in the peer-reviewed APEX methods literature): bezuclastinib inhibited KIT V560G/D816V phosphorylation at IC<sub>50</sub> 14 nM, while phospho-PDGFRα, phospho-PDGFRβ and phospho-CSF1R all remained &gt;10,000 nM — windows of &gt;700-fold. In the same assays avapritinib read 13 nM (KIT), 53 nM (PDGFRα), 10 nM (PDGFRβ) and 249 nM (CSF1R): i.e., avapritinib inhibits PDGFRβ at least as potently as its target. In Ba/F3 growth assays, bezuclastinib IC<sub>50</sub> was 6.6 nM against KIT D816V and 7.1 nM against V560G/D816V, versus 61 nM against wild-type KIT (Gebreyohannes et al., and vendor data summaries of the same work). Brain penetration in rat tissue distribution was minimal (brain:plasma ratio &lt;0.1 at clinically correlated exposures).</p>
+      <p><span class="ev interp">INTERPRETATION</span> Two honest qualifications. First, "wild-type sparing" is relative, not absolute: the wild-type KIT window in growth assays is ~9-fold, and the drug plainly does inhibit wild-type KIT at clinical exposure — the clinical correlates (hair depigmentation in 31–70% of patients across programs) are on-target KIT pharmacology, not an accident. Second, the clinical record so far is consistent with the design intent where it matters most: no intracranial bleeding and no treatment-related cognitive impairment signal emerged in APEX Part 1 or the pivotal programs, and edema rates, while present (periorbital/peripheral ~13% in APEX Part 1), sit well below the avapritinib experience. The selectivity claim is therefore best read as a toxicity-shaping claim, not an efficacy claim — efficacy against D816V is comparable in kind to avapritinib; the differentiation is what patients don't have to tolerate.</p>
+      <h3>How it could fail scientifically</h3>
+      <p><span class="ev interp">INTERPRETATION</span> (1) The transaminase signal is real, reproducible across all three programs, and mechanistically unexplained in public data — if FDA treats it as a class-level hepatic liability, the label could carry monitoring that erases the convenience advantage. (2) In GIST the drug is not used alone: the PEAK regimen bolts bezuclastinib onto sunitinib, itself a multi-kinase inhibitor with its own toxicity, so the "clean selective drug" story is diluted in the largest-revenue indication. (3) Resistance: type I KIT inhibitors remain vulnerable to activation-loop and gatekeeper evolution; durability beyond the PEAK/OS follow-up is unproven, and overall survival in PEAK is still immature.</p>
+      <p class="source-note">Key literature: DeAngelo et al., APEX design/methods, HemaSphere (EHA abstract book, PMC9431291); Rein et al., SUMMIT primary analysis, Blood 2025;146(Suppl 1):80; Wagner et al., JAMA Oncology 2021 (Phase 1 bezuclastinib ± sunitinib in GIST); Gebreyohannes et al., Clin Exp Med 2019 (PDX); Gotlib et al. and the mIWG-MRT-ECNM response-criteria literature for AdvSM endpoints.</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Three pivotal datasets, all positive — with one recurring safety footnote</h2><p class="lede">Every number below is from the registrational datasets as presented at ASH 2025 (SUMMIT), EHA 2026 (APEX) and ASCO 2026 (PEAK), via company releases furnished on Form 8-K and congress reporting. Cross-trial comparisons to avapritinib are flagged as such and are not head-to-head evidence.</p></div></div>
+      <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Key results</th></tr></thead><tbody>
+        <tr><td data-label="Study">SUMMIT — NonAdvSM (NCT05186753)</td><td data-label="Design">Randomized, double-blind, placebo-controlled Phase 2 (registration-directed Part 2): bezuclastinib 100 mg QD + best supportive care, n=119 randomized, vs placebo + BSC, n=60; primary endpoint mean change in total symptom score (TSS, MS2D2 diary) at week 24. Registry total enrollment 237 across Parts 1–3.</td><td data-label="Key results">Primary hit: mean TSS change at wk 24 −24.3 (−43%) vs −15.4 (−29%); difference −8.91 (95% CI −13.56 to −4.26), p&lt;0.001 (topline p=0.0002). ≥30% TSS reduction 65.4% vs 38.6% (p&lt;0.001); ≥50% reduction 34.3% vs 18.1% (p=0.01). Objective markers: ≥50% serum tryptase reduction 87.4% (95.4% of evaluable at ASH) vs 0%; ≥50% bone-marrow mast-cell reduction or aggregate clearance 88.2% vs 25.5%; ≥50% KIT D816V VAF reduction 97.5% vs 0% (all p&lt;0.0001). At 48 weeks (single-arm follow-on): TSS −32.0 (−54%), ≥50% responders 56.4%.</td></tr>
+        <tr><td data-label="Study">APEX — AdvSM (NCT04996875)</td><td data-label="Design">Open-label, single-arm Phase 2. Part 1 dose optimization (50/100/200 mg BID, 400 mg QD; n=32). Part 2 at the selected 150 mg dose: 81 patients treated (57 SM-AHN, 11 ASM, 13 MCL); primary endpoint ORR (CR+CRh+PR+CI) per mIWG-MRT-ECNM, responses 12-week confirmed.</td><td data-label="Key results">At the Mar 31, 2026 cutoff (EHA 2026): ORR 65% per mIWG among 68 evaluable patients, with 57% achieving CR/CRh/PR; ORR 81% per pure pathological response (PPR) criteria. 12-month PFS 79%; 12-month OS 87%; medians not reached. ≥50% reductions: tryptase 89%, bone-marrow mast cells 89%, KIT D816V VAF 91% (n=43); roughly one-third of patients reached undetectable VAF. Dec 2025 topline on an earlier cut read ORR 57% mIWG / 80% PPR — the EHA update supersedes it.</td></tr>
+        <tr><td data-label="Study">PEAK — 2L GIST (Phase 3)</td><td data-label="Design">Randomized Phase 3, &gt;440 enrolled: bezuclastinib + sunitinib 37.5 mg vs sunitinib 37.5 mg alone, in imatinib-resistant or -intolerant GIST; primary endpoint PFS by blinded independent central review. Cutoff Sep 30, 2025; presented ASCO 2026.</td><td data-label="Key results">Primary hit decisively: mPFS 16.5 vs 9.2 months, HR 0.50 (95% CI 0.39–0.65), p&lt;0.0001 — a 50% reduction in risk of progression or death against an active comparator, the first positive randomized trial in second-line GIST in over 20 years (company characterization). ORR 46% vs 26% (p&lt;0.0001). Overall survival immature. Mean treatment duration on the combination estimated 21.4 months among ongoing patients (Mar 31, 2026). An exon 9 subgroup showed 25.1-month mPFS, now the subject of a 40-patient first-line extension cohort.</td></tr>
+      </tbody></table>
+      <h3>Safety, program by program — the transaminase thread</h3>
+      <p><span class="ev fact">FACT</span> <strong>SUMMIT</strong> (24-week double-blind; bezu n=118 safety set): TEAEs 98.3% vs 88.3% placebo; ~70% of TEAEs grade 1; serious TEAEs 4.2% vs 5.0%. Most common: hair color changes 69.5% vs 5.0%, altered taste 23.7% vs 0%, nausea 22.0% vs 13.3%, ALT/AST elevation 22.0% vs 6.6%, headache 17.8%, alopecia 11.9%, ALP elevation 10.2%. Grade ≥3 ALT/AST occurred in 5.9%; dose reductions for TRAEs 11.0%; discontinuations for TRAEs 5.9% — every one attributable to transaminase elevations, all transient and fully resolved, none requiring hospitalization. Through 48 weeks, TEAE discontinuations were 9.2% (11/119).</p>
+      <p><span class="ev fact">FACT</span> <strong>APEX</strong> (150 mg): most frequent TRAEs — hair color change ~31%, neutropenia ~31%, altered taste ~28%, thrombocytopenia ~25%, ALT/AST elevations ~21%. Dose reductions 14.8%; in the Dec 2025 topline cut there were no discontinuations due to TRAEs; at EHA, of two patients with grade 3 transaminase elevation, one discontinued and one continued after dose reduction. Transaminase elevations were predominantly low-grade, asymptomatic and reversible. In Part 1 (all doses, sicker and higher-dose cohorts): TRAEs 91%, grade ≥3 TRAEs 44%, dose reductions 34%, TRAE discontinuations 6% — including one grade 3 drug-induced liver injury — with no treatment-related cognitive impairment, no intracranial bleeding and no treatment-related deaths.</p>
+      <p><span class="ev fact">FACT</span> <strong>PEAK</strong> (combination): the company characterizes the combination as well tolerated with no unique risks versus sunitinib's known profile. The specific asymmetry in the topline data: AE discontinuations 7.4% (combination) vs 3.8% (sunitinib alone), and grade 3+ liver-enzyme elevations led to dose reductions in 12.7% vs 1.5%. No life-threatening liver-enzyme abnormalities were reported.</p>
+      <p><span class="ev interp">INTERPRETATION</span> Read together: bezuclastinib's tolerability advantage over avapritinib is genuine on the CNS/bleeding axis (the events that drive avapritinib's warnings are absent) and on edema, but it is not a clean drug — it trades those liabilities for a hepatic enzyme signal plus cosmetic hair depigmentation in a third to two-thirds of patients, and myelosuppression in advanced disease. Whether that trade is commercially decisive depends on the label language FDA attaches to the liver signal, which is why §05 is the section that matters most in this dossier.</p>
+    </section>
+
+    <section id="regulatory">
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>Three files, three clocks — note the corrected PDUFA map</h2><p class="lede">A mapping caution first, because secondary summaries (and an earlier internal scan) have scrambled these: the November 30, 2026 date belongs to GIST, the December 30, 2026 date to NonAdvSM, and June 29, 2027 to AdvSM. The assignments below are taken from the company's FDA-acceptance releases, two of which were furnished to the SEC.</p></div></div>
+      <table class="study-table"><thead><tr><th>NDA</th><th>Filing history</th><th>Review status</th></tr></thead><tbody>
+        <tr><td data-label="NDA">GIST (PEAK) — bezuclastinib + sunitinib, post-imatinib</td><td data-label="Filing history">NDA initiated under Real-Time Oncology Review Jan 2026; Breakthrough Therapy Designation granted Jan 2026; submission completed April 2026; accepted May 2026.</td><td data-label="Review status"><strong>PDUFA Nov 30, 2026 [hard]</strong>, Priority Review. FDA communicated no AdCom planned and no potential review issues identified at acceptance (May 28, 2026 release).</td></tr>
+        <tr><td data-label="NDA">NonAdvSM (SUMMIT) — bezuclastinib monotherapy</td><td data-label="Filing history">NDA submitted December 2025; accepted February 2026. Breakthrough Therapy Designation (Oct 2025) covers smoldering SM and NonAdvSM after prior avapritinib; Orphan Drug Designation since Mar 2023.</td><td data-label="Review status"><strong>PDUFA Dec 30, 2026 [hard]</strong>, standard review. The endpoint is a patient-reported symptom score (TSS) — an approval basis with less precedent than the objective endpoints in the other two files.</td></tr>
+        <tr><td data-label="NDA">AdvSM (APEX) — bezuclastinib monotherapy</td><td data-label="Filing history">NDA submitted June 30, 2026; accepted September 15, 2026.</td><td data-label="Review status"><strong>PDUFA Jun 29, 2027 [hard]</strong>, standard review. FDA communicated no AdCom planned and no potential review issues identified at acceptance (Sep 15, 2026 release).</td></tr>
+      </tbody></table>
+      <p><span class="ev fact">FACT</span> Commercial readiness is being built ahead of the decisions, and it is documented in SEC filings rather than only in presentations: the full field-based commercial and medical team was onboarded by August 2026 (Q2 2026 release), and on September 1, 2026 Cogent signed a five-year Commercial Supply Agreement with Hovione for bezuclastinib spray-dried dispersion and tablets, with binding near-term forecast commitments (8-K, Item 1.01, Sep 2, 2026). Expanded Access Programs are active in both GIST and SM.</p>
+      <p><span class="ev interp">INTERPRETATION</span> Regulatory risk ranking, highest to lowest: (1) NonAdvSM — symptom-score primary endpoint in a largely indolent population sets the highest evidentiary bar for benefit-risk, and the standard-review clock gives FDA the most room; a CRL here would be read as endpoint precedent, not necessarily as a drug failure, but the equity would not make that distinction. (2) GIST — Priority Review, BTD, RTOR and an active-comparator HR of 0.50 make outright rejection unlikely; the live risks are label scope (combination-only wording) and hepatic language. (3) AdvSM — single-arm data in a fatal rare disease against mIWG criteria, following the exact path avapritinib and midostaurin took; lowest surprise risk, latest date. A manufacturing/CMC surprise is a background risk for all three; the Hovione agreement is mitigation, not elimination.</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>The incumbent is real, growing, and owned by Sanofi</h2><p class="lede">Bezuclastinib does not enter empty markets. Avapritinib (Ayvakit/Ayvakyt) is approved in AdvSM, indolent SM and PDGFRA-mutant GIST, and its franchise is compounding at roughly 50% a year. The clinical differentiation case — not the marketing case — rests on specific, checkable tolerability and efficacy contrasts.</p></div></div>
+      <div class="signal-grid">
+        <article class="compare-card"><h3>Ayvakit (avapritinib) — the comp that matters</h3><p><span class="ev fact">FACT</span> Net product revenue $479M in 2024; ~$150M in Q1 2025 alone; Blueprint guided FY2025 to $700–720M and Sanofi (which acquired Blueprint for $9.1B upfront in 2025) reported pro-forma FY2025 Ayvakit sales of $725M, with Q1 2026 sales of €177M — a trajectory toward blockbuster status in 2026, and a $2B-by-2030 ambition stated by Blueprint. Avapritinib is the same target (KIT D816V) with a dirtier kinase profile: its label carries warnings for intracranial hemorrhage and cognitive effects, and edema is a signature toxicity.</p></article>
+        <article class="compare-card"><h3>Where bezuclastinib is clinically differentiated</h3><p><span class="ev fact">FACT</span> (1) No intracranial bleeding or treatment-related cognitive signal in the bezuclastinib pivotal programs to date, versus label warnings for avapritinib. (2) Cellular selectivity &gt;700× over PDGFRβ/CSF1R versus ~1× for avapritinib (§03). (3) In AdvSM, APEX ORR 65% (mIWG) with 12-mo OS 87% compares favorably on a cross-trial basis to avapritinib's EXPLORER/PATHFINDER experience — cross-trial, different eras and adjudications; not a superiority claim. (4) In GIST, the PEAK combination beat an active standard head-to-head (HR 0.50), a claim no KIT inhibitor in 2L GIST has previously made.</p></article>
+        <article class="compare-card"><h3>Where it is not differentiated</h3><p><span class="ev fact">FACT</span> Midostaurin (Rydapt, approved AdvSM 2017) is a cheap, dirty multikinase fallback. In GIST, sunitinib is generic-era and the entrenched 2L standard; ripretinib (Qinlock) and regorafenib occupy later lines; and Sanofi retains next-generation SM assets from Blueprint (elenestinib; the wild-type KIT inhibitor BLU-808) that could answer bezuclastinib's tolerability pitch inside the decade. Bezuclastinib also shares the class's cosmetic signature (hair depigmentation) and adds its own hepatic one.</p></article>
+        <article class="compare-card"><h3>Commercial asymmetry</h3><p><span class="ev interp">INTERPRETATION</span> Cogent must out-execute a Sanofi sales machine with a first-time commercial organization across three launches in seven months, selling a tolerability story to the same concentrated prescriber base that already knows Ayvakit. The realistic base case is share-taking in new starts and switch patients (Cogent is already running an avapritinib-switch extension cohort in SUMMIT, results expected by end of 2026), not displacement of stable Ayvakit patients.</p></article>
+      </div>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>One approved-soon molecule, then a discovery-stage bench</h2><p class="lede">Ranked by descending value. Everything after bezuclastinib is preclinical or Phase 1 — real programs with credible selectivity data, but none should carry valuation weight yet beyond option value.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div class="pipe-rank">1</div><div class="pipe-name">Bezuclastinib — GIST (PEAK)</div><div class="pipe-desc"><span class="ev fact">FACT</span> Largest revenue pool of the three filings (2L GIST, combination with sunitinib) and the strongest dataset (randomized HR 0.50). First-line exon 9 extension cohort (n=40) initiated 2026. <span class="pipe-status">PDUFA Nov 30, 2026</span></div></div>
+        <div class="pipe-row"><div class="pipe-rank">2</div><div class="pipe-name">Bezuclastinib — NonAdvSM (SUMMIT)</div><div class="pipe-desc"><span class="ev fact">FACT</span> Largest patient population (indolent/smoldering SM), chronic daily therapy, symptom-driven — the annuity indication if the label lands broadly. Avapritinib-switch cohort read out expected by end of 2026. <span class="pipe-status">PDUFA Dec 30, 2026</span></div></div>
+        <div class="pipe-row"><div class="pipe-rank">3</div><div class="pipe-name">Bezuclastinib — AdvSM (APEX)</div><div class="pipe-desc"><span class="ev fact">FACT</span> Smallest population, highest acuity, cleanest regulatory precedent. Value is strategic as much as commercial: the third approval completes the SM label family. <span class="pipe-status">PDUFA Jun 29, 2027</span></div></div>
+        <div class="pipe-row"><div class="pipe-rank">4</div><div class="pipe-name">CGT1145 — JAK2 V617F inhibitor</div><div class="pipe-desc"><span class="ev fact">FACT</span> Preclinical; &gt;100× selectivity for JAK2 V617F over wild-type JAK2 and JAK1/3 (EHA 2026 poster). The mutant-selective JAK2 concept is genuinely differentiated if it survives translation; IND submission planned. <span class="pipe-status">Pre-IND</span></div></div>
+        <div class="pipe-row"><div class="pipe-rank">5</div><div class="pipe-name">CGT1815 / CGT1263 — pan-KRAS(ON)</div><div class="pipe-desc"><span class="ev fact">FACT</span> Preclinical prodrug/active pair; picomolar activity across KRAS-mutant lines and selectivity over HRAS/NRAS claimed (AACR-NCI-EORTC 2025). Crowded field (Revolution Medicines et al.); IND planned. <span class="pipe-status">Pre-IND</span></div></div>
+        <div class="pipe-row"><div class="pipe-rank">6</div><div class="pipe-name">CGT4255 (ErbB2, CNS-penetrant) · CGT4859 (FGFR2/3) · CGT6297 (PI3Kα)</div><div class="pipe-desc"><span class="ev fact">FACT</span> Early clinical/discovery mutant-selective programs; dose escalation ongoing for CGT4255, Phase 1/2 data pending for CGT4859. Option value only. <span class="pipe-status">Phase 1 / discovery</span></div></div>
+      </div>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>Three dated decisions in seven months</h2><p class="lede">Catalysts are tagged by date quality: <span class="date-tag hard">HARD</span> confirmed date · <span class="date-tag guidance">GUIDANCE</span> company-guided window · <span class="date-tag inferred">INFERRED</span> estimated, not committed · <span class="date-tag gap">GAP</span> no timeline · <span class="date-tag landed">LANDED</span> already occurred. As of October 20, 2026.</p></div></div>
+      <div class="timeline">
+        <article class="event"><div class="event-date">Nov 30, 2026</div><div class="event-body"><h3>GIST PDUFA — bezuclastinib + sunitinib <span class="date-tag hard">HARD</span></h3><p>First decision. Priority Review + BTD + RTOR; no AdCom planned. Label scope and hepatic language are the read-through for the whole franchise.</p></div></article>
+        <article class="event"><div class="event-date">Dec 30, 2026</div><div class="event-body"><h3>NonAdvSM PDUFA <span class="date-tag hard">HARD</span></h3><p>Second decision, on a symptom-score endpoint. The SUMMIT avapritinib-switch cohort results are also expected by end of 2026 [guidance] and would land in the same window as launch positioning.</p></div></article>
+        <article class="event"><div class="event-date">Q4 2026</div><div class="event-body"><h3>Q3 2026 earnings / updated cash and ATM usage <span class="date-tag inferred">INFERRED</span></h3><p>First look at launch-preparation spend trajectory and whether the new $400M ATM (Aug 2026) is being drawn ahead of approvals.</p></div></article>
+        <article class="event"><div class="event-date">Jun 29, 2027</div><div class="event-body"><h3>AdvSM PDUFA <span class="date-tag hard">HARD</span></h3><p>Third decision, standard review, no AdCom planned. By this date the market will also have two quarters of GIST/NonAdvSM launch data — the approval itself may matter less than the revenue run-rate.</p></div></article>
+        <article class="event"><div class="event-date">2026–2027</div><div class="event-body"><h3>IND filings: CGT1815 (KRAS) and CGT1145 (JAK2 V617F) <span class="date-tag guidance">GUIDANCE</span></h3><p>Company-guided, undated. These convert the pipeline from slide-ware to clinical programs; timing slips are low-signal, filings are modest positives.</p></div></article>
+        <article class="event"><div class="event-date">Ongoing</div><div class="event-body"><h3>PEAK overall survival maturation <span class="date-tag gap">GAP</span></h3><p>OS was immature at the Sep 30, 2025 cutoff. A positive OS trend would strengthen the GIST label and guideline position post-approval; no disclosure date is committed.</p></div></article>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Bear, base, bull — priced per PDUFA, not per hope</h2><p class="lede">Scenario-based soft ranges built from this dossier's own numbers, using treasury-method share counts at each scenario's price level. These are illustrative anchors around the three FDA decisions, not price targets or recommendations. Street context (aggregators, Oct 2026): consensus average $51.56; highest published target $62 (J.P. Morgan) — the bull top is held below it.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear</div><div class="big">$12.50–15.00</div><p><span class="ev interp">INTERPRETATION</span> One of the two 2026 decisions fails or lands impaired: the live candidates are a NonAdvSM CRL on the symptom endpoint, or a GIST approval whose hepatic-monitoring label guts the switching thesis; AdvSM slips into a 2027 CRL. Equity de-rates to cash plus a single-indication stub: $2.52–3.02B over ~201.6M treasury-method shares. Cash (~$866M pro forma, less launch burn) cushions but does not floor the stock at ~16% cash-to-price.</p></article>
+        <article class="scen-card base"><div class="tag">Base</div><div class="big">$37.50–44.50</div><p><span class="ev interp">INTERPRETATION</span> GIST and NonAdvSM are approved on their dates with workable labels (transaminase monitoring language, no boxed warning); AdvSM follows June 29, 2027. Launches ramp against Ayvakit on new starts and switchers, funded from the existing balance sheet with no major raise before late 2028; pipeline carries no value. Equity value $8.0–9.5B over ~213.8M treasury-method shares — roughly the level at which the stock traded at its August 2026 highs, i.e., the market paying for execution rather than for the decisions.</p></article>
+        <article class="scen-card bull"><div class="tag">Bull</div><div class="big">$56.50–61.00</div><p><span class="ev interp">INTERPRETATION</span> Clean sweep: all three approvals on time with clean labels, PEAK combination becomes the default second-line GIST regimen with OS trending positive, NonAdvSM converts as a chronic annuity at orphan pricing, and the JAK2/KRAS programs attract partnership or platform value. Equity value $12.5–13.5B over ~220.8M shares (converts if-converted above their $44.95 strike). The top of this range is deliberately held below the $62 street high.</p></article>
+      </div>
+      <div class="assump"><h3>Method &amp; assumptions</h3><p class="method"><span class="ev fact">FACT</span> Share inputs: common outstanding 173,524,982 (Q2 2026 10-Q cover, Aug 6, 2026); Series A preferred convertible into 9,853,500 and Series B into 4,516,000 (as-converted basic 187,894,482); equity awards outstanding 32,060,695 (DEF 14A, April 2026 — 26,395,478 under shareholder-approved plans at WAEP $9.54, plus 5,665,217 inducement-plan awards); convertible notes $230M principal, conversion price ~$44.95 (≈5,116,994 shares if-converted). Treasury method: approved-plan option proceeds ($251.8M at the $9.54 WAEP) repurchase shares at each scenario's midpoint price; inducement awards are added at face because their WAEP is not separately disclosed (conservative); converts enter the divisor only in the bull case, where price exceeds the strike. Divisors: bear ~201.6M (at $13.75 midpoint), base ~213.8M (at $41), bull ~220.8M (at $58.75, converts included). Arithmetic: $2.52B÷201.6M=$12.50, $3.02B→$14.98; $8.0B÷213.8M=$37.42, $9.5B→$44.43; $12.5B÷220.8M=$56.61, $13.5B→$61.14 — ranges rounded to the nearest $0.50 against those computations. Equity-value anchors are judgment inputs (bear = cash + single-indication value; base = multi-indication launch value at incumbent-benchmarked revenue multiples, cross-checked against the $725M-and-growing Ayvakit franchise inside Sanofi; bull = franchise-plus-platform). No DCF is presented.</p></div>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>A fortress balance sheet, spent at commercial-stage speed</h2><p class="lede">Cogent enters its approval window with ~$866M of pro-forma cash and a company-stated runway into late 2028 — and a cost base that has already stepped up to launch scale: Q2 2026 opex was $102.6M in a single quarter. The financing question is not survival; it is how much of the next two years is pre-funded at today's prices via the ATM.</p></div></div>
+      <div class="fin-grid">
+        <article class="metric"><div class="tag">Cash &amp; securities — Jun 30, 2026</div><div class="big">$792.3M</div><p><span class="ev fact">FACT</span> Q2 2026 10-Q / earnings release. Plus $73.6M gross from ATM sales after quarter-end → pro-forma $865.9M (company figure). Cash was $900.8M at Dec 31, 2025.</p></article>
+        <article class="metric"><div class="tag">Burn</div><div class="big">$164.2M H1 op. cash use</div><p><span class="ev fact">FACT</span> H1 2026: net loss $193.8M (Q2 alone $96.4M); operating cash use $164.2M (~$82M/quarter and rising with launch build). Q2 2026 R&amp;D $70.8M, G&amp;A $31.8M (vs $13.4M a year earlier — the commercial organization arriving).</p></article>
+        <article class="metric"><div class="tag">Runway</div><div class="big">Into late 2028</div><p><span class="ev fact">FACT</span> Company guidance (Aug 10, 2026), explicitly including through the three potential approvals and early launch activities. No going-concern language; accumulated deficit $1.19B at Dec 31, 2025.</p></article>
+        <article class="metric"><div class="tag">Dilution capacity</div><div class="big">$400M ATM (new)</div><p><span class="ev fact">FACT</span> New ATM prospectus supplement filed Aug 10, 2026 (up to $400M, Guggenheim, 3.0% commission) replacing the Nov 2025 facility ($300M cap; $88.6M remained at Jun 30 after 1,340,699 shares sold in H1 2026 for ~$45.7M net). The $73.6M post-quarter raise was drawn under these facilities.</p></article>
+      </div>
+      <table class="study-table cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>Note</th></tr></thead><tbody>
+        <tr><td data-label="Item">Common outstanding</td><td data-label="Shares">173,524,982</td><td data-label="Note">Q2 2026 10-Q cover (Aug 6, 2026). Was 160,980,024 at Dec 31, 2025 and 171,598,409 at Jun 30, 2026 — ATM issuance is the main driver of the drift.</td></tr>
+        <tr><td data-label="Item">Series A preferred (non-voting, convertible)</td><td data-label="Shares">39,414 → 9,853,500</td><td data-label="Note">Legacy PIPE-era preferred (250:1 conversion). 67,414 shares at Dec 31, 2025; conversions are steadily bleeding into common.</td></tr>
+        <tr><td data-label="Item">Series B preferred (non-voting, convertible)</td><td data-label="Shares">4,516 → 4,516,000</td><td data-label="Note">1,000:1 conversion. Unchanged through Jun 30, 2026.</td></tr>
+        <tr><td data-label="Item">Equity awards outstanding</td><td data-label="Shares">32,060,695</td><td data-label="Note">DEF 14A equity-compensation table (Apr 2026): 26,395,478 approved-plan (WAEP $9.54) + 5,665,217 inducement-plan. Includes options, RSUs and PSUs (up to 2,714,000 executive PSUs from 2023/24 grants at 0–200% of target). Pre-funded warrants: fully exercised Jan 2026 — none remain.</td></tr>
+        <tr><td data-label="Item">Convertible senior notes</td><td data-label="Shares">$230M · ~5,116,994 if-converted</td><td data-label="Note">1.625% due 2031, issued Nov 18, 2025 alongside a concurrent equity offering (combined net proceeds ~$546.8M). Conversion price ~$44.95. Carrying value $223.5M at Jun 30, 2026. Out of the money at $31.24; treated as debt in the EV bridge.</td></tr>
+        <tr><td data-label="Item">At $31.24 (Oct 20, 2026)</td><td data-label="Shares">~$5.42B equity · ~$4.79B EV</td><td data-label="Note">Equity on common only; as-converted equity ~$5.87B. EV = equity − $865.9M pro-forma cash + $230M converts. Treasury-method FD at the current price ≈ 211.9M shares (converts excluded).</td></tr>
+      </tbody></table>
+      <div class="overhang"><h3>Financing history — raises come before catalysts, not after</h3><p><span class="ev fact">FACT</span> November 2025: concurrent common-stock and convertible-note offerings, ~$546.8M net — executed after all three pivotal readouts but before any NDA was filed. H1 2026: $45.7M net via ATM. Post-Q2 2026: a further $73.6M gross via ATM, and a refreshed $400M ATM facility filed the same day as Q2 results. <span class="ev interp">INTERPRETATION</span> Management consistently sells strength and pre-funds decisions. Expect continued ATM usage into the PDUFA window; the open variable is pace, not intent. At ~$31, every $100M raised costs ~3.2M shares (~1.8% of the count) — tolerable, but the market will read heavy pre-approval selling as a tell about management's own launch-spend expectations.</p></div>
+      <p class="source-note">All financials: Q2 2026 10-Q (balance sheet, cash-flow statement, equity and debt notes), FY2025 10-K, 424B5 dated Aug 10, 2026, and the Q2 2026 earnings release furnished on Form 8-K (Aug 10, 2026).</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>An operator CEO, a sponsor-built board, and a CFO sale plan</h2><p class="lede">Andrew Robbins commercialized Array BioPharma into a Pfizer acquisition; the board's center of gravity is Fairmount Funds, the healthcare investor whose partners chair the board and sit on it. Insider signals in 2026 are administrative, with one disclosure that deserves a flag.</p></div></div>
+      <ul class="people-list">
+        <li><span class="ev fact">FACT</span> <strong>Andrew Robbins, President &amp; CEO (since Oct 2020)</strong> — previously COO of Array BioPharma (Mar 2015 through its July 2019 acquisition by Pfizer), where he ran sales, marketing and strategy. A commercial operator's résumé, matched to a company whose remaining risk is commercial. He also sits on the board.</li>
+        <li><span class="ev fact">FACT</span> <strong>John Green, CFO</strong> — principal financial and accounting officer (signs the 10-Q). On July 30, 2026 he adopted a Rule 10b5-1 plan to sell up to 157,337 shares and to exercise-and-hold 62,619 ISOs, subject to price conditions (disclosed in the Q2 2026 10-Q). <span class="ev interp">INTERPRETATION</span> A pre-arranged, disclosed, partial-sale plan adopted three months before the first PDUFA is ordinary executive liquidity management; it is not an open-market conviction signal in either direction, but in a stock priced for a clean sweep it removes one potential source of insider-buying support and is worth knowing.</li>
+        <li><span class="ev fact">FACT</span> <strong>Board / sponsorship</strong> — Chairman Peter Harwin is a Fairmount Funds co-founder; director Chris Cain, Ph.D. is Fairmount's Director of Research (previously RA Capital and Samsara BioCapital). The 2026 Form 4 record (clusters around the June annual meeting, plus Aug 31 and Oct 5 filings) is dominated by grants, vesting and plan transactions; no large open-market insider purchases were identified in the filings reviewed. <span class="ev gap">GAP</span> A full beneficial-ownership rebuild from the April 2026 proxy (top institutional holders and percentages) was not re-derived for this dossier; the DEF 14A is the source of record.</li>
+        <li><span class="ev fact">FACT</span> <strong>Execution signal</strong> — the commercial organization was hired before approval (full field team onboarded by Aug 2026) and manufacturing was contracted ahead of the first decision (Hovione, Sep 2026). Whatever the FDA decides, launch-readiness spend is already sunk — which cuts both ways in a CRL scenario.</li>
+      </ul>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by expected value impact over the next twelve months, not by drama.</p></div></div>
+      <ol class="risk-list">
+        <li><strong>Label risk on the liver signal (highest).</strong> Grade ≥3 transaminase elevations in ~6% (SUMMIT), grade 3+ hepatic dose reductions in 12.7% of the PEAK combination arm, one grade 3 DILI in APEX Part 1. FDA's rendering — monitoring schedule, warning placement, possible REMS-adjacent language — determines whether the tolerability thesis survives contact with the label, in all three indications simultaneously.</li>
+        <li><strong>NonAdvSM endpoint precedent.</strong> A chronic symptom-score (PRO) approval basis in a non-fatal population is the least precedented of the three files. A CRL here is the single most probable bear trigger and would likely drag the AdvSM file's perceived odds with it.</li>
+        <li><strong>Priced for the sweep.</strong> At ~$4.8B EV with ~16% cash-to-price, the equity embeds substantial approval and launch success. Asymmetric payoff now runs the other way versus the library's pre-data names: clean approvals confirm; any single failure de-rates the whole molecule.</li>
+        <li><strong>First-time commercial execution vs Sanofi.</strong> Three launches in seven months against an entrenched incumbent (~$725M and growing ~50%/yr) with a global rare-disease machine and next-generation SM assets (elenestinib, BLU-808) behind it.</li>
+        <li><strong>GIST is a combination, not a clean label.</strong> The 2L GIST product is bezuclastinib plus generic sunitinib: combination tolerability (AE discontinuations 7.4% vs 3.8%), co-promotion complexity, and an immature OS dataset that payers and guidelines will eventually demand.</li>
+        <li><strong>Continuous ATM dilution.</strong> A fresh $400M facility, a demonstrated pattern of pre-catalyst selling, and 32.1M equity awards outstanding (~17% of the as-converted count) at a $9.54 blended WAEP on the main pool — a structural transfer from shareholders to employees and new buyers that continues regardless of outcomes.</li>
+        <li><strong>Converts overhang at $44.95.</strong> The $230M 1.625% notes due 2031 convert into ~5.12M shares just above the base-case range — success itself reintroduces dilution and caps the bull arithmetic.</li>
+        <li><strong>Single-molecule company.</strong> All three NDAs are the same drug: a CMC, safety or supply event (note the single-source Hovione spray-dried-dispersion/tablet agreement) touches every indication at once. The pipeline behind it (JAK2, KRAS) is pre-IND and cannot backfill a bezuclastinib failure.</li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>The evidence that would change the view</h2><p class="lede">Falsifiers and open items, as of October 20, 2026.</p></div></div>
+      <ul class="people-list">
+        <li><span class="ev gap">GAP</span> <strong>Label text on hepatotoxicity</strong> — unknowable until Nov 30; the single highest-information document of the next six weeks.</li>
+        <li><span class="ev gap">GAP</span> <strong>PEAK overall survival</strong> — immature at cutoff; the trend direction at the next update moves the GIST base case more than any other pending datapoint.</li>
+        <li><span class="ev gap">GAP</span> <strong>Launch pricing</strong> — no US price has been disclosed for any indication; scenario revenue framing is benchmarked to the incumbent, not to a Cogent price.</li>
+        <li><span class="ev gap">GAP</span> <strong>Full institutional ownership rebuild</strong> — 13F/13G detail (the register includes multiple 2026 13G/A updates and at least one 13D/A) was not re-derived; proxy and EDGAR are the sources of record.</li>
+        <li><span class="ev gap">GAP</span> <strong>Inducement-plan WAEP</strong> — the 5,665,217 inducement awards are carried at face in the FD build because the proxy table extract did not separate their exercise price; treasury-method FD is therefore slightly overstated (conservative direction).</li>
+        <li><span class="ev interp">INTERPRETATION</span> What would change the verdict: a boxed warning or REMS on any label (thesis-breaking for the switching story); a NonAdvSM CRL (bear case activates, focus shifts to whether GIST revenue alone can carry ~$3B+ of value); two clean approvals plus a switch-cohort dataset showing avapritinib patients converting (bull path opens); PEAK OS turning negative (would cap the GIST franchise even with approval in hand).</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Filings, registries, and peer-reviewed literature carry the most weight. Company claims remain labeled unverified until corroborated.</p></div></div>
+      <div class="source-group"><h3>SEC — primary</h3><p>Q2 2026 Form 10-Q (filed Aug 10, 2026: financials, cap table, converts, ATM, 10b5-1 disclosure); FY2025 Form 10-K (filed Feb 17, 2026: history, FY2025 financials); Form 8-K earnings releases Aug 10, 2026 (Q2 results, PEAK/APEX data, pro-forma cash) and Feb 17, 2026 (FY2025 results, SUMMIT/APEX/PEAK summaries); Form 8-K Sep 2, 2026 (Hovione Commercial Supply Agreement, Item 1.01); Form 424B5 Aug 10, 2026 ($400M ATM; Aug 7, 2026 sale price $42.39); DEF 14A Apr 23, 2026 (equity-compensation table, board biographies); annual-meeting 8-K Jun 11, 2026 (170,801,004 shares at Apr 13, 2026 record date); Form 4 filings 2026. EDGAR company record: CIK 0001622229.</p></div>
+      <div class="source-group"><h3>Regulatory &amp; registries</h3><p>FDA-acceptance releases: GIST (May 28, 2026 — Priority Review, PDUFA Nov 30, 2026, no AdCom/review issues), NonAdvSM (Mar 16, 2026 — PDUFA Dec 30, 2026), AdvSM (Sep 15, 2026 — PDUFA Jun 29, 2027, no AdCom/review issues). ClinicalTrials.gov: SUMMIT NCT05186753; APEX NCT04996875. Ayvakit (avapritinib) US label (warnings: intracranial hemorrhage, cognitive effects) via FDA.</p></div>
+      <div class="source-group"><h3>Peer-reviewed &amp; congress literature</h3><p>Rein et al., SUMMIT primary analysis, Blood 2025;146(Suppl 1):80 (ASH 2025); Boggs et al., SUMMIT expanded results, AAAAI 2026 (Abst. 519); DeAngelo et al., APEX Part 1/2 data, HemaSphere/EHA 2022–2026 (PMC9431291) and EHA 2026 detailed APEX presentation; Wagner et al., JAMA Oncology 2021;7(9):1343–1350; Gebreyohannes et al., Clin Exp Med 2019;19(2):201–210; Cogent selectivity poster, AACR-NCI-EORTC 2021 (cellular IC<sub>50</sub> panel). PEAK full results: ASCO 2026 oral presentation (May 30, 2026).</p></div>
+      <div class="source-group"><h3>Trade press &amp; market data (secondary)</h3><p>OncLive and HCPLive congress coverage (SUMMIT/APEX detail); BioSpace (PEAK topline safety detail, Nov 2025); Sanofi Q4/FY2025 results and Q1 2026 release (Ayvakit pro-forma FY2025 sales $725M; Q1 2026 €177M); Blueprint Medicines 2025 guidance ($700–720M) via acquisition coverage (Sanofi–Blueprint, $9.1B upfront, 2025). Price/consensus: Finnhub (Oct 20, 2026 close $31.24; 52-wk range $13.78–$43.73); MarketBeat/TipRanks (consensus $51.56; JPMorgan high $62).</p></div>
+      <p class="source-note">As-of date: October 20, 2026. Filings used: through the Oct 5, 2026 Form 4 (latest EDGAR submission at build). PDUFA dates are FDA-assigned target action dates communicated by the company; they are hard calendar dates, not guarantees of action on the day.</p>
+    </section>
+</main>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>

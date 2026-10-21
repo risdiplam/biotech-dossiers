@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>DYN — Dyne Therapeutics · Deep-Dive Dossier · 2026-10-20</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · DYN</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>Two binaries in one quarter: a dystrophin verdict, then a vHOT verdict</h1>
+        <p class="hero-dek">Dyne's FORCE platform delivers oligonucleotides into muscle at levels unconjugated drugs never reached. The question for the next 100 days is narrower: will FDA approve a BLA built on 5.46% muscle-content-adjusted dystrophin, and will a vHOT endpoint that just failed a competitor's Phase 3 carry a second accelerated approval?</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$16.27</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$1.93B</strong> est. enterprise value (pro-forma) · <strong>~$6.98</strong> gross cash per share<br>$3.04B market cap (186.75M shares) · ~$1.30B pro-forma cash vs $200M debt</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#harbor">Regulatory risk</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The swing factor is a sequence, not a single event</h2><p class="lede">Dyne Therapeutics (Nasdaq: DYN; CIK 0001818794; Delaware; Waltham, MA) is a clinical-stage neuromuscular company built on one delivery idea. Two regulatory events land within roughly one quarter of each other, and the second one's endpoint just failed for the best-funded competitor in the field.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Binary 1 · DMD</div><div class="big">Jan 21, 2027</div><p><span class="ev fact">FACT</span> FDA accepted the BLA for z-rostudirsen (DYNE-251) with Priority Review; PDUFA target action date January 21, 2027. Accelerated approval sought on dystrophin as a surrogate endpoint.</p></article>
+        <article class="decision warn"><div class="tag">Binary 2 · DM1</div><div class="big">Q1 2027</div><p><span class="ev unverified">UNVERIFIED · COMPANY</span> ACHIEVE registrational expansion cohort (n=71) topline guided for Q1 2027; primary endpoint is change in vHOT at 6 months — the same endpoint Novartis's HARBOR Phase 3 missed on Sept. 8, 2026.</p></article>
+        <article class="decision"><div class="tag">Est. enterprise value</div><div class="big">~$1.93B</div><p><span class="ev interp">INTERPRETATION</span> $3.04B market cap (186.75M shares × $16.27) less ~$1.10B pro-forma net cash ($1,303.5M cash incl. July raise − $200M term-loan principal). Pro-forma, not reported: Q3 actuals land in November.</p></article>
+        <article class="decision"><div class="tag">Runway</div><div class="big">Into Q2 2028</div><p><span class="ev fact">FACT</span> Company guidance (Jul. 29, 2026): cash plus July offering net proceeds fund operations into Q2 2028. That covers both binaries and a launch — but not two confirmatory Phase 3s to completion.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What is genuinely different here</h3><ul>
+          <li><span class="ev fact">FACT</span> DELIVER's registrational cohort met its primary endpoint: muscle-content-adjusted dystrophin rose to a mean of <strong>5.46% of normal</strong> at 6 months (~7× baseline; p&lt;0.0001) — roughly 6× the dystrophin level on which eteplirsen was approved (~0.9% of normal in FDA's review).</li>
+          <li><span class="ev fact">FACT</span> FDA accepted the filing and granted Priority Review in July 2026 — after the EleVidys label narrowing. The dystrophin-surrogate pathway is damaged politically, but it is demonstrably still open.</li>
+          <li><span class="ev fact">FACT</span> In DM1, z-basivarsen improved vHOT by 3.3 s vs placebo at 6 months at the registrational dose and showed sustained functional gains to 12 months in Dyne's Sept. 29, 2026 one-year data — the same measures HARBOR failed to move in Phase 3.</li>
+          <li><span class="ev fact">FACT</span> Novartis paid ~$12B for Avidity, the direct platform competitor — third-party validation that muscle-targeted oligo conjugates are strategically scarce, even after HARBOR.</li>
+        </ul></article>
+        <article class="thesis-card risk"><h3>What the price does not remove</h3><ul>
+          <li>The functional support under the dystrophin number is nominal and post-hoc: DELIVER was not powered for function; two endpoints reached nominal p&lt;0.05 only in a post-hoc pooled-placebo analysis.</li>
+          <li>vHOT is now a demonstrated Phase 3 failure risk: HARBOR (n=159) missed it with a same-class conjugate. Dyne's registrational DM1 bet runs on vHOT at n=71.</li>
+          <li>The registrational-dose evidence is thin where it matters: n=24 treated in the DMD REC; n=6 at the DM1 registrational dose for the 12-month dataset.</li>
+          <li>Burn is accelerating (H1 2026 operating cash use $275.2M) into a launch build and two confirmatory Phase 3s; the share count has risen ~83% since January 2025.</li>
+          <li>At $16.27 the stock trades at ~2.8× pro-forma net cash: a CRL plus a weak REC plausibly converges toward cash.</li>
+        </ul></article>
+      </div>
+      <p class="source-note">Identity and filings: <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526323639/dyn-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> · <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526308343/dyn-20260720.htm" target="_blank" rel="noopener">BLA acceptance 8-K (Jul. 20, 2026)</a>. Market snapshot: <a href="https://finnhub.io/?q=%22DYN%22" target="_blank" rel="noopener">Finnhub (Oct. 20, 2026)</a>.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>Priced as an option on the platform, not on either drug alone</h2><p class="lede">At $16.27 (Oct. 20, 2026 close), equity is ~$3.04B against ~$1.10B of pro-forma net cash. The ~$1.93B enterprise stub has to cover two registrational programs, a pre-commercial launch build, and a platform — through two verdicts that arrive within weeks of each other.</p></div></div>
+      <div class="valuation-bridge">
+        <div><span>Market cap (basic)</span><b>$3.04B</b><small>186,746,431 shares (Jul. 24, 2026) × $16.27</small></div><i>−</i>
+        <div><span>Pro-forma net cash</span><b>$1.10B</b><small>$898.5M at Jun. 30 + ~$405M July net proceeds − $200M loan principal</small></div><i>=</i>
+        <div class="bridge-result"><span>Enterprise value (est.)</span><b>~$1.93B</b><small>Pro-forma estimate; Q3 2026 actuals not yet reported</small></div>
+      </div>
+      <div class="event-tape">
+        <article><span class="event-mark">SEP 8, 2026</span><h3>HARBOR misses; DYN reprices</h3><p>Novartis disclosed that del-desiran's Phase 3 HARBOR trial (n=159) did not significantly improve vHOT in DM1. Reuters reported Dyne shares fell ~18% the same day — the market read the endpoint failure straight across to ACHIEVE.</p></article>
+        <article><span class="event-mark">SEP 29, 2026</span><h3>Dyne answers with one-year data</h3><p>Additional ACHIEVE one-year data showed functional improvement vs baseline, vs placebo (6-month vHOT), and vs a matched natural-history cohort — the company's direct counter to the "vHOT is dead" read.</p></article>
+        <article><span class="event-mark">OCT 2026</span><h3>Drift into the PDUFA quarter</h3><p><span class="ev fact">FACT</span> Finnhub: 52-week range $14.00–$27.31 on its series; Oct. 19 close $15.23, Oct. 20 close $16.27 (+6.8%). Consensus (MarketBeat, 16 analysts): average target $33.07, high $50 (Jefferies), low $10.</p></article>
+      </div>
+      <div class="readthrough"><strong>How to read the setup.</strong> <span class="ev interp">INTERPRETATION</span> The January PDUFA and the Q1 REC topline are correlated risks, not independent ones: a CRL citing surrogate-endpoint skepticism would likely raise the market's discount on the DM1 accelerated-approval plan weeks later, and a clean approval would do the reverse. Position math should treat Q1 2027 as one combined event window with two headlines, not two separate coin flips.</div>
+      <p class="source-note">Prices: <a href="https://finnhub.io/?q=%22DYN%22" target="_blank" rel="noopener">Finnhub DYN snapshot (Oct. 20, 2026)</a> · <a href="https://www.marketbeat.com/stocks/NASDAQ/DYN/forecast/" target="_blank" rel="noopener">MarketBeat consensus</a> · <a href="https://www.novartis.com/us-en/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis HARBOR release (Sept. 8, 2026)</a>.</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>FORCE: an antibody taxi for oligonucleotides that muscle otherwise refuses</h2><p class="lede">Unconjugated oligonucleotides barely enter skeletal muscle — the reason Sarepta's PMOs are dosed at 30–80 mg/kg weekly and still produce ~1% dystrophin. Dyne's bet is that transferrin receptor 1 (TfR1) targeting changes the delivery math by an order of magnitude.</p></div></div>
+      <div class="science-chain" aria-label="FORCE platform mechanism">
+        <article><b>01</b><h3>TfR1 binding</h3><p>An antigen-binding fragment (Fab) against transferrin receptor 1 — highly expressed on skeletal and cardiac muscle — carries the payload across the muscle membrane via receptor-mediated uptake.</p></article>
+        <article><b>02</b><h3>Conjugated payload</h3><p>A clinically validated linker joins the Fab to the oligo: a PMO for exon skipping (DMD) or an ASO against DMPK RNA (DM1). Conjugation, not encapsulation — one defined molecule.</p></article>
+        <article><b>03</b><h3>Nuclear action</h3><p>In DMD, the PMO skips exon 51 in pre-mRNA, restoring the reading frame so a shortened, Becker-like dystrophin is made. In DM1, the ASO reduces toxic nuclear DMPK RNA, releasing sequestered splicing proteins (MBNL).</p></article>
+        <article><b>04</b><h3>Functional claim</h3><p>Higher muscle exposure at lower dose: z-rostudirsen runs at 20 mg/kg every 4 weeks vs weekly unconjugated PMO; z-basivarsen at 6.8 mg/kg every 8 weeks. Delivery also reaches the CNS at preclinical level, relevant to DM1's brain manifestations.</p></article>
+      </div>
+      <div class="moa-box"><h3>FORCE in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> Muscle is a fortress for RNA drugs: almost none of an injected dose gets in. Dyne bolts each oligo to half an antibody that grabs a handle (TfR1) muscle cells use to import iron — the cell pulls the whole package inside. The oligo then fixes the message: skip the broken exon in DMD, or destroy the toxic message that jams splicing in DM1.</p><p><strong>Technical.</strong> FORCE = Fab (anti-TfR1) + linker + oligonucleotide payload, administered IV. TfR1 is also expressed on reticulocytes and other proliferating cells, so the same handle that enables muscle delivery creates the platform's core safety questions: chronic receptor engagement, iron/erythropoiesis biology, and immunogenicity against both Fab and payload.</p></div>
+      <div class="fail-grid" aria-label="Ways the FORCE mechanism could fail">
+        <article><h3>1 · Delivery does not scale with dose</h3><p>TfR1-mediated uptake can saturate, and biopsy-measured dystrophin comes from one muscle at one timepoint. If human muscle exposure plateaus below the functional threshold, the entire premium over unconjugated PMOs collapses — Sarepta's drugs are the control case for "some dystrophin, limited function."</p></article>
+        <article><h3>2 · Immunogenicity</h3><p>Repeat IV dosing of a Fab-oligo conjugate invites anti-drug antibodies against the Fab, the linker, or the oligo — with loss of exposure or infusion reactions over the multi-year dosing these diseases require. Long-term ADA data remain limited to small cohorts.</p></article>
+        <article><h3>3 · TfR1 and ASO class effects</h3><p>TfR1 sits on erythroid precursors; sustained engagement is a theoretical anemia/iron risk that needs chronic monitoring. ASOs as a class carry hepatic, renal, platelet, and complement signals (the drisapersen and inotersen precedents); PMOs have been cleaner, but the conjugate is a new molecular entity, not a PMO.</p></article>
+        <article><h3>4 · Splicing correction ≠ function</h3><p>DM1's spliceopathy is broad; correcting a composite splicing index does not guarantee clinically meaningful change in strength or function — HARBOR showed clinical activity on secondaries yet failed its functional primary. Molecular response is necessary, not sufficient.</p></article>
+      </div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Preclinical anchor</div><h3>Conjugation raised dystrophin where PMO alone could not</h3><p><span class="ev fact">FACT</span> In the mdx mouse model, a single IV dose of a TfR1-Fab–PMO conjugate produced robust, durable exon skipping in cardiac and skeletal muscle; in non-human primates, z-rostudirsen achieved robust exon skipping in heart and diaphragm with a favorable safety profile (FY2025 10-K). Heart and diaphragm delivery is the scientifically important claim — respiratory and cardiac failure drive DMD mortality, and unconjugated PMOs penetrate both poorly.</p></article>
+        <article class="paper-card"><div class="program-kicker">The honest gap</div><h3>Human target-engagement proof is biopsy math</h3><p><span class="ev gap">GAP</span> There is no direct human measurement of muscle oligo concentration at the registrational doses; the chain from dose → muscle exposure → dystrophin/splicing → function is inferred from biopsies (one muscle, ~28 days post-dose) and downstream biomarkers. FDA's review of the BLA is, in large part, a review of that inference chain.</p></article>
+      </div>
+      <p class="source-note">Platform and preclinical claims: <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526084178/dyn-20251231.htm" target="_blank" rel="noopener">FY2025 10-K</a>. Class context: Roberts, Langer &amp; Wood, <em>Nat Rev Drug Discov</em> 2020 (PMID 32782413) · Mendell et al., <em>Ann Neurol</em> 2016 (eteplirsen dystrophin).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>Small trials, outsized numbers — read the denominators</h2><p class="lede">Both registrational datasets are Phase 1/2-sized. The effect sizes are large by DMD/DM1 standards; the sample sizes are the diligence issue, and the functional statistics are explicitly nominal.</p></div></div>
+      <div class="signal-grid">
+        <article class="paper-card">
+          <div class="program-kicker">DMD · BLA under review</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Z-rostudirsen (DYNE-251)</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> PMO exon-51 skipping conjugate, 20 mg/kg IV Q4W (approximate PMO dose). Breakthrough Therapy, Orphan Drug, Fast Track and Rare Pediatric Disease designations; Priority Review granted.</p>
+          <div class="status-row"><span class="pill">PDUFA Jan 21, 2027</span><span class="pill">DELIVER N=86</span><span class="pill">FORZETTO Ph3 recruiting</span></div>
+          <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Evidence status</th></tr></thead><tbody>
+            <tr><td data-label="Study">DELIVER<br><small>NCT05524883</small></td><td data-label="Design">Phase 1/2, global; ambulant + non-ambulant males 4–16 y, exon-51-amenable. MAD 0.7–40 mg/kg Q4W/Q8W (24-wk placebo-controlled), then OLE + 192-wk LTE. REC: 32 enrolled; 24 on 20 mg/kg Q4W vs 8 placebo, 6 months.</td><td data-label="Evidence">REC primary endpoint met (Dec. 2025). BLA basis: all 86 participants.</td></tr>
+            <tr><td data-label="Study">FORZETTO<br><small>NCT07608432</small></td><td data-label="Design">Phase 3 confirmatory, randomized, double-blind, placebo-controlled; ~90 ambulatory males 4–18 y; 20 mg/kg Q4W vs placebo 1:1; primary endpoint rise-from-floor (RFF) velocity. FDA-aligned design; initiated May 2026.</td><td data-label="Evidence">Recruiting; no data. The trial an accelerated approval would legally rest on.</td></tr>
+          </tbody></table>
+          <div class="bar-set" aria-label="Dystrophin expression comparison">
+            <div class="bar-row"><div class="bar-label">REC 6 mo</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">5.46%</div></div>
+            <div class="bar-row"><div class="bar-label">Eteplirsen</div><div class="bar-track"><div class="bar-fill" style="width:16.5%"></div></div><div class="bar-value">~0.9%</div></div>
+          </div>
+          <p class="source-note"><span class="ev fact">FACT</span> Muscle-content-adjusted dystrophin, % of normal, Western blot, biopsy ~28 days post-dose. Eteplirsen figure from FDA's approval-era review — different assay era and lab; cross-program comparison is indicative, not head-to-head.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">DELIVER REC · Dec. 8, 2025 topline</div><h3>What the registrational cohort actually showed</h3>
+          <div class="outlier-metrics"><div><b>5.46%</b><span>MCA dystrophin at 6 mo (~7× baseline)</span></div><div><b>p&lt;0.0001</b><span>Primary endpoint vs baseline (prespecified)</span></div><div><b>n=24 / 8</b><span>Treated / placebo in REC</span></div></div>
+          <p style="font-size:13px">Improvement vs placebo was observed across all six prespecified functional endpoints. Time-to-rise velocity and 10MWR velocity reached <strong>nominal p&lt;0.05</strong> — in a <em>post-hoc</em> analysis against a pooled placebo group (n=18); the trial was not powered for function and the prespecified plan included no formal functional hypothesis testing. FVC % predicted was preserved at 6 months vs a placebo decline. Long-term MAD data showed sustained functional improvement through 24 months in small cohorts (n=6 per dose cohort). Safety across 86 participants (to 36 months): mostly mild/moderate related TEAEs; most common pyrexia and headache; no related serious TEAEs in the REC.</p>
+          <p class="source-note"><span class="ev fact">FACT</span> <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312525310516/d16518dex991.htm" target="_blank" rel="noopener">DELIVER topline release (Dec. 8, 2025)</a> · FY2025 10-K. Functional p-values are nominal/post-hoc by the company's own description — do not read them as confirmatory.</p>
+        </article>
+      </div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card">
+          <div class="program-kicker">DM1 · registrational cohort enrolled</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Z-basivarsen (DYNE-101)</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> ASO conjugate against toxic DMPK RNA, 6.8 mg/kg IV Q8W (approximate ASO dose). Breakthrough Therapy, Orphan Drug, Fast Track (FDA); Orphan designations EMA/MHLW.</p>
+          <div class="status-row"><span class="pill">REC topline Q1 2027</span><span class="pill">ACHIEVE N=127 actual</span><span class="pill">HARMONIA Ph3 recruiting</span></div>
+          <table class="study-table"><thead><tr><th>Study</th><th>Design</th><th>Evidence status</th></tr></thead><tbody>
+            <tr><td data-label="Study">ACHIEVE<br><small>NCT05481879</small></td><td data-label="Design">Phase 1/2, global, randomized, double-blind, placebo-controlled. MAD 1.8–6.8 mg/kg Q4W/Q8W × 24 wks → OLE → 96-wk LTE. REC: 71 enrolled at 6.8 mg/kg Q8W; primary endpoint Δ vHOT (middle finger) at 6 months vs placebo; secondaries CASI-22 splicing, QMT strength, 10MWR, 5xSTS, MDHI.</td><td data-label="Evidence">MAD complete; REC fully enrolled Jun. 2026; topline Q1 2027 guided.</td></tr>
+            <tr><td data-label="Study">HARMONIA<br><small>NCT07486934</small></td><td data-label="Design">Phase 3 confirmatory, global; ~150 participants; primary endpoint 5-times sit-to-stand (5xSTS) at 12 months. FDA-aligned; dosing began Jul. 2026; 35+ active sites.</td><td data-label="Evidence">Recruiting; no data. Note the confirmatory primary is a functional test, not vHOT.</td></tr>
+          </tbody></table>
+          <p class="source-note"><a href="https://clinicaltrials.gov/study/NCT05481879" target="_blank" rel="noopener">ACHIEVE registry</a> · <a href="https://clinicaltrials.gov/study/NCT07486934" target="_blank" rel="noopener">HARMONIA registry</a> · <a href="https://clinicaltrials.gov/study/NCT07608432" target="_blank" rel="noopener">FORZETTO registry</a> · <a href="https://clinicaltrials.gov/study/NCT05524883" target="_blank" rel="noopener">DELIVER registry</a>.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">ACHIEVE MAD · through Sept. 29, 2026</div><h3>Splicing, myotonia, strength — with the n attached</h3>
+          <div class="outlier-metrics"><div><b>−3.3 s</b><span>vHOT improvement vs placebo at 6 mo (6.8 mg/kg cohort, n=6)</span></div><div><b>−3.2 s</b><span>Pooled-dose vHOT Δ baseline at 6 mo; baseline 8.2 s</span></div><div><b>+20%</b><span>QMT strength vs baseline at 12 mo (registrational dose)</span></div></div>
+          <p style="font-size:13px">At the 6.8 mg/kg Q8W registrational dose: significant splicing correction (CASI-22) at 3 months vs baseline; vHOT improvement of 3.3 s vs placebo at 6 months; QMT strength +10% at 6 months and +20% at 12 months vs baseline (n=6). The Sept. 29, 2026 one-year pooled analysis (N=25–26 across 3.4/5.4/6.8 mg/kg, incl. re-baselined placebo crossovers; only 8 of 26 on the registrational dose for the full 12 months) showed vHOT −3.2 s from baseline at 6 months vs +0.4 s for MAD placebo (n=14); at 12 months, 5xSTS −1.2 s, 10MWR −0.3 s, QMT total and hand grip +4.8% predicted, MDHI total −25.2% — with divergence from a propensity-matched END-DM1 natural-history cohort (N=41–46). REC baseline vHOT is 8.3 s (SD 6.0), disclosed blinded. Safety (MAD, cutoff Apr. 20, 2026): no related serious TEAEs.</p>
+          <p class="source-note"><span class="ev fact">FACT</span> <a href="https://www.sec.gov/Archives/edgar/data/1818794/000181879426000009/dyn-ex99_1.htm" target="_blank" rel="noopener">One-year ACHIEVE release (Sept. 29, 2026)</a> · FY2025 10-K. The 12-month comparisons are vs baseline and natural history — there is no 12-month placebo arm; placebo participants crossed over.</p>
+        </article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>DMD safety read</h3><p>86 DELIVER participants, up to 36 months: related TEAEs mostly mild/moderate; pyrexia and headache most common; no related serious TEAEs in the REC. <span class="ev interp">INTERPRETATION</span> A clean profile at n=86 does not clear a chronic-dosing label; infusion and immunogenicity events typically declare at larger exposure.</p></article>
+        <article><h3>DM1 safety read</h3><p>56 patients through MAD/OLE (Jun. 2025 update) and the Sept. 2026 update: favorable profile, majority mild/moderate TEAEs, no related serious TEAEs identified.</p></article>
+        <article><h3>What is unknowable pre-approval</h3><p><span class="ev gap">GAP</span> No public data on multi-year ADA incidence, TfR1/erythroid effects under chronic dosing, or hepatic/platelet trends at registrational exposure in either program. The BLA review may surface any of these; none is visible from outside.</p></article>
+      </div>
+      <p class="source-note">Trial data: FY2025 10-K (filed Mar. 2, 2026); DELIVER topline (Dec. 8, 2025); ACHIEVE one-year release (Sept. 29, 2026); ClinicalTrials.gov records verified Oct. 2026.</p>
+    </section>
+
+    <section id="harbor">
+      <div class="section-head"><div class="section-num">05 / REGULATORY RISK</div><div><h2>Two regulatory overhangs: a damaged surrogate pathway, and a failed endpoint twin</h2><p class="lede">Neither overhang is Dyne's making. Both will be in the room when FDA decides the BLA in January and reads the REC in Q1.</p></div></div>
+      <div class="harbor-grid">
+        <article class="harbor-fact"><span class="ev fact">FACT</span><h3 style="margin-top:10px">The EleVidys precedent (DMD)</h3><ul>
+          <li>Jun. 2025: FDA opened a safety investigation after <strong>two fatal acute liver failures</strong> in non-ambulatory boys treated with EleVidys (Sarepta's AAV gene therapy); Sarepta paused non-ambulatory shipments.</li>
+          <li>Nov. 14, 2025: FDA revised the EleVidys label — <strong>boxed warning</strong> for acute serious liver injury/liver failure, indication <strong>limited to ambulatory patients ≥4 years</strong>, non-ambulatory use removed, postmarketing liver-safety study required.</li>
+          <li>The accelerated-approval architecture itself survived: EleVidys kept its ambulatory approval and Sarepta's three PMOs (all dystrophin-surrogate approvals) were untouched.</li>
+          <li>Jul. 20, 2026: FDA accepted Dyne's BLA and granted Priority Review with a Jan. 21, 2027 PDUFA — a post-crisis, eyes-open acceptance of a dystrophin-based filing.</li>
+        </ul></article>
+        <article class="harbor-gap"><span class="ev fact">FACT</span><h3 style="margin-top:10px">The HARBOR precedent (DM1)</h3><ul>
+          <li>Sept. 8, 2026: Novartis announced Phase 3 HARBOR (n=159) <strong>did not meet its primary endpoint</strong> of vHOT for del-desiran — a TfR1 antibody-oligonucleotide conjugate from the Avidity acquisition — despite clinical activity on secondary/exploratory measures.</li>
+          <li>vHOT is the primary endpoint of Dyne's ACHIEVE REC (n=71) and the proposed <em>intermediate clinical endpoint</em> for z-basivarsen's accelerated approval.</li>
+          <li>Structural differences cut both ways: del-desiran is an siRNA degrader payload on a full antibody; z-basivarsen is an ASO on a Fab, with demonstrated CASI-22 splicing correction — HARBOR disclosed no splicing data, so a molecular-vs-endpoint failure cannot be separated from outside.</li>
+          <li>Dyne's own confirmatory trial (HARMONIA) does <em>not</em> use vHOT as primary — it uses 5xSTS — which limits, but does not eliminate, the read-across.</li>
+        </ul></article>
+      </div>
+      <div class="readthrough"><strong>What FDA has actually signaled.</strong> <span class="ev interp">INTERPRETATION</span> The observable signals are behavioral, not rhetorical: (1) the agency narrowed EleVidys on safety while leaving the surrogate pathway standing; (2) it granted Priority Review to a dystrophin BLA filed after the crisis; (3) it aligned with Dyne on two confirmatory designs (FORZETTO: RFF velocity; HARMONIA: 5xSTS) that use functional primaries. The residual CRL risk concentrates in three places: the muscle-content-adjustment methodology behind the 5.46% figure, CMC for a first-of-kind conjugate at commercial scale, and whether a 32-patient REC plus small MAD cohorts is an adequate safety database for chronic dosing. None of these is handicappable from public data — they are the honest content of the January binary. <span class="ev gap">GAP</span> No advisory committee has been announced for the BLA as of Oct. 20, 2026; whether one is convened is itself a signal to watch in Q4.</div>
+      <p class="source-note">FDA EleVidys approval letter / label revision (Nov. 14, 2025): <a href="https://www.fda.gov/media/189632/download?attachment" target="_blank" rel="noopener">fda.gov</a> · <a href="https://www.novartis.com/us-en/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis HARBOR release</a> · <a href="https://www.fiercebiotech.com/biotech/novartis-centerpiece-12b-avidity-buyout-flunks-crucial-phase-3-test" target="_blank" rel="noopener">Fierce Biotech, Sept. 8, 2026</a>.</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Differentiation is a delivery claim, and rivals are funded to contest it</h2><p class="lede">Compare on dystrophin produced per dose, dosing burden, and evidence quality — not on indication lists.</p></div></div>
+      <div class="compare">
+        <article class="compare-card"><div class="program-kicker">Incumbent · Sarepta</div><div class="name">PMO franchise + EleVidys</div><dl>
+          <dt>Position</dt><dd>Exondys 51 (eteplirsen), Vyondys 53, Amondys 45 — weekly IV unconjugated PMOs; EleVidys gene therapy (ambulatory only, boxed warning since Nov. 2025)</dd>
+          <dt>Commercial proof</dt><dd>FY2025 net product revenue $1.86B total: PMO franchise $966M, EleVidys $899M (company-reported). Exon-51 alone is a ~$0.5B/yr revenue pool at ~0.9% dystrophin.</dd>
+          <dt>Differentiation vs DYN</dt><dd>Z-rostudirsen: ~6× the dystrophin, monthly vs weekly dosing, heart/diaphragm penetration claim. Sarepta: a decade of payer contracts, installed base, and manufacturing at scale. Also developing Arrowhead-platform siRNAs in DM1/FSHD — a future direct DM1 rival.</dd>
+        </dl></article>
+        <article class="compare-card"><div class="program-kicker">Platform rival · Novartis (ex-Avidity)</div><div class="name">AOC franchise</div><dl>
+          <dt>Position</dt><dd>Acquired Avidity for $72.00/share (~$12B fully diluted; closed Feb. 27, 2026). Del-zota (DMD exon 44) filed for accelerated approval with Priority Review; del-brax (FSHD) Phase 1/2 biomarker-positive; del-desiran (DM1) continuing under review after HARBOR.</dd>
+          <dt>Read for DYN</dt><dd>The takeout prices the modality, not any single asset. But Novartis now funds the two programs flanking Dyne's — DMD44 next door to exon 51, and a DM1 program with big-pharma development resources despite the HARBOR miss.</dd>
+          <dt>Differentiation vs DYN</dt><dd>Full-antibody AOCs vs Dyne's Fab conjugates; siRNA/ASO payload differences in DM1 are real but unproven as the cause of HARBOR's miss.</dd>
+        </dl></article>
+        <article class="compare-card"><div class="program-kicker">The empty chair · DM1</div><div class="name">No approved therapy</div><dl>
+          <dt>Position</dt><dd>DM1 (~40,000 U.S. / ~55,000 EU patients, company-cited) has no approved disease-modifying treatment. Z-basivarsen would be first, with Breakthrough Therapy designation.</dd>
+          <dt>Other DM1 programs</dt><dd>PepGen's PGN-EDODM1 (steric-block PMO conjugate; Phase 2, partial U.S. hold), Sarepta/Arrowhead siRNA (early), and Novartis's del-desiran path review. None is ahead of Dyne's REC timeline.</dd>
+          <dt>The catch</dt><dd>First-in-disease also means first to negotiate the endpoint with FDA — and the only Phase 3 vHOT test on record just failed.</dd>
+        </dl></article>
+      </div>
+      <p class="source-note">Sarepta revenues: Q4/FY2025 results (company-reported, Feb. 2026). Avidity terms: <a href="https://www.novartis.com/news/media-releases/novartis-successfully-completes-acquisition-avidity-biosciences-strengthening-late-stage-neuroscience-pipeline-and-advancing-xrna-strategy" target="_blank" rel="noopener">Novartis completion release (Feb. 27, 2026)</a>.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>Ranked by descending value</h2><p class="lede">Two registrational assets carry essentially all of the enterprise value; the rest is platform optionality priced at close to zero — which is the correct price until one of them produces human data.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div class="pipe-rank">01</div><div><div class="pipe-name">Z-rostudirsen (DYNE-251) — DMD, exon 51</div><div class="pipe-desc">BLA under Priority Review (PDUFA Jan. 21, 2027). The only asset that can make Dyne a commercial company in 2027 and the only one with a revenue line inside any reasonable forecast window.</div></div><div class="pipe-status">BLA review</div></div>
+        <div class="pipe-row"><div class="pipe-rank">02</div><div><div class="pipe-name">Z-basivarsen (DYNE-101) — DM1</div><div class="pipe-desc">First-in-disease potential in a ~40k-patient U.S. indication with no approved therapy; REC topline Q1 2027 supports a Q3 2027 accelerated-approval BLA. Largest long-run value pool in the company — and the asset most exposed to the vHOT question.</div></div><div class="pipe-status">Ph 1/2 REC</div></div>
+        <div class="pipe-row"><div class="pipe-rank">03</div><div><div class="pipe-name">DYNE-302 — FSHD</div><div class="pipe-desc">DUX4-suppressing conjugate; IND cleared Jul. 2026; Phase 1 MAD planned in ambulatory adults (safety primary; DUX4 transcriptome and plasma KHDC1L biomarkers). Novartis's del-brax is ahead in the same indication.</div></div><div class="pipe-status">IND cleared</div></div>
+        <div class="pipe-row"><div class="pipe-rank">04</div><div><div class="pipe-name">DMD exon franchise — DYNE-253 / 245 / 244 / 255</div><div class="pipe-desc">Exon 53, 45, 44 and 55 skipping conjugates in IND-enabling work. Follows the Sarepta playbook of stacking exon franchises behind one delivery platform; note the exon-44 candidate would meet Novartis's del-zota head-on.</div></div><div class="pipe-status">Preclinical</div></div>
+        <div class="pipe-row"><div class="pipe-rank">05</div><div><div class="pipe-name">Pompe and platform discovery</div><div class="pipe-desc">Preclinical FORCE applications beyond the two lead indications. Optionality only; no timelines disclosed.</div></div><div class="pipe-status">Discovery</div></div>
+      </div>
+      <p class="source-note">Program status: Q2 2026 10-Q and Jul. 29, 2026 release. Ranking is this dossier's synthesis <span class="ev interp">INTERPRETATION</span>.</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>The next twelve months are the company</h2><p class="lede">Date-quality tags: [hard] = regulator-set or filed date; [guidance] = company-stated window; [inferred] = estimated from cadence.</p></div></div>
+      <div class="timeline">
+        <div class="event"><div class="event-date">Nov. 2026<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Q3 2026 results</b>First reported balance sheet after the July raise; watch burn trajectory and any AdCom signal for the BLA.</div></div>
+        <div class="event primary"><div class="event-date">Jan. 21, 2027<br><span class="date-tag hard">HARD</span></div><div class="event-body"><b>PDUFA — z-rostudirsen (DMD, exon 51)</b>Accelerated-approval decision on the dystrophin surrogate. Approval, label scope (ambulatory vs all-comers), or CRL — each reprices the whole platform.</div></div>
+        <div class="event primary"><div class="event-date">Q1 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>ACHIEVE REC topline (DM1)</b>n=71, 6.8 mg/kg Q8W vs placebo; primary Δ vHOT at 6 months. The vHOT endpoint's second registrational test, weeks after HARBOR's failure.</div></div>
+        <div class="event"><div class="event-date">Q1 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>Potential U.S. launch of z-rostudirsen</b>Company-guided, approval-contingent. First revenue; also first real-world read on conjugate manufacturing and payer behavior vs Sarepta's PMOs.</div></div>
+        <div class="event"><div class="event-date">Q3 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>DM1 BLA submission (accelerated approval)</b>Built on REC plus ACHIEVE MAD/LTE data, assuming REC hits.</div></div>
+        <div class="event"><div class="event-date">2027–2028<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>FORZETTO / HARMONIA execution; DYNE-302 Phase 1 start</b>Confirmatory enrollment pace is itself a disclosure: slow confirmatory progress after accelerated approval has drawn FDA action elsewhere.</div></div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Soft ranges, explicit assumptions</h2><p class="lede">Anchors are illustrative equity-value builds, not price targets. Share counts use the treasury method at each scenario price (options: 13.41M at $17.58 WAEP; RSUs: 4.39M — Jun. 30, 2026). Bull top is held at $48, below the $50 street high (Jefferies).</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card"><div class="tag">Bear</div><div class="pt">$7.00–8.50</div><div class="soft">Soft range · equity ~$1.34–1.62B</div><ul>
+          <li>CRL on the DMD BLA (surrogate methodology, CMC, or safety-database objection), and/or REC misses vHOT</li>
+          <li>Value collapses toward pro-forma net cash (~$1.10B, ~$5.91/sh) plus a stub for platform/IP</li>
+          <li>Division: 191.1M FD shares (options out of the money, excluded) × $7.00–8.50 = $1.34–1.62B</li>
+          <li>Further dilutive raise likely from weakness; Hercules covenants become a live topic</li>
+        </ul></article>
+        <article class="scen-card base"><div class="tag">Base</div><div class="pt">$23.50–28.50</div><div class="soft">Soft range · equity ~$4.6–5.6B</div><ul>
+          <li>Accelerated approval on/near Jan. 21, 2027 with a workable label; launch into the exon-51 pool begins</li>
+          <li>REC hits vHOT with an effect near the MAD signal; DM1 BLA filed Q3 2027 as guided</li>
+          <li>Division: FD 194.5M at $23.50 → $4.57B; FD 196.3M at $28.50 → $5.59B (treasury method)</li>
+          <li>Confirmatory trials enroll on plan; one more raise along the way at higher prices</li>
+        </ul></article>
+        <article class="scen-card bull"><div class="tag">Bull</div><div class="pt">$41–48</div><div class="soft">Soft range · equity ~$8.2–9.6B</div><ul>
+          <li>Broad DMD label, fast uptake vs weekly PMOs on the dystrophin/dosing story; FORZETTO tracking clean</li>
+          <li>REC hits decisively; z-basivarsen becomes the presumptive first DM1 therapy with HARMONIA de-risked</li>
+          <li>Platform re-rates toward strategic value (Avidity cleared at ~$12B with three registrational programs)</li>
+          <li>Division: FD 198.8M at $41 → $8.15B; FD 199.6M at $48 → $9.58B. Top held below the $50 street high</li>
+        </ul></article>
+      </div>
+      <div class="assump"><b>Assumption discipline.</b> No probability is assigned to any branch — the PDUFA/REC window is a genuine binary pair with correlated outcomes, and false precision would be worse than none. Ranges use today's cap table; any pre-PDUFA financing (none announced) shifts every per-share figure down. Cross-check: at $16.27 the market already pays ~$1.93B of EV — roughly the base case's DMD-only value with DM1 carried near zero, or the bear case's platform value with both assets alive. That is the argument the next two quarters settle.</div>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>Funded through both binaries — at a rising burn</h2><p class="lede">The balance sheet is the strongest part of the story and the clock is the weakest: ~$1.30B pro-forma cash against a half-year operating burn of $275M that is still climbing into a launch and two Phase 3s.</p></div></div>
+      <div class="fin-grid">
+        <div class="metric-stack">
+          <div class="metric"><b>$898.5M</b><span>Cash, equivalents &amp; marketable securities · Jun. 30, 2026 (10-Q)</span></div>
+          <div class="metric"><b>~$1,303.5M</b><span>Pro-forma cash incl. July 2026 offering net proceeds (~$405M) · estimate</span></div>
+          <div class="metric"><b>$275.2M</b><span>Operating cash used · H1 2026 (vs $200.6M H1 2025)</span></div>
+          <div class="metric"><b>$178.6M</b><span>Q2 2026 net loss · R&amp;D $152.2M, G&amp;A $29.5M in the quarter</span></div>
+        </div>
+        <div>
+          <table class="cap-table"><thead><tr><th>Capital structure</th><th>Shares</th><th>Note</th></tr></thead><tbody>
+            <tr><td>Common outstanding</td><td>186,746,431</td><td>Jul. 24, 2026 (10-Q cover)</td></tr>
+            <tr><td>Options outstanding</td><td>13,408,228</td><td>WAEP $17.58; 8.3-yr life (Jun. 30)</td></tr>
+            <tr><td>RSUs unvested</td><td>4,394,478</td><td>Jun. 30, 2026</td></tr>
+            <tr><td>Fully diluted (treasury, at $16.27)</td><td>~191.1M</td><td>Options out of the money at snapshot price</td></tr>
+            <tr><td>Term debt (Hercules)</td><td>$200M principal</td><td>Facility expanded to $400M, Jun. 2026; principal due 2029–30; end-of-term charge applies</td></tr>
+          </tbody></table>
+          <div class="overhang"><b>~83%</b> share-count growth since Jan. 1, 2025 (102.3M → 186.7M) — the honest price of arriving at two registrational readouts fully funded.</div>
+        </div>
+      </div>
+      <div class="runway"><b>Runway into Q2 2028 — company guidance, and the arithmetic roughly agrees</b><p>H1 2026 operating cash use of $275.2M annualizes to ~$550M before the launch build and full FORZETTO/HARMONIA enrollment, both of which push spend up, not down. Pro-forma cash of ~$1,303.5M covers ~2 years at a rising burn — consistent with the guided Q2 2028, with no slack for a CRL-driven delay plus a re-filing. Expect at least one more equity raise before DM1 revenue exists in any scenario; the ATM (Jefferies sales agreement under the 2024 shelf) is in place. Dilution history: 2025 ATM issuance incl. 10.66M shares in H1 2025 (~$140.7M net); Dec. 2025 underwritten offering of 18.98M shares at $18.44 (~$350M gross, plus 2.85M-share underwriters' option); Jul. 2026 offering of 21.045M shares at $20.50 (~$431M gross, ~$405M net).</p></div>
+      <p class="source-note">Financials: <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526323639/dyn-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> · <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526323940/dyn-ex99_1.htm" target="_blank" rel="noopener">Q2 2026 results release</a> · offering terms: Jul. 2026 424B5 and Dec. 2025 8-K (underwriting agreement). The scan-stage claim of "~$1.30B pro-forma cash, runway Q2 2028" is <span class="ev fact">FACT</span>-verified against these filings.</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>Operator-led, founder-backed, signal-quiet</h2><p class="lede">Management diligence here is mostly about who has run a launch before — because the base case requires one in Q1 2027.</p></div></div>
+      <div class="people-grid">
+        <article class="paper-card"><h3>Leadership</h3><dl class="people-list">
+          <dt>John Cox — President &amp; CEO</dt><dd>30+ years of life-sciences leadership (10-K). Has repositioned Dyne from platform story to two-asset registrational company; G&amp;A build in 2026 ($29.5M in Q2) is explicitly launch preparation.</dd>
+          <dt>Doug Kerr, M.D., Ph.D. — CMO</dt><dd>The clinical voice on DELIVER/ACHIEVE data calls; his framing of the REC dystrophin result ("data from all 86 participants will form the basis for our submission") correctly describes the BLA's actual construction.</dd>
+          <dt>Johanna Friedl-Naderer — Chief Commercial Officer</dt><dd>20+ years in biopharma with global commercialization and rare-disease launch experience (10-K) — the hire that answers the "no launch team" objection; her organization is what the G&amp;A ramp is buying.</dd>
+          <dt>Erick Lucera — CFO</dt><dd>Ran the Dec. 2025 and Jul. 2026 raises that pre-funded the PDUFA window rather than financing into it — the single best capital-allocation signal in the file.</dd>
+        </dl></article>
+        <article class="paper-card"><h3>Insider &amp; holder signals</h3><ul class="check-list">
+          <li><span class="ev fact">FACT</span> Atlas Venture (founding backer) held ~5.5% at Dec. 31, 2025 and <em>bought</em> 1,111,111 shares through the ATM on Jan. 27, 2025 — insiders-adjacent buying, not just holding.</li>
+          <li><span class="ev fact">FACT</span> Sampled 2026 Form 4s (Aug.–Oct.) show predominantly automatic sell-to-cover for RSU tax withholding under 10b5-1-style RSU agreements — non-discretionary; no pattern of discretionary open-market dumping in the sampled filings.</li>
+          <li><span class="ev gap">GAP</span> No pre-PDUFA insider open-market purchases were identified in the sampled 2026 filings; absence of buying into a binary is neutral, not negative, but it is not a tell of confidence either.</li>
+        </ul></article>
+        <article class="paper-card"><h3>Track record read</h3><ul class="check-list">
+          <li>Execution to date is genuinely strong: two registrational programs, two FDA-aligned confirmatory designs, a BLA accepted with Priority Review, and a competitor acquired at $12B validating the modality.</li>
+          <li>The unproven half is commercial: no one on the team has launched a Dyne product, and the first launch would be against Sarepta's entrenched DMD infrastructure.</li>
+          <li>Watch Q3/Q4 disclosures for commercial hires and launch spend discipline — G&amp;A is already +78% year over year in Q2.</li>
+        </ul></article>
+      </div>
+      <p class="source-note">Sources: FY2025 10-K; Q2 2026 10-Q; EDGAR Form 4 filings (2026, sampled); Atlas disclosure in FY2025 10-K related-party/ownership notes.</p>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by expected damage to the equity story, not by probability alone.</p></div></div>
+      <ol class="risk-list">
+        <li><b>Correlated binary concentration</b><span>~$1.93B of EV rests on two verdicts in one quarter that share a root cause — FDA's posture toward novel endpoints and surrogates. They are not independent coin flips; a bad January plausibly bleeds into the REC read.</span></li>
+        <li><b>vHOT is a demonstrated Phase 3 failure risk</b><span>HARBOR (n=159, same modality class) missed vHOT in Phase 3. Dyne's DM1 accelerated-approval plan asks FDA to accept that same measure as an intermediate endpoint on n=71 Phase 1/2 data.</span></li>
+        <li><b>Surrogate methodology scrutiny</b><span>The 5.46% dystrophin figure is muscle-content-adjusted, from one biopsy site ~28 days post-dose, in 24 treated patients. Adjustment methodology and biopsy variability are classic CRL territory even when the headline number is large.</span></li>
+        <li><b>Functional evidence is nominal</b><span>DELIVER's functional separation rests on post-hoc, pooled-placebo analyses the company itself describes as not powered and not prespecified for hypothesis testing. An approval can still issue — but a skeptical review division has material to work with.</span></li>
+        <li><b>Burn and dilution trajectory</b><span>H1 burn $275M and rising; two confirmatory Phase 3s plus a launch to fund; +83% shares in 19 months; $200M Hercules debt with an end-of-term charge. The Q2 2028 runway has no room for a CRL cycle.</span></li>
+        <li><b>Small-n, pooled-analysis evidence base</b><span>Registrational-dose cohorts of n=24 (DMD) and n=6 (DM1 12-month data); the headline DM1 one-year analysis pools three dose levels with crossover re-baselining. Effect sizes may not replicate at REC scale.</span></li>
+        <li><b>Platform class safety (TfR1 / ASO)</b><span>Chronic TfR1 engagement (erythroid/iron biology), anti-drug antibodies, and ASO-class hepatic/platelet/complement signals are unquantified at registrational exposure. Any one surfacing in review or post-marketing hits both assets at once.</span></li>
+        <li><b>Funded competition on both flanks</b><span>Sarepta's installed DMD franchise (~$966M PMO revenue) defends exon 51 commercially; Novartis's $12B AOC platform contests DMD44 and DM1 with big-pharma resources, and its del-zota filing competes for the same FDA review bandwidth.</span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>What would change the answer</h2><p class="lede">Disclosed gaps, stated rather than filled.</p></div></div>
+      <div class="open-grid">
+        <article><span>GAP 01</span><h3>AdCom or not?</h3><p>No advisory committee for the z-rostudirsen BLA has been announced as of Oct. 20, 2026. A convened AdCom would raise January variance; its continued absence into December is mild positive signal.</p></article>
+        <article><span>GAP 02</span><h3>Unadjusted dystrophin &amp; biopsy detail</h3><p>The public record leads with the muscle-content-adjusted 5.46%. The full biopsy dataset (per-patient values, unadjusted levels, sampling variance) sits in the BLA, not in public filings.</p></article>
+        <article><span>GAP 03</span><h3>Why HARBOR missed</h3><p>Novartis has not disclosed del-desiran's splicing/DMPK-knockdown data. Whether HARBOR was a molecular failure or an endpoint failure is the single most decision-relevant unknown for the REC — and it is currently unknowable.</p></article>
+        <article><span>GAP 04</span><h3>Q3 2026 actuals</h3><p>Pro-forma cash (~$1,303.5M) is an estimate built from the Jun. 30 balance plus offering proceeds. Q3 results (expected November) will show the true post-raise balance and the burn step-up.</p></article>
+        <article><span>GAP 05</span><h3>Label scope</h3><p>The BLA seeks treatment of DMD "amenable to exon 51 skipping"; DELIVER enrolled ambulant and non-ambulant patients. Post-EleVidys, whether FDA writes the label across both populations is open.</p></article>
+        <article><span>GAP 06</span><h3>CMC at commercial scale</h3><p>First-of-kind Fab-oligo conjugate manufacturing (oligo synthesis + conjugation + PPQ batches) is referenced in expense lines but not described in public detail. CMC is a silent CRL cause across the industry.</p></article>
+      </div>
+      <div class="verdict-box"><div><span class="ev interp">INTERPRETATION</span><h3>The dossier's verdict</h3></div><p>Dyne is the rare platform story whose pivotal numbers are large enough to survive honest discounting: 5.46% dystrophin is not 0.9%, and a 3-plus-second vHOT separation is not noise — in cohorts of 24 and 6. That tension is the whole position. The January PDUFA is a methodology review dressed as a drug review, and the Q1 REC is an endpoint review dressed as a data readout. At ~$1.93B of enterprise value with ~$1.10B of net cash beneath it, the market is paying for the DMD asset and carrying DM1 cheaply; the bear case is not "zero," it is "cash plus a wounded platform," and it is reachable in a single quarter. Everything that matters resolves by the end of Q1 2027.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Ordered by evidentiary weight: SEC filings, FDA, trial registries, peer-reviewed literature, then company and trade sources (unverified tier).</p></div></div>
+      <div class="sources">
+        <article class="source-group"><h3>SEC filings · primary</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526323639/dyn-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q<small>Cash $898.5M · 186,746,431 shares (Jul. 24, 2026) · options/RSU tables · Hercules debt</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526084178/dyn-20251231.htm" target="_blank" rel="noopener">FY2025 10-K<small>DELIVER/ACHIEVE trial data · Atlas ~5.5% · ATM purchases</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526308343/dyn-20260720.htm" target="_blank" rel="noopener">8-K — BLA acceptance<small>Priority Review · PDUFA Jan. 21, 2027 (Jul. 20, 2026)</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000181879426000009/dyn-ex99_1.htm" target="_blank" rel="noopener">8-K Ex. 99.1 — ACHIEVE one-year data<small>Sept. 29, 2026 · pooled vHOT/QMT/MDHI · REC baseline vHOT 8.3 s</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312525310516/d16518dex991.htm" target="_blank" rel="noopener">8-K Ex. 99.1 — DELIVER topline<small>Dec. 8, 2025 · MCA dystrophin 5.46%, p&lt;0.0001 · functional endpoints nominal</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1818794/000119312526323940/dyn-ex99_1.htm" target="_blank" rel="noopener">Q2 2026 results release<small>Runway into Q2 2028 · July offering terms · Hercules expansion</small></a>
+        </article>
+        <article class="source-group"><h3>FDA &amp; registries</h3>
+          <a href="https://www.fda.gov/media/189632/download?attachment" target="_blank" rel="noopener">FDA — EleVidys label revision<small>Nov. 14, 2025 · boxed warning · ambulatory-only limitation</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05524883" target="_blank" rel="noopener">DELIVER — NCT05524883<small>Phase 1/2 · N=86 actual · dystrophin primary</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05481879" target="_blank" rel="noopener">ACHIEVE — NCT05481879<small>Phase 1/2 · N=127 actual · REC vHOT primary</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT07608432" target="_blank" rel="noopener">FORZETTO — NCT07608432<small>Phase 3 · ~90 · RFF velocity primary</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT07486934" target="_blank" rel="noopener">HARMONIA — NCT07486934<small>Phase 3 · ~150 · 5xSTS primary</small></a>
+        </article>
+        <article class="source-group"><h3>Literature</h3>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/27677934/" target="_blank" rel="noopener">Mendell et al., Ann Neurol 2016<small>Eteplirsen dystrophin (~0.9% of normal) — the surrogate's origin</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/32782413/" target="_blank" rel="noopener">Roberts, Langer &amp; Wood, Nat Rev Drug Discov 2020<small>Oligonucleotide delivery — why muscle is hard</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/25183011/" target="_blank" rel="noopener">Thornton, Neurol Clin 2014<small>DM1 spliceopathy and clinical spectrum</small></a>
+        </article>
+        <article class="source-group"><h3>Company &amp; trade · unverified tier</h3>
+          <a href="https://www.novartis.com/us-en/news/media-releases/novartis-provides-update-delpacibart-etedesiran-del-desiran-phase-iii-harbor-study-treatment-myotonic-dystrophy-type-1-dm1" target="_blank" rel="noopener">Novartis — HARBOR update<small>Sept. 8, 2026 · vHOT primary missed (n=159)</small></a>
+          <a href="https://www.novartis.com/news/media-releases/novartis-successfully-completes-acquisition-avidity-biosciences-strengthening-late-stage-neuroscience-pipeline-and-advancing-xrna-strategy" target="_blank" rel="noopener">Novartis — Avidity completion<small>Feb. 27, 2026 · $72.00/share · ~$12B fully diluted</small></a>
+          <a href="https://www.fiercebiotech.com/biotech/novartis-centerpiece-12b-avidity-buyout-flunks-crucial-phase-3-test" target="_blank" rel="noopener">Fierce Biotech — HARBOR analysis<small>Sept. 8, 2026</small></a>
+          <a href="https://finnhub.io/?q=%22DYN%22" target="_blank" rel="noopener">Finnhub — DYN snapshot<small>Oct. 20, 2026 close $16.27 · 52-wk $14.00–$27.31</small></a>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/DYN/forecast/" target="_blank" rel="noopener">MarketBeat — analyst consensus<small>16 analysts · avg $33.07 · high $50 (Jefferies) · low $10</small></a>
+        </article>
+      </div>
+      <div class="method"><strong>Method.</strong> Built as of October 20, 2026. Filings used: Q2 2026 10-Q, FY2025 10-K, 2026 8-Ks and exhibits (BLA acceptance; ACHIEVE one-year data; DELIVER topline; Q2 results), July 2026 424B5, December 2025 underwriting 8-K, and sampled 2026 Form 4s. Evidence labels distinguish primary/peer-reviewed fact, interpretation, gap, and unverified company or secondary claims. Cross-trial and cross-program comparisons are not head-to-head. Scenario anchors in section 09 are soft and illustrative; no probability estimate or recommendation is included.</div>
+    </section>
+  </main>
+
+  <footer><strong>DYN deep-dive dossier</strong> · Built October 20, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='\u2212';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'\u2212'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

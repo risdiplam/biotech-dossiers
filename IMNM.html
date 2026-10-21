@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>IMNM — Immunome · Deep-Dive Dossier · 2026-10-20</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · IMNM</span><span class="stamp">Deep-dive dossier · October 20, 2026 · as-of October 20, 2026</span></div>
+        <h1>A clean Phase 3, an accepted NDA — and a second GSI problem to solve commercially, not clinically.</h1>
+        <p class="hero-dek">A source-weighted investigation of Immunome's varegacestat: RINGSIDE produced the strongest efficacy numbers ever reported in a desmoid-tumor Phase 3, but Ogsiveo is already approved, entrenched, and owned by Merck KGaA. The dossier's question is whether once-daily dosing and a cleaner ovarian-toxicity signal can take share — the data say nothing about that yet.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$17.92</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$1.59B</strong> enterprise value · <strong>$4.41</strong> cash per share<br>$2.11B market cap (118.00M shares) · $520.0M cash &amp; securities (Jun 30, 2026)</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The swing factor is the label-to-launch conversion, not another readout</h2><p class="lede">There is no pivotal data left to wait for. Varegacestat's NDA is accepted with a PDUFA target date of April 28, 2027. Everything that moves this stock for the next 18 months is regulatory texture (label breadth, ovarian-toxicity language, any advisory committee), launch preparation against an entrenched first mover, and whether the market stops pricing the ADC pipeline at roughly zero.</p></div></div>
+      <div class="evidence-strip"><span><span class="ev fact">FACT</span> SEC / FDA / label sourced</span><span><span class="ev interp">INTERPRETATION</span> Spark analysis</span><span><span class="ev gap">GAP</span> not disclosed</span><span><span class="ev unverified">UNVERIFIED</span> company or secondary claim, not corroborated</span></div>
+      <div class="decision-grid">
+        <div class="decision accent"><span class="tag">Lead asset</span><div class="big">Varegacestat (AL102)</div><p>Oral once-daily gamma-secretase inhibitor for progressing desmoid tumors. RINGSIDE Phase 3 hit every primary and key secondary endpoint; NDA accepted July 2026. <span class="ev fact">FACT</span></p></div>
+        <div class="decision"><span class="tag">The binary</span><div class="big">PDUFA · Apr 28, 2027</div><p><span class="date-tag hard">HARD DATE</span> Standard 10-month review from the April 2026 submission. No advisory committee has been announced. <span class="ev gap">GAP</span> on AdCom — FDA can convene one at any point in the cycle.</p></div>
+        <div class="decision warn"><span class="tag">The catch</span><div class="big">Second into a ~$1B niche</div><p>Ogsiveo (nirogacestat) has been marketed since Nov 2023, is EU-approved, and sits inside Merck KGaA's commercial machine. Varegacestat must win on profile, not on being first. <span class="ev fact">FACT</span></p></div>
+        <div class="decision"><span class="tag">The balance sheet</span><div class="big">$520.0M, no debt</div><p>Cash, equivalents and marketable securities at Jun 30, 2026 against $40.3M of total liabilities. Company guides runway into 2028. <span class="ev fact">FACT</span></p></div>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>Why the asset is real</h3><ul>
+          <li><span class="ev fact">FACT</span> RINGSIDE (N=156): PFS hazard ratio 0.16 (95% CI 0.071–0.375; p&lt;0.0001) — an 84% reduction in progression/death risk, with benefit consistent across prespecified subgroups.</li>
+          <li><span class="ev fact">FACT</span> Confirmed ORR 56% vs 9% (p&lt;0.0001, blinded central review) and a statistically significant worst-pain improvement (−2.24 vs +0.18 points) visible from week 4 — pain is the symptom that drives desmoid treatment decisions.</li>
+          <li><span class="ev fact">FACT</span> Once-daily 1.2 mg dosing vs Ogsiveo's 150 mg twice daily, and ovarian toxicity in 56% of premenopausal women vs the 75% in Ogsiveo's label (different trials — context only; see Landscape).</li>
+          <li><span class="ev fact">FACT</span> On Oct 2, 2026 Immunome paid BMS $20M cash plus 4,425,487 shares to extinguish <em>all</em> milestone and royalty obligations on varegacestat and take assignment of the patents — the lead asset is now royalty-free to its licensor chain except Ayala economics.</li>
+          <li><span class="ev fact">FACT</span> CEO Clay Siegall bought shares on the open market twice in late Dec 2025 (7,278 @ $20.48; 4,729 @ $21.15), after the RINGSIDE print and the $21.50 offering.</li>
+        </ul></article>
+        <article class="thesis-card risk"><h3>What the market is actually worried about</h3><ul>
+          <li><span class="ev fact">FACT</span> 80% of RINGSIDE patients on varegacestat needed a dose reduction for adverse events — far above Ogsiveo's 42% in DeFi. The tolerability story is mixed, not clean (cross-trial context, not a head-to-head claim).</li>
+          <li><span class="ev fact">FACT</span> Ovarian toxicity is a class effect, not an Ogsiveo-only problem: 56% of premenopausal women on varegacestat, resolved in only 55% of those at ASCO data cut.</li>
+          <li><span class="ev fact">FACT</span> The October slide (~−29% in a month) followed the BMS share issuance and its resale-registration overhang, a lukewarm Stifel Hold initiation, and sector beta (2.67) — no negative clinical or regulatory event is in the filing record.</li>
+          <li><span class="ev interp">INTERPRETATION</span> At ~$1.59B EV the market already pays for approval; the argument is over share capture and pipeline value, not over whether the drug works.</li>
+        </ul></article>
+      </div>
+      <div class="verdict-box"><div><span class="tag" style="color:#9db6b1">DOSSIER VERDICT</span><h3>Proof is done. Differentiation is a dosing-and-tolerability claim that is only half-proven.</h3></div><p>Varegacestat is the second GSI to a market the first one created. Its efficacy package is at least as strong as the incumbent's on the numbers each sponsor generated separately, its dosing is simpler, and its ovarian-toxicity rate is lower in cross-trial context — but its 80% dose-reduction rate is a genuine liability the "cleaner GSI" framing skips. Approval on April 28, 2027 is the base case, not the bull case. What is genuinely underpriced or overpriced here is the post-approval share split and three Phase 1 ADC/radioligand programs the EV largely ignores. Scenarios below are built on that split, not on approval odds alone.</p></div>
+      <p class="source-note">Identity: Immunome, Inc., Nasdaq: IMNM, CIK 0001472012, Delaware, HQ Bothell, WA (SEC EDGAR company registry and Q2 2026 10-Q cover). Regulatory: <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526344577/imnm-ex99_1.htm" target="_blank" rel="noopener">Q2 2026 business update (Ex-99.1, Aug 11, 2026)</a>.</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>A −29% month with no fundamental event in it</h2><p class="lede">IMNM fell from $21.41 (Sep 25 close) to a $16.41 intraday-period low in mid-October before closing at $17.92 on Oct 20, 2026 — a 1-month return of −28.5% (Finnhub). The filing record for the window contains exactly one material 8-K: the Oct 2 BMS license amendment. The decline is best explained by share supply and positioning, documented below, not by any change to the varegacestat data or the PDUFA timeline.</p></div></div>
+      <div class="chart-card">
+        <div class="chart-top"><div><div class="chart-title">IMNM daily close</div><div class="source-note">USD · fixed series through October 20, 2026</div></div><div class="range" role="group" aria-label="Chart range"><button data-range="63" aria-pressed="false">3M</button><button data-range="126" aria-pressed="false">6M</button><button data-range="252" aria-pressed="true">1Y</button></div></div>
+        <div class="chart-stats"><div class="chart-stat"><b id="rangeReturn">—</b><span>Range return</span></div><div class="chart-stat"><b id="rangeLow">—</b><span>Closing low</span></div><div class="chart-stat"><b id="rangeHigh">—</b><span>Closing high</span></div></div>
+        <div class="chart-shell" id="chartShell"><svg id="priceChart" role="img" aria-labelledby="chartTitle chartDesc" viewBox="0 0 1000 330" preserveAspectRatio="none"><title id="chartTitle">IMNM daily closing price</title><desc id="chartDesc">Interactive line chart of Immunome daily closes. Use the range buttons to view three, six, or twelve months.</desc></svg><div class="chart-tooltip" id="chartTip"></div></div>
+        <div class="chart-caption">The price chart is a dated build-time snapshot, not a live quote. Line scale starts above zero. Source: Finnhub daily candles fetched Oct 20, 2026 (series closes: $15.67 on Oct 17, 2025 → $17.92 on Oct 20, 2026; series closing range $15.24–$29.82; Finnhub-quoted 52-week range $14.64–$30.06).</div>
+      </div>
+      <div class="readthrough"><strong>Anatomy of the slide.</strong> <span class="ev fact">FACT</span> Closes: $21.51 (Sep 30) → $19.31 (Oct 6, −8.8% day) → $17.58 (Oct 13, −8.2% day) → $16.47 (Oct 16) → $17.92 (Oct 20, +6.9% day). <span class="ev fact">FACT</span> On Sep 30, Stifel initiated at Hold with a $24 target — the only lukewarm initiation in a field of Buys (Wedbush $35, Truist $38, Alliance Global $32, William Blair Outperform in mid-Oct). <span class="ev fact">FACT</span> On Oct 2 (after close Friday), the BMS amendment issued 4,425,487 new shares (~3.9% of the count) with a resale registration statement due by Nov 16, 2026. <span class="ev interp">INTERPRETATION</span> A known block of registered-for-resale stock, a Hold initiation at the top of the range, and a 2.67-beta name in a soft tape explain the move without any fundamental break. The Aug 11 Q2 print (net loss $73.1M vs ~$0.51/sh consensus estimate) had already reset expectations two months earlier.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">SEP 30</span><h3>Stifel initiates Hold / $24</h3><p>The initiation framed varegacestat as a second entrant with a real but bounded desmoid opportunity — the "second GSI" discount, in writing. <span class="ev fact">FACT</span> (initiation as reported by MarketBeat)</p></article>
+        <article><span class="event-mark">OCT 2</span><h3>BMS buyout: $20M + 4.43M shares</h3><p>Economically accretive long-term (royalty stack gone), mechanically dilutive short-term, with BMS free to resell once the registration is effective. <span class="ev fact">FACT</span> (8-K, Oct 5, 2026)</p></article>
+        <article><span class="event-mark">OCT 6–16</span><h3>Two −8% days, no news</h3><p>No 8-K, no PR, no FDA event in the window after Oct 5. Volume ran ~1.1–2.3M shares/day vs a ~1.36M average. <span class="ev fact">FACT</span> (EDGAR submissions record; MarketBeat price history)</p></article>
+      </div>
+      <p class="source-note"><a href="https://finnhub.io/?q=%22IMNM%22" target="_blank" rel="noopener">Finnhub IMNM snapshot (Oct 20, 2026)</a> · <a href="https://www.marketbeat.com/stocks/NASDAQ/IMNM/chart/" target="_blank" rel="noopener">MarketBeat price history</a> · <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526413217/d114908d8k.htm" target="_blank" rel="noopener">BMS amendment 8-K (Oct 5, 2026)</a>.</p>
+    </section>
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Notch blockade in a β-catenin disease — effective, and toxic for the same reason</h2><p class="lede">Desmoid tumors are driven by Wnt/β-catenin signaling (85–90% sporadic, ~85% of those carrying CTNNB1 mutations). Gamma-secretase inhibition does not touch β-catenin directly; it blocks Notch receptor cleavage, and Notch–Wnt crosstalk is part of what sustains desmoid growth. The same Notch dependence in gut, skin, and ovarian follicles produces the class's signature toxicities. Efficacy and the side-effect ceiling are mechanistically inseparable — that is the whole science story of this drug class.</p></div></div>
+      <div class="science-chain">
+        <article><b>01</b><h3>The tumor</h3><p>Locally aggressive, non-metastasizing fibroblastic neoplasm. 1,000–1,650 new US diagnoses per year (company 10-K figure); recurrence after surgery 60–80%, which is why management shifted to active surveillance first, systemic therapy on progression. <span class="ev fact">FACT</span></p></article>
+        <article><b>02</b><h3>The driver</h3><p>Stabilized β-catenin (CTNNB1 or APC loss) accumulates in the nucleus and drives proliferative gene programs. <span class="ev fact">FACT</span></p></article>
+        <article><b>03</b><h3>The lever</h3><p>Gamma-secretase cleaves Notch receptors, releasing the Notch intracellular domain (NICD). Varegacestat inhibits the enzyme, cutting Notch signaling that desmoid cells co-opt alongside Wnt. <span class="ev fact">FACT</span></p></article>
+        <article><b>04</b><h3>The cost</h3><p>Notch is also required for intestinal goblet-cell differentiation, skin homeostasis, and ovarian folliculogenesis — hence diarrhea, rash, and ovarian toxicity across every GSI ever dosed chronically. <span class="ev fact">FACT</span></p></article>
+      </div>
+      <div class="moa-box"><h3>Why gamma-secretase has a graveyard — and why oncology dosing is different</h3>
+        <p>The class's defining failure was Alzheimer's disease: Lilly's semagacestat not only missed in Phase 3 (IDENTITY, halted 2010) but <em>worsened</em> cognition, because chronic systemic Notch/APP-cleavage blockade at CNS-intent doses is intolerable — with excess skin cancers and infections on top. BMS's avagacestat was discontinued after Phase 2 for similar tolerability/dose reasons. (Fittingly, varegacestat itself began life inside BMS as a licensed compound before passing to Ayala.) The oncology use case survives because the therapeutic index question is different: a progressing tumor with no good options, a younger but treatment-needing population, and benefit measured in months of progression-free survival rather than decades of prevention. The toxicities did not disappear — they were repriced. Any reader who sees "GSI" and stops at the Alzheimer's history is missing that repricing; any reader who ignores the history misses why FDA will read the ovarian and skin data line by line.</p>
+        <p><span class="ev interp">INTERPRETATION</span> The relevant scientific risk is not the Alzheimer's precedent. It is duration: desmoid therapy is chronic (median exposure 20.3 months in RINGSIDE), cumulative Notch toxicity in a young, often female population — ovarian function above all — is the long-horizon unknown no 2-year trial fully resolves.</p>
+      </div>
+      <div class="fail-grid">
+        <article><h3>Failure mode 1 — ovarian toxicity proves dose-limiting in practice</h3><p>56% incidence in premenopausal women (RINGSIDE), resolution in 55% at cut. If real-world discontinuation for ovarian effects runs hotter than the trial's zero, the drug's usable population shrinks toward post-menopausal and male patients — a fraction of a 1,000–1,650/yr incidence market.</p></article>
+        <article><h3>Failure mode 2 — the 80% dose-reduction rate is the real dose</h3><p>Four of five patients reduced dose for AEs. If the delivered dose intensity in practice drifts below the trial's managed level, the ORR/PFS package may not reproduce — while the label will still carry the full-dose efficacy claims.</p></article>
+        <article><h3>Failure mode 3 — second-mover entrenchment</h3><p>Ogsiveo's two-year head start, guideline inclusion, and Merck KGaA's sales infrastructure may make "good enough and familiar" beat "once-daily and somewhat cleaner" in sarcoma centers.</p></article>
+        <article><h3>Failure mode 4 — the platform is a call option, not a pipeline</h3><p>IM-1021, IM-1617 and IM-3050 are all Phase 1, first-in-human in 2025–2026. ADC and radioligand fields are littered with Phase 1 responses that never became drugs; ROR1 specifically has burned sponsors before (see Pipeline).</p></article>
+      </div>
+      <p class="source-note">Disease background and epidemiology: <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526088172/imnm-20251231.htm" target="_blank" rel="noopener">FY2025 10-K, Business section</a>. Class history: published Phase 3 record of semagacestat (IDENTITY program) and the OGSIVEO label's class warnings (Landscape sources).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>RINGSIDE: the strongest desmoid dataset ever produced — with an 80% asterisk</h2><p class="lede">RINGSIDE (NCT04871282) is a single seamless Phase 2/3 study Ayala designed and Immunome inherited. Part A picked the dose; Part B was the registrational, double-blind, placebo-controlled trial. Part B enrolled 156 patients with progressing desmoid tumors (≥20% growth in the prior 12 months), randomized 1:1 to varegacestat 1.2 mg once daily or placebo, with progression assessed by blinded independent central review.</p></div></div>
+      <div class="paper-card">
+        <div class="program-kicker">Registrational · Phase 3 (RINGSIDE Part B)</div>
+        <h3>Primary and key secondary results</h3>
+        <div class="status-row"><span class="pill">Topline Dec 15, 2025</span><span class="pill">Full data: ASCO 2026 oral (May 30, 2026)</span><span class="pill">NDA accepted Jul 2026</span></div>
+        <table class="study-table">
+          <thead><tr><th>Endpoint</th><th>Varegacestat 1.2 mg QD</th><th>Placebo</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Endpoint">PFS (primary, BICR)</td><td data-label="Drug">—</td><td data-label="Placebo">—</td><td data-label="Effect">HR 0.16 (95% CI 0.071–0.375), p&lt;0.0001 — 84% risk reduction; consistent across prespecified subgroups (location, size, age, prior therapy)</td></tr>
+            <tr><td data-label="Endpoint">Confirmed ORR (RECIST v1.1, BICR)</td><td data-label="Drug">56%</td><td data-label="Placebo">9%</td><td data-label="Effect">p&lt;0.0001</td></tr>
+            <tr><td data-label="Endpoint">Tumor volume, wk-24 mean change</td><td data-label="Drug">−109.6 (SE 40.64)</td><td data-label="Placebo">+122.8 (SE 42.72)</td><td data-label="Effect">Difference −232.4, p&lt;0.0001; median best change −83% vs +11% (exploratory)</td></tr>
+            <tr><td data-label="Endpoint">Worst pain intensity (key secondary)</td><td data-label="Drug">−2.24 points</td><td data-label="Placebo">+0.18 points</td><td data-label="Effect">p&lt;0.0001; &gt;2-point separation from week 4</td></tr>
+          </tbody>
+        </table>
+        <div class="bar-set">
+          <div class="bar-row"><span class="bar-label">ORR drug</span><div class="bar-track"><div class="bar-fill" style="width:56%"></div></div><span class="bar-value">56%</span></div>
+          <div class="bar-row"><span class="bar-label">ORR pbo</span><div class="bar-track"><div class="bar-fill" style="width:9%"></div></div><span class="bar-value">9%</span></div>
+        </div>
+        <p class="source-note">All <span class="ev fact">FACT</span> — topline PR (Dec 15, 2025) and ASCO 2026 detailed-results PR (May 30, 2026). Median PFS by arm was not the headline disclosure in either release. <span class="ev gap">GAP</span>: arm-level median PFS and duration-of-response medians await the full publication.</p>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Ovarian toxicity — the label fight</h3><p><span class="ev fact">FACT</span> 20 of 36 premenopausal women (56%) had ovarian-toxicity AEs; resolved in 11 (55%) at cut; <strong>zero</strong> discontinuations for ovarian toxicity. Compare the OGSIVEO label: 75% of 36 females of reproductive potential, with ovarian toxicity among its serious reactions and a labeled warning. Cross-trial context only — populations and ascertainment differ, and no head-to-head exists. This is varegacestat's best differentiation datapoint and it is still a class-effect coin flip at the individual patient level.</p></article>
+        <article><h3>Dose reductions — the asterisk</h3><p><span class="ev fact">FACT</span> Dose reductions for TEAEs: <strong>80%</strong> on varegacestat vs 9% on placebo. AE discontinuations: 20% vs 7%. Grade 3/4 AEs in 57% vs 17% of patients (95% of all events were grade 1–2). Median exposure 20.3 vs 11.1 months, no treatment-related deaths. Against DeFi's label figures for Ogsiveo (reductions 42%, interruptions 51%, discontinuations 20%), varegacestat's delivered-dose profile is <em>worse</em> on reductions and equal on discontinuations. Tolerability differentiation is a dosing-schedule and ovarian argument, not a blanket claim.</p></article>
+        <article><h3>The common-AE background</h3><p><span class="ev fact">FACT</span> Diarrhea 82% (vs 27% pbo), fatigue 44% (23%), rash 43% (12%), nausea 35% (26%), cough 34% (5%). This is the GSI signature — manageable, chronic, quality-of-life-relevant in a young population taking the drug for ~20 months. It caps how "clean" any GSI label can honestly be.</p></article>
+      </div>
+      <div class="paper-card" style="margin-top:20px">
+        <div class="program-kicker">Dose selection · Phase 2 (RINGSIDE Part A)</div>
+        <h3>Why 1.2 mg once daily</h3>
+        <p class="mechanism">Part A enrolled 42 participants across three regimens — 1.2 mg once daily, 2 mg twice-weekly, 4 mg twice-weekly. ORR in evaluable patients was 64% across doses and <strong>75% at 1.2 mg QD</strong> (ITT: 64% at 1.2 mg QD; per-arm ASCO 2023 evaluable ORRs: 50% QD at first cut, rising with follow-up; 45.5% at 2 mg BIW; 23.1% at 4 mg BIW). The daily regimen also produced the fastest and deepest tumor-volume and T2-weighted MRI signal reductions (−88% median best volume change). Dose selection was efficacy-led, and Part B validated it. <span class="ev fact">FACT</span> (10-K; Ayala ASCO/ESMO 2023 presentations)</p>
+      </div>
+      <p class="source-note">Registry: <a href="https://clinicaltrials.gov/study/NCT04871282" target="_blank" rel="noopener">NCT04871282</a> (actual enrollment 198 across Parts A+B+OLE; status active, not recruiting). Topline: <a href="https://www.businesswire.com/news/home/20251215845554/en/Immunome-Announces-Positive-Topline-Results-from-Phase-3-RINGSIDE-Trial-of-Varegacestat-in-Patients-with-Desmoid-Tumors" target="_blank" rel="noopener">Business Wire, Dec 15, 2025</a>.</p>
+    </section>
+    <section id="competition">
+      <div class="section-head"><div class="section-num">05 / LANDSCAPE</div><div><h2>Second GSI to market: the comp is a label, a sales curve, and a head start</h2><p class="lede">No head-to-head trial of varegacestat vs nirogacestat exists or is planned, and none of the comparisons below are efficacy claims — different trials, different enrollment eras, different ascertainment. What can be compared honestly: dosing schedule, labeled safety burdens, and the commercial trajectory of the only marketed product in the class.</p></div></div>
+      <div class="compare">
+        <article class="compare-card"><span class="program-kicker">The challenger</span><div class="name">Varegacestat (IMNM)</div><dl>
+          <dt>Dosing</dt><dd>1.2 mg once daily <span class="ev fact">FACT</span></dd>
+          <dt>Pivotal</dt><dd>RINGSIDE (N=156): PFS HR 0.16; ORR 56% vs 9%</dd>
+          <dt>Safety signature</dt><dd>Ovarian tox 56% of premenopausal women; dose reductions 80%; AE discontinuations 20%</dd>
+          <dt>Status</dt><dd>NDA accepted; PDUFA Apr 28, 2027 <span class="date-tag hard">HARD</span>; EU MAA planned by end-2026 <span class="date-tag guidance">GUIDANCE</span></dd>
+        </dl></article>
+        <article class="compare-card"><span class="program-kicker">The incumbent</span><div class="name">Ogsiveo · nirogacestat (Merck KGaA)</div><dl>
+          <dt>Dosing</dt><dd>150 mg twice daily <span class="ev fact">FACT</span> (US label)</dd>
+          <dt>Pivotal</dt><dd>DeFi (N=142): PFS HR 0.29; ORR 41% vs 8% (label §14)</dd>
+          <dt>Safety signature</dt><dd>Ovarian tox 75% of females of reproductive potential (labeled warning); dose reductions 42%; interruptions 51%; discontinuations 20%</dd>
+          <dt>Status</dt><dd>FDA-approved Nov 2023; EU-approved Aug 2025; acquired with SpringWorks for ~€3B (closed H2 2025)</dd>
+        </dl></article>
+        <article class="compare-card"><span class="program-kicker">Everything else</span><div class="name">The pre-GSI standard</div><dl>
+          <dt>Options</dt><dd>Active surveillance; surgery (60–80% recurrence); off-label TKIs (sorafenib, pazopanib), methotrexate/vinblastine, anthracyclines <span class="ev fact">FACT</span></dd>
+          <dt>Implication</dt><dd>The GSI class created the systemic-therapy market rather than splitting an existing one — total class sales can grow even as share splits.</dd>
+          <dt>Watch</dt><dd>No third GSI is in late-stage desmoid development in the registry record reviewed. <span class="ev gap">GAP</span> — competitive pipeline census was targeted, not exhaustive.</dd>
+        </dl></article>
+      </div>
+      <div class="readthrough"><strong>The market comp that matters.</strong> <span class="ev fact">FACT</span> Merck KGaA reported Ogsiveo net product sales of €134M between the SpringWorks closing and Dec 31, 2025 (~5 months), and sell-side models around the acquisition carried ~$1B peak-sales assumptions for Ogsiveo alone. <span class="ev interp">INTERPRETATION</span> A two-player class in a 1,000–1,650-incidence/yr US market with multi-year treatment durations supports a combined peak in the ~$800M–1.2B range without heroic assumptions — the fight is over the split (incumbent-favored by default) and over duration of therapy, where tolerability is the lever that actually moves revenue. That is precisely the lever on which varegacestat's evidence is mixed: fewer ovarian events and simpler dosing pull one way; an 80% dose-reduction rate pulls the other.</div>
+      <p class="source-note">Ogsiveo label: <a href="https://www.emdserono.com/content/dam/web/corporate/non-images/country-specifics/us/pi/ogsiveo-pi-and-mg.pdf" target="_blank" rel="noopener">US Prescribing Information (EMD Serono)</a>. Sales: <a href="https://reports.emdgroup.com/en/annualreport/2025/management-report/fundamental-information-about-the-group/company-profile-and-structure/healthcare.html" target="_blank" rel="noopener">Merck KGaA Annual Report 2025, Healthcare</a>. DeFi figures are from the Ogsiveo label's clinical-studies section; cross-trial context only.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">06 / PIPELINE</div><div><h2>One near-commercial asset and three Phase 1 lottery tickets, ranked honestly</h2><p class="lede">Immunome's post-2023 identity is Siegall's ADC playbook rebuilt: a discovery engine producing TOP1-inhibitor ADCs (proprietary HC74 payload) plus a FAP radioligand inherited from Morphimmune. The pipeline beyond varegacestat is real but early — all of it is Phase 1 or pre-IND, and none of it should carry much of the current EV in a disciplined model.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><span class="pipe-rank">01</span><div><div class="pipe-name">Varegacestat — desmoid tumors</div><p class="pipe-desc">GSI; NDA under review. Carries effectively all near-term value. EU MAA planned by end-2026. <span class="ev fact">FACT</span></p></div><span class="pipe-status">PDUFA APR 2027</span></div>
+        <div class="pipe-row"><span class="pipe-rank">02</span><div><div class="pipe-name">IM-1021 — ROR1 ADC</div><p class="pipe-desc">Phase 1 (NCT06823167, recruiting, ~190 planned) in advanced cancers; objective responses observed in B-cell lymphoma at multiple dose levels; initial data promised in 2026. Licensed from Zentalis (Jan 2024; $15M cash + stock + milestones/royalties). Honest rank: ROR1 is a validated-but-treacherous target — Merck's zilovertamab vedotin leads the class; earlier ROR1 programs have failed. Responses in lymphoma are the first real signal. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></p></div><span class="pipe-status">PHASE 1</span></div>
+        <div class="pipe-row"><span class="pipe-rank">03</span><div><div class="pipe-name">IM-1617 — solid-tumor ADC (HC74 TOP1 payload)</div><p class="pipe-desc">Potential first-in-class ADC against an undisclosed receptor-tyrosine-kinase target implicated in tumor survival and immune exclusion. First patient dosed June 2026 (CRC, NSCLC, breast cohorts planned). Pre-IND at the FY2025 10-K; in the clinic within months — the fastest of the home-grown ADCs, and the purest test of the HC74 payload thesis. <span class="ev fact">FACT</span></p></div><span class="pipe-status">PHASE 1</span></div>
+        <div class="pipe-row"><span class="pipe-rank">04</span><div><div class="pipe-name">IM-3050 — FAP-targeted radioligand (¹⁷⁷Lu)</div><p class="pipe-desc">First patient dosed July 2026. FAP is expressed on cancer-associated fibroblasts across most solid tumors (company-cited 75%), but FAP radioligands have a long history of strong imaging and weak therapy — stromal targeting delivers dose to the neighborhood, not always to the tumor cell. Purdue-licensed IP (Morphimmune lineage). Ranked below the ADCs on evidentiary maturity of the modality. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></p></div><span class="pipe-status">PHASE 1</span></div>
+        <div class="pipe-row"><span class="pipe-rank">05</span><div><div class="pipe-name">IM-1340 / IM-1335 — next ADCs</div><p class="pipe-desc">Undisclosed solid-tumor targets, HC74 payload; IND submissions guided for mid- and late 2026 respectively (10-K language; Aug 2026 update reiterated the plan). No clinical data; value is platform cadence only. <span class="ev unverified">UNVERIFIED · COMPANY GUIDANCE</span></p></div><span class="pipe-status">PRE-IND</span></div>
+        <div class="pipe-row"><span class="pipe-rank">06</span><div><div class="pipe-name">AL101 — the other Ayala GSI</div><p class="pipe-desc">BMS-originated GSI acquired alongside varegacestat; its BMS patent estate was part of the Oct 2026 buyout. No active development program is disclosed in the current pipeline. <span class="ev gap">GAP</span> — carried at zero.</p></div><span class="pipe-status dead">NO DISCLOSED PROGRAM</span></div>
+      </div>
+      <p class="source-note">Pipeline status: <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526344577/imnm-ex99_1.htm" target="_blank" rel="noopener">Q2 2026 update</a> and FY2025 10-K. Registry: <a href="https://clinicaltrials.gov/study/NCT06823167" target="_blank" rel="noopener">NCT06823167 (IM-1021)</a>.</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">07 / CATALYSTS</div><div><h2>One hard date runs the next twelve months</h2><p class="lede">Everything before April 2027 is positioning: an EMA filing, first IM-1021 data, a Q3 print that confirms the post-BMS share count, and the standing possibility of an FDA advisory committee announcement — the single largest unpriced binary inside the review cycle.</p></div></div>
+      <div class="timeline">
+        <div class="event"><span class="event-date">NOV 16, 2026</span><div class="event-body"><b>BMS resale registration deadline</b>Company agreed to file the resale S-3 for BMS's 4,425,487 shares by this date (effectiveness to follow). A supply event, not a fundamental one — but it dates the overhang. <span class="date-tag hard">HARD · CONTRACTUAL</span></div></div>
+        <div class="event"><span class="event-date">~NOV 2026</span><div class="event-body"><b>Q3 2026 results (10-Q)</b>First filing to confirm the post-BMS share count (~118.0M), Q3 burn against the $520.0M Jun-30 balance, and any commercial-build spending. Earnings date itself is <span class="date-tag inferred">INFERRED</span> from prior-year cadence (Q3 2025 reported Nov 6).</div></div>
+        <div class="event"><span class="event-date">H2 2026</span><div class="event-body"><b>Initial IM-1021 lymphoma data</b>Company-committed for 2026. The first datapoint that can move the pipeline from "option" to "asset." <span class="date-tag guidance">GUIDANCE WINDOW</span></div></div>
+        <div class="event"><span class="event-date">BY YE 2026</span><div class="event-body"><b>EU MAA submission for varegacestat</b>Announced plan in the Aug 11, 2026 update. <span class="date-tag guidance">GUIDANCE WINDOW</span></div></div>
+        <div class="event"><span class="event-date">ANY TIME</span><div class="event-body"><b>AdCom: announced or ruled out</b><span class="ev gap">GAP</span> — no advisory committee has been announced for this NDA. A convening notice would reprice approval odds and label risk immediately; silence into Q1 2027 progressively de-risks it.</div></div>
+        <div class="event primary"><span class="event-date">APR 28, 2027</span><div class="event-body"><b>PDUFA — varegacestat (desmoid tumors, adults)</b>The date the whole dossier hangs on. <span class="date-tag hard">HARD DATE</span></div></div>
+        <div class="event"><span class="event-date">2027+</span><div class="event-body"><b>IM-1617 / IM-3050 first data; IM-1340/1335 INDs</b>Platform-cadence events; individually small, collectively the test of the Siegall rebuild thesis. <span class="date-tag inferred">INFERRED</span></div></div>
+      </div>
+    </section>
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">08 / SCENARIOS</div><div><h2>Soft ranges — what has to be true at each level</h2><p class="lede">Scenarios are anchored on post-decision enterprise value, with cash and treasury-method share counts stated per case. They are framing devices, not price targets or recommendations. The bull-case top is capped at the highest sourced sell-side target (Truist, $38, Aug 2026).</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><span class="tag">Bear · soft range</span><div class="pt">$7 – $10</div><span class="soft">Approval fails or arrives crippled</span><ul>
+          <li>CRL, a convened AdCom turns hostile, or a label so restricted (population limits, burdensome ovarian monitoring) that uptake stalls against Ogsiveo</li>
+          <li>EV anchor ~$0.6B — cash plus distressed platform value</li>
+          <li>Cash ~$400M at decision (burn, no raise); options out of the money → FD = 118.0M basic: ($0.60B + $0.40B) / 118.0M ≈ $8.47</li>
+        </ul></article>
+        <article class="scen-card base"><span class="tag">Base · soft range</span><div class="pt">$26 – $32</div><span class="soft">Approval, honest second place</span><ul>
+          <li>Approval on/near Apr 28, 2027 with a label broadly tracking RINGSIDE; no AdCom derailment</li>
+          <li>Varegacestat takes a meaningful minority share of a ~$0.9–1.1B combined class peak; IM-1021 carries modest option value</li>
+          <li>EV anchor ~$3.3B; cash ~$450M; FD ≈ 128.4M (treasury at ~$29): ($3.30B + $0.45B) / 128.4M ≈ $29.2</li>
+        </ul></article>
+        <article class="scen-card bull"><span class="tag">Bull · soft range</span><div class="pt">$35 – $38</div><span class="soft">Share flip + platform credit</span><ul>
+          <li>Label clean enough for the once-daily/ovarian profile to flip share leadership over 2–3 years; combined class peak at/above ~$1.2B</li>
+          <li>IM-1021 lymphoma data strong enough to price the ADC platform as a second engine</li>
+          <li>EV anchor ~$4.35B; cash ~$450M; FD ≈ 129.8M (treasury at ~$37): ($4.35B + $0.45B) / 129.8M ≈ $36.98. Top capped at Truist's $38 — the highest sourced street target</li>
+        </ul></article>
+      </div>
+      <div class="assump"><b>Assumption disclosure.</b> Reference price $17.92 (Oct 20, 2026 close, Finnhub). Basic shares 118.00M = 113,577,629 (10-Q cover, Aug 2026) + 4,425,487 BMS shares (Oct 2, 2026). Options 16,926,110 at $11.31 weighted-average exercise price (Jun 30, 2026) are treasury-method adjusted at each scenario's price level; at bear prices they are excluded (strike above price). Cash anchors are estimates after burn/launch spend, not forecasts. No use of the $134.1M remaining ATM is assumed in any case — actual ATM use lowers per-share outcomes. EV anchors are judgment inputs built from the Ogsiveo sales comp in §05; they are <span class="ev interp">INTERPRETATION</span>, and the arithmetic from anchor to price is exact.</div>
+      <p class="source-note">Consensus context (Oct 2026, vendor-reported): Truist $38 (Aug 12, 2026), Wedbush $35 (Aug 12, 2026), Alliance Global $32 (Sep 21, 2026), Stifel Hold $24 (Sep 30, 2026); consensus average ≈ $34–35. Reported by MarketBeat/Finnhub summaries — <span class="ev unverified">UNVERIFIED</span> against the underlying notes.</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">09 / FINANCIALS</div><div><h2>$520M, no funded debt, and a burn rate that is about to change character</h2><p class="lede">Immunome enters the launch window unusually clean: half a billion in liquid assets, $40.3M of total liabilities, and a cost base still dominated by R&amp;D. The Dec 2025 raise — $432.4M net at $21.50, priced the day after the RINGSIDE topline — is the reason. The question is not survival; it is how much of the pile a first commercial launch consumes before revenue answers.</p></div></div>
+      <div class="fin-grid">
+        <div class="metric-stack">
+          <div class="metric"><b>$520.0M</b><span>Cash, equivalents + marketable securities · Jun 30, 2026 ($217.7M + $302.3M) <span class="ev fact">FACT</span></span></div>
+          <div class="metric"><b>$73.1M</b><span>Q2 2026 net loss (EPS −$0.65); H1 2026 net loss $127.0M <span class="ev fact">FACT</span></span></div>
+          <div class="metric"><b>$120.3M</b><span>H1 2026 operating cash use ≈ $60M/quarter and rising <span class="ev fact">FACT</span></span></div>
+          <div class="metric"><b>$40.3M</b><span>Total liabilities, Jun 30, 2026 — leases and payables; no funded debt on the balance sheet <span class="ev fact">FACT</span></span></div>
+        </div>
+        <div>
+          <table class="cap-table">
+            <thead><tr><th>Capitalization</th><th>Shares</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td>Basic outstanding (10-Q cover, Aug 2026)</td><td>113,577,629</td><td>FACT</td></tr>
+              <tr><td>BMS license-buyout shares (Oct 2, 2026)</td><td>+4,425,487</td><td>FACT</td></tr>
+              <tr><td>Current basic (derived)</td><td>≈118,003,116</td><td>Matches vendor ~118M prints</td></tr>
+              <tr><td>Options outstanding @ $11.31 WAEP</td><td>16,926,110</td><td>Jun 30, 2026</td></tr>
+              <tr><td>Treasury-method FD @ $17.92</td><td>≈124.2M</td><td>+$191.4M proceeds → 10.68M repurchased → net +6.24M</td></tr>
+              <tr><td>ATM capacity remaining</td><td>$134.1M</td><td>TD Cowen program; 6.66M shares already sold for $65.9M gross</td></tr>
+            </tbody>
+          </table>
+          <div class="overhang"><b>~$1.59B EV at $17.92</b> — $2.11B market cap on 118.0M shares less $520.0M Jun-30 cash. Pro-forma for the Oct 2 BMS payment, cash is ~$500M before Q3 burn; the Q3 10-Q (expected ~Nov 2026, <span class="date-tag inferred">INFERRED</span> cadence) resets both numbers.</div>
+        </div>
+      </div>
+      <div class="runway"><b>Runway: guided "into 2028" — and the guide is doing work</b><p><span class="ev fact">FACT</span> Company guidance (Aug 11, 2026): current resources fund operations into 2028. <span class="ev interp">INTERPRETATION</span> At the H1 pace (~$60M/qtr) $520M covers ~8 quarters; launch build-out (sales force, market access, EU filing) plus three Phase 1 programs push spend up from here, so "into 2028" implies a 2027 financing or partnership decision even in the approval case — with an ATM already in place as the low-friction route. Dilution history is two-sided evidence: management raised $161.7M net at $7.75 (Jan 2025) when it had to, and $432.4M net at $21.50 (Dec 2025) when it could. Recent dilution: 21,418,750 shares in the Dec 2025 offering (incl. full greenshoe) and 4,425,487 to BMS — the share count has roughly doubled since early 2025, which the per-share math above already reflects.</p></div>
+      <p class="source-note">All figures: <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526344636/imnm-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a>; offerings and BMS issuance: FY2025 10-K and Oct 5, 2026 8-K.</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">10 / PEOPLE</div><div><h2>Siegall's second act — with a paper trail that mostly supports him</h2><p class="lede">Immunome is, explicitly, a Clay Siegall rebuild: the ADC pioneer who co-founded Seagen, took it to four FDA approvals and a $43B Pfizer exit, arrived via the Oct 2023 Morphimmune merger and has since re-pointed the company at ADCs while bolting on a near-commercial GSI. The insider tape under his tenure is mixed-but-readable: he bought stock himself after the pivotal print; others are monetizing compensation on schedule.</p></div></div>
+      <div class="people-grid">
+        <article class="source-group"><h3>Clay B. Siegall, Ph.D. — Chairman, President &amp; CEO</h3><dl class="people-list">
+          <dt>Track record <span class="ev fact">FACT</span></dt><dd>Co-founded Seagen (Seattle Genetics) in July 1997; CEO for ~25 years; four FDA-approved therapies; &gt;$2B annual revenue at exit; Pfizer's $43B Seagen acquisition agreed Mar 2023 (closed Dec 2023). BMS/NCI background before Seagen per company bio.</dd>
+          <dt>Arrival <span class="ev fact">FACT</span></dt><dd>CEO of Morphimmune in 2023; became Immunome Chairman/President/CEO at the merger close (Oct 2023), with a $125M PIPE alongside.</dd>
+          <dt>Own money <span class="ev fact">FACT</span></dt><dd>Open-market purchases: 7,278 sh @ $20.48 (Dec 19, 2025) and 4,729 sh @ $21.15 (Dec 30, 2025) — small (~$246K) but real, post-data, post-offering. Also moved 200,000 sh to a grantor-retained annuity trust (estate planning; not a sale).</dd>
+        </dl></article>
+        <article class="source-group"><h3>Insider tape, 2026 — sampled Form 4s</h3><dl class="people-list">
+          <dt>Exercise-and-sell (routine)</dt><dd>CSO Jack Higgins: exercised 18,000 options @ $1.35, sold 13,200 @ $25.32, gifted 8,800 (Sep 2026). Officer Kinney Horn: exercises with a partial sale (Aug 2026). Pattern = compensation monetization, prices ~$25–26. <span class="ev fact">FACT</span></dd>
+          <dt>Fund selling</dt><dd>Director-affiliated ABHMC II LLC (Isaac Barchas reporting) sold 83,464 sh @ ~$26.07–27.25 (Aug 10–12, 2026) under a Rule 10b5-1 plan. <span class="ev fact">FACT</span></dd>
+          <dt>What is absent</dt><dd>No open-market insider <em>purchases</em> appear in the 2026 filings sampled; the Dec 2025 Siegall buys remain the directional signal. A full 2026 Form 4 census was not performed. <span class="ev gap">GAP</span></dd>
+        </dl></article>
+        <article class="source-group"><h3>Governance &amp; alignment notes</h3><ul class="check-list">
+          <li>Combined Chairman/CEO role — concentration is the design, not an accident, in a founder-style rebuild. <span class="ev fact">FACT</span></li>
+          <li>BMS now holds 4,425,487 shares (~3.7% of current basic) with registration rights — a sophisticated holder with a seller's option, not a partner's lock-up. <span class="ev fact">FACT</span></li>
+          <li>Two 13G/A amendments filed Aug 14, 2026 reflect moving institutional holders during the year; named-holder detail is in the proxy/13G record. <span class="ev gap">GAP</span> for this dossier's scope.</li>
+          <li>Financing behavior to date (raise at strength, buy out the royalty stack with equity at ~$21 implied value) reads as shareholder-aware. <span class="ev interp">INTERPRETATION</span></li>
+        </ul></article>
+      </div>
+      <p class="source-note">Bio: Immunome/Morphimmune merger release (Jun 2023) and FY2025 10-K. Form 4s: EDGAR ownership filings for Siegall (Dec 2025), Higgins (Sep 2026), Barchas (Aug 2026), sampled Oct 20, 2026.</p>
+    </section>
+    <section id="risks">
+      <div class="section-head"><div class="section-num">11 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by expected damage to the dossier's base case, not by headline drama. The top three are all the same risk wearing different clothes: varegacestat must convert a clean trial into share against an entrenched incumbent, and its own safety table fights the conversion story.</p></div></div>
+      <ol class="risk-list">
+        <li><b>The 80% dose-reduction rate contradicts the differentiation pitch.</b><span>RINGSIDE's delivered-dose reality (80% reductions, 20% AE discontinuations, 57% grade 3/4) is the number payers, physicians and FDA reviewers will set against the "better-tolerated GSI" narrative. Cross-trial, DeFi's reductions were 42%. <span class="ev fact">FACT</span> (both datasets as reported)</span></li>
+        <li><b>Ovarian toxicity is a class effect with incomplete reversibility data.</b><span>56% incidence in premenopausal women; 55% resolved at cut. Long-term fertility outcomes are unknown, the population skews young and female, and FDA labeled the same risk prominently for Ogsiveo. Label language here is a commercial variable, not a footnote. <span class="ev fact">FACT</span> / <span class="ev gap">GAP</span> (long-term follow-up)</span></li>
+        <li><b>Second-mover economics vs Merck KGaA.</b><span>Ogsiveo owns the guidelines, the KOL relationships and a two-year sales head start (€134M in its first ~5 months under Merck), backed by a parent that paid ~€3B for the franchise. "Once daily" has lost to "already prescribed" before. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></span></li>
+        <li><b>AdCom optionality inside the review.</b><span>No advisory committee announced as of Oct 20, 2026 — but FDA can convene one late in a cycle, and a class with this safety signature is a plausible candidate. A convening notice is the largest single unpriced binary before PDUFA. <span class="ev gap">GAP</span></span></li>
+        <li><b>Share-supply stack.</b><span>BMS's 4.43M shares come with a registration filing due Nov 16, 2026; $134.1M of ATM capacity remains; the base count has already ~doubled since early 2025. Supply events have demonstrably moved this stock (October). <span class="ev fact">FACT</span></span></li>
+        <li><b>Burn inflection meets a fixed runway guide.</b><span>~$60M/quarter and rising before any launch spend; "into 2028" guidance leaves a thin cushion for launch + three Phase 1 programs. A 2027 raise is base-case planning, not a bear-case surprise. <span class="ev fact">FACT</span> / <span class="ev interp">INTERPRETATION</span></span></li>
+        <li><b>Single-asset gravity.</b><span>Effectively all near-term EV sits in one indication of one drug in a 1,000–1,650-patient/yr incidence market. IM-1021/IM-1617/IM-3050 are Phase 1 with no human proof-of-concept beyond early lymphoma responses. <span class="ev fact">FACT</span></span></li>
+        <li><b>Residual Ayala economics are not fully mapped here.</b><span>The Ayala asset purchase layered a $10.0M milestone (paid Dec 2025) on the original ~$20M cash + $50.6M stock consideration. Any remaining Ayala milestones/royalties were not quantified from the filings reviewed for this dossier — a known unknown in the post-approval margin stack. <span class="ev gap">GAP</span></span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">12 / OPEN</div><div><h2>What the next filings and events must resolve</h2><p class="lede">Every item below is answerable from a dated future source. None requires speculation to close — only the documents.</p></div></div>
+      <div class="open-grid">
+        <article><span>FDA PROCESS</span><h3>AdCom: yes or no</h3><p>Watch the Federal Register and company 8-Ks through Q1 2027. Absence of a notice by ~Feb 2027 progressively converts this GAP into a de-risked fact pattern.</p></article>
+        <article><span>PUBLICATION</span><h3>Arm-level median PFS and DOR</h3><p>Topline and ASCO releases led with the HR and landmark analyses. The full RINGSIDE manuscript (and the FDA review documents at approval) will supply medians, censoring detail, and the complete PRO package.</p></article>
+        <article><span>Q3 10-Q · ~NOV 2026</span><h3>Post-BMS share count and cash</h3><p>First filing to confirm ~118.0M basic and the post-$20M cash balance, plus the first read on commercial-build spending.</p></article>
+        <article><span>SAFETY FOLLOW-UP</span><h3>Ovarian reversibility, long horizon</h3><p>55% resolution at ASCO cut is a snapshot. Open-label-extension follow-up and any FDA-mandated post-marketing commitments will determine whether this is a monitoring label or a franchise constraint.</p></article>
+        <article><span>EU PATH</span><h3>MAA filing confirmation</h3><p>Guided for end-2026. A filed/validated MAA converts the EU from narrative to a second dated regulatory path behind Ogsiveo's Aug 2025 approval.</p></article>
+        <article><span>CONTRACTS</span><h3>Ayala residual economics</h3><p>The FY2026 10-K's commitments disclosures should quantify what, if anything, remains owed to Ayala on approval/sales — needed to finish the post-launch margin model the BMS buyout started.</p></article>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">13 / SOURCES</div><div><h2>References</h2><p class="lede">Primary sources first, per the standing source order. Company releases are marked as company claims where they carry data not yet in a filing or label.</p></div></div>
+      <div class="sources">
+        <div class="source-group"><h3>SEC filings (primary)</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526344636/imnm-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q (filed Aug 11, 2026)<small>Cash $520.0M, share count, options, ATM, pipeline status</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526088172/imnm-20251231.htm" target="_blank" rel="noopener">FY2025 10-K<small>Disease background, RINGSIDE design/Part A, Ayala &amp; Zentalis deals, offering history</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526413217/d114908d8k.htm" target="_blank" rel="noopener">8-K — BMS license Amendment No. 4 (Oct 5, 2026)<small>$20.0M + 4,425,487 shares; royalty/milestone extinguishment; resale registration by Nov 16, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1472012/000119312526344577/imnm-ex99_1.htm" target="_blank" rel="noopener">Q2 2026 business update, Ex-99.1 (Aug 11, 2026)<small>NDA acceptance, PDUFA Apr 28, 2027, MAA plan, pipeline dosing milestones</small></a>
+          <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001472012&amp;type=4" target="_blank" rel="noopener">Form 4 record (sampled)<small>Siegall purchases Dec 2025; Higgins Sep 2026; Barchas/ABHMC Aug 2026</small></a>
+        </div>
+        <div class="source-group"><h3>Labels, registry, literature</h3>
+          <a href="https://www.emdserono.com/content/dam/web/corporate/non-images/country-specifics/us/pi/ogsiveo-pi-and-mg.pdf" target="_blank" rel="noopener">OGSIVEO (nirogacestat) US Prescribing Information<small>§6.1 safety (ovarian toxicity 75%, reductions 42%, discontinuations 20%); §14 DeFi efficacy (HR 0.29; ORR 41% vs 8%)</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT04871282" target="_blank" rel="noopener">NCT04871282 — RINGSIDE<small>Seamless Ph2/3; actual enrollment 198; Part B 1.2 mg QD vs placebo, PFS by BICR</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06823167" target="_blank" rel="noopener">NCT06823167 — IM-1021 Phase 1<small>Recruiting; ~190 planned</small></a>
+          <a href="https://reports.emdgroup.com/en/annualreport/2025/management-report/fundamental-information-about-the-group/company-profile-and-structure/healthcare.html" target="_blank" rel="noopener">Merck KGaA Annual Report 2025 — Healthcare<small>Ogsiveo net product sales €134M from SpringWorks closing to Dec 31, 2025</small></a>
+        </div>
+        <div class="source-group"><h3>Company releases (UNVERIFIED where standalone)</h3>
+          <a href="https://www.businesswire.com/news/home/20251215845554/en/Immunome-Announces-Positive-Topline-Results-from-Phase-3-RINGSIDE-Trial-of-Varegacestat-in-Patients-with-Desmoid-Tumors" target="_blank" rel="noopener">RINGSIDE topline release (Dec 15, 2025)<small>PFS HR 0.16, p&lt;0.0001; ORR 56% vs 9%; tumor volume −83% vs +11%</small></a>
+          <a href="https://www.nasdaq.com/press-release/immunome-and-morphimmune-announce-definitive-merger-agreement-and-simultaneous" target="_blank" rel="noopener">Immunome–Morphimmune merger release (Jun 29, 2023)<small>Siegall Seagen record: co-founded 1997, four approvals, $43B Pfizer agreement</small></a>
+        </div>
+        <div class="source-group"><h3>Market &amp; consensus (secondary)</h3>
+          <a href="https://finnhub.io/?q=%22IMNM%22" target="_blank" rel="noopener">Finnhub IMNM snapshot (Oct 20, 2026)<small>Close $17.92; 1-month −28.5%; 52-wk $14.64–$30.06; beta ~2.67; daily candle series for the chart</small></a>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/IMNM/chart/" target="_blank" rel="noopener">MarketBeat IMNM<small>Daily closes Sep–Oct 2026; analyst targets: Truist $38, Wedbush $35, Alliance Global $32, Stifel Hold $24</small></a>
+        </div>
+      </div>
+      <p class="method">Method: identity, financials, share counts, deal terms and insider transactions are from SEC filings read directly. ASCO 2026 detailed RINGSIDE figures (subgroup consistency, ovarian-toxicity counts, dose-reduction rates) are from the company's May 30, 2026 detailed-results release as covered by HMP Global/Oncology Learning Network — company-reported, pending the full manuscript. Cross-trial comparisons are labeled as context throughout; no head-to-head trial exists. Prices are fixed snapshots as dated. Nothing here is a recommendation.</p>
+    </section>
+</main>
+
+  <footer><strong>IMNM — Immunome, Inc.</strong> · Deep-dive dossier · Built October 20, 2026 · As-of October 20, 2026 · Prices are dated snapshots, not live quotes · Research document; not investment advice.</footer>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    const prices=[["2025-10-17",15.67],["2025-10-20",16.25],["2025-10-21",16.74],["2025-10-22",15.9],["2025-10-23",16.06],["2025-10-24",15.69],["2025-10-27",16.6],["2025-10-28",16.39],["2025-10-29",15.76],["2025-10-30",15.98],["2025-10-31",16.07],["2025-11-03",17],["2025-11-04",15.41],["2025-11-05",15.35],["2025-11-06",15.5],["2025-11-07",15.24],["2025-11-10",16.44],["2025-11-11",17.52],["2025-11-12",17.43],["2025-11-13",16.51],["2025-11-14",17.14],["2025-11-17",18.13],["2025-11-18",17.86],["2025-11-19",17.69],["2025-11-20",17.51],["2025-11-21",18.53],["2025-11-24",18.65],["2025-11-25",18.3],["2025-11-26",18.63],["2025-11-28",18.42],["2025-12-01",18.32],["2025-12-02",17.09],["2025-12-03",19.37],["2025-12-04",20.09],["2025-12-05",19.76],["2025-12-08",19.64],["2025-12-09",19.06],["2025-12-10",20.3],["2025-12-11",19.49],["2025-12-12",19.57],["2025-12-15",22.64],["2025-12-16",23.48],["2025-12-17",19.78],["2025-12-18",19.95],["2025-12-19",21.44],["2025-12-22",22.03],["2025-12-23",21.73],["2025-12-24",22.33],["2025-12-26",21.71],["2025-12-29",21.6],["2025-12-30",21.18],["2025-12-31",21.48],["2026-01-02",20.82],["2026-01-05",19.71],["2026-01-06",19.75],["2026-01-07",19.98],["2026-01-08",20.45],["2026-01-09",21.07],["2026-01-12",20.57],["2026-01-13",20.14],["2026-01-14",20.76],["2026-01-15",22.85],["2026-01-16",22.41],["2026-01-20",23.88],["2026-01-21",24.87],["2026-01-22",25.82],["2026-01-23",25.87],["2026-01-26",25.43],["2026-01-27",25.7],["2026-01-28",24.75],["2026-01-29",25.07],["2026-01-30",24.62],["2026-02-02",26.14],["2026-02-03",26.97],["2026-02-04",26.41],["2026-02-05",24],["2026-02-06",24.88],["2026-02-09",24.5],["2026-02-10",24.93],["2026-02-11",23.41],["2026-02-12",22.44],["2026-02-13",22.16],["2026-02-17",22.69],["2026-02-18",21.99],["2026-02-19",22.14],["2026-02-20",21.5],["2026-02-23",21.8],["2026-02-24",22.12],["2026-02-25",22.14],["2026-02-26",21.89],["2026-02-27",21.86],["2026-03-02",22.21],["2026-03-03",21.54],["2026-03-04",22.52],["2026-03-05",20.95],["2026-03-06",21.04],["2026-03-09",21.33],["2026-03-10",21.86],["2026-03-11",21.4],["2026-03-12",20.99],["2026-03-13",20.36],["2026-03-16",20.36],["2026-03-17",20.71],["2026-03-18",20.62],["2026-03-19",20.83],["2026-03-20",20.01],["2026-03-23",20.75],["2026-03-24",20.21],["2026-03-25",20.3],["2026-03-26",20.41],["2026-03-27",19.61],["2026-03-30",19.3],["2026-03-31",21.87],["2026-04-01",22.45],["2026-04-02",21.84],["2026-04-06",21.48],["2026-04-07",21.58],["2026-04-08",21.7],["2026-04-09",22.46],["2026-04-10",21.67],["2026-04-13",22.62],["2026-04-14",22.9],["2026-04-15",23.39],["2026-04-16",23.26],["2026-04-17",24.63],["2026-04-20",24.25],["2026-04-21",23.85],["2026-04-22",23.78],["2026-04-23",22.99],["2026-04-24",23.56],["2026-04-27",23.49],["2026-04-28",23.71],["2026-04-29",22.95],["2026-04-30",22.94],["2026-05-01",22.73],["2026-05-04",23.33],["2026-05-05",23.11],["2026-05-06",23.27],["2026-05-07",22.19],["2026-05-08",22.44],["2026-05-11",23],["2026-05-12",22.69],["2026-05-13",22.2],["2026-05-14",22.02],["2026-05-15",20.88],["2026-05-18",19.9],["2026-05-19",19.66],["2026-05-20",21.53],["2026-05-21",22.96],["2026-05-22",21.66],["2026-05-26",21.91],["2026-05-27",22.11],["2026-05-28",22.54],["2026-05-29",21.83],["2026-06-01",20.78],["2026-06-02",19.34],["2026-06-03",19.81],["2026-06-04",19.68],["2026-06-05",18.58],["2026-06-08",18.61],["2026-06-09",18.39],["2026-06-10",18.16],["2026-06-11",18.36],["2026-06-12",18.38],["2026-06-15",18.07],["2026-06-16",17.91],["2026-06-17",18.53],["2026-06-18",18.74],["2026-06-22",19.18],["2026-06-23",19.33],["2026-06-24",19.75],["2026-06-25",19.4],["2026-06-26",19.96],["2026-06-29",21.04],["2026-06-30",21.19],["2026-07-01",21.49],["2026-07-02",23.61],["2026-07-06",23.9],["2026-07-07",24.39],["2026-07-08",24.01],["2026-07-09",24.17],["2026-07-10",23.35],["2026-07-13",22.8],["2026-07-14",22.59],["2026-07-15",22.92],["2026-07-16",22.2],["2026-07-17",22.32],["2026-07-20",22.16],["2026-07-21",22.78],["2026-07-22",22.88],["2026-07-23",22.01],["2026-07-24",22.21],["2026-07-27",22.58],["2026-07-28",23.22],["2026-07-29",23.11],["2026-07-30",23.08],["2026-07-31",22.76],["2026-08-03",23.01],["2026-08-04",25.06],["2026-08-05",25.52],["2026-08-06",25.82],["2026-08-07",25.03],["2026-08-10",25.69],["2026-08-11",26.25],["2026-08-12",27.99],["2026-08-13",26.42],["2026-08-14",27.2],["2026-08-17",27.4],["2026-08-18",27.56],["2026-08-19",29.82],["2026-08-20",28.08],["2026-08-21",28.52],["2026-08-24",28.01],["2026-08-25",29.39],["2026-08-26",28.75],["2026-08-27",28.87],["2026-08-28",27.57],["2026-08-31",27.41],["2026-09-01",27.07],["2026-09-02",27.33],["2026-09-03",27.16],["2026-09-04",26.76],["2026-09-08",26.81],["2026-09-09",26.12],["2026-09-10",24.97],["2026-09-11",24.67],["2026-09-14",24.55],["2026-09-15",23.95],["2026-09-16",23.46],["2026-09-17",23.93],["2026-09-18",23.97],["2026-09-21",25.07],["2026-09-22",25.75],["2026-09-23",24.24],["2026-09-24",22.34],["2026-09-25",21.41],["2026-09-28",21.68],["2026-09-29",21.89],["2026-09-30",21.51],["2026-10-01",20.89],["2026-10-02",20.9],["2026-10-05",21.17],["2026-10-06",19.31],["2026-10-07",19.09],["2026-10-08",19.31],["2026-10-09",19.55],["2026-10-12",19.15],["2026-10-13",17.58],["2026-10-14",17.2],["2026-10-15",17.4],["2026-10-16",16.47],["2026-10-19",16.77],["2026-10-20",17.92]];
+
+    const svg=document.getElementById('priceChart'), shell=document.getElementById('chartShell'), tip=document.getElementById('chartTip');
+    let range=252, visible=[];
+    const NS='http://www.w3.org/2000/svg';
+    function el(name,attrs){attrs=attrs||{};const n=document.createElementNS(NS,name);for(const k of Object.keys(attrs))n.setAttribute(k,attrs[k]);return n}
+    function money(v){return '$'+v.toFixed(2)}
+    function prettyDate(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}
+    function themeVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+    function render(){
+      visible=prices.slice(-range); svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(function(n){n.remove()});
+      const W=1000,H=330,L=62,R=20,T=20,B=42; const vals=visible.map(function(d){return d[1]}); const min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); const pad=(max-min)*.12||1; const lo=Math.max(0,min-pad),hi=max+pad;
+      const lineC=themeVar('--chart-line'), areaC=themeVar('--chart-area'), gridC=themeVar('--chart-grid'), textC=themeVar('--chart-text');
+      const x=function(i){return L+i*(W-L-R)/(visible.length-1)}, y=function(v){return T+(hi-v)*(H-T-B)/(hi-lo)};
+      const grid=el('g');
+      for(let i=0;i<5;i++){const val=lo+(hi-lo)*(4-i)/4, yy=T+i*(H-T-B)/4;grid.append(el('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:gridC,'stroke-width':'1'}));const tx=el('text',{x:L-10,y:yy+4,'text-anchor':'end',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent='$'+val.toFixed(2);grid.append(tx)}
+      const ticks=[0,Math.floor((visible.length-1)/2),visible.length-1];ticks.forEach(function(i){const tx=el('text',{x:x(i),y:H-13,'text-anchor':i===0?'start':i===visible.length-1?'end':'middle',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent=new Date(visible[i][0]+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'});grid.append(tx)});svg.append(grid);
+      let d='';visible.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(2)+','+y(p[1]).toFixed(2)});const area=el('path',{d:d+'L'+x(visible.length-1)+','+(H-B)+'L'+x(0)+','+(H-B)+'Z',fill:areaC,opacity:'.75'});svg.append(area);svg.append(el('path',{d:d,fill:'none',stroke:lineC,'stroke-width':'3','vector-effect':'non-scaling-stroke','stroke-linejoin':'round'}));
+      const hover=el('g',{opacity:'0'});const vline=el('line',{y1:T,y2:H-B,stroke:'#d85f2a','stroke-width':'1.5','stroke-dasharray':'4 4','vector-effect':'non-scaling-stroke'}),dot=el('circle',{r:'6',fill:'#fff',stroke:'#d85f2a','stroke-width':'3','vector-effect':'non-scaling-stroke'});hover.append(vline,dot);svg.append(hover);
+      const hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent',tabindex:'0','aria-label':'Explore chart values'});svg.append(hit);
+      function show(evt){const rect=shell.getBoundingClientRect(), px=Math.max(0,Math.min(rect.width,(evt.clientX||rect.left)-rect.left));const plotLeft=L/W*rect.width,plotRight=(W-R)/W*rect.width;const frac=Math.max(0,Math.min(1,(px-plotLeft)/(plotRight-plotLeft)));const i=Math.round(frac*(visible.length-1)),p=visible[i],xx=x(i),yy=y(p[1]);hover.setAttribute('opacity','1');vline.setAttribute('x1',xx);vline.setAttribute('x2',xx);dot.setAttribute('cx',xx);dot.setAttribute('cy',yy);tip.style.display='block';tip.style.left=(xx/W*rect.width)+'px';tip.style.top=(yy/H*rect.height)+'px';tip.textContent=prettyDate(p[0])+' · '+money(p[1])}
+      hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',function(){hover.setAttribute('opacity','0');tip.style.display='none'});
+      const ret=(visible[visible.length-1][1]/visible[0][1]-1)*100;document.getElementById('rangeReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';document.getElementById('rangeLow').textContent=money(min);document.getElementById('rangeHigh').textContent=money(max);
+    }
+    document.querySelectorAll('.range button').forEach(function(b){b.addEventListener('click',function(){range=Number(b.dataset.range);document.querySelectorAll('.range button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render()})});
+    render();
+
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}render()}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

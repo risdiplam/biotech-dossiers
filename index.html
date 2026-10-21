@@ -32,7 +32,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:48px;paddi
 <div class="wrap">
 <header>
 <h1>Biotech Dossiers</h1>
-<p>Deep-dive research library — 32 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
+<p>Deep-dive research library — 39 tickers, each with full science, pipeline, catalysts, and bear/base/bull scenarios.</p>
 </header>
 <div class="controls">
 <input type="search" id="q" placeholder="Search tickers or companies…" aria-label="Search dossiers">
@@ -76,7 +76,14 @@ const D=[
 {t:"VIR",c:"Vir Biotechnology",d:"2026-10-16",cat:"ECLIPSE 1 HDV Ph3 topline — Q4 2026 [guidance]",sc:"Bear $3.50–5 / Base $12–16 / Bull $23–29"},
 {t:"PCVX",c:"Vaxcyte",d:"2026-10-16",cat:"OPUS-2/OPUS-3 + infant Ph2 toplines — 1H 2027 [guidance]",sc:"Bear $12–15 / Base $58–70 / Bull $100–115"},
 {t:"RAPP",c:"Rapport Therapeutics",d:"2026-10-20",cat:"RAP-219 FDA EOP2 meeting — 1Q 2027 [guidance]",sc:"Bear $10–14 / Base $30–38 / Bull $58–72"},
-{t:"LRMR",c:"Larimar Therapeutics",d:"2026-10-20",cat:"Nomlabofusp rolling BLA remaining modules — 2H 2026 [guidance]",sc:"Bear $0.80–1.10 / Base $6.35–8.00 / Bull $14.60–17.95"}
+{t:"LRMR",c:"Larimar Therapeutics",d:"2026-10-20",cat:"Nomlabofusp rolling BLA remaining modules — 2H 2026 [guidance]",sc:"Bear $0.80–1.10 / Base $6.35–8.00 / Bull $14.60–17.95"},
+{t:"SVRA",c:"Savara",d:"2026-10-20",cat:"MOLBREEVI aPAP PDUFA — Nov 22, 2026 [hard]",sc:"Bear $1.30–1.90 / Base $8–10.25 / Bull $10.50–12"},
+{t:"COGT",c:"Cogent Biosciences",d:"2026-10-20",cat:"Bezuclastinib GIST PDUFA — Nov 30, 2026 [hard]; NonAdvSM Dec 30, 2026 [hard]",sc:"Bear $12.50–15 / Base $37.50–44.50 / Bull $56.50–61"},
+{t:"DYN",c:"Dyne Therapeutics",d:"2026-10-20",cat:"Z-rostudirsen DMD PDUFA — Jan 21, 2027 [hard]",sc:"Bear $7–8.50 / Base $23.50–28.50 / Bull $41–48"},
+{t:"CGEM",c:"Cullinan Therapeutics",d:"2026-10-20",cat:"Zipalertinib EGFR ex20 PDUFA — Feb 27, 2027 [hard]",sc:"Bear $6–8 / Base $20–25 / Bull $34–42"},
+{t:"IMNM",c:"Immunome",d:"2026-10-20",cat:"Varegacestat desmoid PDUFA — Apr 28, 2027 [hard]",sc:"Bear $7–10 / Base $26–32 / Bull $35–38"},
+{t:"ZBIO",c:"Zenas BioPharma",d:"2026-10-20",cat:"SunStone SLE topline — Q4 2026 [guidance]; obexelimab PDUFA May 27, 2027 [hard]",sc:"Bear $13–16 / Base $31–38 / Bull $48–55"},
+{t:"MLTX",c:"MoonLake Immunotherapeutics",d:"2026-10-20",cat:"Sonelokimab BLA acceptance/PDUFA — late Nov 2026 [guidance]",sc:"Bear $4–5.50 / Base $16–22 / Bull $38–48"}
 ];
 const grid=document.getElementById('grid'),q=document.getElementById('q');
 function render(f=""){

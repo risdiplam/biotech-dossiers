@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>CGEM — Cullinan Therapeutics · Deep-Dive Dossier · 2026-10-20</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · CGEM</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>A dated FDA decision, half the U.S. profit, and two T-cell engagers the market prices as options.</h1>
+        <p class="hero-dek">Cullinan Therapeutics (CIK 0001789972, Cambridge, Mass.) has an NDA under review for zipalertinib — an EGFR exon-20-insertion TKI it owns only as a 50/50 U.S. profit share with Taiho — with a PDUFA date of February 27, 2027. Behind it sit a CD19 T-cell engager with early remission data in refractory autoimmune disease, a BCMA engager licensed from Genrix, and a FLT3 engager entering a potentially registrational AML study. The question is what each layer is worth once the 50% haircut and the accelerated-approval fine print are applied honestly.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$14.83</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Finnhub)</div>
+        <div class="quote-meta"><strong>~$954M</strong> implied equity (64.35M shares) · <strong>~$0.60B</strong> est. enterprise value<br>$356.0M cash &amp; investments (Jun 30, 2026) · no debt · 52-wk range $6.73–$23.19</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#regulatory">Regulatory</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The swing factor is a February FDA decision on a drug Cullinan only half-owns</h2><p class="lede">Everything else in this dossier is optionality. The dated, binary event is the February 27, 2027 PDUFA for zipalertinib monotherapy in post-platinum EGFR exon-20-insertion NSCLC — an accelerated-approval filing built on a 35% response rate. Cullinan's economics are a 50% share of U.S. pre-tax profits plus up to $130M of approval milestones; Taiho runs the program and books the sales. That structure caps the upside of the lead asset and pushes real valuation weight onto CLN-978, where the data are early, small, and genuinely interesting.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$0.60B</div><p><span class="ev interp">INTERPRETATION</span> $954M implied equity at the Oct 20 close less $356.0M cash &amp; investments (Jun 30, 2026). Counting the $42.0M of non-debt liabilities (payables, accruals, leases) puts EV nearer $0.64B. No borrowings.</p></article>
+        <article class="decision"><div class="tag">Cash per share</div><div class="big">~$5.53</div><p><span class="ev fact">FACT</span> $356.0M ÷ 64.35M shares (Jun 30, 2026). Not a floor: H1 2026 operating cash use was $84.3M, and two Phase 2 starts are layered on top.</p></article>
+        <article class="decision warn"><div class="tag">Next decisive event</div><div class="big">Feb 27, 2027</div><p><span class="ev fact">FACT</span> PDUFA target action date for the zipalertinib monotherapy NDA (post-platinum ± prior amivantamab), accepted April 2026. Hard date; the outcome — approval, label scope, or CRL — reprices every scenario in §09.</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">Two NDAs in motion</div><p><span class="ev fact">FACT</span> Monotherapy NDA under review (accelerated approval sought). A second NDA — zipalertinib + chemotherapy, first-line — was initiated under FDA Real-Time Oncology Review on Oct 1, 2026, on positive Phase 3 REZILIENT3 data, with completion expected by year-end 2026.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>What is actually being priced</h3><ul><li>At ~$0.60B EV, the market is paying for a probability-weighted U.S. profit share in a niche EGFR segment, plus something for CLN-978 — and very little for CLN-049 or velinotamig.</li><li>Zipalertinib's dataset is not best-in-class on response rate (35% overall vs sunvozertinib's labeled 46%, different populations) — its edge is post-amivantamab experience, oral dosing, and a positive randomized Phase 3 in first-line.</li><li>The 50/50 split is not a detail: every dollar of U.S. zipalertinib profit is fifty cents to Cullinan, and Taiho controls development, the label negotiations, and the commercial engine.</li></ul></article>
+        <article class="thesis-card"><h3>The honest tensions</h3><ul><li><strong>Accelerated approval needs a confirmatory story.</strong> No dedicated confirmatory trial in the monotherapy population has been publicly designated; REZILIENT3 is a first-line chemotherapy-combination trial, not a monotherapy confirmation (§05).</li><li><strong>CLN-978's data are n-of-few.</strong> Remissions in refractory SLE/RA are striking, but cohorts are single-digit to ~29 patients, uncontrolled, with follow-up measured in weeks (§04).</li><li><strong>Burn vs. runway.</strong> The company guides runway "into 2029"; H1 2026 cash use annualizes to a shorter runway unless spend moderates or milestones land (§10).</li></ul></article>
+      </div>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>A small, genetically defined segment — sized by epidemiology, not theater</h2><p class="lede">EGFR exon 20 insertions are a real but bounded market. This dossier sizes the patient pool from the cited literature and deliberately does not build a revenue forecast on top of it: Cullinan books no product sales itself (Taiho commercializes), takes 50% of U.S. pre-tax profit, and has disclosed no pricing. Any peak-sales figure printed here would be invented.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Layer</th><th>Size</th><th>Basis</th></tr></thead>
+        <tbody>
+        <tr><td>NSCLC with EGFR mutations (U.S.)</td><td>~16% of NSCLC</td><td><span class="ev fact">FACT</span> Company-cited epidemiology in FDA-review coverage and Taiho/Cullinan releases (Riess et al., J Thorac Oncol 2018).</td></tr>
+        <tr><td>Exon 20 insertions within EGFR-mutant NSCLC</td><td>Up to ~12%</td><td><span class="ev fact">FACT</span> Same sources; ex20ins occur in up to ~4% of all NSCLC globally (Burnett et al., PLoS One 2021).</td></tr>
+        <tr><td>Implied U.S. ex20ins population</td><td>~2% of NSCLC — a few thousand patients per year</td><td><span class="ev interp">INTERPRETATION</span> Arithmetic on the two rows above. A niche, premium-priced oncology segment — large enough to matter for a company of Cullinan's size at a 50% profit share, too small to carry the valuation alone at mega-cap multiples.</td></tr>
+        <tr><td>Autoimmune indications for CLN-978 / velinotamig</td><td>Large (RA alone ~5.3M adults across U.S./EU5/Japan/Australia)</td><td><span class="ev fact">FACT</span> Company-cited figure for RA prevalence (May 18, 2026 release). The addressable slice — treatment-refractory, B-cell-driven disease suitable for a T-cell engager — is a small fraction of prevalence and is not yet definable from Phase 1 data. <span class="ev gap">GAP</span></td></tr>
+        <tr><td>R/R AML for CLN-049</td><td>~22,000 new U.S. AML cases/yr; R/R 5-yr survival ≤10%</td><td><span class="ev fact">FACT</span> Company-cited epidemiology (ASH 2025 release). FLT3 is expressed on blasts in &gt;80% of AML per the same source — the target is broad, the registrational path is single-arm, and pricing/penetration are unknowable today.</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev interp">INTERPRETATION</span> The valuation-relevant fact about market size is asymmetric: zipalertinib's segment is small and shared 50/50, so even a clean win is a mid-hundreds-of-millions profit stream at maturity, not a blockbuster — while the autoimmune indications behind CLN-978 are prevalence-rich but years from a priced product. Scenario values in §09 are built to respect that asymmetry.</p>
+    </section>
+
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Three mechanisms, three different failure modes</h2><p class="lede">Zipalertinib is a chemistry answer to a structural problem. CLN-978 and CLN-049 are T-cell engagers whose risk is not binding but biology — whether depleting a lineage produces durable remission without unacceptable immune toxicity. Velinotamig extends the same logic one step deeper, to the plasma cells that antibodies and CD19-directed agents cannot reach.</p></div></div>
+      <h3>Zipalertinib — plain English</h3>
+      <p>Some lung cancers are driven by a mutated growth switch (EGFR). In the exon-20-insertion variant, a few extra amino acids are wedged into the switch right next to where drugs need to sit. The wedge both locks the switch "on" and reshapes the pocket so that standard EGFR drugs either can't bind tightly or can't avoid also hitting the normal, healthy version of the switch found in skin and gut — which is why first-generation attempts produced rash and diarrhea before they produced tumor shrinkage. Zipalertinib is a small oral molecule, dosed twice daily, shaped to fit the wedged pocket and largely ignore the normal switch.</p>
+      <h3>Zipalertinib — technical</h3>
+      <p><span class="ev fact">FACT</span> Exon 20 insertions (most commonly at residues ~762–774, the loop following the αC-helix) shift the αC-helix and P-loop into the drug-binding pocket, producing an active kinase conformation whose pocket sterically resembles wild-type EGFR — the structural reason non-selective TKIs fail on therapeutic index (Robichaux et al., Nature 2018; Vyse &amp; Huang, reviews of ex20ins structural biology). Zipalertinib (CLN-081/TAS6417, originated by Taiho) is an irreversible, covalent EGFR inhibitor (Cys797-binding) selected for potency against ex20ins variants with relative sparing of wild-type EGFR; it is dosed 100 mg twice daily in the pivotal program.</p>
+      <p><span class="ev interp">INTERPRETATION</span> <strong>WT-sparing is relative, not absolute — the label-relevant evidence is the adverse-event table, not the binding assay.</strong> In the REZILIENT1 Phase 2b safety population (n=244), paronychia (38.5%), rash (30.3%), dermatitis acneiform, dry skin, diarrhea (21.7%) and stomatitis (20.1%) were the most common treatment-related events — an unmistakably EGFR-class profile, mostly grade 1–2, with grade ≥3 pneumonitis at 2.5% the signal that matters most. The molecule is cleaner than pan-EGFR inhibition; it is not clean.</p>
+      <p><span class="ev fact">FACT</span> <strong>CNS: data, but thin data.</strong> Zipalertinib showed systemic responses in patients with baseline brain metastases in REZILIENT1 (ORR 31%, n=68) and a PFS hazard ratio of 0.38 in the brain-metastasis subgroup of REZILIENT3; in REZILIENT2's small CNS cohort (n=16), intracranial ORR was 31.3% with median intracranial duration of response of 8.1 months. <span class="ev interp">INTERPRETATION</span> That is consistent with CNS penetration, but no pivotal cohort was powered on intracranial endpoints, and "CNS-active" claims beyond these numbers are <span class="ev unverified">UNVERIFIED</span> marketing extrapolation.</p>
+      <p><span class="ev interp">INTERPRETATION</span> <strong>Why it might fail:</strong> (1) response rate — 35% overall in the filing population is mid-pack for the class, and cross-trial comparisons against sunvozertinib's 46% will be made by every reviewer and payer regardless of population differences; (2) resistance — covalent Cys797 inhibitors invite C797S and bypass-track resistance, untested at scale here; (3) the confirmatory-evidence problem in §05; (4) pneumonitis/ILD is a class warning on the competitor's label and a grade ≥3 signal already present in zipalertinib's own data.</p>
+      <h3>CLN-978 — CD19×CD3 T-cell engager</h3>
+      <p><span class="ev fact">FACT</span> CLN-978 is a 65 kDa bispecific T-cell engager: a very-high-affinity anti-CD19 scFv, an anti-CD3 scFv, and an albumin-binding single-domain antibody for half-life extension. It is subcutaneously administered, wholly owned, and dosed in micrograms (single target doses of 10–45 µg in Phase 1). The design thesis is that very high CD19 affinity permits depletion of B cells — including low-CD19 plasmablasts and tissue-resident B cells that monoclonal antibodies spare — at doses low enough to keep cytokine release manageable in an outpatient setting. <span class="ev interp">INTERPRETATION</span> The "immune reset" claim (deplete, let a naïve repertoire reconstitute, durable treatment-free remission) is borrowed from the academic CD19 CAR-T experience in SLE; whether a transient engager reproduces it is exactly what Phase 1/2 must prove, and 8-week follow-up cannot.</p>
+      <h3>CLN-049 — FLT3×CD3 T-cell engager</h3>
+      <p><span class="ev fact">FACT</span> CLN-049 binds the extracellular domain of FLT3 — wild-type and mutated — which is expressed on AML blasts in &gt;80% of patients, and redirects T cells against them regardless of FLT3 mutational status. It is licensed exclusively, worldwide, from DKFZ/Tübingen. The mechanistic risk is on-target: FLT3 is also expressed on normal hematopoietic progenitors, so the therapeutic window rests on expression density and dose titration (the program uses step-up dosing).</p>
+      <h3>Velinotamig — BCMA×CD3 T-cell engager</h3>
+      <p><span class="ev fact">FACT</span> Velinotamig targets BCMA on long-lived plasma cells — the compartment that keeps secreting autoantibodies after CD19-directed B-cell depletion. Cullinan holds an exclusive license for all fields ex-Greater China from Genrix Bio (terms in §07/§10). The scientific logic is complementary to CLN-978; the evidentiary base today is a Phase 1 in China run by the licensor, with the first detailed autoimmune data in two patients (§04).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>What the trials actually showed</h2><p class="lede">Zipalertinib carries the only mature dataset: a single-arm pivotal study behind the pending NDA and a positive randomized Phase 3 behind the next one. Everything else is Phase 1 — reported here with the denominators attached, because in the T-cell-engager programs the denominators are the story.</p></div></div>
+      <h3>REZILIENT1 Phase 2b — the NDA dataset (NCT04036682)</h3>
+      <p><span class="ev fact">FACT</span> Open-label Phase 1/2; the Phase 2b primary efficacy population (N=176) received zipalertinib 100 mg twice daily after prior platinum-based chemotherapy, with or without prior amivantamab. Co-primary endpoints: confirmed ORR and duration of response by blinded independent central review (RECIST v1.1). Median follow-up 9.3 months at the ASCO 2025 primary presentation (Yu et al.); a peer-reviewed report of the study has since appeared in the Journal of Clinical Oncology.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cohort (REZILIENT1 Ph2b)</th><th>n</th><th>Confirmed ORR</th><th>Median DOR</th><th>Median PFS</th></tr></thead>
+        <tbody>
+        <tr><td>All patients</td><td>176</td><td><strong>35%</strong> (95% CI 28.2–42.8; 1 CR, 61 PR)</td><td>8.8 mo (95% CI 8.3–12.7)</td><td>9.5 mo</td></tr>
+        <tr><td>Prior platinum, no prior ex20ins-targeted therapy</td><td>125</td><td><strong>40%</strong></td><td>8.8 mo</td><td>9.5 mo</td></tr>
+        <tr><td>Prior amivantamab as only targeted therapy</td><td>30</td><td><strong>30%</strong></td><td>14.7 mo</td><td>—</td></tr>
+        <tr><td>Prior amivantamab ± other targeted therapy</td><td>51</td><td><strong>24%</strong></td><td>8.5 mo</td><td>—</td></tr>
+        <tr><td>Baseline brain metastases (systemic response)</td><td>68</td><td><strong>31%</strong></td><td>8.3 mo</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev fact">FACT</span> Safety population (all patients receiving ≥1 dose of 100 mg BID, n=244): most common treatment-related AEs were paronychia 38.5%, rash 30.3%, dermatitis acneiform 24.6%, dry skin 24.6%, diarrhea 21.7%, stomatitis 20.1% — predominantly grade 1–2. Grade ≥3 treatment-related events included anemia 7%, pneumonitis 2.5% and rash 2.5%. Treatment-related discontinuations were ~8.2% and dose reductions ~14.3% per ASCO 2025 coverage of the dataset. <span class="ev interp">INTERPRETATION</span> Read the cohort gradient carefully: efficacy decays with prior targeted therapy (40% → 30% → 24%), which is expected — but it also means the label population's headline 35% blends a favorable chemo-only subgroup with a post-amivantamab subgroup where responses are fewer though sometimes durable (14.7-month median DOR in the small n=30 cohort cuts both ways: durable when it works, in a minority).</p>
+      <p><span class="ev fact">FACT</span> <strong>Post-amivantamab expansion update (WCLC 2025; June 2025 cutoff, n=84; median 3 prior lines, 54.8% prior brain metastases):</strong> confirmed ORR 27.4%, median DOR 8.5 months, disease control rate 84.5%. Prior-amivantamab-only patients (n=54): ORR 31.5%, mDOR 9.5 months, DCR 87.0%. Prior amivantamab + other targeted therapy (n=30): ORR 20.0%, mDOR 8.3 months, DCR 80.0%. <span class="ev interp">INTERPRETATION</span> This is zipalertinib's genuine differentiation: it is the only oral ex20ins agent with a dataset of this size after amivantamab failure — increasingly the relevant second-line question as amivantamab moves into first-line standard care.</p>
+      <h3>REZILIENT3 Phase 3 — first-line combination (NCT05973773)</h3>
+      <p><span class="ev fact">FACT</span> Global, randomized, open-label Phase 3 (Taiho-sponsored): zipalertinib + platinum-based chemotherapy vs chemotherapy alone in previously untreated, locally advanced/metastatic non-squamous NSCLC with EGFR ex20ins. 285 patients enrolled (6-patient safety lead-in; 279 randomized). Primary endpoint PFS by BICR. At the planned interim analysis (122 PFS events), announced Aug 12, 2026 (IDMC recommended unblinding) and presented at WCLC 2026 (Presidential Symposium; Tan et al.):</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Endpoint (interim)</th><th>Zipalertinib + chemo</th><th>Chemo alone</th><th>Effect</th></tr></thead>
+        <tbody>
+        <tr><td>Median PFS</td><td><strong>14.5 mo</strong></td><td>8.5 mo</td><td>HR 0.50 (95% CI 0.34–0.73); p=0.00015</td></tr>
+        <tr><td>Objective response rate</td><td><strong>65.0%</strong></td><td>40.3%</td><td>p&lt;0.0001</td></tr>
+        <tr><td>Median duration of response</td><td><strong>14.2 mo</strong></td><td>9.9 mo</td><td>—</td></tr>
+        <tr><td>Overall survival (interim, 30% maturity)</td><td colspan="2">Immature</td><td>HR 0.72 (95% CI 0.42–1.23)</td></tr>
+        <tr><td>PFS, baseline brain metastases subgroup (~31% of patients)</td><td colspan="2">Subgroup</td><td>HR 0.38</td></tr>
+        <tr><td>Grade ≥3 AEs</td><td><strong>87.1%</strong></td><td>54.4%</td><td>Driven by hematologic AEs (58.6% vs 28.7%); grade ≥3 rash 10.7% and diarrhea 1.4% in the combination arm</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev interp">INTERPRETATION</span> A 6.0-month median PFS gain with HR 0.50 is a strong randomized result in this segment, and the companies' "longest median PFS observed to date in first-line ex20ins" phrasing is <span class="ev unverified">UNVERIFIED</span> as a cross-trial claim — the control arm's 8.5 months is itself higher than historical chemo controls (PAPILLON's was 6.7), which flatters neither arm's absolute number in cross-trial comparisons. What is not in the releases: discontinuation rates for the combination. Grade ≥3 toxicity of 87% is manageable-oncology-normal for platinum doublets plus an EGFR inhibitor, but tolerability detail is a <span class="ev gap">GAP</span> until the full dataset is published.</p>
+      <h3>REZILIENT2 Phase 2 (NCT05967689) — breadth cohorts</h3>
+      <p><span class="ev fact">FACT</span> Recruiting parallel-cohort Phase 2 (Taiho; registry estimate 220 patients) in ex20ins and uncommon non-ex20ins EGFR mutations. Reported cohorts (WCLC/ESMO 2025): uncommon non-ex20ins mutations (n=40; March 2025 cutoff) — confirmed ORR 30%, median DOR 7.75 months; CNS-metastasis subset (n=16; February 2025 cutoff) — intracranial ORR 31.3%, intracranial disease control 68.8%, median intracranial DOR 8.1 months. <span class="ev interp">INTERPRETATION</span> Optionality, not value driver: these cohorts support label-breadth ambitions and the CNS narrative, at Taiho's pace.</p>
+      <h3>CLN-978 Phase 1 — OUTRACE SLE (NCT06613360), OUTRACE RA (NCT06994143), Sjögren's (NCT07041099)</h3>
+      <p><span class="ev fact">FACT</span> Global Phase 1 single- and multi-dose studies in treatment-refractory disease; background immunosuppressants were discontinued before dosing. EULAR 2026 dataset (29 patients evaluated: SLE n=18, RA n=11; May 2026 cutoffs): in SLE, 10 of 14 patients with ≥4 weeks' follow-up had a ≥4-point hSLEDAI reduction after a single target dose and 5 achieved DORIS remission; lab markers (anti-dsDNA, UPCR, C3/C4) improved where abnormal at baseline; lupus-nephritis patients showed rapid proteinuria improvement. In RA, multi-dose data included a DAS28-ESR remission (4.0 → 2.2 at week 4, maintained at week 8) in a patient refractory to rituximab, with autoantibody reductions. Peripheral B-cell depletion was deep and dose-dependent, with clearance of CD19+ cells documented in lymph-node and synovial tissue. Safety: most CRS was grade 1 and followed the first (10 µg) dose; one grade 3 CRS occurred at the 45 µg target dose and that cohort was discontinued; no ICANS was observed. <span class="ev interp">INTERPRETATION</span> For a Phase 1 of a T-cell engager in autoimmune disease, this is an unusually coherent package — depletion depth, tissue clearance, clinical scores moving together. It is also uncontrolled, unblinded, and weeks deep. Regression to the mean and background-therapy washout effects cannot be excluded; the December 2026 multi-dose readouts (§08) are the next real test.</p>
+      <h3>Velinotamig Phase 1 (Genrix Bio, China) — SLE</h3>
+      <p><span class="ev fact">FACT</span> In the first two refractory SLE patients completing four IV doses (3 µg/kg, then 10 µg/kg ×3), SLEDAI-2K fell from 16 → 0 and 14 → 2 by week 8, both achieved complete renal response, and no CRS or ICANS was observed (data cutoff May 15, 2026; Cullinan Immunology Day). <span class="ev interp">INTERPRETATION</span> Two patients is a signal, not a dataset — flagged as such. Multi-dose data are slated for ACR Convergence on Nov 8, 2026.</p>
+      <h3>CLN-049 Phase 1 — R/R AML/MDS (NCT05143996)</h3>
+      <p><span class="ev fact">FACT</span> First-in-human dose escalation (ASH 2025 oral; August 2025 cutoff): 45 patients (39 AML, 3 MDS/AML, 3 MDS), median 2 prior therapies, target doses 1.5–12 µg/kg IV. At the highest target dose (12 µg/kg; n=16): CR/CRh rate 31% (5/16) and composite CR rate 31%. At target doses ≥6 µg/kg (n=32): CR/CRh 25% (8/32), CRc 28% (9/32); among TP53-mutated patients at 12 µg/kg, 4 of 8 achieved CR/CRh; MRD negativity was observed in a subset of responders, and 2 responders proceeded to transplant. Safety: CRS 35.6% (nearly all grade 1–2; no grade 3 CRS with two step-up doses; no CRS discontinuations), infusion reactions 33.3%, febrile neutropenia 20.0%. Responses occurred independent of baseline FLT3 expression. <span class="ev interp">INTERPRETATION</span> A ~30% CR/CRh rate in unselected, heavily pretreated R/R AML — including TP53-mutated disease — from a monotherapy engager is a strong Phase 1 signal by AML standards. The registrational bet (§05) is that a single-arm Phase 2 at the chosen dose reproduces it in a larger, defined population.</p>
+    </section>
+
+    <section id="regulatory">
+      <div class="section-head"><div class="section-num">05 / REGULATORY</div><div><h2>One accelerated approval, one Phase-3-based filing, and an unanswered confirmatory question</h2><p class="lede">Zipalertinib's monotherapy filing is an accelerated-approval application resting on response rate. Under current FDA practice, accelerated approval requires a confirmatory trial underway — and the sponsors have not publicly said which trial that is. That silence is the single largest regulatory risk in this dossier.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Application / designation</th><th>Status</th><th>Detail</th></tr></thead>
+        <tbody>
+        <tr><td>NDA — zipalertinib monotherapy, post-platinum ex20ins NSCLC (with/without prior amivantamab)</td><td><strong>Under review; PDUFA Feb 27, 2027</strong> <span class="date-tag hard">HARD</span></td><td><span class="ev fact">FACT</span> Rolling submission completed February 2026 (Taiho); FDA accepted the NDA in April 2026. Accelerated approval is being sought on REZILIENT1 Phase 2b ORR/DOR.</td></tr>
+        <tr><td>Breakthrough Therapy designation — post-platinum ex20ins NSCLC</td><td>Held</td><td><span class="ev fact">FACT</span> Zipalertinib holds BTD for locally advanced/metastatic ex20ins NSCLC previously treated with platinum-based chemotherapy (company releases). The designation was granted in January 2022 on Phase 1/2a data, per trade-press reporting. <span class="ev unverified">UNVERIFIED</span> (date)</td></tr>
+        <tr><td>NDA — zipalertinib + chemotherapy, first-line ex20ins NSCLC</td><td>Submission initiated Oct 1, 2026 under RTOR; completion expected by YE 2026 <span class="date-tag guidance">GUIDANCE</span></td><td><span class="ev fact">FACT</span> Based on REZILIENT3's positive randomized PFS result — a traditional-approval-grade dataset, in contrast to the monotherapy filing's single-arm basis.</td></tr>
+        <tr><td>Confirmatory trial for the monotherapy accelerated approval</td><td><span class="ev gap">GAP</span></td><td><span class="ev gap">GAP</span> No trial has been publicly designated as the confirmatory study for the post-platinum monotherapy indication. REZILIENT3 cannot serve that role in any straightforward way: it is a first-line, chemotherapy-combination, PFS-endpoint trial in a different (treatment-naïve) population. Whether FDA has agreed a plan — e.g., a randomized post-platinum monotherapy study not yet registered, reliance on REZILIENT3 plus real-world evidence, or conversion sequencing via the first-line approval — is undisclosed. Post-FDORA, FDA can require the confirmatory trial to be underway before granting accelerated approval and can expedite withdrawal if it fails; an unresolved confirmatory plan is a plausible CRL rationale and, at minimum, a label/PMR negotiation risk.</td></tr>
+        <tr><td>Taiho independent Phase 3 (additional indication)</td><td>Initiated Nov 2025</td><td><span class="ev fact">FACT</span> Taiho is independently running a global Phase 3 of zipalertinib in an additional indication under the co-development agreement's independent-development clause (10-K). The indication is not named in the filing excerpt reviewed. <span class="ev gap">GAP</span> (identity)</td></tr>
+        <tr><td>CLN-049 Fast Track — R/R AML</td><td>Granted (2025)</td><td><span class="ev fact">FACT</span> FDA Fast Track designation for relapsed/refractory AML (ASH 2025 release). Following a positive End-of-Phase 1 meeting (July 2026), Cullinan is initiating a potentially registrational Phase 2: dose optimization, then seamless single-arm expansion at the recommended Phase 2 dose.</td></tr>
+        <tr><td>CLN-978 / velinotamig</td><td>Phase 1; Phase 2 expansions planned early 2027</td><td><span class="ev fact">FACT</span> No expedited designations disclosed for either program as of this dossier. <span class="ev unverified">UNVERIFIED</span> (absence based on releases reviewed)</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev interp">INTERPRETATION</span> Sequencing matters: if the first-line combination (traditional pathway, randomized data) is approved while the monotherapy accelerated approval is still pending or newly granted, the monotherapy's commercial role narrows to post-amivantamab and post-chemo niches — and its confirmatory obligation does not disappear. Conversely, a February 2027 approval with a clean label and a defined post-marketing requirement is the base case in §09; a CRL citing confirmatory-trial inadequacy is the bear trigger. There is no advisory committee announced for the monotherapy NDA as of Oct 20, 2026. <span class="ev gap">GAP</span> (any AdCom would be scheduled closer to the PDUFA)</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">06 / LANDSCAPE</div><div><h2>Amivantamab owns the standard; sunvozertinib owns the oral head start</h2><p class="lede">Zipalertinib enters third in its own indication. Its differentiation is specific — post-amivantamab data, oral convenience, no infusion burden — and its problem is equally specific: the two incumbents define the comparisons every clinician will make. Cross-trial numbers below are shown for orientation only; no head-to-head trials exist, and populations differ materially (prior therapy, brain metastases, region).</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Agent</th><th>Setting / status</th><th>Key data (as labeled / published)</th><th>Read for zipalertinib</th></tr></thead>
+        <tbody>
+        <tr><td><strong>Amivantamab (Rybrevant, J&amp;J)</strong> — EGFR×MET bispecific antibody, IV (subcutaneous co-formulation also marketed)</td><td>Standard of care: first-line with chemotherapy (PAPILLON); monotherapy post-platinum (traditional approval)</td><td><span class="ev fact">FACT</span> PAPILLON (NEJM 2023): median PFS 11.4 vs 6.7 months for chemo (HR 0.40); ORR 73% vs 47%. CHRYSALIS monotherapy post-platinum: ORR 40%, median DOR 11.1 months.</td><td>The efficacy bar and the sequencing engine: 1L amivantamab use manufactures the post-ami population only zipalertinib has studied at size (n=84). But amivantamab's EGFR/MET toxicity (rash, paronychia, edema, infusion reactions) is the tolerability contrast oral agents sell against.</td></tr>
+        <tr><td><strong>Sunvozertinib (Zegfrovy, Dizal)</strong> — oral ex20ins TKI</td><td>U.S. accelerated approval Jul 2, 2025 — post-platinum; first-line Phase 3 program advancing</td><td><span class="ev fact">FACT</span> FDA approval basis (WU-KONG1B, n=85 at 200 mg QD): ORR 46% (95% CI 35–57), median DOR 11.1 months. Label warnings include ILD/pneumonitis, GI and dermatologic toxicity, ocular toxicity.</td><td>The direct oral competitor, ~19 months ahead, with a higher headline ORR in a less pretreated population. Zipalertinib's counters: post-amivantamab dataset, twice-daily covalent pharmacology — and, decisively, REZILIENT3's randomized first-line data, where sunvozertinib's own first-line program is the race to watch.</td></tr>
+        <tr><td><strong>Mobocertinib (Exkivity, Takeda)</strong></td><td>Withdrawn (Oct 2023)</td><td><span class="ev fact">FACT</span> Voluntarily withdrawn after the Phase 3 EXCLAIM-2 first-line trial failed against chemotherapy.</td><td>The class cautionary tale: an accelerated approval in this exact segment was reversed when the confirmatory trial missed. Directly relevant precedent for §05's confirmatory question.</td></tr>
+        <tr><td><strong>Poziotinib (Spectrum)</strong></td><td>Never approved (FDA CRL, Nov 2022)</td><td><span class="ev fact">FACT</span> Complete response letter citing, among other things, the absence of a confirmatory trial underway.</td><td>A second precedent in the same segment pointing the same direction: FDA has already refused an ex20ins application on confirmatory-readiness grounds once.</td></tr>
+        <tr><td><strong>Other ex20ins / pan-EGFR programs</strong> (e.g., Bayer's sevabertinib — EGFR/HER2 exon-20-directed TKI in development)</td><td>Clinical-stage</td><td><span class="ev unverified">UNVERIFIED</span> Development-stage competitors continue to enroll ex20ins cohorts; none is approved in the U.S. as of this dossier.</td><td>The window in which three oral agents contest this niche is open now and will not stay open; speed of the first-line filing matters.</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev interp">INTERPRETATION</span> On differentiation, zipalertinib's defensible claims are: (1) only agent with a substantial post-amivantamab dataset; (2) only agent with a positive randomized first-line Phase 3 in hand today; (3) oral dosing vs an infused antibody standard. Its indefensible claims would be best-in-class response rate (sunvozertinib's 46% stands, population caveats notwithstanding) and "clean" safety (the EGFR-class AE table in §04). Commercial execution belongs to Taiho Oncology, which is a real commercial organization — a genuine, if unglamorous, advantage over a first-time launch.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">07 / PIPELINE</div><div><h2>Ranked by descending value — with two programs honestly at zero</h2><p class="lede">Ranking reflects risk-adjusted contribution to equity value as of Oct 20, 2026: regulatory proximity and data quality first, prevalence second, novelty third. Cullinan's history of pruning (CLN-619, CLN-617) is treated as a governance positive and a valuation zero for the pruned assets.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Program</th><th>Stage / next step</th><th>Ownership &amp; economics</th><th>Value logic</th></tr></thead>
+        <tbody>
+        <tr><td>1</td><td><strong>Zipalertinib</strong> (EGFR ex20ins TKI)</td><td>NDA under review (PDUFA Feb 27, 2027); 1L NDA filing under RTOR</td><td>50% of U.S. pre-tax profits; equal share of U.S. development costs for the agreed indication; up to $130M U.S. regulatory milestones ($30M second-line + $100M first-line approvals); Taiho commercializes; ex-U.S. economics sit with Taiho (no ex-U.S. royalty to Cullinan disclosed)</td><td>The only near-term, de-risked-by-randomized-data asset — but structurally capped: half the U.S. profit of a niche segment, controlled by the partner.</td></tr>
+        <tr><td>2</td><td><strong>CLN-978</strong> (CD19×CD3 TCE, SC)</td><td>Phase 1 (SLE/RA/SjD); multi-dose data Dec 2026; Phase 2 expansions early 2027</td><td>Wholly owned</td><td>The equity's real option: wholly owned, huge autoimmune prevalence, a differentiated microgram-dose/outpatient thesis, and early remission data. Also the least proven asset in the top three — Phase 1, uncontrolled, n≤29 per dataset.</td></tr>
+        <tr><td>3</td><td><strong>CLN-049</strong> (FLT3×CD3 TCE)</td><td>Phase 1 complete enough for a registrational-intent Phase 2 (initiating Q3 2026); frontline combo study Q4 2026</td><td>Wholly controlled; exclusive worldwide license from DKFZ/Tübingen (royalty terms not detailed in sources reviewed)</td><td>A credible single-arm accelerated-approval shot in R/R AML on ~31% CR/CRh — a hard endpoint in a refractory population. Binary and dose-selection-dependent.</td></tr>
+        <tr><td>4</td><td><strong>Velinotamig</strong> (BCMA×CD3 TCE)</td><td>Phase 1 (China, licensor-run); Cullinan Ph1b/2a in ITP/wAIHA planned early 2027</td><td>Licensed ex-Greater China from Genrix: $20M upfront paid; up to $292M development/regulatory milestones + up to $400M sales milestones owed, plus tiered royalties (mid-single-digit to mid-teens) on net sales</td><td>Scientifically complementary to CLN-978 (plasma-cell compartment) but the thinnest data (n=2 detailed) and a real downstream cost stack. Option value only.</td></tr>
+        <tr><td>5</td><td><strong>Preclinical TCE platform</strong></td><td>Discovery / preclinical</td><td>Wholly owned</td><td>The 2024 pivot renamed the company for this platform. No candidate-level disclosure supports a separable value today. <span class="ev gap">GAP</span></td></tr>
+        <tr><td>—</td><td><strong>CLN-619</strong> (MICA/B antibody) · <strong>CLN-617</strong> (IL-2/IL-12 fusion)</td><td><strong>Discontinued</strong> (CLN-619: gynecologic cohorts May 2025; fully Nov 2025; CLN-617 previously in Phase 1)</td><td>—</td><td>Value: $0. Recorded here because stale third-party pipeline listings still carry both as active — they are not.</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="ev fact">FACT</span> <strong>How the Taiho structure arose:</strong> zipalertinib was developed inside Cullinan Pearl, a Cullinan subsidiary holding the Taiho license. In 2022 Cullinan sold its Pearl equity interest to Taiho for $275.0M (received, per the FY2025 10-K) and entered the June 21, 2022 co-development agreement with Taiho Oncology — converting an owned asset into a 50% U.S. profit interest plus milestones, and transferring operational control to Taiho. For indications Taiho develops independently (one Phase 3 began Nov 2025), Taiho funds development, and 50% of its independent development costs are later deducted from the U.S. pre-tax profit pool — a slow leak in Cullinan's share that deserves more attention than it gets.</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">08 / CATALYSTS</div><div><h2>A dense four months, then the decision</h2><p class="lede">Catalysts are tagged by date quality: <span class="date-tag hard">HARD</span> confirmed date · <span class="date-tag guidance">GUIDANCE</span> company-guided window · <span class="date-tag inferred">INFERRED</span> estimated, not committed · <span class="date-tag gap">GAP</span> no timeline · <span class="date-tag landed">LANDED</span> already occurred. As of October 20, 2026.</p></div></div>
+      <div class="timeline">
+        <div class="event landed"><div class="event-date">AUG 12, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>REZILIENT3 met its primary endpoint at the planned interim analysis</b> — IDMC recommended unblinding; full data presented at WCLC 2026 (Presidential Symposium, Sep 13–14): median PFS 14.5 vs 8.5 months (HR 0.50), ORR 65.0% vs 40.3%. This converted the first-line program from binary risk to filing execution.</div></div>
+        <div class="event landed"><div class="event-date">OCT 1, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>First-line NDA submission initiated under FDA Real-Time Oncology Review</b> — zipalertinib + chemotherapy, on REZILIENT3. RTOR permits rolling submission of data ahead of the complete application; it is a process accelerator, not an approval signal.</div></div>
+        <div class="event"><div class="event-date">NOV 8, 2026<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>Velinotamig multi-dose SLE data — ACR Convergence poster session</b> (session time published: Nov 8, 10:30 a.m.–12:30 p.m. ET). <strong>What "good" looks like:</strong> the two complete renal responses holding up in a larger cohort with the same no-CRS/ICANS profile. <strong>Watch for:</strong> actual n — the entire program's autoimmune dataset was two detailed patients as of June.</div></div>
+        <div class="event"><div class="event-date">DEC 2026<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>CLN-978 multi-dose data across SLE, RA and Sjögren's</b> — the quarter's most consequential non-zipalertinib event. <strong>What "good" looks like:</strong> DORIS-level remissions reproduced on multi-dose regimens with durability past 8 weeks, B-cell depletion depth maintained, no further grade ≥3 CRS. <strong>Watch for:</strong> any infection signal as depletion deepens and lengthens.</div></div>
+        <div class="event"><div class="event-date">DEC 2026<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>CLN-049 Phase 1 dose-escalation update (longer follow-up)</b> — durability and RP2D confirmation ahead of the registrational Phase 2 readout path. Also expected in Q4: initiation of the frontline CLN-049 + venetoclax + azacitidine study, and completion of the first-line zipalertinib NDA submission by year-end (both company-guided).</div></div>
+        <div class="event"><div class="event-date">NOV 2026<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>Q3 2026 10-Q</b> — first look at the post-REZILIENT3 burn rate with two Phase 2 programs starting, and any update to the preferred-stock conversion tail. Timing estimated from the company's filing cadence (Q2 10-Q was filed Aug 6, 2026).</div></div>
+        <div class="event"><div class="event-date">EARLY 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>Phase 2 expansions begin</b> — CLN-978 in SLE, lupus nephritis and RA; velinotamig Phase 1b/2a basket in autoimmune cytopenias (ITP/wAIHA, NCT07738822). Trial starts are weak catalysts individually; collectively they convert Phase 1 signals into registrational timelines.</div></div>
+        <div class="event primary"><div class="event-date">FEB 27, 2027<br><span class="date-tag hard">HARD</span></div><div class="event-body"><b>PDUFA — zipalertinib monotherapy (accelerated approval sought)</b> <strong>What "good" looks like:</strong> approval covering the post-platinum population including post-amivantamab patients, with a defined, achievable post-marketing confirmatory requirement. <strong>Watch for:</strong> label breadth (is the post-ami population in or out?), any confirmatory-trial condition with teeth, and whether the decision references the confirmatory plan at all. A CRL — particularly one citing confirmatory evidence — is the bear trigger in §09 and has direct precedent in this segment (poziotinib, 2022).</div></div>
+        <div class="event"><div class="event-date">2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>REZILIENT3 overall-survival maturation; first-line NDA review clock</b> — the OS hazard ratio (0.72 at 30% maturity) must hold or improve as events accrue; it underwrites both the first-line approval's durability and the franchise's pricing narrative. First-line PDUFA timing will only exist once the submission completes and is accepted. <span class="ev gap">GAP</span></div></div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">09 / SCENARIOS</div><div><h2>Bear, base, bull — with the arithmetic shown</h2><p class="lede">Scenario-based soft ranges built from this dossier's own numbers, not price targets or recommendations. Share counts use the treasury method: 64.35M common + 2.04M preferred (if-converted at the observed 10:1 ratio) + 0.56M RSUs + 0.02M ESPP = 66.97M shares before options; 13.23M options at a $14.51 weighted-average strike (10-K, Feb 18, 2026 — used as proxy for the June 30 option pool) contribute only above that strike, net of $192.0M assumed exercise proceeds. Cash at the February 2027 decision is estimated at ~$250M (from $356.0M at Jun 30, 2026 at the H1 burn pace) and labeled an estimate throughout. Bull top is held at the sourced street high ($42, Wedbush, Aug 13, 2026); consensus average is $33.71 (MarketBeat compilation, Oct 2026).</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear case</div><div class="pt">$6–$8</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> CRL at the Feb 2027 PDUFA (confirmatory-plan or benefit-risk rationale), or a narrow label excluding the post-amivantamab population — compounded by a soft December CLN-978 dataset that removes the pipeline offset.</li><li><strong>Math:</strong> zipalertinib EV compresses to a delayed/second-attempt stub and the TCE platform is marked to early-stage comparables: EV ~$150–290M + ~$250M est. cash ≈ $400–540M equity ÷ 66.97M shares (options at $14.51 strike are out of the money and excluded) ≈ $6.0–8.1.</li><li><strong>Why it's bounded:</strong> ~$250M of cash at the decision date is ~$3.73/share of the range by itself — but burn continues at ~$42M/quarter and a distressed raise after a CRL would dilute into the floor.</li></ul></article>
+        <article class="scen-card base"><div class="tag">Base case</div><div class="pt">$20–$25</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> accelerated approval on Feb 27, 2027 with the filed label (post-platinum ± amivantamab) and a manageable PMR; the $30M second-line milestone is received; first-line NDA completes review on a normal clock; CLN-978 multi-dose data are solid enough to start Phase 2 on schedule; CLN-049 Phase 2 enrolls.</li><li><strong>Math:</strong> EV build — zipalertinib U.S. profit share ~$750M (50% of a niche-segment profit stream, probability-weighted across both filings), CLN-978 ~$300M, CLN-049 ~$180M, velinotamig + platform ~$100M = ~$1.33B EV; + $250M est. cash + $30M milestone ≈ $1.61B equity ÷ 71.66M FD shares (at $22.50, options add 4.70M net) ≈ $22.50 center.</li><li><strong>Sanity check:</strong> the center sits ~33% below the $33.71 consensus average — deliberately: consensus models tend to capitalize the milestones and the first-line profit pool at higher probabilities than this dossier does.</li></ul></article>
+        <article class="scen-card bull"><div class="tag">Bull case</div><div class="pt">$34–$42</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> clean monotherapy approval; first-line combination approved during 2027 on REZILIENT3 (+$100M milestone) with OS maturing favorably; CLN-978 produces controlled-trial-grade remission durability and a registrational autoimmune path; CLN-049's Phase 2 reproduces ≥30% CR/CRh and an accelerated-approval route firms up.</li><li><strong>Math:</strong> EV ~$2.60B (zipalertinib ~$1.6B with both lines approved; CLN-978 ~$600M; CLN-049 ~$300M; velinotamig ~$100M) + ~$205M remaining cash + $130M cumulative milestones ≈ $2.94B equity ÷ 75.27M FD shares (at $39, options add 8.31M net) ≈ $39 center; top of range held at the $42 street high rather than extrapolated past it.</li><li><strong>What has to be true:</strong> essentially everything — two approvals, a maturing OS curve, and two Phase 1/2 TCE programs converting signal into registrational credibility inside ~18 months. Priced accordingly as a tail, not an expectation.</li></ul></article>
+      </div>
+      <p><span class="ev interp">INTERPRETATION</span> At $14.83, the market price sits between bear and base — consistent with a market that assigns the February approval a bit better than even odds, pays something for CLN-978, and charges full price for the 50% Taiho haircut and the confirmatory overhang. The asymmetry is real but it is not the 3–4× mispricing the raw consensus targets imply; those targets embed the bull-case milestones at probabilities this dossier does not.</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">10 / FINANCIALS</div><div><h2>Funded through the binary, not obviously through the strategy</h2><p class="lede">Cullinan enters the PDUFA window with $356M, no debt, and a $130M milestone stack in front of it. The guided runway "into 2029" is achievable only if burn moderates from the H1 2026 pace or milestones arrive — the filing arithmetic and the guidance do not fully agree, and this dossier sides with the arithmetic.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Item</th><th>Value</th><th>Source / note</th></tr></thead>
+        <tbody>
+        <tr><td>Cash, cash equivalents &amp; investments</td><td><strong>$356.0M</strong> (Jun 30, 2026)</td><td><span class="ev fact">FACT</span> Q2 2026 10-Q: cash $78.6M + short-term investments $255.9M + long-term investments $19.0M (the company-reported total includes interest receivable). Down from $439.0M at Dec 31, 2025 (preliminary, Jan 8, 2026).</td></tr>
+        <tr><td>Debt</td><td><strong>None</strong></td><td><span class="ev fact">FACT</span> Total liabilities $42.0M at Jun 30, 2026 — payables, accruals and leases; no borrowings on the balance sheet.</td></tr>
+        <tr><td>Burn</td><td>Operating cash use <strong>$84.3M in H1 2026</strong> (~$42M/quarter); Q2 net loss $53.7M; Q2 R&amp;D $44.4M</td><td><span class="ev fact">FACT</span> Q2 2026 10-Q. Spend is rising as the CLN-049 Phase 2 and CLN-978 multi-dose cohorts start.</td></tr>
+        <tr><td>Runway</td><td>Company: "into 2029"</td><td><span class="ev unverified">UNVERIFIED</span> Company guidance (Q2 2026 releases). <span class="ev interp">INTERPRETATION</span> At the H1 2026 pace (~$169M/yr), $356M funds ~2.1 years — to roughly late 2028 — before either milestone receipts or a raise. The guidance implies spend discipline, milestone income, or both; treat "into 2029" as a plan, not a fact.</td></tr>
+        <tr><td>Shares outstanding</td><td><strong>64,345,770</strong> common (Jun 30, 2026)</td><td><span class="ev fact">FACT</span> Q2 2026 10-Q. Up from 60,244,136 at Dec 31, 2025 — entirely preferred conversions (3,517,260 shares) and equity-compensation issuance (584,374); no offering or ATM issuance in H1 2026.</td></tr>
+        <tr><td>Fully diluted build</td><td>Gross FD ≈ <strong>80.2M</strong>; treasury FD at $14.83 ≈ <strong>67.3M</strong></td><td><span class="ev fact">FACT</span> Period-end: 204,209 Series A preferred shares (→ 2,042,090 common at the observed 10:1 conversion), 13,230K options, 564K RSUs, 15K ESPP shares (10-Q anti-dilutive table; its preferred figure, 5,168K, is a weighted average across H1, not period-end). Options carry a $14.51 weighted-average strike (10-K, Feb 18, 2026) — at the Oct 20 close of $14.83 the treasury method adds only ~0.29M net shares. Mass dilution is a rising-price phenomenon here, not a current-price one.</td></tr>
+        <tr><td>Market cap / EV at $14.83</td><td>Equity ≈ <strong>$954M</strong>; EV ≈ <strong>$0.60B</strong></td><td><span class="ev interp">INTERPRETATION</span> 64.35M × $14.83 = $954M, less $356M cash &amp; investments. Aggregator prints (~$832M, Finnhub) use a stale share count and understate the equity value — one reason third-party "market cap" figures for CGEM disagree with each other.</td></tr>
+        <tr><td>Milestones receivable (Taiho)</td><td>Up to <strong>$130M</strong>; $0 received as of Dec 31, 2025</td><td><span class="ev fact">FACT</span> FY2025 10-K / company releases: $30M on U.S. second-line approval + $100M on U.S. first-line approval of zipalertinib. (Milestone value beyond these — e.g., sales-based — is not disclosed. <span class="ev gap">GAP</span>)</td></tr>
+        <tr><td>Milestones &amp; royalties payable (Genrix)</td><td>$20M upfront paid; up to <strong>$292M</strong> development/regulatory + <strong>$400M</strong> sales milestones, plus tiered royalties (mid-single-digit to mid-teens)</td><td><span class="ev fact">FACT</span> Dec 2025 license, 10-K/10-Q. A success tax on velinotamig that is entirely appropriate to pay — but belongs in any program NPV.</td></tr>
+        <tr><td>Financing history</td><td>$842.2M lifetime net equity proceeds; April 2024 private placement $262.7M net (~14.4M shares + 0.3M pre-funded warrants); 2022 Taiho Pearl sale $275.0M</td><td><span class="ev fact">FACT</span> FY2025 10-K. The company has repeatedly funded itself ahead of data rather than after — the April 2024 raise preceded the immunology pivot's first datasets by two years.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">11 / PEOPLE</div><div><h2>Decisive capital allocators who sold control of the lead asset — and one quiet 10b5-1 seller</h2><p class="lede">Cullinan's leadership (President &amp; CEO Nadim Ahmed; CMO Jeffrey Jones, MD, MBA; CSO Jennifer S. Michaelson, PhD) renamed the company for immunology in April 2024, killed two programs without sentimentality, and funded the pivot with a $263M private placement before the data. The same record includes the 2022 decision to sell zipalertinib's control to Taiho for $275M — defensible as risk management at the time, expensive in hindsight if REZILIENT3 converts to a first-line approval.</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Signal</th><th>Observation</th><th>Read</th></tr></thead>
+        <tbody>
+        <tr><td>Beneficial ownership (DEF 14A, Apr 2026; on 61,451,380 shares)</td><td><span class="ev fact">FACT</span> UBS Oncology Impact Fund 12.45% (7,648,268); BVF-affiliated entities 9.99% (6,185,463); BlackRock 7.06% (4,338,725); Vanguard 5.37% (3,298,504).</td><td><span class="ev interp">INTERPRETATION</span> A specialist-heavy register (oncology-dedicated and crossover healthcare funds at the top) — supportive of long-duration development decisions, and of the 2024 pivot financing.</td></tr>
+        <tr><td>Insider selling — Jennifer S. Michaelson (CSO &amp; director)</td><td><span class="ev fact">FACT</span> Form 4s under a Rule 10b5-1 plan adopted Aug 7, 2025: Jul 6, 2026 — sold 8,000 @ $17.82 (wtd avg); Aug 13, 2026 — exercised 30,000 options @ $4.30 and sold 30,000 @ $20.26; Sep 8, 2026 — exercised 4,000 @ $4.30 and sold 8,000 @ $21.57. Retained ~158,844 shares held directly plus remaining options.</td><td><span class="ev interp">INTERPRETATION</span> Pre-planned monetization of deep-in-the-money 2020-era options into the REZILIENT3 rally — the weakest form of negative signal (the plan predates the data by a year), but it is selling, into strength, by the scientific founder-figure of the company, with no offsetting purchases.</td></tr>
+        <tr><td>Insider buying</td><td><span class="ev fact">FACT</span> No open-market purchases by officers or directors were identified in the 2026 Form 4 record reviewed for this dossier.</td><td><span class="ev interp">INTERPRETATION</span> Neutral-to-mildly-negative context ahead of a PDUFA: nobody is adding, one senior scientist is systematically trimming. Not a thesis; a temperature check.</td></tr>
+        <tr><td>Program discipline</td><td><span class="ev fact">FACT</span> CLN-619 discontinued in stages (May → Nov 2025) and CLN-617 dropped, each on data, while capital concentrated on CLN-978/CLN-049.</td><td><span class="ev interp">INTERPRETATION</span> The kill decisions are the strongest management evidence in the file: this team has demonstrated it will stop, which raises the prior that what survives their filter is real.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">12 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by expected damage to equity value, not by likelihood alone. The top two are structural — they persist even if every trial works.</p></div></div>
+      <ol class="risk-list">
+        <li><strong>The confirmatory-trial gap (zipalertinib monotherapy).</strong> <span class="ev gap">GAP</span> No publicly designated confirmatory trial exists for the accelerated-approval population, REZILIENT3 does not map onto it, and FDA has already issued a CRL to a competitor in this exact segment partly on confirmatory readiness (poziotinib, 2022) and overseen a withdrawal after a failed confirmatory trial (mobocertinib, 2023). This is the dossier's #1 red flag because it is binary, dated (Feb 27, 2027), and entirely outside investors' visibility.</li>
+        <li><strong>Partner dependence on the lead asset.</strong> <span class="ev fact">FACT</span> Taiho controls zipalertinib's development, regulatory interactions and commercialization; Cullinan receives 50% of U.S. pre-tax profit and cannot set price, pace, or label strategy. Taiho's independent-indication development costs are 50%-deductible from Cullinan's future profit pool. A disagreement, a reprioritization inside Taiho, or a conservative label negotiation all land directly on CGEM's largest asset with no Cullinan recourse visible in the filed agreement summary.</li>
+        <li><strong>Competitive compression.</strong> <span class="ev fact">FACT</span> Sunvozertinib is approved, oral, and ~19 months ahead with a higher headline ORR (46% vs 35%, different populations); amivantamab-based regimens are entrenched in first-line and expanding (including subcutaneous delivery). Zipalertinib's defensible niches — post-amivantamab, first-line-with-chemo — are real but narrower than "EGFR ex20ins" as a headline.</li>
+        <li><strong>Monotherapy relevance decay.</strong> <span class="ev interp">INTERPRETATION</span> If the first-line combination and amivantamab regimens absorb patients earlier, the post-platinum monotherapy population — the February filing — shrinks and skews more refractory (where zipalertinib's ORR was 24–27%, §04). Approval and commercial significance are different events.</li>
+        <li><strong>CLN-978 evidentiary thinness.</strong> <span class="ev fact">FACT</span> The autoimmune thesis rests on ≤29-patient, uncontrolled cohorts with weeks of follow-up, and the dose ceiling has already appeared once (grade 3 CRS at 45 µg ended that cohort). Autoimmune T-cell engagers are a crowded, well-capitalized race; a single serious infection or a durability failure in the December multi-dose data re-rates the program from "platform" to "project."</li>
+        <li><strong>CLN-049 single-arm registrational risk.</strong> <span class="ev interp">INTERPRETATION</span> A seamless dose-optimization → single-arm expansion design asks FDA to accept ~30% CR/CRh as an accelerated-approval basis in R/R AML. Dose selection error, FLT3 on-target hematologic toxicity at higher exposure, or simple regression in a larger population each independently break the plan; the Fast Track designation de-risks communication, not outcome.</li>
+        <li><strong>Burn vs. guided runway.</strong> <span class="ev fact">FACT</span> H1 2026 operating cash use of $84.3M annualizes well short of the company's into-2029 runway framing, with two Phase 2 programs still ramping. A raise before the autoimmune data mature (2027–28) is the base expectation in this dossier's financial read, at whatever price the February decision leaves behind.</li>
+        <li><strong>Licensed-asset stack.</strong> <span class="ev fact">FACT</span> Three of the four ranked programs are licensed (Taiho, DKFZ/Tübingen, Genrix), carrying up to $692M of contingent Genrix payments alone plus royalties. Success is taxed at every layer; only CLN-978 is wholly owned — which is precisely why its December data carry disproportionate valuation weight.</li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">13 / OPEN</div><div><h2>What this dossier could not establish</h2><p class="lede">Open items are listed rather than smoothed over. Each is a specific, answerable question with a named venue where the answer should appear.</p></div></div>
+      <ul>
+        <li><span class="ev gap">GAP</span> <strong>Confirmatory plan for the monotherapy accelerated approval</strong> — which study, which population, agreed with FDA or not. Venue: the approval letter/PMR list (Feb 2027) or a CRL. Until then this is unresolvable from public sources.</li>
+        <li><span class="ev gap">GAP</span> <strong>Identity of Taiho's independent Phase 3 indication</strong> (initiated Nov 2025 under the co-development agreement) — unnamed in the FY2025 10-K; watch Taiho's registry postings and Cullinan's Q3 10-Q.</li>
+        <li><span class="ev gap">GAP</span> <strong>REZILIENT3 tolerability detail</strong> — discontinuation rates and dose modifications for the combination were not in the WCLC releases; the full publication will settle whether 87% grade ≥3 AEs came with manageable attrition.</li>
+        <li><span class="ev gap">GAP</span> <strong>Q3 2026 financials</strong> — burn with both Phase 2 programs running; 10-Q expected November 2026 (inferred from cadence).</li>
+        <li><span class="ev gap">GAP</span> <strong>CLN-978 durability</strong> — no data beyond ~8–12 weeks on remission persistence after dosing stops, and no infection-rate picture under sustained deep B-cell depletion. December 2026 multi-dose data address the first, not the second.</li>
+        <li><span class="ev gap">GAP</span> <strong>Ex-U.S. zipalertinib economics</strong> — no royalty or profit share to Cullinan outside the U.S. is disclosed in the FY2025 10-K; whether "undisclosed" means "none" is not stated in so many words.</li>
+        <li><span class="ev gap">GAP</span> <strong>First-line NDA review terms</strong> — priority review, advisory committee, and PDUFA for the combination filing will only exist after submission completion (expected YE 2026) and FDA acceptance.</li>
+        <li><span class="ev gap">GAP</span> <strong>CLN-049 recommended Phase 2 dose</strong> — final selection from the 1.5–12 µg/kg escalation, and the Phase 2's exact eligibility/MRD framework, pending the December 2026 update.</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">14 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Filings, registries, and peer-reviewed literature carry the most weight. Company claims remain labeled unverified until corroborated. As of October 20, 2026; filings used: FY2025 10-K and Q2 2026 10-Q.</p></div></div>
+      <div class="sources">
+        <div class="source-group"><h3>SEC filings (primary)</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526127954/cgem-20251231.htm" target="_blank" rel="noopener">FY2025 Form 10-K (filed Mar 2026)<small>Taiho agreement economics, Pearl sale $275.0M, Genrix license, April 2024 placement, option WAEP $14.51</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526331768/cgem-20260630.htm" target="_blank" rel="noopener">Q2 2026 Form 10-Q (filed Aug 6, 2026)<small>Cash $356.0M, share counts, anti-dilutive table, H1 burn $84.3M, equity statement</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526183465/cgem-20260427.htm" target="_blank" rel="noopener">DEF 14A (Apr 2026)<small>Beneficial ownership: UBS Oncology Impact 12.45%, BVF 9.99%, BlackRock 7.06%, Vanguard 5.37%</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526347674/" target="_blank" rel="noopener">8-K · Aug 12, 2026<small>REZILIENT3 interim topline: PFS HR 0.50; IDMC recommended unblinding</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526393026/" target="_blank" rel="noopener">8-K · Sep 14, 2026<small>WCLC 2026 REZILIENT3 presentation release (full interim dataset)</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526406209/" target="_blank" rel="noopener">8-K · Oct 2, 2026<small>First-line NDA submission initiated under RTOR (release dated Oct 1)</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526283006/" target="_blank" rel="noopener">8-K · Jun 8, 2026<small>CLN-978 EULAR 2026 Phase 1 data (SLE/RA)</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526291159/" target="_blank" rel="noopener">8-K · Jun 11, 2026<small>Immunology Day: velinotamig first SLE cases; CLN-978 Sjögren's data</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1789972/000119312526245439/" target="_blank" rel="noopener">8-K · May 19, 2026<small>Pipeline/milestone update: PDUFA Feb 27, 2027; December 2026 data cadence</small></a>
+          <a><span>Form 4 filings, Jul–Sep 2026</span><small>Michaelson 10b5-1 exercise-and-sale transactions (SEC EDGAR, CIK 0001789972)</small></a>
+        </div>
+        <div class="source-group"><h3>Registries &amp; regulators</h3>
+          <a href="https://clinicaltrials.gov/study/NCT04036682" target="_blank" rel="noopener">NCT04036682 — REZILIENT1<small>Zipalertinib Phase 1/2 in ex20ins NSCLC (Cullinan)</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05973773" target="_blank" rel="noopener">NCT05973773 — REZILIENT3<small>Phase 3, 1L zipalertinib + chemo vs chemo (Taiho Oncology)</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05967689" target="_blank" rel="noopener">NCT05967689 — REZILIENT2<small>Phase 2 cohorts incl. uncommon EGFR mutations / CNS (Taiho Oncology)</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05143996" target="_blank" rel="noopener">NCT05143996 — CLN-049 Phase 1<small>R/R AML/MDS dose escalation</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06613360" target="_blank" rel="noopener">NCT06613360 — OUTRACE SLE<small>CLN-978 in SLE</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06994143" target="_blank" rel="noopener">NCT06994143 — OUTRACE RA<small>CLN-978 in rheumatoid arthritis</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT07041099" target="_blank" rel="noopener">NCT07041099 — CLN-978 in Sjögren's disease</a>
+          <a href="https://clinicaltrials.gov/study/NCT07738822" target="_blank" rel="noopener">NCT07738822 — Velinotamig Phase 1b/2a<small>ITP / warm autoimmune hemolytic anemia (not yet recruiting at dossier date)</small></a>
+          <a href="https://www.fda.gov/drugs/resources-information-approved-drugs/fda-grants-accelerated-approval-sunvozertinib-non-small-cell-lung-cancer-egfr-exon-20-insertion" target="_blank" rel="noopener">FDA — sunvozertinib accelerated approval (Jul 2, 2025)<small>WU-KONG1B: ORR 46% (95% CI 35–57), median DOR 11.1 months</small></a>
+        </div>
+        <div class="source-group"><h3>Peer-reviewed literature &amp; conference data</h3>
+          <a><span>Yu HA, et al. Journal of Clinical Oncology (2025)</span><small>REZILIENT1 Phase 2b primary analysis: ORR 35%, mDOR 8.8 mo, cohort detail</small></a>
+          <a><span>Tan DSW, et al. WCLC 2026 (Presidential Symposium)</span><small>REZILIENT3 interim: mPFS 14.5 vs 8.5 mo, HR 0.50; full data via Sep 2026 8-K exhibit</small></a>
+          <a><span>Zhou C, et al. New England Journal of Medicine (2023)</span><small>PAPILLON: amivantamab + chemo, 1L ex20ins — mPFS 11.4 vs 6.7 mo</small></a>
+          <a><span>Park K, et al. Journal of Clinical Oncology (2021)</span><small>CHRYSALIS: amivantamab monotherapy post-platinum — ORR 40%, mDOR 11.1 mo</small></a>
+          <a><span>Robichaux JP, et al. Nature (2018)</span><small>Structural basis of ex20ins drug resistance / pocket geometry</small></a>
+          <a><span>Burnett HF, et al. PLoS One (2021); Riess JW, et al. J Thorac Oncol (2018)</span><small>Ex20ins epidemiology: up to ~4% of NSCLC; ~12% of EGFR-mutant NSCLC</small></a>
+          <a><span>Piotrowska Z, et al. WCLC 2025</span><small>Zipalertinib post-amivantamab cohort (n=84): ORR 27.4%, mDOR 8.5 mo</small></a>
+          <a><span>Sallman D, et al. ASH 2025 (oral)</span><small>CLN-049 Phase 1: CR/CRh 31% at 12 µg/kg in R/R AML</small></a>
+          <a href="https://acrabstracts.org/abstract/stable-depletion-of-autoimmune-disease-biomarkers-and-high-rates-of-complete-renal-response-are-achieved-with-velinotamig-a-bcma-x-cd3-bispecific-antibody-in-refractory-systemic-lupus/" target="_blank" rel="noopener">ACR Convergence 2026 — velinotamig abstract<small>Session scheduled Nov 8, 2026 (abstract page, ACR)</small></a>
+        </div>
+        <div class="source-group"><h3>Market data &amp; consensus (unverified)</h3>
+          <a><span>Finnhub price history (queried Oct 20, 2026)</span><small>Close $14.83 (Oct 20, 2026); 52-wk range $6.73–$23.19</small></a>
+          <a><span>MarketBeat consensus compilation (Oct 2026)</span><small>Average target $33.71; high $42 (Wedbush, Aug 13, 2026); BTIG $40; H.C. Wainwright $35; Citi $33; Guggenheim $30; Morgan Stanley $30</small></a>
+        </div>
+      </div>
+      <p>Prepared October 20, 2026. Scenario ranges are illustrative analytical anchors, not price targets, recommendations, or investment advice.</p>
+    </section>
+
+</main>
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script>
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}}
+let startTheme='light';try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}
+applyTheme(startTheme);
+themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+document.querySelectorAll('main > section').forEach(function(sec){const head=sec.querySelector('.section-head');if(!head)return;const body=document.createElement('div');body.className='section-body';let n=head.nextSibling;while(n){const nx=n.nextSibling;body.appendChild(n);n=nx}sec.appendChild(body);const btn=document.createElement('button');btn.className='collapse-btn';btn.type='button';btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-label','Collapse section');btn.textContent='−';btn.addEventListener('click',function(){const c=sec.classList.toggle('collapsed');btn.textContent=c?'+':'−';btn.setAttribute('aria-expanded',c?'false':'true')});head.appendChild(btn)});
+const toTop=document.getElementById('toTop');function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}window.addEventListener('scroll',onScroll,{passive:true});toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+</script>
+</body>
+</html>

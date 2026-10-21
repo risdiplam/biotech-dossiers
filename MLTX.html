@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>MLTX — MoonLake Immunotherapeutics · Deep-Dive Dossier · 2026-10-20</title>
+  <style>
+    :root{
+      --ink:#102a2e; --ink-2:#25474b; --muted:#5b7375; --paper:#f4f7f3; --surface:#fff;
+      --raised:#fff; --line:#ced9d4; --teal:#0d756d; --teal-dark:#07534f; --mint:#dff1e8;
+      --orange:#d85f2a; --orange-soft:#f9e7dc; --yellow:#f4c34f; --red:#a43834;
+      --panel-dark:#102a2e; --panel-text:#f7fbf8; --pill-bg:#edf1ef; --track:#e9efec;
+      --chart-line:#0d756d; --chart-area:#dff1e8; --chart-grid:#d9e2de; --chart-text:#607779;
+      --shadow:0 12px 34px rgba(20,54,55,.08);
+      --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+      --sans:"Avenir Next",Avenir,"Helvetica Neue",Helvetica,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    html[data-theme="dark"]{
+      --ink:#e6f0ec; --ink-2:#bcd0ca; --muted:#8fa3a0; --paper:#0b1413; --surface:#141f1e;
+      --raised:#1a2725; --line:#2b3b38; --teal:#35b3a4; --teal-dark:#7fd6c9; --mint:#122f2c;
+      --orange:#e8854f; --orange-soft:#2f2019; --yellow:#f4c34f; --red:#e0716a;
+      --panel-dark:#0a1413; --panel-text:#eef5f2; --pill-bg:#1e2c29; --track:#22302d;
+      --chart-line:#35b3a4; --chart-area:#122f2c; --chart-grid:#2b3b38; --chart-text:#8fa3a0;
+      --shadow:0 12px 34px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:var(--teal-dark);text-decoration-thickness:1px;text-underline-offset:3px}
+    a:hover{color:var(--orange)}
+    button{font:inherit}
+    .topline{height:7px;background:linear-gradient(90deg,var(--teal-dark) 0 58%,var(--orange) 58% 76%,var(--yellow) 76%)}
+    .hero{position:relative;overflow:hidden;background:var(--panel-dark);color:var(--panel-text);padding:64px max(24px,calc((100vw - 1180px)/2)) 42px}
+    .hero:after{content:"";position:absolute;width:470px;height:470px;border:1px solid rgba(255,255,255,.08);border-radius:50%;right:-130px;top:-250px;box-shadow:0 0 0 72px rgba(255,255,255,.025),0 0 0 146px rgba(255,255,255,.018)}
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.75fr);gap:54px;align-items:end}
+    .ticker-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticker{font:700 14px/1 var(--mono);letter-spacing:.08em;background:#b9ead8;color:#073f3c;padding:8px 10px;border-radius:4px}
+    .stamp{font-size:13px;color:#bed0cc}
+    h1{font:500 clamp(36px,6vw,72px)/1.02 var(--serif);letter-spacing:-.035em;margin:0;max-width:900px}
+    .hero-dek{font-size:18px;line-height:1.55;color:#d0dedb;max-width:760px;margin:22px 0 0}
+    .hero-quote{border-top:1px solid rgba(255,255,255,.22);padding-top:18px}
+    .quote-price{font:600 42px/1 var(--serif);letter-spacing:-.03em}
+    .quote-label{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#9db6b1;margin-top:8px}
+    .quote-meta{margin-top:15px;color:#c8d8d4;font-size:13px}
+    .jump-wrap{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+    .jump{max-width:1180px;margin:auto;padding:10px 24px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .jump a{text-decoration:none;color:var(--ink-2);font-size:12px;font-weight:700;padding:7px 10px;border-radius:4px}
+    .jump a:hover,.jump a:focus{background:var(--mint);color:var(--teal-dark)}
+    .theme-toggle{margin-left:auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:8px 14px;border-radius:4px;cursor:pointer;font:700 12px/1 var(--sans);min-height:44px}
+    .theme-toggle:hover{background:var(--mint);color:var(--teal-dark)}
+    main{max-width:1180px;margin:auto;padding:38px 24px 80px}
+    section{scroll-margin-top:74px;margin-top:62px;position:relative}
+    section:first-child{margin-top:0}
+    section.collapsed .section-body{display:none}
+    .section-head{display:grid;grid-template-columns:105px minmax(0,1fr);gap:20px;align-items:start;margin-bottom:24px;position:relative}
+    .section-head>div:nth-child(2){padding-right:52px}
+    .collapse-btn{position:absolute;right:0;top:2px;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);border-radius:4px;cursor:pointer;font:400 22px/1 var(--mono)}
+    .collapse-btn:hover{background:var(--mint)}
+    .section-num{font:700 12px/1.3 var(--mono);letter-spacing:.12em;color:var(--orange);padding-top:8px}
+    h2{font:500 clamp(29px,4.3vw,46px)/1.08 var(--serif);letter-spacing:-.025em;margin:0}
+    h3{font:650 18px/1.3 var(--sans);margin:0 0 10px}
+    p{margin:0 0 14px}
+    .lede{font-size:18px;color:var(--ink-2);max-width:860px;margin-top:10px}
+    .source-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .source-note a{font-weight:650}
+    .decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+    .decision{background:var(--raised);padding:24px 22px;min-height:215px}
+    .decision .tag{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+    .decision .big{font:600 30px/1.1 var(--serif);margin:18px 0 12px;letter-spacing:-.025em}
+    .decision p{font-size:14px;color:var(--ink-2);margin:0}
+    .decision.warn{background:var(--orange-soft)}
+    .decision.accent{background:var(--mint)}
+    .thesis{margin-top:20px;display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+    .thesis-card{background:var(--raised);padding:27px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}
+    .thesis-card.risk{border-top-color:var(--orange)}
+    .thesis-card ul,.risk-list,.check-list{margin:12px 0 0;padding:0;list-style:none}
+    .thesis-card li,.check-list li{padding:10px 0 10px 21px;border-top:1px solid var(--line);position:relative;font-size:14px}
+    .thesis-card li:before,.check-list li:before{content:"";position:absolute;left:0;top:18px;width:7px;height:7px;background:var(--teal);border-radius:50%}
+    .thesis-card.risk li:before{background:var(--orange)}
+    .chart-card{background:var(--raised);box-shadow:var(--shadow);padding:24px;margin-top:22px}
+    .chart-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .chart-title{font:600 22px/1.2 var(--serif)}
+    .range{display:flex;gap:6px;flex-wrap:wrap}
+    .range button{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 11px;border-radius:3px;cursor:pointer;font:700 11px/1 var(--mono);min-height:44px;min-width:48px}
+    .range button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .chart-stats{display:flex;gap:24px;flex-wrap:wrap;margin:15px 0 12px}
+    .chart-stat b{display:block;font-size:19px}
+    .chart-stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+    .chart-shell{height:330px;position:relative;width:100%}
+    .chart-shell svg{display:block;width:100%;height:100%;overflow:visible}
+    .chart-tooltip{position:absolute;z-index:3;display:none;background:var(--panel-dark);color:var(--panel-text);padding:8px 10px;border-radius:4px;font-size:12px;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.2);transform:translate(-50%,-115%);white-space:nowrap}
+    .chart-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}
+    .signal-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+    .paper-card{background:var(--raised);box-shadow:var(--shadow);padding:26px}
+    .program-kicker{font:700 11px/1.3 var(--mono);color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+    .mechanism{font-size:15px;color:var(--ink-2)}
+    .status-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 20px}
+    .pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:750;padding:7px 9px;border-radius:3px;background:var(--pill-bg);color:var(--ink-2)}
+    .pill:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .pill.hold{background:var(--orange-soft);color:var(--orange)}.pill.hold:before{background:var(--orange)}
+    .pill.hold{color:#8e351d}html[data-theme="dark"] .pill.hold{color:var(--orange)}
+    .study-table{width:100%;border-collapse:collapse;font-size:13px}
+    .study-table th{text-align:left;font:700 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 8px;border-bottom:2px solid var(--ink)}
+    .study-table td{vertical-align:top;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .study-table td:first-child{font-weight:700}
+    .bar-set{margin-top:22px}
+    .bar-row{display:grid;grid-template-columns:74px minmax(0,1fr) 56px;gap:10px;align-items:center;margin:14px 0}
+    .bar-label{font:700 12px/1.2 var(--mono)}
+    .bar-track{height:14px;background:var(--track);position:relative}
+    .bar-fill{height:100%;background:var(--teal);min-width:2px}
+    .bar-value{text-align:right;font-weight:750;font-size:13px}
+    .outlier-box{background:var(--orange-soft);padding:22px;border-top:4px solid var(--orange);margin-top:20px}
+    .outlier-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:18px 0 10px}
+    .outlier-metrics div{background:var(--raised);padding:15px}
+    .outlier-metrics b{font:600 24px/1 var(--serif);display:block}
+    .outlier-metrics span{font-size:11px;color:var(--muted)}
+    .moa-box{background:var(--mint);padding:22px;margin-top:20px;border-left:5px solid var(--teal)}
+    .moa-box h3{margin-bottom:8px}.moa-box p{font-size:14px;color:var(--ink-2);margin:0 0 10px}.moa-box p:last-child{margin:0}
+    .fail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+    .fail-grid article{background:var(--raised);padding:20px 22px}
+    .fail-grid h3{font-size:15px;margin-bottom:6px}.fail-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .pipeline{margin-top:20px;background:var(--raised);box-shadow:var(--shadow)}
+    .pipe-row{display:grid;grid-template-columns:230px 1fr 150px;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);align-items:center}
+    .pipe-row:last-child{border-bottom:0}
+    .pipe-rank{font:700 30px/1 var(--serif);color:var(--teal)}
+    .pipe-name{font-weight:750}
+    .pipe-desc{font-size:14px;color:var(--ink-2)}
+    .pipe-status{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;text-align:right;color:var(--teal)}
+    .pipe-status.dead{color:var(--red)}
+    .timeline{position:relative;margin:10px 0 0;padding-left:28px}
+    .timeline:before{content:"";position:absolute;left:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+    .event{position:relative;padding:0 0 26px 18px;display:grid;grid-template-columns:170px 1fr;gap:20px}
+    .event:before{content:"";position:absolute;left:-25px;top:6px;width:12px;height:12px;border:3px solid var(--paper);border-radius:50%;background:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+    .event.primary:before{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+    .event.landed:before{background:var(--muted);box-shadow:0 0 0 2px var(--muted)}
+    .event-date{font:700 13px/1.4 var(--mono);color:var(--teal-dark)}
+    .event-body{font-size:15px}.event-body b{display:block;margin-bottom:3px}
+    .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+    .metric-stack{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .metric{background:var(--raised);padding:21px}
+    .metric b{display:block;font:600 30px/1.1 var(--serif)}
+    .metric span{display:block;font-size:12px;color:var(--muted);margin-top:7px}
+    .runway{margin-top:20px;background:var(--panel-dark);color:var(--panel-text);padding:25px}
+    .runway b{font:500 28px/1.2 var(--serif);display:block;margin-bottom:8px}
+    .runway p{font-size:13px;color:#c7d8d4;margin:0}
+    .cap-table{width:100%;border-collapse:collapse;font-size:13px}
+    .cap-table th,.cap-table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:right}
+    .cap-table th:first-child,.cap-table td:first-child{text-align:left}
+    .cap-table th{font:700 10px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+    .overhang{margin-top:16px;padding:18px;background:var(--mint)}
+    .overhang b{font:600 26px/1 var(--serif)}
+    .compare{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .compare-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--teal)}
+    .compare-card:nth-child(2){border-color:var(--orange)}.compare-card:nth-child(3){border-color:var(--yellow)}
+    .compare-card .name{font:600 23px/1.2 var(--serif);margin:8px 0 14px}
+    .compare-card dl{margin:0}.compare-card dt{font:700 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:13px}.compare-card dd{margin:3px 0 0;font-size:13px}
+    .readthrough{margin-top:18px;background:var(--orange-soft);padding:22px;font-size:14px}
+    .risk-list{counter-reset:risk;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .risk-list li{counter-increment:risk;background:var(--raised);padding:22px 22px 22px 62px;position:relative;min-height:150px}
+    .risk-list li:before{content:counter(risk,decimal-leading-zero);position:absolute;left:20px;top:22px;font:700 13px/1 var(--mono);color:var(--orange)}
+    .risk-list b{display:block;margin-bottom:6px}.risk-list span{font-size:13px;color:var(--ink-2)}
+    .filings{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .filing{background:var(--raised);padding:18px;border-top:3px solid var(--ink)}
+    .filing .form{font:700 18px/1 var(--mono)}
+    .filing .date{font-size:11px;color:var(--muted);margin:7px 0 12px}
+    .filing p{font-size:13px;margin:0}
+    details{background:var(--raised);border-bottom:1px solid var(--line)}
+    summary{cursor:pointer;padding:17px 20px;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:44px}
+    summary::-webkit-details-marker{display:none} summary:after{content:"+";font:400 20px/1 var(--mono);color:var(--teal);flex:none} details[open] summary:after{content:"−"}
+    details p{padding:0 20px 18px;color:var(--ink-2);font-size:14px}
+    .sources{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .source-group{background:var(--raised);padding:22px}
+    .source-group h3{margin-bottom:12px}
+    .source-group a{display:block;padding:9px 0;border-top:1px solid var(--line);font-size:13px;font-weight:650}
+    .source-group a small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+    .method{margin-top:22px;padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .evidence-strip{display:flex;gap:9px 14px;align-items:center;flex-wrap:wrap;background:var(--raised);padding:13px 16px;margin-bottom:18px;border:1px solid var(--line);font-size:11px;color:var(--muted)}
+    .ev{display:inline-block;font:800 9px/1 var(--mono);letter-spacing:.08em;padding:4px 5px;border-radius:2px;vertical-align:middle;white-space:nowrap}.ev.fact{background:var(--mint);color:var(--teal-dark)}.ev.interp{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .ev.interp{background:#1e2c29;color:#9fc4bd}.ev.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .ev.gap{color:var(--orange)}.ev.unverified{background:#f4edcf;color:#67510e}html[data-theme="dark"] .ev.unverified{background:#2e2a17;color:#d8c26a}
+    .event-tape{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.event-tape article{background:var(--raised);padding:21px}.event-tape p{font-size:13px;color:var(--ink-2);margin:0}.event-mark{font:800 10px/1 var(--mono);letter-spacing:.1em;color:var(--orange)}
+    .science-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.science-chain article{background:var(--raised);padding:22px;position:relative}.science-chain article>b{font:600 33px/1 var(--serif);color:#9db6b1}.science-chain h3{margin-top:14px}.science-chain p{font-size:13px;color:var(--ink-2);margin:0}.splice-table-wrap{background:var(--raised);padding:20px 24px;box-shadow:var(--shadow);margin-top:20px}
+    .safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}.safety-grid article{background:var(--raised);padding:22px;border-top:4px solid var(--teal);box-shadow:var(--shadow)}.safety-grid article:nth-child(2){border-top-color:var(--yellow)}.safety-grid article:nth-child(3){border-top-color:var(--orange)}.safety-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .delivery-panel{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.delivery-panel>div{background:var(--raised);padding:22px}.delivery-panel h3{margin-top:13px}.delivery-panel p{font-size:13px;color:var(--ink-2);margin:0}
+    .quote-panel{background:var(--panel-dark);color:var(--panel-text);padding:28px;box-shadow:var(--shadow)}.quote-panel blockquote{font:500 26px/1.35 var(--serif);margin:0}.quote-panel cite{display:block;color:#a9c0bb;font-size:12px;margin-top:15px;font-style:normal}.hold-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}.hold-grid article{background:var(--raised);padding:21px}.hold-grid h3{margin-top:13px}.hold-grid p{font-size:13px;color:var(--ink-2);margin:0}
+    .harbor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.harbor-grid article{padding:25px;background:var(--raised);box-shadow:var(--shadow)}.harbor-grid ul{margin:0;padding-left:19px}.harbor-grid li{margin:9px 0;font-size:14px}.harbor-fact{border-top:5px solid var(--teal)}.harbor-gap{border-top:5px solid var(--orange)}
+    .scenario-table{margin-top:20px;border:1px solid var(--line);background:var(--raised)}.scenario-head,.scenario-row{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:0}.scenario-head{background:var(--panel-dark);color:#fff;font:750 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.scenario-head span,.scenario-row>span{padding:13px 15px}.scenario-row>span{border-right:1px solid var(--line);border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}.scenario-row>span:last-child{border-right:0}.scenario-row b{display:block;color:var(--ink);margin-bottom:3px}.scenario-row small{color:var(--muted)}
+    .compare-four{grid-template-columns:repeat(4,1fr)}
+    .date-tag{display:inline-block;font:800 9px/1 var(--mono);padding:4px 5px;margin-top:5px;border-radius:2px;white-space:nowrap}.date-tag.hard{background:var(--mint);color:var(--teal-dark)}.date-tag.guidance{background:#e8eef0;color:#294e5a}html[data-theme="dark"] .date-tag.guidance{background:#1e2c29;color:#9fc4bd}.date-tag.inferred{background:#f4edcf;color:#67510e}html[data-theme="dark"] .date-tag.inferred{background:#2e2a17;color:#d8c26a}.date-tag.gap{background:var(--orange-soft);color:#8e351d}html[data-theme="dark"] .date-tag.gap{color:var(--orange)}.date-tag.landed{background:var(--mint);color:var(--teal-dark)}
+    .valuation-bridge{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:18px;background:var(--raised);padding:23px;margin-top:20px;box-shadow:var(--shadow)}.valuation-bridge>div{min-width:0}.valuation-bridge span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}.valuation-bridge b{display:block;font:600 30px/1.1 var(--serif);margin:7px 0}.valuation-bridge small{color:var(--muted)}.valuation-bridge i{font:400 28px/1 var(--serif);color:var(--orange)}.valuation-bridge .bridge-result{background:var(--mint);padding:16px}
+    .people-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.people-list{margin:0}.people-list dt{font-weight:750;margin-top:12px}.people-list dd{margin:3px 0 0;font-size:13px;color:var(--ink-2)}.people-grid .check-list{margin:0}
+    .open-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}.open-grid article{background:var(--raised);padding:22px}.open-grid article>span{font:700 11px/1 var(--mono);color:var(--orange)}.open-grid h3{margin-top:13px}.open-grid p{font-size:13px;color:var(--ink-2);margin:0}.verdict-box{display:grid;grid-template-columns:230px 1fr;gap:24px;background:var(--panel-dark);color:var(--panel-text);padding:28px;margin-top:20px}.verdict-box h3{font:500 27px/1.15 var(--serif);margin:12px 0 0}.verdict-box p{color:#d0dedb;margin:0}
+    .scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:20px}
+    .scen-card{background:var(--raised);padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--red)}
+    .scen-card.base{border-top-color:var(--teal)}.scen-card.bull{border-top-color:var(--orange)}
+    .scen-card .tag{font:800 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .scen-card .pt{font:600 34px/1.1 var(--serif);margin:10px 0 4px;letter-spacing:-.02em}
+    .scen-card .soft{font:700 10px/1.3 var(--mono);color:var(--orange);text-transform:uppercase;letter-spacing:.08em}
+    .scen-card ul{margin:12px 0 0;padding:0;list-style:none}
+    .scen-card li{font-size:13px;color:var(--ink-2);padding:8px 0 8px 18px;border-top:1px solid var(--line);position:relative}
+    .scen-card li:before{content:"";position:absolute;left:0;top:15px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+    .scen-card.bear li:before{background:var(--red)}.scen-card.bull li:before{background:var(--orange)}
+    .assump{margin-top:18px;background:var(--surface);border:1px solid var(--line);padding:20px 22px;font-size:13px;color:var(--ink-2)}
+    .assump b{color:var(--ink)}
+    footer{background:var(--panel-dark);color:#d5e2df;padding:26px max(24px,calc((100vw - 1180px)/2));font-size:12px}
+    footer strong{color:#fff}
+    .totop{position:fixed;right:18px;bottom:18px;z-index:50;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--teal-dark);font-size:20px;line-height:1;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .totop.show{opacity:1;pointer-events:auto;transform:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media(max-width:900px){
+      .hero-grid,.thesis,.signal-grid,.fin-grid{grid-template-columns:1fr}.hero{padding-top:44px}.hero-quote{max-width:360px}
+      .decision-grid{grid-template-columns:1fr 1fr}.compare,.compare-four{grid-template-columns:1fr 1fr}.filings{grid-template-columns:1fr 1fr}
+      .science-chain,.hold-grid,.delivery-panel{grid-template-columns:1fr 1fr}.safety-grid,.people-grid,.open-grid,.scen-grid,.fail-grid{grid-template-columns:1fr 1fr}.event-tape{grid-template-columns:1fr}.valuation-bridge{grid-template-columns:1fr auto 1fr}.valuation-bridge .bridge-result{grid-column:1/-1}.verdict-box{grid-template-columns:1fr}
+      .pipe-row{grid-template-columns:60px 1fr}.pipe-status{text-align:left;grid-column:2}.sources{grid-template-columns:1fr}
+    }
+    @media(max-width:620px){
+      main{padding:28px 16px 60px}.hero{padding:34px 18px 30px}.hero-grid{gap:32px}h1{font-size:42px}.hero-dek{font-size:16px}
+      .jump{padding:8px 12px;gap:4px}.jump a{font-size:11px;padding:6px 8px;min-height:44px;display:inline-flex;align-items:center}.theme-toggle{margin-left:0;min-height:44px}
+      .collapse-btn{width:44px;height:44px}
+      .section-head{grid-template-columns:minmax(0,1fr);gap:2px}.section-head>div:nth-child(2){padding-right:50px;min-width:0}.section-head h2{overflow-wrap:break-word;hyphens:auto}.section-num{padding:0}.lede{font-size:16px}
+      .decision-grid,.metric-stack,.risk-list,.outlier-metrics,.science-chain,.hold-grid,.delivery-panel,.safety-grid,.people-grid,.open-grid,.compare-four,.scen-grid,.fail-grid{grid-template-columns:1fr}.decision{min-height:0}.chart-card,.paper-card{padding:18px;margin-left:-2px;margin-right:-2px}.chart-shell{height:285px}
+      .study-table,.study-table tbody,.study-table tr,.study-table td{display:block}.study-table thead{display:none}.study-table tr{padding:10px 0;border-bottom:1px solid var(--line)}.study-table td{border:0;padding:4px 0}.study-table td:before{content:attr(data-label);display:block;font:700 10px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+      .harbor-grid{grid-template-columns:1fr}.scenario-head{display:none}.scenario-row{grid-template-columns:1fr}.scenario-row>span{border-right:0}.scenario-row>span:before{content:attr(data-label);display:block;font:700 9px/1.3 var(--mono);text-transform:uppercase;color:var(--muted);margin-bottom:5px}.valuation-bridge{grid-template-columns:1fr}.valuation-bridge i{transform:rotate(90deg)}.valuation-bridge .bridge-result{grid-column:auto}.quote-panel blockquote{font-size:21px}.evidence-strip{align-items:flex-start}
+      .pipe-row{grid-template-columns:1fr;gap:5px}.pipe-rank{display:none}.pipe-status{grid-column:auto;text-align:left}.event{grid-template-columns:1fr;gap:3px}.bar-row{grid-template-columns:60px minmax(0,1fr) 48px}.filings{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{
+      html,html[data-theme="dark"]{--ink:#102a2e;--ink-2:#25474b;--muted:#5b7375;--paper:#fff;--surface:#fff;--raised:#fff;--line:#ced9d4;--teal:#0d756d;--teal-dark:#07534f;--mint:#dff1e8;--orange:#d85f2a;--orange-soft:#f9e7dc;--panel-dark:#102a2e;--panel-text:#fff;--pill-bg:#edf1ef;--track:#e9efec}
+      .jump-wrap,.range,.collapse-btn,.totop,.theme-toggle{display:none}
+      section.collapsed .section-body{display:block}
+      .hero{background:#fff;color:#000;padding-top:20px}.hero-dek,.quote-meta,.quote-label{color:#333}.chart-card,.paper-card,.decision-grid,.pipeline,.compare-card{box-shadow:none}a{color:#000}.topline{display:none}section{break-inside:avoid}
+    }
+  </style>
+</head>
+<body>
+  <div class="topline"></div>
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="ticker-line"><span class="ticker">NASDAQ · MLTX</span><span class="stamp">Deep-dive dossier · October 20, 2026</span></div>
+        <h1>One trial missed on paper. The FDA took the filing anyway.</h1>
+        <p class="hero-dek">MoonLake’s sonelokimab — a ~40 kDa trivalent Nanobody® against IL-17A and IL-17F — lost ~90% of its market value in a day when VELA-2 missed its primary analysis on a p=0.053 technicality. Thirteen months later the HS BLA is filed, the FDA has agreed the package can establish effectiveness without new trials, and the next binary has moved to psoriatic arthritis data that nobody outside the blinded team has fully seen.</p>
+      </div>
+      <div class="hero-quote" aria-label="Market snapshot">
+        <div class="quote-price">$10.32</div>
+        <div class="quote-label">Fixed market snapshot · Oct 20, 2026 close (Yahoo Finance series)</div>
+        <div class="quote-meta"><strong>~$441M</strong> est. enterprise value · <strong>~$5.13</strong> net cash per share<br>$878M implied equity (85.11M shares) · $537.0M cash &amp; securities less $100M drawn debt</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="jump-wrap">
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#frame">Frame</a><a href="#market">Market</a><a href="#science">Science</a><a href="#clinical">Clinical</a><a href="#hold">Blinded</a><a href="#harbor">Sep 2025</a><a href="#competition">Landscape</a><a href="#pipeline">Pipeline</a><a href="#catalysts">Catalysts</a><a href="#scenarios">Scenarios</a><a href="#financials">Financials</a><a href="#management">People</a><a href="#risks">Risks</a><a href="#open">Open</a><a href="#sources">Sources</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">Theme</button>
+    </nav>
+  </div>
+
+<main>
+    <section id="frame">
+      <div class="section-head"><div class="section-num">01 / FRAME</div><div><h2>The derating priced a dead program. The record since says otherwise.</h2><p class="lede">The September 29, 2025 collapse assumed the VELA-2 statistical miss killed the HS filing. Instead, FDA’s December 2025 Type B meeting confirmed the existing data could support a BLA, Week 52 data deepened, and the application was submitted on September 30, 2026. What the market is actually discounting now is different: an unseen placebo arm in the Phase 3 psoriatic arthritis trial whose full data arrive in H1 2027.</p></div></div>
+      <div class="evidence-strip" aria-label="Evidence legend"><span class="ev fact">FACT</span><span>Primary source or peer-reviewed evidence</span><span class="ev interp">INTERPRETATION</span><span>Reasoned synthesis</span><span class="ev gap">GAP</span><span>Open or undisclosed</span><span class="ev unverified">UNVERIFIED</span><span>Company or secondary-source claim</span></div>
+      <div class="decision-grid">
+        <article class="decision accent"><div class="tag">Est. enterprise value</div><div class="big">~$441M</div><p><span class="ev interp">INTERPRETATION</span> Oct 20, 2026: $878M implied equity less $437.0M net cash ($537.0M cash &amp; securities at Jun 30, 2026, less $100M Hercules debt drawn). The operating business — a filed BLA plus a Phase 3 PsA program — is priced at roughly one Bimzelx quarter of sales.</p></article>
+        <article class="decision"><div class="tag">Net cash per share</div><div class="big">~$5.13</div><p><span class="ev fact">FACT</span> $437.0M net cash ÷ 85.11M Class A shares (Aug 1, 2026, 10-Q cover). Half the share price is net cash — before ongoing burn of ~$61M per quarter at the H1 2026 operating-cash rate.</p></article>
+        <article class="decision warn"><div class="tag">Next decisive events</div><div class="big">Nov 2026 → H1 2027</div><p><span class="ev fact">FACT</span> FDA acceptance / PDUFA allocation for the HS BLA is expected by end-November 2026; the full unblinded IZAR-1 PsA dataset follows in H1 2027. Either can reprice the stock independently.</p></article>
+        <article class="decision"><div class="tag">Regulatory state</div><div class="big">BLA filed</div><p><span class="ev fact">FACT</span> BLA for moderate-to-severe HS (adults and adolescents 12+) submitted Sept 30, 2026, after FDA agreed at a Type B meeting that no additional HS trials are needed to establish substantial evidence of effectiveness.</p></article>
+      </div>
+      <div class="thesis">
+        <article class="thesis-card"><h3>Why the September 2025 verdict looks wrong</h3><ul><li>VELA-1 hit every primary and key secondary endpoint under both pre-specified analysis strategies (HiSCR75 delta +17 pts, p&lt;0.001). VELA-2 missed only the composite-strategy primary (p=0.053) and was significant under the pre-specified treatment-policy strategy (p=0.033).</li><li>FDA’s Type B feedback (Jan 8, 2026) explicitly allows substantial evidence of effectiveness from VELA-1 + VELA-2 + MIRA with no additional HS trials — the agency treated the package as a filing, not a failure.</li><li>Week 52 data deepened rather than faded: 67.2% HiSCR75 and 33.1% HiSCR100 (as observed, n=396), with placebo crossovers converging to the same trajectory — an internal replication of the drug effect.</li><li>IZAR-1 (PsA) met all Week 16 endpoints on the disclosed drug arm: ACR50 42.1%, ACR20 66.5%, MDA 41.2%, PASI90 61% — in line with the published Phase 2 ARGO result (ACR50 46.3% at Week 12).</li><li>The balance sheet was rebuilt after the crash: $537.0M cash &amp; securities and guided runway to mid-2028, so neither binary is a financing hostage.</li></ul></article>
+        <article class="thesis-card risk"><h3>What the low price is still legitimately charging for</h3><ul><li>VELA-2’s composite miss is in the review record. FDA can still narrow the label, weight VELA-1 alone, or let the adolescent and HiSCR75 claims slip in negotiation.</li><li>The IZAR-1 placebo response is genuinely unknown. ARGO’s placebo ACR50 was 20.0%; if IZAR-1’s blinded placebo runs near 30%, the placebo-adjusted delta compresses toward commodity IL-17 territory.</li><li>Bimzelx is entrenched, scaled, and still growing (H1 2026 sales €1.53B across indications); an oral competitor (povorcitinib) has already hit both of its Phase 3 primaries.</li><li>Single asset, single mechanism: every program is sonelokimab, and the IL-17 class carries candidiasis and IBD baggage that grows with exposure.</li><li>The share count rose ~32% in seven months (64.6M → 85.1M). The cash is real; so is the dilution that bought it.</li></ul></article>
+      </div>
+      <p class="source-note">Identity: <span class="ev fact">FACT</span> MoonLake Immunotherapeutics is a Cayman Islands exempted company (CIK 0001821586; file no. 001-39630) and a <strong>domestic SEC filer</strong> (10-K/10-Q/DEF 14A) despite the offshore structure; operating company MoonLake Immunotherapeutics AG is headquartered in Zug, Switzerland. The listed security is Class A ordinary shares ($0.0001 par) on the Nasdaq Capital Market — <strong>not ADSs</strong>; no Class B or Class C shares were outstanding at June 30, 2026 (Class C, non-economic, fully converted in 2025). Formed via the Helix Acquisition Corp SPAC combination, closed April 5, 2022. Valuation inputs: <a href="https://www.sec.gov/Archives/edgar/data/1821586/000182158626000010/mnlk-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> · price series via Yahoo Finance (see Sources).</p>
+    </section>
+
+    <section id="market">
+      <div class="section-head"><div class="section-num">02 / MARKET</div><div><h2>A $4.0B certainty trade met a p=0.053</h2><p class="lede">Into the September 2025 VELA print, MLTX had run to a ~$4.0B market value that priced dual Phase 3 success and a premium HS launch. The print delivered one clean trial, one statistical miss, and the largest single-day destruction in the stock’s history — followed by a year in which almost every subsequent fact broke in the company’s favor and the price recovered only a fraction.</p></div></div>
+      <div class="chart-card">
+        <div class="chart-top"><div><div class="chart-title">MLTX daily close</div><div class="source-note">USD · fixed series, Sep 4, 2025 – Oct 20, 2026</div></div><div class="range" role="group" aria-label="Chart range"><button data-range="63" aria-pressed="false">3M</button><button data-range="126" aria-pressed="false">6M</button><button data-range="300" aria-pressed="true">ALL</button></div></div>
+        <div class="chart-stats"><div class="chart-stat"><b id="rangeReturn">—</b><span>Range return</span></div><div class="chart-stat"><b id="rangeLow">—</b><span>Closing low</span></div><div class="chart-stat"><b id="rangeHigh">—</b><span>Closing high</span></div></div>
+        <div class="chart-shell" id="chartShell"><svg id="priceChart" role="img" aria-labelledby="chartTitle chartDesc" viewBox="0 0 1000 330" preserveAspectRatio="none"><title id="chartTitle">MLTX daily closing price</title><desc id="chartDesc">Interactive line chart of MoonLake daily closes from September 2025 to October 2026, showing the September 29, 2025 collapse from about $62 to about $6 and the partial recovery since. Use the range buttons to view three months, six months, or the full series.</desc></svg><div class="chart-tooltip" id="chartTip"></div></div>
+        <div class="chart-caption">The price chart is a dated build-time snapshot, not a live quote. Line scale starts above zero. Source: Yahoo Finance daily closes (unadjusted), fetched October 20, 2026. Intraday extremes in the window: $62.75 high and $5.95 low, both around the September 2025 readout.</div>
+      </div>
+      <div class="readthrough"><strong>The setup.</strong> <span class="ev fact">FACT</span> MLTX closed at $61.99 on Friday, September 26, 2025 — a ~$4.0B market capitalization on ~64.6M shares — after running from the low-$50s earlier that month. Expectations embedded in that price were not “one of two trials hits”: VELA was the company’s value, MIRA had already produced a 43% HiSCR75 at the chosen 120 mg dose, and the twin-trial design was sold as redundancy. <span class="ev interp">INTERPRETATION</span> At ~$4.0B with ~$380M of cash, the market was paying ~$3.6B of enterprise value for a pre-approval HS asset — a full-success price with no allowance for the estimand fight that followed.</div>
+      <div class="event-tape">
+        <article><span class="event-mark">SEP 29, 2025</span><h3>−89.9% in one session</h3><p><span class="ev fact">FACT</span> On the VELA release (PR dated Sunday, Sept 28), the stock opened at $6.97 and closed at $6.24 on 79.7M shares — roughly $3.6B of market value erased in a day. The proximate cause was VELA-2’s composite-strategy primary miss (p=0.053) and a 25.6% placebo HiSCR75 against a 13–18% historical Phase 3 range.</p></article>
+        <article><span class="event-mark">JAN 8–9, 2026</span><h3>The Type B relief rally</h3><p><span class="ev fact">FACT</span> FDA’s confirmation that no additional HS trials were needed took the stock from $11.29 (Jan 7 close) to $18.49 (Jan 9) — the market re-pricing regulatory death risk, not commercial risk. It remains the clearest evidence of what the September price had actually been discounting.</p></article>
+        <article><span class="event-mark">AUG–OCT 2026</span><h3>A hit that sold off</h3><p><span class="ev fact">FACT</span> IZAR-1 met all Week 16 endpoints on August 10, 2026 — and the stock slid from $17.33 that day to $10.32 by October 20. <span class="ev interp">INTERPRETATION</span> With placebo data withheld by design, the market is treating absolute response rates as unscoreable and charging full uncertainty for the H1 2027 reveal.</p></article>
+      </div>
+      <p class="source-note">Prices: Yahoo Finance daily series (see Sources). Readout: <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390025092614/ea025912901ex99-1_moonlake.htm" target="_blank" rel="noopener">VELA Week 16 release, 8-K Ex-99.1 (Sept 29, 2025)</a>. Type B outcome: MoonLake release, Jan 8, 2026 (8-K Ex-99.1).</p>
+    </section>
+    <section id="science">
+      <div class="section-head"><div class="section-num">03 / SCIENCE</div><div><h2>Two cytokines, one small protein, and a penetration claim still awaiting proof</h2><p class="lede">HS is a neutrophil-driven, tunnel-forming inflammatory disease in which IL-17A and IL-17F are both upregulated. Sonelokimab blocks all three IL-17A/F dimers with a molecule roughly a quarter of an antibody’s size. The pharmacology is sound; the differentiating claim — deeper tissue penetration from the nanobody format — remains a claim, because no human tissue-exposure comparison has been published.</p></div></div>
+      <div class="science-chain" aria-label="HS disease mechanism">
+        <article><b>01</b><h3>Follicular occlusion</h3><p>HS begins around hair follicles in intertriginous skin; rupture spills keratin and bacteria into the dermis and triggers intense innate inflammation.</p></article>
+        <article><b>02</b><h3>IL-17 amplification</h3><p>IL-17A and IL-17F (as A/A, A/F and F/F dimers) drive neutrophil recruitment and keratinocyte activation. Lesional HS skin overexpresses both — the rationale for dual blockade over IL-17A alone.</p></article>
+        <article><b>03</b><h3>Abscesses and tunnels</h3><p>Neutrophilic abscesses coalesce into draining tunnels (sinus tracts) and fibrosis — the structural damage HiSCR counts and IHS4 weights most heavily, and the stage at which response is hardest to win.</p></article>
+        <article><b>04</b><h3>Dual blockade</h3><p>Sonelokimab binds IL-17A and IL-17F with high affinity, neutralizing all three dimers — the same ligand pair as bimekizumab, in a ~40 kDa format instead of a ~150 kDa IgG.</p></article>
+      </div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card"><div class="program-kicker">Format</div><h3>Three VHH domains, deliberately built</h3><p><span class="ev fact">FACT</span> Sonelokimab (originator code M1095; in-licensed from Merck Healthcare KGaA) is a humanized trivalent Nanobody®: two binding domains against IL-17A and IL-17F, plus a central anti-albumin domain that extends half-life and is intended to enrich the molecule at sites of inflammatory edema, where albumin extravasates. Flexible glycine-serine linkers join the domains; the drug is produced in <em>Pichia pastoris</em> yeast. Clinical dosing is a single 1 mL subcutaneous injection — 120 mg monthly in HS after a 4-dose induction, 60 mg in PsA.</p><p class="source-note"><span class="ev fact">FACT</span> Company scientific description, Q2 2026 release (8-K Ex-99.1, Aug 10, 2026); structure first described in Papp et al., <em>Lancet</em> 2021.</p></article>
+        <article class="paper-card"><div class="program-kicker">Claims vs evidence</div><h3>“Tissue penetration” is plausible, not demonstrated</h3><p><span class="ev gap">GAP</span> No published study measures sonelokimab concentrations in human HS lesions against a monoclonal antibody comparator, and no head-to-head trial exists against bimekizumab. The indirect evidence is real but circumstantial: deep-response rates at Week 52 (26.0% IHS4-100, i.e., complete resolution of abscesses, nodules and draining tunnels) are the kind of outcome a penetration advantage would predict — and are also what any potent IL-17A/F blocker might produce with a year of dosing. <span class="ev interp">INTERPRETATION</span> Treat format superiority as unproven; treat dual-ligand efficacy as proven at the class level by Bimzelx.</p><p class="source-note">Week 52 outcomes: MoonLake release, June 21, 2026 (8-K Ex-99.1).</p></article>
+      </div>
+      <div class="splice-table-wrap">
+        <table class="study-table splice-table"><thead><tr><th>Class question</th><th>Evidence</th><th>Strength</th><th>Why it matters</th></tr></thead><tbody>
+          <tr><td data-label="Question">Does adding IL-17F help?</td><td data-label="Evidence">Bimekizumab (A+F) posted larger placebo-adjusted HiSCR50 deltas (+19–20 pts) than secukinumab (A-only, +12–15 pts) across separate Phase 3 programs; network meta-analyses rank dual blockade above A-only in HS.</td><td data-label="Strength"><strong>B · cross-trial</strong></td><td data-label="Why it matters">Supports the dual-ligand thesis sonelokimab shares — and the bar set by the incumbent that owns it.</td></tr>
+          <tr><td data-label="Question">Candida risk</td><td data-label="Evidence">IL-17 is essential to mucocutaneous antifungal defense. VELA Week 16: oral candidiasis 7.3% on sonelokimab vs 0.4% on placebo (incl. 3 esophageal cases); psoriasis Phase 2b: 7.4% across sonelokimab arms vs 1.9% on secukinumab.</td><td data-label="Strength"><strong>A · replicated</strong></td><td data-label="Why it matters">The most consistent on-target toxicity; manageable, but it will be in the label and in payer/physician comparisons.</td></tr>
+          <tr><td data-label="Question">IBD risk</td><td data-label="Evidence">IL-17A blockade worsened Crohn’s disease in dedicated trials; approved IL-17 labels carry IBD warnings. VELA recorded zero IBD events through Week 52 — in trials that excluded IBD patients.</td><td data-label="Strength"><strong>B · class</strong></td><td data-label="Why it matters">Zero events in a screened population does not retire a class warning; expect label language mirroring competitors.</td></tr>
+          <tr><td data-label="Question">The M1095 precedent</td><td data-label="Evidence">As M1095 under prior sponsors, the molecule produced striking psoriasis data (Lancet 2021: IGA 0/1 up to 88.2% at Week 12) yet was not advanced into Phase 3 by them; MoonLake in-licensed it from Merck Healthcare KGaA in 2021 and built a company around it.</td><td data-label="Strength"><strong>B · historical</strong></td><td data-label="Why it matters">Big-pharma deprioritization cuts both ways — portfolio triage or quiet doubts. The subsequent decade of data favors triage, but the question belongs in diligence.</td></tr>
+        </tbody></table>
+      </div>
+      <p class="source-note">Literature: <a href="https://pubmed.ncbi.nlm.nih.gov/33894834/" target="_blank" rel="noopener">Papp et al., Lancet 2021 (PMID 33894834)</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/38795716/" target="_blank" rel="noopener">Kimball et al., Lancet 2024 — BE HEARD I/II (PMID 38795716)</a> · JAMA Dermatology living network meta-analysis of HS interventions, 2025 (PMID 40601333).</p>
+    </section>
+
+    <section id="clinical">
+      <div class="section-head"><div class="section-num">04 / CLINICAL</div><div><h2>VELA: the first HS program to bet on HiSCR75 — and nearly lose on arithmetic</h2><p class="lede">MoonLake designed VELA-1 and VELA-2 (838 patients) around HiSCR75 at Week 16 — a higher response bar than any prior Phase 3 primary — with two pre-specified ways of handling patients who left, flared, or took rescue therapy. The drug cleared the bar in one trial under both strategies, and in the second trial under one. Everything since has been an argument about which strategy should count.</p></div></div>
+      <div class="moa-box"><h3>The estimand fight in 60 seconds <span class="ev interp">INTERPRETATION</span></h3><p><strong>Plain English.</strong> In HS trials, some patients quit, need surgery, or take rescue antibiotics. The <em>composite</em> strategy scores every such patient as a failure, whatever their lesions did. The <em>treatment-policy</em> strategy scores what actually happened to their lesions. VELA-2’s placebo arm had an unusual cluster of these “intercurrent events” alongside a genuinely high placebo response — so the composite math failed (p=0.053) while the treatment-policy math passed (p=0.033). Regulators had seen both strategies in advance; which one anchors the label is now an FDA review question, not a data question.</p><p><strong>Technical.</strong> Primary endpoint: HiSCR75 at Week 16 (≥75% reduction in abscess + inflammatory nodule count, no increase in abscess or draining-tunnel count). Dosing: 120 mg SC every other week to Week 6 (4 induction doses), then monthly; placebo crossed to sonelokimab at Week 16; assessments to Week 52, then a 2-year open-label extension. Randomization ~2:1 (VELA-1: 283 SLK / 138 PBO; VELA-2: 276 / 141).</p></div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card">
+          <div class="program-kicker">Registrational program · HS</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">VELA-1 / VELA-2 · Phase 3</h3>
+          <p class="mechanism"><span class="ev fact">FACT</span> First Phase 3 HS program with a HiSCR75 primary endpoint. BLA submitted September 30, 2026 on VELA-1 + VELA-2 + MIRA, per the FDA Type B agreement.</p>
+          <div class="status-row"><span class="pill">VELA-1: all endpoints hit</span><span class="pill hold">VELA-2: composite miss</span><span class="pill">BLA submitted Sept 30, 2026</span></div>
+          <table class="study-table"><thead><tr><th>Week 16 endpoint</th><th>VELA-1</th><th>VELA-2</th></tr></thead><tbody>
+            <tr><td data-label="Endpoint">HiSCR75 — composite (primary analysis)</td><td data-label="VELA-1">Δ +17 pts · p&lt;0.001 ✓</td><td data-label="VELA-2">Δ +9 pts · p=0.053 ✗</td></tr>
+            <tr><td data-label="Endpoint">HiSCR75 — treatment policy</td><td data-label="VELA-1">34.8% vs 17.5% · p&lt;0.001</td><td data-label="VELA-2">35.9% vs 25.6% · p=0.033</td></tr>
+            <tr><td data-label="Endpoint">HiSCR50 — treatment policy</td><td data-label="VELA-1">51.6% vs 30.3%</td><td data-label="VELA-2">58.7% vs 43.0% · p=0.003</td></tr>
+            <tr><td data-label="Endpoint">IHS4-55 — treatment policy</td><td data-label="VELA-1">54.4% vs 34.2%</td><td data-label="VELA-2">56.9% vs 44.7% · p=0.021</td></tr>
+            <tr><td data-label="Endpoint">Pain NRS ≥3-pt improvement (pooled)</td><td data-label="VELA-1" colspan="2">29.1% vs 13.9% · p≤0.002</td></tr>
+            <tr><td data-label="Endpoint">HiSQOL change (pooled)</td><td data-label="VELA-1" colspan="2">−9.1 vs −3.5 · p&lt;0.001</td></tr>
+          </tbody></table>
+          <p class="source-note"><span class="ev fact">FACT</span> <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390025092614/ea025912901ex99-1_moonlake.htm" target="_blank" rel="noopener">VELA Week 16 release (Sept 28, 2025)</a> · Registries: <a href="https://clinicaltrials.gov/study/NCT06411379" target="_blank" rel="noopener">NCT06411379</a> · <a href="https://clinicaltrials.gov/study/NCT06411899" target="_blank" rel="noopener">NCT06411899</a>.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">Phase 3 · Week 16 · treatment policy</div><h3>HiSCR75: drug vs placebo, by trial</h3>
+          <div class="bar-set" aria-label="HiSCR75 response at Week 16 under the treatment-policy strategy">
+            <div class="bar-row"><div class="bar-label">V1 · SLK</div><div class="bar-track"><div class="bar-fill" style="width:87%"></div></div><div class="bar-value">34.8%</div></div>
+            <div class="bar-row"><div class="bar-label">V1 · PBO</div><div class="bar-track"><div class="bar-fill" style="width:44%"></div></div><div class="bar-value">17.5%</div></div>
+            <div class="bar-row"><div class="bar-label">V2 · SLK</div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><div class="bar-value">35.9%</div></div>
+            <div class="bar-row"><div class="bar-label">V2 · PBO</div><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div><div class="bar-value">25.6%</div></div>
+          </div>
+          <p class="source-note">The drug arms are nearly identical (34.8% / 35.9%). The trials differ almost entirely in the placebo arm — 17.5% (inside the 13–18% historical Phase 3 HiSCR75 range the company cites) vs 25.6% (well above it).</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">Week 52 · as observed · n=396</div><h3 style="margin-top:6px">Depth arrived late — the VELA signature</h3><div class="outlier-metrics"><div><b>67.2%</b><span>HiSCR75 at Week 52</span></div><div><b>33.1%</b><span>HiSCR100</span></div><div><b>26.0%</b><span>IHS4-100 (full resolution)</span></div></div><p style="font-size:13px;margin:0">Consistent across trials (VELA-1 HiSCR75 68.3%; VELA-2 66.0%). Placebo crossovers reached ~60% HiSCR75 after 36 weeks on drug, converging with continuous-treatment arms. ~90% of patients rolled into the 2-year extension. Caveat: as-observed completer analysis — attrition flatters long-term rates in every HS program, including competitors’.</p></div>
+        </article>
+      </div>
+      <div class="fail-grid" aria-label="Ways the HS program could still disappoint">
+        <article><h3>1 · The label could price in the miss</h3><p>FDA agreed the package can establish effectiveness; it did not pre-agree the label. A label built on VELA-1 alone, without the adolescent indication or with the composite analysis featured, would narrow the commercial claim set.</p></article>
+        <article><h3>2 · Placebo response is drifting up class-wide</h3><p>Recent HS trials (VELA-2 placebo HiSCR50 43.0%; povorcitinib placebo ~29–30% at an easier Week 12 bar) show rising placebo rates. Any future trial MoonLake runs — including label-expansion studies — faces the same headwind.</p></article>
+        <article><h3>3 · Adolescent data are thin by design</h3><p>VELA-TEEN is a 35-patient open-label PK/safety study. Interim Week 24: ~68% HiSCR75, ~45% HiSCR100 (n=22). Supportive, not definitive; the BLA asks FDA to include ages 12+ on this plus adult efficacy extrapolation.</p></article>
+        <article><h3>4 · Durability beyond a year is unproven</h3><p>Week 52 is the longest controlled exposure. Bimzelx already has 2- and 3-year HS datasets public. The VELA open-label extension (N=835) will take years to close that gap.</p></article>
+      </div>
+      <div class="safety-grid">
+        <article><h3>Safety at Week 16 (pooled VELA)</h3><p><span class="ev fact">FACT</span> Any TEAE 67.3% (SLK) vs 55.6% (PBO); serious TEAE 2.5% vs 1.8%; discontinuation for TEAE 2.9% vs 1.4%; serious infections 0.7% in both arms. No IBD, no suicidal ideation/behavior, no MACE.</p></article>
+        <article><h3>The one clear on-target cost</h3><p><span class="ev fact">FACT</span> Oral candidiasis 7.3% vs 0.4%, including 3 esophageal cases — the IL-17 class signature, at rates comparable to bimekizumab’s label experience. No new signals emerged through Week 52.</p></article>
+        <article><h3>Phase 2 foundation (MIRA)</h3><p><span class="ev fact">FACT</span> MIRA (N=234, published JAAD 2026): HiSCR75 at Week 12 was 43% at 120 mg (p&lt;0.001) and 35% at 240 mg (p=0.007) vs 15% placebo (NRI) — note the inverted dose order, which is why 120 mg, not 240 mg, went forward. An adalimumab reference arm (n=33) was included for context, not comparison.</p></article>
+      </div>
+      <p class="source-note">Clinical sources: VELA Week 16 release (SEC 8-K Ex-99.1, Sept 29, 2025) · VELA Week 52 release (SEC 8-K Ex-99.1, June 21, 2026) · <a href="https://pubmed.ncbi.nlm.nih.gov/42822776/" target="_blank" rel="noopener">Kimball et al., JAAD 2026 — MIRA (PMID 42822776)</a> · <a href="https://clinicaltrials.gov/study/NCT05322473" target="_blank" rel="noopener">MIRA registry (NCT05322473)</a> · <a href="https://clinicaltrials.gov/study/NCT06768671" target="_blank" rel="noopener">VELA-TEEN registry (NCT06768671)</a>.</p>
+    </section>
+
+    <section id="hold">
+      <div class="section-head"><div class="section-num">05 / BLINDED</div><div><h2>IZAR-1 “hit everything” — except the comparison that decides value</h2><p class="lede">The August 10, 2026 IZAR-1 release is the most unusual disclosure in the story: under an unblinding protocol agreed with FDA, MoonLake published the winning drug arm’s absolute response rates and withheld the placebo arm entirely, because the trial is still running to Week 52. The numbers look strong. They are also, by construction, unscoreable — and that gap is the H1 2027 binary.</p></div></div>
+      <div class="quote-panel"><blockquote>“Consistent with the unblinding protocol defined with the FDA, topline disclosure at Week 16 includes absolute response levels and endpoint outcomes for the sonelokimab 60 mg with induction arm. Comparative analyses versus placebo and detailed treatment arm data remain blinded until completion of the Phase 3 program.”</blockquote><cite>MoonLake IZAR-1 topline release · Aug 10, 2026 (8-K Ex-99.1)</cite></div>
+      <div class="hold-grid">
+        <article><span class="ev fact">FACT</span><h3>What was disclosed</h3><p>60 mg with-induction arm, Week 16: ACR50 (primary) 42.1%; ACR20 66.5%; MDA 41.2%; PASI90 61% in skin-involved patients; HAQ-DI −0.427; SF-36 PCS +6.54. All clinical endpoints met. Blinded safety: consistent with prior studies, no new signals, low dropout.</p></article>
+        <article><span class="ev fact">FACT</span><h3>What was not</h3><p>No placebo rates, no p-values versus placebo, no data for the 60 mg without-induction arm, no per-arm N in the release, no ACR70, enthesitis, or dactylitis detail. The word “met” for the primary endpoint implies the pre-specified comparison succeeded — but the margin is invisible.</p></article>
+        <article><span class="ev fact">FACT</span><h3>The best placebo anchor</h3><p>In the published Phase 2 ARGO trial (same molecule, same 60 mg with-induction regimen), placebo ACR50 at Week 12 was 20.0% and drug 46.3%. If IZAR-1’s placebo behaves like ARGO’s, the hidden delta is ~20 pts — competitive with any approved PsA biologic. That is an anchor, not a measurement.</p></article>
+        <article><span class="ev gap">GAP</span><h3>Why it can still go wrong</h3><p>Phase 3 PsA placebo ACR50 rates have drifted upward across the industry, and IZAR-1 enrolled 960 patients across three arms — a different population from ARGO’s 207. A placebo print near 30% would halve the delta, reframe IZAR-1 as “me-too IL-17,” and shift all value onto IZAR-2’s harder TNF-refractory test.</p></article>
+      </div>
+      <div class="signal-grid" style="margin-top:20px">
+        <article class="paper-card">
+          <div class="program-kicker">PsA Phase 3 program · IZAR</div><h3 style="font:600 29px/1.15 var(--serif);margin-top:7px">Two trials, two different proofs</h3>
+          <table class="study-table"><thead><tr><th>Trial</th><th>Design</th><th>Status</th></tr></thead><tbody>
+            <tr><td data-label="Trial">IZAR-1<br><small>NCT06641076 · M1095-PSA-301</small></td><td data-label="Design">Biologic-naïve PsA; N≈960; SLK 60 mg with induction vs SLK 60 mg without induction vs placebo; primary ACR50 at Week 16.</td><td data-label="Status">Week 16 endpoints met (blinded disclosure); runs to Week 52; full readout H1 2027.</td></tr>
+            <tr><td data-label="Trial">IZAR-2<br><small>NCT06641089 · M1095-PSA-302</small></td><td data-label="Design">Anti-TNF inadequate responders; N≈600; two SLK dose regimens vs placebo vs <strong>risankizumab</strong> standard-of-care arm; primary ACR50 at Week 16 vs placebo.</td><td data-label="Status">Enrollment completion guided Q3 2026 (unconfirmed at Oct 20); registry primary completion est. Jan 2027.</td></tr>
+            <tr><td data-label="Trial">ARGO (Phase 2)<br><small>NCT05640245 · M1095-PSA-201</small></td><td data-label="Design">N=207; three SLK regimens vs placebo, adalimumab reference arm; primary ACR50 at Week 12.</td><td data-label="Status">Published, Nature Medicine 2025: ACR50 46.3% (60 mg WI) and 46.5% (120 mg WI) vs 20.0% placebo.</td></tr>
+          </tbody></table>
+          <p class="source-note"><a href="https://clinicaltrials.gov/study/NCT06641076" target="_blank" rel="noopener">IZAR-1 registry</a> · <a href="https://clinicaltrials.gov/study/NCT06641089" target="_blank" rel="noopener">IZAR-2 registry</a> · <a href="https://pubmed.ncbi.nlm.nih.gov/41053449/" target="_blank" rel="noopener">McInnes et al., Nat Med 2025 — ARGO (PMID 41053449)</a>.</p>
+        </article>
+        <article class="paper-card">
+          <div class="program-kicker">IZAR-1 · Week 16 · drug arm only</div><h3>Response rates with no denominator of doubt removed</h3>
+          <div class="bar-set" aria-label="IZAR-1 Week 16 response rates, sonelokimab 60 mg with induction arm">
+            <div class="bar-row"><div class="bar-label">ACR20</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-value">66.5%</div></div>
+            <div class="bar-row"><div class="bar-label">PASI90</div><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div><div class="bar-value">61%</div></div>
+            <div class="bar-row"><div class="bar-label">ACR50</div><div class="bar-track"><div class="bar-fill" style="width:63%"></div></div><div class="bar-value">42.1%</div></div>
+            <div class="bar-row"><div class="bar-label">MDA</div><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><div class="bar-value">41.2%</div></div>
+          </div>
+          <p class="source-note"><span class="ev fact">FACT</span> Absolute rates for the 60 mg with-induction arm (company release, Aug 10, 2026). There are no placebo bars to draw: that absence is precisely the open risk. Cross-trial context only: bimekizumab’s Phase 3 ACR50 in biologic-naïve PsA was ~44% vs ~7% placebo (BE OPTIMAL); risankizumab’s ACR50 was ~51% vs ~27% at Week 24 (KEEPsAKE-1) — different populations, timepoints and eras, not head-to-head.</p>
+          <div class="outlier-box"><div class="program-kicker" style="color:#963e1f">The financing tell</div><h3 style="margin-top:6px">Hercules gets paid on the unblinding too</h3><p style="font-size:13px;margin:0">Tranche 3 of the Hercules facility (up to $50M) unlocks only on announcement that <em>both</em> IZAR-1 and IZAR-2 met their primary endpoints (window to Mar 15, 2027). The lender structured its money around exactly the disclosure the market is waiting for. <span class="ev fact">FACT</span> Q2 2026 10-Q, debt note.</p></div>
+        </article>
+      </div>
+      <p class="source-note">Primary source: <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026086939/ea030119101ex99-1.htm" target="_blank" rel="noopener">IZAR-1 topline + Q2 2026 results release (8-K Ex-99.1, Aug 10, 2026)</a>.</p>
+    </section>
+    <section id="harbor">
+      <div class="section-head"><div class="section-num">06 / SEP 2025</div><div><h2>Autopsy of a −90% day: what the VELA print actually said</h2><p class="lede">The September 28, 2025 release contained a genuine disappointment wrapped in a statistical technicality, priced as a program failure. Reconstructing it matters because the same three readings are still available today — and the evidence accumulated since discriminates between them.</p></div></div>
+      <div class="harbor-grid">
+        <article class="harbor-fact"><h3>What the print contained</h3><ul><li>VELA-1: every primary and key secondary endpoint significant under both analysis strategies; HiSCR75 composite delta +17 pts, p&lt;0.001.</li><li>VELA-2: primary missed under the composite strategy — delta +9 pts, p=0.053 — and hit under the pre-specified treatment-policy strategy, 35.9% vs 25.6%, p=0.033.</li><li>Drug-arm HiSCR75 was nearly identical in both trials (34.8% / 35.9%, treatment policy). The variance was in VELA-2’s placebo arm: 25.6% vs a 13–18% historical Phase 3 range, compounded by intercurrent events scored as failures under the composite.</li><li>Safety was clean and class-typical: candidiasis 7.3% vs 0.4% was the only material imbalance; no IBD, no SI/B, no MACE.</li><li>The stock had closed at $61.99 (~$4.0B market value) the prior Friday, pricing near-flawless execution.</li></ul></article>
+        <article class="harbor-gap"><h3>What the print could not tell anyone</h3><ul><li>Whether FDA would accept a filing built on one clean trial plus one strategy-dependent trial — the only question that actually determined HS value.</li><li>Whether VELA-2’s placebo rate was noise, site/population mix, or a real feature of the trial’s conduct.</li><li>Whether Week 16 was even the right frame: HS responses to IL-17 blockade deepen for a year, and the release itself noted improvement beyond Week 16.</li><li>What any of it implied for PsA, where the same molecule was already in two Phase 3 trials with a different endpoint culture (ACR) and a published positive Phase 2.</li></ul></article>
+      </div>
+      <div class="readthrough"><strong>How the question resolved.</strong> <span class="ev fact">FACT</span> On December 15, 2025, MoonLake took the package to a Type B meeting. FDA’s answer (disclosed January 8, 2026): substantial evidence of effectiveness can be established <em>without additional HS trials</em>, from VELA-1, VELA-2 and MIRA; FDA advised including MIRA in the submission and VELA-2 regardless of its evidentiary role, to inform the safety profile. Week 52 data (June 21, 2026) then showed both trials converging at ~67% HiSCR75 with crossover patients replicating the trajectory. The BLA followed on September 30, 2026. <span class="ev interp">INTERPRETATION</span> The September 2025 price was a probability-weighted regulatory death sentence. The realized path was the benign branch of every uncertainty the print left open.</div>
+      <div class="scenario-table">
+        <div class="scenario-head"><span>Reading of the VELA-2 miss</span><span>What it predicted</span><span>What happened</span></div>
+        <div class="scenario-row"><span data-label="Reading"><b>Estimand artifact</b><small>Composite scoring + event cluster</small></span><span data-label="Prediction">FDA accepts treatment-policy framing; filing proceeds.</span><span data-label="Outcome">Consistent so far: Type B agreement, BLA filed. Label wording is the remaining test.</span></div>
+        <div class="scenario-row"><span data-label="Reading"><b>True high-placebo trial</b><small>Population/site noise in VELA-2</small></span><span data-label="Prediction">Drug effect real but smaller; approvable on VELA-1 + MIRA.</span><span data-label="Outcome">Also consistent: FDA cited all three trials for the package; Week 52 convergence supports a real effect in both.</span></div>
+        <div class="scenario-row"><span data-label="Reading"><b>Weak drug</b><small>HiSCR75 was a bar too far</small></span><span data-label="Prediction">CRL, new trial demanded, or failed review.</span><span data-label="Outcome">Contradicted at each checkpoint to date: no new trial required, deepening Week 52 responses, ~90% OLE rollover.</span></div>
+      </div>
+      <p class="source-note"><span class="ev interp">INTERPRETATION</span> Retrospective discrimination among readings, not a prediction of the review outcome. Sources: VELA Week 16 release (Sept 28, 2025) · Type B outcome release (Jan 8, 2026) · VELA Week 52 release (June 21, 2026) · BLA submission 8-K (Sept 30, 2026).</p>
+    </section>
+
+    <section id="competition">
+      <div class="section-head"><div class="section-num">07 / LANDSCAPE</div><div><h2>Sonelokimab would enter as the third IL-17 in HS — with an oral rival behind it</h2><p class="lede">HS went from one approved biologic (adalimumab, 2015) to three in a decade, and the market is still underpenetrated. The fight is not for existence; it is for position against a scaled incumbent (Bimzelx), a entrenched second (Cosentyx), and the first oral (povorcitinib) arriving with Phase 3 wins of its own.</p></div></div>
+      <div class="compare compare-four">
+        <article class="compare-card"><div class="program-kicker">UCB · incumbent</div><div class="name">Bimzelx (bimekizumab)</div><dl><dt>Mechanism</dt><dd>IL-17A + IL-17F mAb (~150 kDa)</dd><dt>HS approval</dt><dd>FDA Nov 20, 2024 (adults)</dd><dt>Pivotal data</dt><dd>BE HEARD I/II HiSCR50 wk16: 48% / 52% vs 29% / 32% placebo (Q2W)</dd><dt>Commercial proof</dt><dd>€1,528M net sales H1 2026 (all indications, +91% YoY); UCB peak ambition ≥€7B</dd><dt>Friction</dt><dd>320 mg = two injections; Q2W to Week 16, then Q4W</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#9b3d1c">Novartis · second</div><div class="name">Cosentyx (secukinumab)</div><dl><dt>Mechanism</dt><dd>IL-17A-only mAb</dd><dt>HS approval</dt><dd>FDA Oct 2023 (adults); adolescents 12+ added Mar 2026</dd><dt>Pivotal data</dt><dd>SUNSHINE / SUNRISE label HiSCR50 wk16 (Q2W): 44.5% / 38.3% vs 29.4% / 26.1% placebo</dd><dt>Position</dt><dd>Weakest efficacy of the three IL-17s; strongest brand/channel legacy from psoriasis</dd><dt>Read for MLTX</dt><dd>Its pediatric extension already occupies the adolescent claim MoonLake’s BLA also seeks</dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#7d6000">Incyte · oral threat</div><div class="name">Povorcitinib</div><dl><dt>Mechanism</dt><dd>Oral JAK1 inhibitor, once daily</dd><dt>Status</dt><dd>STOP-HS1/2 Phase 3 primaries met (2025); 54-week data at AAD 2026</dd><dt>Data</dt><dd>HiSCR50 wk12 ~40–42% vs ~29–30% placebo; wk54 HiSCR50 up to 71.4%, HiSCR75 up to 57% (as reported)</dd><dt>Threat shape</dt><dd>No injections, no candidiasis mechanism; JAK class warnings and labs cut the other way</dd><dt>Timing</dt><dd>Regulatory filing path under way in 2026 <span class="ev unverified">UNVERIFIED</span></dd></dl></article>
+        <article class="compare-card"><div class="program-kicker" style="color:#4b6270">MoonLake · challenger</div><div class="name">Sonelokimab</div><dl><dt>Mechanism</dt><dd>IL-17A + IL-17F Nanobody® (~40 kDa)</dd><dt>Status</dt><dd>BLA filed Sept 30, 2026 (adults + 12+)</dd><dt>Data claim</dt><dd>Only program with a HiSCR75 primary; wk52 HiSCR75 67.2%, HiSCR100 33.1% (as observed)</dd><dt>Friction</dt><dd>Single 1 mL injection, monthly after 4-dose induction — the convenience edge vs Bimzelx</dd><dt>Deficit</dt><dd>No salesforce, no payer contracts, latest entrant, smallest evidence base</dd></dl></article>
+      </div>
+      <div class="readthrough"><strong>Mandatory cross-trial caveat.</strong> The numbers above come from different trials, estimands, imputation rules, and eras of placebo response; none of these drugs has faced another head-to-head in HS. Sonelokimab’s higher-threshold data (HiSCR75/100, IHS4-100) are genuinely distinctive as a <em>dataset</em>, and the Week 52 depth is at least comparable to bimekizumab’s long-term trajectory — but “best-in-class” remains a marketing claim until a label, a launch, and persistence data exist. Also in the field: adalimumab and biosimilars anchor the cheap end (PIONEER HiSCR50 41.8% / 58.9% at Week 12 vs 26.0% / 27.6%); AbbVie’s lutikizumab (IL-1α/β) posted a 59.5% vs 35.0% HiSCR50 in a TNF-failed Phase 2 and is in Phase 3; Merck’s tulisokibart (TL1A) showed striking small Phase 2b numbers in 2026. The window in which IL-17A/F differentiation alone suffices is not permanent.</div>
+      <p class="source-note">Bimzelx: <a href="https://pubmed.ncbi.nlm.nih.gov/38795716/" target="_blank" rel="noopener">Kimball et al., Lancet 2024</a> · UCB H1 2026 report (net sales, peak ambition). Cosentyx: FDA label, Table 15 (HS Trials 1–2); pediatric extension per Novartis, March 2026. Povorcitinib / lutikizumab / tulisokibart: AAD 2026 presentations and trade coverage (HCPLive, AJMC) — <span class="ev unverified">UNVERIFIED</span> tier for the pipeline agents. Adalimumab: PIONEER I/II, published literature.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="section-head"><div class="section-num">08 / PIPELINE</div><div><h2>One molecule, ranked by proximity to revenue</h2><p class="lede">MoonLake is a single-asset company by design. The ranking below is by value at stake and time to resolution: HS is the business, PsA is the second business if the blinded data cooperate, and everything else is optionality the market currently prices near zero.</p></div></div>
+      <div class="pipeline">
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">1</span><div><div class="pipe-name">Sonelokimab — HS</div><div class="pipe-desc">Adults + adolescents 12+</div></div></div><div class="pipe-desc">BLA submitted Sept 30, 2026. Carries the near-term equity story: acceptance and PDUFA allocation expected end-Nov 2026; company guides a Q3/Q4 2027 launch on standard review, ~one quarter earlier if Priority Review is granted. The VELA-OLE open-label extension (N=835) is collecting the long-term safety exposure the label will need.</div><div class="pipe-status">BLA filed</div></div>
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">2</span><div><div class="pipe-name">Sonelokimab — PsA</div><div class="pipe-desc">IZAR-1 (naïve) · IZAR-2 (TNF-IR)</div></div></div><div class="pipe-desc">The value swing factor. IZAR-1’s drug arm matches published Phase 2; everything depends on the withheld placebo and on IZAR-2, which adds a risankizumab comparator arm — a chance to claim differentiation, and a chance to be measured against the IL-23 class leader in public.</div><div class="pipe-status">Phase 3 · blinded</div></div>
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">3</span><div><div class="pipe-name">Sonelokimab — axSpA</div><div class="pipe-desc">S-OLARIS (Ph2) · P-OLARIS (imaging)</div></div></div><div class="pipe-desc"><span class="ev unverified">UNVERIFIED · COMPANY</span> S-OLARIS topline (Feb 22, 2026): 80%+ ASAS40 at Week 12 with concordant ASDAS-CRP and SPARCC MRI improvements and PET/MRI signals of reduced osteoblast activity — a disease-modification narrative in a small biomarker-controlled trial; full dataset and N are not yet public in a primary source reviewed here. P-OLARIS interim readout guided end-2026 / early 2027.</div><div class="pipe-status">Phase 2 · positive topline</div></div>
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">4</span><div><div class="pipe-name">Sonelokimab — PPP</div><div class="pipe-desc">LEDA (Ph2, complete)</div></div></div><div class="pipe-desc">LEDA (open-label, N=32): mean ppPASI improvement 64% at Week 16; PPPASI75 in 39%. No approved therapy exists for palmoplantar pustulosis; FDA granted Fast Track. A Phase 3 was guided to start enrollment in H2 2026. Small market, clean regulatory logic, real but distant value.</div><div class="pipe-status">Phase 3 starting</div></div>
+        <div class="pipe-row"><div style="display:flex;align-items:center;gap:14px"><span class="pipe-rank">5</span><div><div class="pipe-name">Sonelokimab — psoriasis</div><div class="pipe-desc">Phase 2b complete (2021)</div></div></div><div class="pipe-desc">The molecule’s original proof (Lancet 2021: IGA 0/1 up to 88.2% at Week 12, numerically above the secukinumab control arm in a study not powered for that comparison). No active psoriasis program — the field is crowded with superior commercial assets; treat as platform validation history, not pipeline value.</div><div class="pipe-status dead">Dormant · no value assigned</div></div>
+      </div>
+      <p class="source-note"><span class="ev interp">INTERPRETATION</span> Value ranking, not a company statement. Program status: Q2 2026 10-Q and releases cited in Sources; registries: <a href="https://clinicaltrials.gov/study/NCT07007637" target="_blank" rel="noopener">VELA-OLE (NCT07007637)</a> · <a href="https://clinicaltrials.gov/study/NCT07223138" target="_blank" rel="noopener">PsA long-term extension (NCT07223138)</a>.</p>
+    </section>
+
+    <section id="catalysts">
+      <div class="section-head"><div class="section-num">09 / CATALYSTS</div><div><h2>The sequence that resolves the story, in order</h2><p class="lede">Catalysts are tagged by date quality: <span class="date-tag hard">HARD</span> confirmed date · <span class="date-tag guidance">GUIDANCE</span> company-guided window · <span class="date-tag inferred">INFERRED</span> estimated, not committed · <span class="date-tag gap">GAP</span> no timeline · <span class="date-tag landed">LANDED</span> already occurred. As of October 20, 2026.</p></div></div>
+      <div class="timeline">
+        <div class="event landed"><div class="event-date">SEP 30, 2026<br><span class="date-tag landed">LANDED</span></div><div class="event-body"><b>BLA submitted for HS (adults + adolescents 12+)</b>Filed on the guided date, on the VELA-1 / VELA-2 / MIRA package agreed at the Type B meeting, including VELA-TEEN adolescent data. The single most derisking event since the crash — it converts “will FDA accept this?” into a review timeline.</div></div>
+        <div class="event primary"><div class="event-date">END NOV 2026<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>BLA acceptance, PDUFA allocation, Priority Review decision</b>Company expects the filing letter ~60 days post-submission, including whether Priority Review is granted (requested on best-in-class profile + adolescent data).<br><strong>What “good” looks like:</strong> acceptance without a refuse-to-file, Priority Review granted (PDUFA ~6 months from filing), no advisory committee flagged.<br><strong>Watch for:</strong> any RTF language, a standard-review allocation with an advisory committee, or discipline-review letters signalling label fights over VELA-2.</div></div>
+        <div class="event"><div class="event-date">Q3 2026 (WINDOW CLOSING)<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>IZAR-2 enrollment completion — guided, unconfirmed</b>Guided for Q3 2026 in the August 10 release; no confirmation had been published by October 20. <span class="ev gap">GAP</span> A quiet slip here pushes the TNF-IR readout — and the Hercules Tranche 3 milestone (both IZAR trials hitting primaries, window to Mar 15, 2027) — to the right.</div></div>
+        <div class="event"><div class="event-date">END 2026 / EARLY 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>P-OLARIS interim readout (PsA / axSpA imaging)</b>Biomarker- and imaging-focused Phase 2 data (PET/MRI osteoblast activity is the company’s disease-modification claim in axSpA). Supportive color for the platform; not a value driver unless the effect is dramatic.</div></div>
+        <div class="event primary"><div class="event-date">H1 2027<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>IZAR-1 full unblinded readout — the binary</b>Complete Week 52 dataset: placebo-adjusted ACR50 delta, the without-induction arm, ACR70, enthesitis/dactylitis, radiographic-relevant measures, and unblinded safety.<br><strong>What “good” looks like:</strong> placebo ACR50 in the high-teens to ~20% (ARGO-like), preserving a ≥20-pt delta; candida rates in line with HS; no dropout asymmetry suggesting unblinding bias.<br><strong>Watch for:</strong> placebo ≥28–30% (delta compresses to low-teens), a weak without-induction arm muddying the dose story, or any IBD/SI-B emergence at PsA exposure.</div></div>
+        <div class="event"><div class="event-date">2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>IZAR-2 Week 16 topline (TNF-IR, vs placebo + risankizumab arm)</b>Registry primary completion estimated January 2027; enrollment completion governs. The risankizumab arm makes this the first public benchmark of sonelokimab against the IL-23 class in PsA — upside and exposure in equal measure.</div></div>
+        <div class="event"><div class="event-date">~SEP 2027<br><span class="date-tag inferred">INFERRED</span></div><div class="event-body"><b>HS PDUFA (standard review)</b>Inferred from a September 30, 2026 submission under standard BLA review timing; the allocated date arrives with the November filing letter. Company guides launch Q3/Q4 2027 if approved on standard review, ~one quarter earlier under Priority Review (~mid-2027 decision). Approval quality — label breadth, adolescent inclusion, analysis featured — matters as much as the date.</div></div>
+        <div class="event"><div class="event-date">H2 2026 →<br><span class="date-tag guidance">GUIDANCE</span></div><div class="event-body"><b>PPP Phase 3 enrollment start</b>Fast Track in hand, no approved competitor therapy. A slow or silent start would signal capital rationing toward HS launch and PsA; a brisk start signals management sees a third leg.</div></div>
+      </div>
+      <p class="source-note">Timing: BLA 8-K (Sept 30, 2026) · IZAR-1 / Q2 release (Aug 10, 2026) · VELA Week 52 / Investor Day release (June 21, 2026) · registries NCT06641076 / NCT06641089.</p>
+    </section>
+    <section id="scenarios">
+      <div class="section-head"><div class="section-num">10 / SCENARIOS</div><div><h2>Bear, base, bull—with soft price anchors</h2><p class="lede">Scenario anchors built from this dossier’s own numbers — equity value = enterprise value + net cash, over treasury-method share counts. These are illustrative, not price targets or recommendations. No probability is assigned; the current $10.32 price sits between bear and base, which is itself the market’s probability statement.</p></div></div>
+      <div class="scen-grid">
+        <article class="scen-card bear"><div class="tag">Bear case</div><div class="pt">$4.00–$5.50</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> IZAR-1 unblinding shows a compressed delta (placebo ACR50 ~30%+) and/or the HS review turns hostile — RTF, advisory-committee skepticism on VELA-2, or a narrow VELA-1-only label.</li><li><strong>Math:</strong> equity value $350–475M — i.e., net cash ($437M) ± a small stub for the pipeline — ÷ 86.60M shares (85.11M basic + 1.00M pre-funded warrants + 0.50M unvested RSAs; options out of the money) ≈ $4.04–$5.48. The floor logic is cash, but burn (~$61M/quarter operating cash use at H1 2026 rates) erodes it every quarter the story stalls.</li><li><strong>Why it’s bounded:</strong> a filed BLA with an FDA-agreed evidence package is hard to value at zero; even a failed PsA reveal leaves an approvable HS asset and ~$5.13/share of net cash at the last balance sheet.</li></ul></article>
+        <article class="scen-card base"><div class="tag">Base case</div><div class="pt">$16–$22</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> HS approval on standard timing (PDUFA ~Sep 2027) with a competitive label including adolescents; IZAR-1 full data confirm an ARGO-like ~20-pt ACR50 delta; IZAR-2 reads out on schedule.</li><li><strong>Math:</strong> enterprise value re-rates to $1.0–1.45B (a filed/approved HS asset with Bimzelx-validated category economics, plus a de-risked but pre-approval PsA program) + $437M net cash = $1.44–1.89B equity ÷ 86.60M shares ≈ $16.59–$21.79.</li><li><strong>Why this range:</strong> it prices HS as a real but third-position product and PsA as a probability-weighted second indication — below the $28.50 street average target, which embeds more credit for both.</li></ul></article>
+        <article class="scen-card bull"><div class="tag">Bull case</div><div class="pt">$38–$48</div><div class="soft">Soft · scenario-based</div><ul><li><strong>Trigger:</strong> Priority Review granted; IZAR-1 delta ≥25 pts with a clean risankizumab-context IZAR-2; HS label carries HiSCR75-forward language and adolescents; launch trajectory credibly targets share from Bimzelx on dosing convenience.</li><li><strong>Math:</strong> enterprise value $3.0–3.9B + $437M net cash = $3.44–4.34B equity ÷ ~87.7M shares (treasury method at ~$43: 2.50M options at an assumed $25 blended strike add ~1.05M shares) ≈ $39.21–$49.48; the range is held at $38–$48 for discipline.</li><li><strong>Ceiling discipline:</strong> the street high is $50 (HC Wainwright, raised Aug 13, 2026); the top of this range stays below it. Even the bull case does not restore the ~$4.0B pre-print market value per share, because the share count is now ~32% larger.</li></ul></article>
+      </div>
+      <div class="assump"><b>Shared assumptions (all scenarios):</b> 85,106,685 Class A shares (Aug 1, 2026, Q2 10-Q cover); +1,000,000 pre-funded warrants ($0.0001 exercise, from the June 2026 offering); +497,942 unvested RSAs; 2,503,611 EIP options counted by the treasury method at an <b>assumed blended strike of $25</b> (<span class="ev gap">GAP</span>: the exact options-outstanding weighted-average exercise price sits in the FY2025 10-K award table and was not re-verified for this build; disclosed grant strikes bracket the assumption — $12.16 for H1 2026 grants, $41.33 for H1 2025 grants); net cash $437.0M at June 30, 2026 ($537.0M cash &amp; securities − $100M Hercules principal), held flat across scenarios with burn treated as a bear-case erosion factor rather than forward-dated; Hercules milestone tranches ($400M undrawn) excluded from value — they are debt, not equity value. External anchors, context only (<span class="ev unverified">UNVERIFIED</span>, MarketBeat, early Oct 2026): 14 analysts, consensus “Hold,” average target $28.50, high $50 (HC Wainwright), low $10; BTIG $30; Leerink $29.</div>
+      <p class="source-note">Share count, warrants, awards, cash and debt: <a href="https://www.sec.gov/Archives/edgar/data/1821586/000182158626000010/mnlk-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a>. Consensus: MarketBeat MLTX page (accessed Oct 2026).</p>
+    </section>
+
+    <section id="financials">
+      <div class="section-head"><div class="section-num">11 / FINANCIALS</div><div><h2>Rebuilt balance sheet, real burn, and a lender with milestones</h2><p class="lede">The crash forced two equity raises at depressed prices; the result is a company with ~$537M of liquidity, guided runway to mid-2028, and a $500M debt facility whose remaining tranches unlock on exactly the events in the catalyst list. The cost is in the share count: 64.6M shares at year-end 2025 became 85.1M by August 2026.</p></div></div>
+      <div class="fin-grid">
+        <div><div class="metric-stack"><div class="metric"><b>$537.0M</b><span>Cash, equivalents &amp; short-term securities · Jun 30, 2026</span></div><div class="metric"><b>−$121.8M</b><span>Operating cash used · H1 2026</span></div><div class="metric"><b>$131.5M</b><span>Net loss · H1 2026 (Q2: $61.8M)</span></div><div class="metric"><b>$594.4M</b><span>Accumulated deficit · Jun 30, 2026</span></div></div><div class="runway"><b>Company-guided runway to mid-2028</b><p>Stated in the Q2 2026 10-Q and release. At the H1 2026 burn (~$61M/quarter operating cash), $537M covers ~8–9 quarters before the Hercules tranches — consistent with guidance, with launch-build spend (CMO commitments were $172.1M at Jun 30, 2026) the swing factor. No product revenue has ever been reported.</p></div></div>
+        <article class="paper-card"><h3>Capital structure and overhang</h3><table class="cap-table"><thead><tr><th>Item</th><th>Amount</th></tr></thead><tbody><tr><td>Class A shares outstanding · Aug 1, 2026</td><td>85.11M</td></tr><tr><td>Pre-funded warrants ($0.0001 strike)</td><td>1.00M</td></tr><tr><td>EIP options reserved / outstanding pool</td><td>2.50M</td></tr><tr><td>Unvested RSAs</td><td>0.50M</td></tr><tr><td>All-in diluted (before treasury adj.)</td><td>~89.11M</td></tr><tr><td>Hercules debt drawn (of $500M facility)</td><td>$100M</td></tr><tr><td>Merck KGaA milestones still payable (max)</td><td>€299.6M</td></tr></tbody></table><div class="overhang"><b>~$400M of milestone-gated debt remains</b><p style="font-size:13px;margin:7px 0 0">Hercules tranches unlock on IZAR dual-primary success (T3, by Mar 15, 2027), VELA Week 52 + BLA-filing + $1.5B-market-cap conditions (T4, by Dec 15, 2026 — the market-cap condition was not met at Oct 20 prices), and BLA approval (T5/T6). Facility pricing: greater of prime + 1.45% or 8.45% floor; matures Apr 1, 2030.</p></div></article>
+      </div>
+      <div class="valuation-bridge">
+        <div><span>Equity value</span><b>$878M</b><small>$10.32 × 85.11M · Oct 20, 2026</small></div><i>−</i><div><span>Net cash (Jun 30)</span><b>$437.0M</b><small>$537.0M liquidity − $100M debt</small></div><i>=</i><div class="bridge-result"><span>Approx. enterprise value</span><b>~$441M</b><small><span class="ev interp">INTERPRETATION</span> · before post-June burn</small></div>
+      </div>
+      <div class="readthrough"><strong>The dilution ledger.</strong> <span class="ev fact">FACT</span> December 31, 2025: 64.64M shares. A ~$75M gross equity raise closed around the February 2026 Hercules amendment; the June 2026 offering added 9.0M shares at $20.00 plus 1.0M pre-funded warrants ($189.8M net); ATM issuance continued in H1 2026. August 1, 2026: 85.11M. Every pre-crash holder was diluted ~24% through the rebuild — the honest denominator for any “back to $62” framing.</div>
+      <div class="readthrough"><strong>Encumbrances on future product economics.</strong> <span class="ev fact">FACT</span> Sonelokimab is in-licensed from Merck Healthcare KGaA: up to €299.6M (~$342M) of further milestones (filing acceptance, first commercial sale, sales tiers) plus combined royalties in the low-to-mid-teen percent of net sales across the Merck and RCT (Pichia manufacturing) agreements. €7.5M of milestones had been paid by June 30, 2026. This stack compresses launch margins and any takeout math — it is the quiet second lien on the bull case.</div>
+      <p class="source-note">Financials, facility and license terms: <a href="https://www.sec.gov/Archives/edgar/data/1821586/000182158626000010/mnlk-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q</a> (filed Aug 10, 2026) · FY2025 10-K (filed Feb 25, 2026).</p>
+    </section>
+
+    <section id="management">
+      <div class="section-head"><div class="section-num">12 / PEOPLE</div><div><h2>Founders still running it; the register is institutional</h2><p class="lede">MoonLake was founded in 2021 around this single licensed asset, and both founders remain in the top scientific and executive seats. The signal set is mixed: the anchor holder added via the June financing structure, while the CSO sold a small slice into the $20 offering window.</p></div></div>
+      <div class="people-grid">
+        <article class="paper-card"><h3>Leadership</h3><dl class="people-list"><dt>Jorge Santos da Silva, Ph.D.</dt><dd>Founder &amp; CEO. Built the company around the 2021 Merck KGaA in-license of M1095/sonelokimab.</dd><dt>Kristian Reich, M.D., Ph.D.</dt><dd>Founder &amp; CSO. Dermatology trialist; senior author across the sonelokimab literature (Lancet 2021; MIRA; ARGO).</dd><dt>Matthias Bodenstedt</dt><dd>CFO; presented the Week 52 data and commercialization plan at the June 22, 2026 Investor Day.</dd></dl></article>
+        <article class="paper-card"><h3>Ownership concentration</h3><dl class="people-list"><dt>BVF Partners</dt><dd>~15.94M shares (~18.7% of Aug 1 count) across affiliated funds per its June 22, 2026 Form 4; director-by-deputization status; acquired a further 22,195-share derivative position June 17, 2026.</dd><dt>Other institutions</dt><dd>Deep Track (~7.0M), D.E. Shaw (~3.4M), Cormorant (~3.2M) per 13F/13G aggregators — secondary tier, dated snapshots.</dd><dt>Insiders</dt><dd>Reich holds 2,711,198 shares after his July 2026 sales (Form 4).</dd></dl></article>
+        <article class="paper-card"><h3>Insider read</h3><ul class="check-list"><li><span class="ev fact">FACT</span> Reich sold 53,548 shares at ~$20.00–$20.02 on July 21–27, 2026 (Form 4 codes S) — into post-Week-52 strength at the offering price; ~2% of his holding. A mild negative, not an exit.</li><li>No open-market purchases by officers or directors were identified in 2026 Form 4s reviewed. <span class="ev gap">GAP</span> Review was targeted, not exhaustive.</li><li>Q1 2026 included a voluntary cancellation of unvested options for no consideration ($4.8M accelerated expense in Q1 G&A) — unusual housekeeping worth a question on the next call, directionally retention-related per the filing’s framing.</li><li>The June 2026 raise was placed with crossover/institutional demand at $20.00 — 2× the October price; those holders are underwater, which cuts both ways for follow-on support.</li></ul></article>
+      </div>
+      <p class="source-note">Primary sources: Form 4s (Reich, Jul 23 &amp; 29, 2026; BVF Partners, Jun 22, 2026) via <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001821586&amp;type=4&amp;dateb=&amp;owner=include&amp;count=40" target="_blank" rel="noopener">EDGAR</a> · Q2 2026 10-Q (G&amp;A note).</p>
+    </section>
+
+    <section id="risks">
+      <div class="section-head"><div class="section-num">13 / RISKS</div><div><h2>Ranked red flags</h2><p class="lede">Ranked by capacity to destroy value on a near-term timeline, not by probability alone. The first three are the dossier’s core: the review record, the blinded placebo, and the replication trial.</p></div></div>
+      <ol class="risk-list">
+        <li><b>VELA-2’s miss lives in the review</b><span>The composite primary failure (p=0.053) is a permanent part of the BLA. FDA agreed the package can establish effectiveness — it did not agree the label will feature HiSCR75, both trials, or adolescents. Label negotiation is where the miss collects its toll.</span></li>
+        <li><b>The blinded placebo is a true unknown</b><span>IZAR-1’s value rests on a comparison nobody outside the blinded team has seen. ARGO anchors placebo ACR50 at 20.0%; a print near 30% halves the delta and reprices PsA from “second franchise” to “me-too.”</span></li>
+        <li><b>IZAR-2 is the harder room</b><span>TNF-refractory patients, two dose regimens, and a risankizumab arm that invites direct comparison with the IL-23 benchmark. Enrollment completion was guided for Q3 2026 and is unconfirmed — slippage compounds the risk.</span></li>
+        <li><b>Bimzelx has a two-year head start and UCB’s balance sheet</b><span>€1.53B H1 2026 sales across indications, ≥€7B peak ambition, 3-year HS data already presented. MoonLake must build a salesforce and payer access from zero against that machine.</span></li>
+        <li><b>An oral is coming</b><span>Povorcitinib hit both STOP-HS primaries with deepening 54-week responses (HiSCR75 up to 57%). A daily pill with JAK baggage still beats injections for a large patient segment — and it may reach market on a similar timeline.</span></li>
+        <li><b>Class safety scales with success</b><span>Candidiasis at 7.3% is priced in. What is not testable yet: IBD emergence in unscreened real-world use, and the SI/B scrutiny the class carries from bimekizumab’s label history — at millions of patient-years, not 838 trial patients.</span></li>
+        <li><b>Single-asset, single-mechanism concentration</b><span>Every program is sonelokimab; every indication shares the IL-17A/F safety and CMC chain (one yeast-expression platform, $172.1M of CMO commitments at Jun 30, 2026).</span></li>
+        <li><b>Burn and dilution are structural</b><span>~$61M/quarter operating cash use; share count +32% in seven months; a launch to fund in 2027. Runway to mid-2028 is guided, but a launch-year raise at weak prices is a base-case feature, not a tail.</span></li>
+        <li><b>Royalty and milestone stack</b><span>Low-to-mid-teen percent of net sales to Merck KGaA / RCT plus up to €299.6M of milestones. Permanently compresses margins and takeout value relative to wholly-owned peers.</span></li>
+        <li><b>Insider and governance optics</b><span>CSO sold at $20 into the offering window; no insider buying identified in 2026; Q1 2026’s voluntary option cancellations ($4.8M accelerated expense) are unexplained beyond the filing. None is disqualifying; together they argue against paying for alignment.</span></li>
+      </ol>
+    </section>
+
+    <section id="open">
+      <div class="section-head"><div class="section-num">14 / OPEN</div><div><h2>The evidence that would change the view</h2><p class="lede">A deep dive should end with falsifiers, not a verdict. These are the highest-value missing pieces as of October 20, 2026.</p></div></div>
+      <div class="open-grid">
+        <article><span>01</span><h3>IZAR-1 placebo arm</h3><p>The ACR50/ACR20 placebo rates, the without-induction arm, and unblinded safety. The single number — placebo ACR50 — sorts the PsA thesis into franchise or commodity.</p></article>
+        <article><span>02</span><h3>The November filing letter</h3><p>Acceptance vs refuse-to-file; Priority Review granted or denied; advisory committee or not; the allocated PDUFA date. Four facts, each independently price-moving.</p></article>
+        <article><span>03</span><h3>IZAR-2 proof of enrollment</h3><p>Confirmation that enrollment completed (guided Q3 2026), then the Week 16 readout with the risankizumab arm disclosed. Silence into early 2027 is itself information.</p></article>
+        <article><span>04</span><h3>Label drafts at approval</h3><p>Whether HiSCR75 data, adolescent patients, and treatment-policy analyses make the label — the commercial translation of the VELA-2 fight.</p></article>
+        <article><span>05</span><h3>Full S-OLARIS dataset</h3><p>N, placebo control, and the complete ASAS/ASDAS/MRI results behind the “80+%” topline — needed before axSpA carries any value in a model.</p></article>
+        <article><span>06</span><h3>Exact dilution accounting</h3><p>The FY2025 10-K options table (outstanding count and WAEP) to replace this dossier’s assumed $25 blended strike, plus Q3 2026 cash and any post-June ATM usage.</p></article>
+      </div>
+      <div class="verdict-box"><div><span class="ev interp">INTERPRETATION</span><h3>Current research posture</h3></div><p>At ~$441M of enterprise value, the market is paying for the HS filing as if VELA-2’s p=0.053 were still the live question. It isn’t: FDA answered that question in January, and the BLA is in. The live question is one nobody can currently answer — what IZAR-1’s placebo arm did — plus the ordinary execution risk of a first launch against UCB. The setup is asymmetric in a specific way: the downside is cushioned by $5.13/share of net cash and an approvable lead asset, while the upside requires the blinded data to be as good as the unblinded half suggests. That is a coherent reason the stock is cheap. It is not proof that it is mispriced.</p></div>
+    </section>
+
+    <section id="sources">
+      <div class="section-head"><div class="section-num">15 / SOURCES</div><div><h2>Sourcebook</h2><p class="lede">Filings, registries, and peer-reviewed literature carry the most weight. Company claims remain labeled unverified until corroborated.</p></div></div>
+      <div class="sources">
+        <article class="source-group"><h3>SEC filings</h3>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000182158626000010/mnlk-20260630.htm" target="_blank" rel="noopener">Q2 2026 10-Q<small>SEC EDGAR · filed Aug 10, 2026 · CIK 0001821586</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026105240/ea0307097-8k_moonlake.htm" target="_blank" rel="noopener">8-K — BLA submission (Item 8.01)<small>SEC EDGAR · Sept 30, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026086939/ea030119101ex99-1.htm" target="_blank" rel="noopener">8-K Ex-99.1 — IZAR-1 topline + Q2 2026 results<small>SEC EDGAR · Aug 10, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026070362/ea029539901ex99-1.htm" target="_blank" rel="noopener">8-K Ex-99.1 — VELA Week 52 results<small>SEC EDGAR · June 21, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026018967/ea027791001ex99-1_moonlake.htm" target="_blank" rel="noopener">8-K Ex-99.1 — S-OLARIS topline + FY2025 results<small>SEC EDGAR · Feb 22, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390026002344/ea027225201ex99-1_moonlake.htm" target="_blank" rel="noopener">8-K Ex-99.1 — FDA Type B outcome (HS BLA path)<small>SEC EDGAR · Jan 8, 2026</small></a>
+          <a href="https://www.sec.gov/Archives/edgar/data/1821586/000121390025092614/ea025912901ex99-1_moonlake.htm" target="_blank" rel="noopener">8-K Ex-99.1 — VELA Week 16 topline<small>SEC EDGAR · Sept 28, 2025</small></a>
+          <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&amp;CIK=0001821586&amp;type=4&amp;dateb=&amp;owner=include&amp;count=40" target="_blank" rel="noopener">Form 4 index — Reich (Jul 2026) · BVF Partners (Jun 2026)<small>SEC EDGAR ownership filings</small></a>
+        </article>
+        <article class="source-group"><h3>Registries</h3>
+          <a href="https://clinicaltrials.gov/study/NCT06411379" target="_blank" rel="noopener">VELA-1<small>ClinicalTrials.gov · NCT06411379 · M1095-HS-302</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06411899" target="_blank" rel="noopener">VELA-2<small>ClinicalTrials.gov · NCT06411899 · M1095-HS-301</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05322473" target="_blank" rel="noopener">MIRA (Phase 2 HS)<small>ClinicalTrials.gov · NCT05322473 · M1095-HS-201</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06641076" target="_blank" rel="noopener">IZAR-1 (PsA, biologic-naïve)<small>ClinicalTrials.gov · NCT06641076 · M1095-PSA-301</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06641089" target="_blank" rel="noopener">IZAR-2 (PsA, TNF-IR)<small>ClinicalTrials.gov · NCT06641089 · M1095-PSA-302</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT05640245" target="_blank" rel="noopener">ARGO (Phase 2 PsA)<small>ClinicalTrials.gov · NCT05640245 · M1095-PSA-201</small></a>
+          <a href="https://clinicaltrials.gov/study/NCT06768671" target="_blank" rel="noopener">VELA-TEEN (adolescent HS)<small>ClinicalTrials.gov · NCT06768671 · M1095-HS-304</small></a>
+        </article>
+        <article class="source-group"><h3>Peer-reviewed literature</h3>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/42822776/" target="_blank" rel="noopener">Kimball et al., J Am Acad Dermatol 2026<small>MIRA Phase 2 HS trial (PMID 42822776)</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/41053449/" target="_blank" rel="noopener">McInnes et al., Nat Med 2025<small>ARGO Phase 2 PsA trial (PMID 41053449)</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/33894834/" target="_blank" rel="noopener">Papp et al., Lancet 2021<small>Sonelokimab psoriasis Phase 2b (PMID 33894834)</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/38795716/" target="_blank" rel="noopener">Kimball et al., Lancet 2024<small>Bimekizumab BE HEARD I/II (PMID 38795716)</small></a>
+          <a href="https://pubmed.ncbi.nlm.nih.gov/40601333/" target="_blank" rel="noopener">JAMA Dermatol 2025<small>Living systematic review &amp; network meta-analysis of HS interventions (PMID 40601333)</small></a>
+          <p class="source-note">Secukinumab SUNSHINE/SUNRISE Week 16 response rates are taken from the FDA-approved Cosentyx USPI, Table 15 (HS Trial 1 / HS Trial 2), via DailyMed. Bimekizumab PsA context (BE OPTIMAL) and risankizumab PsA context (KEEPsAKE-1) from the published Phase 3 reports.</p>
+        </article>
+        <article class="source-group"><h3>Company, market &amp; trade · unverified tier</h3>
+          <a href="https://www.ucb.com/investors" target="_blank" rel="noopener">UCB H1 2026 results<small>Bimzelx net sales €1,528M; peak ambition ≥€7B · July 2026</small></a>
+          <a href="https://www.marketbeat.com/stocks/NASDAQ/MLTX/" target="_blank" rel="noopener">Analyst consensus — MLTX<small>MarketBeat · 14 analysts · avg $28.50 · high $50 (HC Wainwright) · early Oct 2026</small></a>
+          <a href="https://www.hcplive.com/view/stop-hs-povorcitinib-durable-response-hs-week-54" target="_blank" rel="noopener">Povorcitinib STOP-HS 54-week data<small>HCPLive / AAD 2026 · March 2026</small></a>
+          <a href="https://www.dermatologyadvisor.com/news/sonelokimab-receives-fda-fast-track-status-for-palmoplantar-pustulosis/" target="_blank" rel="noopener">LEDA results + PPP Fast Track<small>Dermatology Advisor · 2026</small></a>
+          <p class="source-note">Price series: Yahoo Finance daily closes for MLTX, Sep 4, 2025 – Oct 20, 2026 (unadjusted), fetched Oct 20, 2026. Filing facts (share counts, cash, debt, license) are from the SEC documents above, not from aggregators.</p>
+        </article>
+      </div>
+      <div class="method"><strong>Method.</strong> Built as of October 20, 2026. Filings used: FY2025 10-K, Q2 2026 10-Q, 8-Ks and exhibits listed above, Form 4s. Trial data are from the cited releases and registries; peer-reviewed anchors are the MIRA, ARGO, psoriasis Phase 2b, and BE HEARD publications. Evidence labels distinguish primary/peer-reviewed fact, interpretation, gap, and unverified company or secondary claims. Cross-trial comparisons are not head-to-head. Scenario anchors in section 10 are soft and illustrative; no probability estimate or recommendation is included. Program-naming note: an upstream research scan assigned the IZAR name to the HS program; the primary record is unambiguous — IZAR-1/IZAR-2 are the PsA trials, VELA-1/VELA-2 are the HS trials, MIRA is the HS Phase 2, and ARGO is the PsA Phase 2 — and this dossier follows the primary record.</div>
+    </section>
+  </main>
+
+  <footer><strong>MLTX deep-dive dossier</strong> · Built October 20, 2026 · Evidence first; open questions explicit; market data is a fixed snapshot.</footer>
+
+  <button class="totop" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+  <script>
+    const prices=[["2025-09-04",59.72],["2025-09-05",59.44],["2025-09-08",61.12],["2025-09-09",57.0],["2025-09-10",54.2],["2025-09-11",54.3],["2025-09-12",52.62],["2025-09-15",53.27],["2025-09-16",53.26],["2025-09-17",51.18],["2025-09-18",54.16],["2025-09-19",53.78],["2025-09-22",54.98],["2025-09-23",52.54],["2025-09-24",53.94],["2025-09-25",56.38],["2025-09-26",61.99],["2025-09-29",6.24],["2025-09-30",7.17],["2025-10-01",7.06],["2025-10-02",7.46],["2025-10-03",8.43],["2025-10-06",8.66],["2025-10-07",9.28],["2025-10-08",9.1],["2025-10-09",9.38],["2025-10-10",10.26],["2025-10-13",10.66],["2025-10-14",10.14],["2025-10-15",9.89],["2025-10-16",9.38],["2025-10-17",9.12],["2025-10-20",9.35],["2025-10-21",9.16],["2025-10-22",9.6],["2025-10-23",9.46],["2025-10-24",9.52],["2025-10-27",10.07],["2025-10-28",9.82],["2025-10-29",9.61],["2025-10-30",9.81],["2025-10-31",10.1],["2025-11-03",10.2],["2025-11-04",10.13],["2025-11-05",10.59],["2025-11-06",10.29],["2025-11-07",10.63],["2025-11-10",10.82],["2025-11-11",11.75],["2025-11-12",12.77],["2025-11-13",12.56],["2025-11-14",12.77],["2025-11-17",12.99],["2025-11-18",13.4],["2025-11-19",13.54],["2025-11-20",13.0],["2025-11-21",12.67],["2025-11-24",13.15],["2025-11-25",13.61],["2025-11-26",13.8],["2025-11-28",13.73],["2025-12-01",13.25],["2025-12-02",12.52],["2025-12-03",13.35],["2025-12-04",14.99],["2025-12-05",14.9],["2025-12-08",15.07],["2025-12-09",14.55],["2025-12-10",14.61],["2025-12-11",14.07],["2025-12-12",14.79],["2025-12-15",14.32],["2025-12-16",15.34],["2025-12-17",13.95],["2025-12-18",13.26],["2025-12-19",13.39],["2025-12-22",13.49],["2025-12-23",13.74],["2025-12-24",13.87],["2025-12-26",13.83],["2025-12-29",13.69],["2025-12-30",13.21],["2025-12-31",13.18],["2026-01-02",11.95],["2026-01-05",11.19],["2026-01-06",11.17],["2026-01-07",11.29],["2026-01-08",14.34],["2026-01-09",18.49],["2026-01-12",18.09],["2026-01-13",17.1],["2026-01-14",17.41],["2026-01-15",16.35],["2026-01-16",16.76],["2026-01-20",16.33],["2026-01-21",16.71],["2026-01-22",15.62],["2026-01-23",15.86],["2026-01-26",15.91],["2026-01-27",16.25],["2026-01-28",16.25],["2026-01-29",16.21],["2026-01-30",15.67],["2026-02-02",15.79],["2026-02-03",15.37],["2026-02-04",15.03],["2026-02-05",14.77],["2026-02-06",15.51],["2026-02-09",15.75],["2026-02-10",15.62],["2026-02-11",15.79],["2026-02-12",15.61],["2026-02-13",15.77],["2026-02-17",17.52],["2026-02-18",18.45],["2026-02-19",18.17],["2026-02-20",18.77],["2026-02-23",18.68],["2026-02-24",18.2],["2026-02-25",18.22],["2026-02-26",17.68],["2026-02-27",17.51],["2026-03-02",17.68],["2026-03-03",17.69],["2026-03-04",18.14],["2026-03-05",18.02],["2026-03-06",18.15],["2026-03-09",18.32],["2026-03-10",18.34],["2026-03-11",17.84],["2026-03-12",17.03],["2026-03-13",17.13],["2026-03-16",16.73],["2026-03-17",16.77],["2026-03-18",16.23],["2026-03-19",16.68],["2026-03-20",16.27],["2026-03-23",16.87],["2026-03-24",16.71],["2026-03-25",18.02],["2026-03-26",17.75],["2026-03-27",17.32],["2026-03-30",16.93],["2026-03-31",18.64],["2026-04-01",16.52],["2026-04-02",17.36],["2026-04-06",16.98],["2026-04-07",17.08],["2026-04-08",18.6],["2026-04-09",19.41],["2026-04-10",17.96],["2026-04-13",18.43],["2026-04-14",18.78],["2026-04-15",18.02],["2026-04-16",17.79],["2026-04-17",18.34],["2026-04-20",17.89],["2026-04-21",17.22],["2026-04-22",17.22],["2026-04-23",16.93],["2026-04-24",17.18],["2026-04-27",16.85],["2026-04-28",16.66],["2026-04-29",16.11],["2026-04-30",16.38],["2026-05-01",16.73],["2026-05-04",17.56],["2026-05-05",17.01],["2026-05-06",17.7],["2026-05-07",17.2],["2026-05-08",17.06],["2026-05-11",18.84],["2026-05-12",18.19],["2026-05-13",18.41],["2026-05-14",18.39],["2026-05-15",17.55],["2026-05-18",16.44],["2026-05-19",16.37],["2026-05-20",17.05],["2026-05-21",18.47],["2026-05-22",18.19],["2026-05-26",18.23],["2026-05-27",18.41],["2026-05-28",18.68],["2026-05-29",19.18],["2026-06-01",18.82],["2026-06-02",17.87],["2026-06-03",18.27],["2026-06-04",18.72],["2026-06-05",17.9],["2026-06-08",18.0],["2026-06-09",17.8],["2026-06-10",17.49],["2026-06-11",17.75],["2026-06-12",18.69],["2026-06-15",19.19],["2026-06-16",18.98],["2026-06-17",19.19],["2026-06-18",19.21],["2026-06-22",22.16],["2026-06-23",21.22],["2026-06-24",20.0],["2026-06-25",19.99],["2026-06-26",19.9],["2026-06-29",19.91],["2026-06-30",19.47],["2026-07-01",19.13],["2026-07-02",18.95],["2026-07-06",18.88],["2026-07-07",19.15],["2026-07-08",19.07],["2026-07-09",19.93],["2026-07-10",20.36],["2026-07-13",20.41],["2026-07-14",19.52],["2026-07-15",19.96],["2026-07-16",19.01],["2026-07-17",19.68],["2026-07-20",19.05],["2026-07-21",20.06],["2026-07-22",18.94],["2026-07-23",19.36],["2026-07-24",19.02],["2026-07-27",19.88],["2026-07-28",18.71],["2026-07-29",18.38],["2026-07-30",18.99],["2026-07-31",18.44],["2026-08-03",17.4],["2026-08-04",17.93],["2026-08-05",17.55],["2026-08-06",18.03],["2026-08-07",18.26],["2026-08-10",17.33],["2026-08-11",16.59],["2026-08-12",17.23],["2026-08-13",16.5],["2026-08-14",16.47],["2026-08-17",16.35],["2026-08-18",16.34],["2026-08-19",16.74],["2026-08-20",15.87],["2026-08-21",15.76],["2026-08-24",15.37],["2026-08-25",15.56],["2026-08-26",15.62],["2026-08-27",15.53],["2026-08-28",14.99],["2026-08-31",15.05],["2026-09-01",15.13],["2026-09-02",15.06],["2026-09-03",15.19],["2026-09-04",15.01],["2026-09-08",14.94],["2026-09-09",13.72],["2026-09-10",13.18],["2026-09-11",12.51],["2026-09-14",12.68],["2026-09-15",12.2],["2026-09-16",12.46],["2026-09-17",12.35],["2026-09-18",12.39],["2026-09-21",12.55],["2026-09-22",13.38],["2026-09-23",12.9],["2026-09-24",12.12],["2026-09-25",12.04],["2026-09-28",11.56],["2026-09-29",11.45],["2026-09-30",11.7],["2026-10-01",11.47],["2026-10-02",11.41],["2026-10-05",11.38],["2026-10-06",10.95],["2026-10-07",10.77],["2026-10-08",10.58],["2026-10-09",10.82],["2026-10-12",10.68],["2026-10-13",10.41],["2026-10-14",10.14],["2026-10-15",10.26],["2026-10-16",9.55],["2026-10-19",9.75],["2026-10-20",10.32]];
+
+    const svg=document.getElementById('priceChart'), shell=document.getElementById('chartShell'), tip=document.getElementById('chartTip');
+    let range=300, visible=[];
+    const NS='http://www.w3.org/2000/svg';
+    function el(name,attrs){attrs=attrs||{};const n=document.createElementNS(NS,name);for(const k of Object.keys(attrs))n.setAttribute(k,attrs[k]);return n}
+    function money(v){return '$'+v.toFixed(2)}
+    function prettyDate(s){return new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}
+    function themeVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+    function render(){
+      visible=prices.slice(-range); svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(function(n){n.remove()});
+      const W=1000,H=330,L=62,R=20,T=20,B=42; const vals=visible.map(function(d){return d[1]}); const min=Math.min.apply(null,vals),max=Math.max.apply(null,vals); const pad=(max-min)*.12||1; const lo=Math.max(0,min-pad),hi=max+pad;
+      const lineC=themeVar('--chart-line'), areaC=themeVar('--chart-area'), gridC=themeVar('--chart-grid'), textC=themeVar('--chart-text');
+      const x=function(i){return L+i*(W-L-R)/(visible.length-1)}, y=function(v){return T+(hi-v)*(H-T-B)/(hi-lo)};
+      const grid=el('g');
+      for(let i=0;i<5;i++){const val=lo+(hi-lo)*(4-i)/4, yy=T+i*(H-T-B)/4;grid.append(el('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:gridC,'stroke-width':'1'}));const tx=el('text',{x:L-10,y:yy+4,'text-anchor':'end',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent='$'+val.toFixed(2);grid.append(tx)}
+      const ticks=[0,Math.floor((visible.length-1)/2),visible.length-1];ticks.forEach(function(i){const tx=el('text',{x:x(i),y:H-13,'text-anchor':i===0?'start':i===visible.length-1?'end':'middle',fill:textC,'font-size':'12','font-family':'Arial, sans-serif'});tx.textContent=new Date(visible[i][0]+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',year:'2-digit',timeZone:'UTC'});grid.append(tx)});svg.append(grid);
+      let d='';visible.forEach(function(p,i){d+=(i?'L':'M')+x(i).toFixed(2)+','+y(p[1]).toFixed(2)});const area=el('path',{d:d+'L'+x(visible.length-1)+','+(H-B)+'L'+x(0)+','+(H-B)+'Z',fill:areaC,opacity:'.75'});svg.append(area);svg.append(el('path',{d:d,fill:'none',stroke:lineC,'stroke-width':'3','vector-effect':'non-scaling-stroke','stroke-linejoin':'round'}));
+      const hover=el('g',{opacity:'0'});const vline=el('line',{y1:T,y2:H-B,stroke:'#d85f2a','stroke-width':'1.5','stroke-dasharray':'4 4','vector-effect':'non-scaling-stroke'}),dot=el('circle',{r:'6',fill:'#fff',stroke:'#d85f2a','stroke-width':'3','vector-effect':'non-scaling-stroke'});hover.append(vline,dot);svg.append(hover);
+      const hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent',tabindex:'0','aria-label':'Explore chart values'});svg.append(hit);
+      function show(evt){const rect=shell.getBoundingClientRect(), px=Math.max(0,Math.min(rect.width,(evt.clientX||rect.left)-rect.left));const plotLeft=L/W*rect.width,plotRight=(W-R)/W*rect.width;const frac=Math.max(0,Math.min(1,(px-plotLeft)/(plotRight-plotLeft)));const i=Math.round(frac*(visible.length-1)),p=visible[i],xx=x(i),yy=y(p[1]);hover.setAttribute('opacity','1');vline.setAttribute('x1',xx);vline.setAttribute('x2',xx);dot.setAttribute('cx',xx);dot.setAttribute('cy',yy);tip.style.display='block';tip.style.left=(xx/W*rect.width)+'px';tip.style.top=(yy/H*rect.height)+'px';tip.textContent=prettyDate(p[0])+' · '+money(p[1])}
+      hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',function(){hover.setAttribute('opacity','0');tip.style.display='none'});
+      const ret=(visible[visible.length-1][1]/visible[0][1]-1)*100;document.getElementById('rangeReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';document.getElementById('rangeLow').textContent=money(min);document.getElementById('rangeHigh').textContent=money(max);
+    }
+    document.querySelectorAll('.range button').forEach(function(b){b.addEventListener('click',function(){range=Number(b.dataset.range);document.querySelectorAll('.range button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render()})});
+    render();
+
+    /* Theme toggle */
+    const themeBtn=document.getElementById('themeToggle');
+    function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeBtn.textContent='Theme';themeBtn.setAttribute('aria-pressed',t==='dark'?'true':'false');try{localStorage.setItem('biotech-theme',t)}catch(e){}render()}
+    let startTheme='light';
+    try{startTheme=localStorage.getItem('biotech-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)startTheme='dark'}
+    applyTheme(startTheme);
+    themeBtn.addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+    /* Collapsible sections */
+    document.querySelectorAll('main > section').forEach(function(sec){
+      const head=sec.querySelector('.section-head'); if(!head)return;
+      const body=document.createElement('div'); body.className='section-body';
+      let n=head.nextSibling; while(n){const nx=n.nextSibling; body.appendChild(n); n=nx}
+      sec.appendChild(body);
+      const btn=document.createElement('button'); btn.className='collapse-btn'; btn.type='button';
+      btn.setAttribute('aria-expanded','true'); btn.setAttribute('aria-label','Collapse section'); btn.textContent='−';
+      btn.addEventListener('click',function(){
+        const c=sec.classList.toggle('collapsed');
+        btn.textContent=c?'+':'−'; btn.setAttribute('aria-expanded',c?'false':'true');
+        btn.setAttribute('aria-label',c?'Expand section':'Collapse section');
+      });
+      head.appendChild(btn);
+    });
+
+    /* Back to top */
+    const toTop=document.getElementById('toTop');
+    function onScroll(){if(window.scrollY>600){toTop.classList.add('show')}else{toTop.classList.remove('show')}}
+    window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+    toTop.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>
